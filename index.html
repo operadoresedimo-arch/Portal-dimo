@@ -327,6 +327,62 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
   .tp-ac,.trow .ac{width:62px}
   .tp-rank,.trow .rk{width:26px}
 }
+
+/* META BARS */
+.meta-bar-wrap{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.meta-bar-bg{flex:1;height:8px;background:#102b4d;border-radius:8px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.3);min-width:60px}
+.meta-bar-fill{height:100%;border-radius:8px;transition:width .8s ease}
+.meta-pct{font-size:.65rem;font-weight:700;min-width:36px;text-align:right;white-space:nowrap}
+.meta-info{font-size:.55rem;color:var(--text3);white-space:nowrap}
+.meta-star{font-size:.9rem;animation:starPulse 1.5s ease-in-out infinite}
+@keyframes starPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.eq-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.55rem;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.eq-novatos{background:rgba(6,182,212,.12);color:#25c9ff;border:1px solid rgba(6,182,212,.25)}
+.eq-10-14{background:rgba(59,130,246,.12);color:#68c2ff;border:1px solid rgba(59,130,246,.25)}
+.eq-14-18{background:rgba(139,92,246,.12);color:#a96cff;border:1px solid rgba(139,92,246,.25)}
+.eq-18-20{background:rgba(245,158,11,.12);color:#f5b91f;border:1px solid rgba(245,158,11,.25)}
+.eq-20mais{background:rgba(34,228,119,.12);color:#22e477;border:1px solid rgba(34,228,119,.25)}
+.eq-other{background:rgba(100,116,139,.12);color:#91a9c7;border:1px solid rgba(100,116,139,.25)}
+.comp-table .meta-col{min-width:140px}.comp-table .eq-col{min-width:80px}
+.comp-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px;padding:0 16px}
+.comp-stat{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:18px;text-align:center}
+.comp-stat .cs-val{font-size:1.6rem;font-weight:900;margin-bottom:2px}
+.comp-stat .cs-lbl{font-size:.55rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.collab-hero{text-align:center;padding:20px 0 10px}
+.collab-name{font-size:2rem;font-weight:900;color:var(--text);margin-bottom:4px}
+.collab-equipe{margin-top:8px}
+.collab-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:700px;margin:24px auto}
+.collab-cards.three-cols{grid-template-columns:1fr 1fr 1fr}
+.collab-card{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:16px;padding:24px 20px;text-align:center;position:relative;overflow:hidden}
+.collab-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.collab-card.card-old::before{background:linear-gradient(90deg,#3d5575,#506987)}
+.collab-card.card-prev::before{background:linear-gradient(90deg,#506987,#91a9c7)}
+.collab-card.card-curr::before{background:linear-gradient(90deg,var(--blue),var(--blue3))}
+.cc-period{font-size:.55rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
+.cc-row{display:flex;justify-content:center;gap:28px;margin-bottom:8px}
+.cc-item{text-align:center}.cc-val{font-size:1.5rem;font-weight:900;line-height:1.2}
+.cc-lbl{font-size:.55rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-top:2px}
+.collab-diff{max-width:700px;margin:20px auto;background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:16px;padding:24px;text-align:center}
+.diff-title{font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:16px}
+.diff-grid{display:flex;justify-content:center;gap:40px;margin-bottom:16px}
+.diff-item{text-align:center}
+.diff-arrow{font-size:2rem;font-weight:900;line-height:1}
+.diff-arrow.up{color:#22e477}.diff-arrow.down{color:#f87171}.diff-arrow.same{color:var(--text3)}
+.diff-label{font-size:.7rem;font-weight:700;margin-top:2px}
+.diff-label.up{color:#22e477}.diff-label.down{color:#f87171}.diff-label.same{color:var(--text3)}
+.diff-verdict{font-size:1rem;font-weight:800;padding:12px 24px;border-radius:12px;display:inline-block;margin-top:8px}
+.diff-verdict.better{background:rgba(34,228,119,.1);border:1px solid rgba(34,228,119,.25);color:#22e477}
+.diff-verdict.worse{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:#f87171}
+.diff-verdict.equal{background:rgba(100,116,139,.1);border:1px solid rgba(100,116,139,.25);color:var(--text2)}
+.diff-verdict.newop{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.25);color:var(--blue3)}
+.collab-meta{max-width:700px;margin:20px auto;background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:16px;padding:24px}
+.collab-meta h4{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;text-align:center}
+.cm-bar-bg{height:18px;background:#102b4d;border-radius:10px;overflow:hidden;position:relative;box-shadow:inset 0 1px 3px rgba(0,0,0,.3)}
+.cm-bar-fill{height:100%;border-radius:10px;transition:width 1.2s ease}
+.cm-bar-pct{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:.65rem;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.cm-detail{display:flex;justify-content:space-between;font-size:.68rem;color:var(--text2);margin-top:8px}
+.cm-remaining{text-align:center;margin-top:14px;font-size:.9rem;font-weight:800}
+@media(max-width:650px){.collab-cards,.collab-cards.three-cols{grid-template-columns:1fr}.cc-val{font-size:1.3rem}}
 </style>
 
 </head>
@@ -354,10 +410,11 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 <div class="page" id="pageComp">
 <div class="date-header"><div class="firm">🏆 Édimo Debarba Junior</div><div class="dt">Comparativo</div></div>
 <div class="comp-upload admin-only" id="compUpload">
-<div class="section-title" style="margin-bottom:12px">📂 Relatórios de Comissão</div><div style="text-align:center;margin-bottom:16px"><button style="padding:10px 22px;border:none;border-radius:10px;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;transition:all .2s" onclick="loadCompDrive()">↻ Atualizar do Drive</button><span style="font-size:.6rem;color:var(--text3);margin-left:10px">ou carregue manualmente:</span></div>
+<div style="text-align:center;margin-bottom:16px"><button style="padding:10px 22px;border:none;border-radius:10px;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff" onclick="loadCompDrive()">↻ Atualizar do Drive</button></div>
 <div class="comp-slots">
-<div class="comp-slot" id="slot0" onclick="document.getElementById('cf0').click()"><div class="slot-icon">📁</div><div class="slot-label">Mês Anterior</div><div class="slot-date" id="sd0"></div><input type="file" id="cf0" accept=".xlsx,.xls" onchange="loadCF(0,this)"></div>
-<div class="comp-slot" id="slot1" onclick="document.getElementById('cf1').click()"><div class="slot-icon">📁</div><div class="slot-label">Mês Atual</div><div class="slot-date" id="sd1"></div><input type="file" id="cf1" accept=".xlsx,.xls" onchange="loadCF(1,this)"></div>
+<div class="comp-slot" id="slot0" onclick="document.getElementById('cf0').click()"><div class="slot-icon">📁</div><div class="slot-label">2 meses atrás</div><div class="slot-date" id="sd0"></div><input type="file" id="cf0" accept=".xlsx,.xls" onchange="loadCF(0,this)"></div>
+<div class="comp-slot" id="slot1" onclick="document.getElementById('cf1').click()"><div class="slot-icon">📁</div><div class="slot-label">Mês passado</div><div class="slot-date" id="sd1"></div><input type="file" id="cf1" accept=".xlsx,.xls" onchange="loadCF(1,this)"></div>
+<div class="comp-slot" id="slot2" onclick="document.getElementById('cf2').click()"><div class="slot-icon">📁</div><div class="slot-label">Mês atual</div><div class="slot-date" id="sd2"></div><input type="file" id="cf2" accept=".xlsx,.xls" onchange="loadCF(2,this)"></div>
 </div>
 </div>
 <div id="compR"></div>
@@ -370,9 +427,10 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 <script>
 const SH='https://docs.google.com/spreadsheets/d/e/2PACX-1vR4kJt-TMldOotLcKYo0d9KnFiQJGqc20Yj0Xfe52Ib9fKJd4bZXCLFXom_jt4tA_LYF2YoPqCL6DJN/pub?output=csv';
 const RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XSTNkcp2pbSTKTsVsygCKucMChmcI4hTZkC_pNEsuFNeQ/pub?output=csv';
-const CP_PREV='https://docs.google.com/spreadsheets/d/e/2PACX-1vRd-WnBwsOyBqVeunc1jH3sTzou9KGZllzJYA1QpKC_wk21Y4Cw9A2KprRbowWDRw/pub?output=csv';
-const CP_CURR='https://docs.google.com/spreadsheets/d/e/2PACX-1vTgVTpekyWnlnCtyKnOgisBZ9YM8WOOoNGe6XKH2PslfxaI3GIdjt4g_hEtLJtqYQ/pub?output=csv';
-let cU=null,cRD=null;const cD=[null,null];
+const CP_M1='https://docs.google.com/spreadsheets/d/e/2PACX-1vRd-WnBwsOyBqVeunc1jH3sTzou9KGZllzJYA1QpKC_wk21Y4Cw9A2KprRbowWDRw/pub?output=csv';
+const CP_M2='https://docs.google.com/spreadsheets/d/e/2PACX-1vTgVTpekyWnlnCtyKnOgisBZ9YM8WOOoNGe6XKH2PslfxaI3GIdjt4g_hEtLJtqYQ/pub?output=csv';
+const CP_NOW='https://docs.google.com/spreadsheets/d/e/2PACX-1vRrs4woT4Rad3tsqEnkRBkBy4mOvXlP-3s24bIOQ3gaxRgPjfH3Lqw4PgMa1qfo-Q/pub?output=csv';
+let cU=null,cRD=null;const cD=[null,null,null];
 
 function parseBR(s){if(!s)return 0;s=s.replace(/"/g,'').trim();if(!s||s==='0')return 0;s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0;}
 
@@ -454,20 +512,19 @@ function pC(rows){
   for(let i=0;i<Math.min(rows.length,30);i++){
     if(!rows[i])continue;
     const j=rows[i].filter(v=>v!=null).join(' ');
-    const m=j.match(/(\d{2}\/\d{2}\/\d{4})\s*até\s*(\d{2}\/\d{2}\/\d{4})/);
-    if(m){period=m[1]+' a '+m[2];break}
+    const m=j.match(/(\d{2}\/\d{2}\/\d{4})\s*at[eé]\s*(\d{2}\/\d{2}\/\d{4})/);
+    if(m){period=m[1]+' a '+m[2];break;}
   }
   let hI=-1,cols={};
   for(let i=0;i<rows.length;i++){
     if(!rows[i])continue;
     for(let j=0;j<rows[i].length;j++){
-      const v=String(rows[i][j]||'').trim();
-      if(v==='Operador'){
+      if(String(rows[i][j]||'').trim()==='Operador'){
         hI=i;
         for(let k=0;k<rows[i].length;k++){
           const hv=String(rows[i][k]||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
           if(hv==='operador')cols.op=k;
-          else if(hv==='configuracao')cols.cfg=k;
+          else if(hv.startsWith('configura'))cols.cfg=k;
           else if(hv==='quantidade')cols.qtd=k;
           else if(hv==='valor')cols.val=k;
         }
@@ -494,57 +551,32 @@ function pC(rows){
   return{period,ops};
 }
 
-function autoComp(){const loaded=cD.filter(d=>d!==null).length;if(loaded>=1)genComp();}
+function autoComp(){if(cD.some(d=>d!==null))genComp();}
 
 function csvSplit(line){
   const cells=[];let cell='',inQ=false;
-  for(let i=0;i<line.length;i++){
-    const c=line[i];
-    if(c==='"')inQ=!inQ;
-    else if(c===','&&!inQ){cells.push(cell);cell='';}
-    else cell+=c;
-  }
-  cells.push(cell);
-  return cells;
+  for(let i=0;i<line.length;i++){const c=line[i];if(c==='"')inQ=!inQ;else if(c===','&&!inQ){cells.push(cell);cell='';}else cell+=c;}
+  cells.push(cell);return cells;
 }
 
 function parseCompCSV(text){
-  const lines=text.split('\n');
-  let period='';
+  const lines=text.split('\n');let period='';
   for(let i=0;i<Math.min(lines.length,30);i++){
     const m=lines[i].match(/(\d{2}\/\d{2}\/\d{4})\s*at/);
-    if(m){
-      const m2=lines[i].match(/(\d{2}\/\d{2}\/\d{4})\s*at[^\d]*(\d{2}\/\d{2}\/\d{4})/);
-      if(m2)period=m2[1]+' a '+m2[2];
-      else period=m[1];
-      break;
-    }
+    if(m){const m2=lines[i].match(/(\d{2}\/\d{2}\/\d{4})\s*at[^\d]*(\d{2}\/\d{2}\/\d{4})/);period=m2?m2[1]+' a '+m2[2]:m[1];break;}
   }
   let hI=-1,hCells=[];
-  for(let i=0;i<lines.length;i++){
-    if(lines[i].includes('Operador')){
-      hCells=csvSplit(lines[i]);
-      const joined=hCells.join(' ').toLowerCase();
-      if(joined.includes('quantidade')||joined.includes('valor')){hI=i;break;}
-    }
-  }
+  for(let i=0;i<lines.length;i++){if(lines[i].includes('Operador')){hCells=csvSplit(lines[i]);if(hCells.join(' ').toLowerCase().match(/quantidade|valor/)){hI=i;break;}}}
   if(hI===-1)return{period,ops:[]};
   const cols={};
-  hCells.forEach((h,j)=>{
-    const hv=h.trim().replace(/"/g,'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    if(hv==='operador')cols.op=j;
-    else if(hv.startsWith('configura'))cols.cfg=j;
-    else if(hv==='quantidade')cols.qtd=j;
-    else if(hv==='valor')cols.val=j;
-  });
+  hCells.forEach((h,j)=>{const hv=h.trim().replace(/"/g,'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(hv==='operador')cols.op=j;else if(hv.startsWith('configura'))cols.cfg=j;else if(hv==='quantidade')cols.qtd=j;else if(hv==='valor')cols.val=j;});
   if(cols.op===undefined)return{period,ops:[]};
   const ops=[];
   for(let i=hI+1;i<lines.length;i++){
     const line=lines[i].trim();if(!line)continue;
     const cells=csvSplit(line);
     const nm=(cells[cols.op]||'').trim().replace(/^"|"$/g,'');
-    if(!nm)continue;
-    if(nm==='Subtotal'||nm==='Total'||nm==='Totais'||nm.startsWith('NÃO')||nm.startsWith('NAO')||nm.startsWith('*'))continue;
+    if(!nm||nm==='Subtotal'||nm==='Total'||nm==='Totais'||nm.startsWith('NÃO')||nm.startsWith('NAO')||nm.startsWith('*'))continue;
     if(nm.toLowerCase().includes('suporte'))continue;
     const cfg=cols.cfg!==undefined?(cells[cols.cfg]||'').trim().replace(/^"|"$/g,''):'';
     if(cfg==='Subtotal')continue;
@@ -559,32 +591,22 @@ function parseCompCSV(text){
 
 async function loadCompDrive(){
   try{
-    const[r1,r2]=await Promise.all([
-      fetch(CP_PREV+'&t='+Date.now()),
-      fetch(CP_CURR+'&t='+Date.now())
-    ]);
-    const[csv1,csv2]=[await r1.text(),await r2.text()];
-    const d1=parseCompCSV(csv1);
-    const d2=parseCompCSV(csv2);
-    if(d1&&d1.ops.length>0){
-      cD[0]=d1;
-      document.getElementById('slot0').classList.add('loaded');
-      document.getElementById('slot0').querySelector('.slot-icon').textContent='✅';
-      const de0=document.getElementById('sd0');de0.textContent=d1.period;de0.style.display='block';
-    }
-    if(d2&&d2.ops.length>0){
-      cD[1]=d2;
-      document.getElementById('slot1').classList.add('loaded');
-      document.getElementById('slot1').querySelector('.slot-icon').textContent='✅';
-      const de1=document.getElementById('sd1');de1.textContent=d2.period;de1.style.display='block';
-    }
+    const[r1,r2,r3]=await Promise.all([fetch(CP_M1+'&t='+Date.now()),fetch(CP_M2+'&t='+Date.now()),fetch(CP_NOW+'&t='+Date.now())]);
+    const csvs=[await r1.text(),await r2.text(),await r3.text()];
+    csvs.forEach((csv,idx)=>{
+      const d=parseCompCSV(csv);
+      if(d&&d.ops.length>0){
+        cD[idx]=d;
+        const el=document.getElementById('slot'+idx);
+        if(el){el.classList.add('loaded');el.querySelector('.slot-icon').textContent='✅';const de=document.getElementById('sd'+idx);de.textContent=d.period;de.style.display='block';}
+      }
+    });
     autoComp();
   }catch(e){console.log('Comp Drive error:',e);}
 }
 
 function getMeta(cfg){
-  if(!cfg)return null;
-  const c=cfg.toLowerCase();
+  if(!cfg)return null;const c=cfg.toLowerCase();
   if(c.includes('novat'))return{min:0,max:8000,label:'Experiência',color:'#25c9ff',cls:'eq-novatos'};
   if(c.includes('10')&&c.includes('14'))return{min:10000,max:14000,label:'10-14k',color:'#68c2ff',cls:'eq-10-14'};
   if(c.includes('14')&&c.includes('18'))return{min:14000,max:18000,label:'14-18k',color:'#a96cff',cls:'eq-14-18'};
@@ -592,129 +614,128 @@ function getMeta(cfg){
   if(c.includes('20')&&(c.includes('mais')||c.includes('+')))return{min:20000,max:20000,label:'20k+',color:'#22e477',cls:'eq-20mais'};
   return{min:0,max:0,label:cfg.replace(/[()]/g,''),color:'#91a9c7',cls:'eq-other'};
 }
-
-function eqBadge(cfg){
-  const m=getMeta(cfg);
-  if(!m)return'';
-  return '<span class="eq-badge '+m.cls+'">'+m.label+'</span>';
-}
-
+function eqBadge(cfg){const m=getMeta(cfg);return m?'<span class="eq-badge '+m.cls+'">'+m.label+'</span>':'';}
 function metaBarHTML(val,cfg){
-  const m=getMeta(cfg);
-  if(!m||m.max===0)return'<span style="color:var(--text3);font-size:.6rem">—</span>';
-  const pct=Math.min(Math.round((val/m.max)*100),100);
-  const exceeded=val>=m.max;
-  const star=exceeded?' <span class="meta-star">⭐</span>':'';
-  const barColor=exceeded?'#22e477':m.color;
-  let info=fm(val)+' / '+fm(m.max);
-  if(exceeded&&m.cls==='eq-20mais')info=fm(val)+' 🔥';
+  const m=getMeta(cfg);if(!m||m.max===0)return'<span style="color:var(--text3);font-size:.6rem">—</span>';
+  const pct=Math.min(Math.round((val/m.max)*100),100),exceeded=val>=m.max;
+  const star=exceeded?' <span class="meta-star">⭐</span>':'',barColor=exceeded?'#22e477':m.color;
+  let info=fm(val)+' / '+fm(m.max);if(exceeded&&m.cls==='eq-20mais')info=fm(val)+' 🔥';
   return '<div class="meta-bar-wrap"><div class="meta-bar-bg"><div class="meta-bar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div><span class="meta-pct" style="color:'+barColor+'">'+pct+'%'+star+'</span></div><div class="meta-info">'+info+'</div>';
 }
+function shortPeriod(p){if(!p)return'';const parts=p.split(' a ');if(parts.length===2){const d1=parts[0].substring(3),d2=parts[1].substring(3);return d1===d2?d1:d1+' a '+d2;}return p;}
 
 function genComp(){
   const ms=cD.filter(d=>d!==null);if(ms.length<1)return;
-  const cur=ms[ms.length-1];
-  const prev=ms.length>=2?ms[0]:null;
+  const now=ms[ms.length-1],prev=ms.length>=2?ms[ms.length-2]:null,oldest=ms.length>=3?ms[0]:null;
   const uN=cU?cU.nome.toLowerCase():'';
+  const nowIdx=ms.length-1;
 
-  // Build merged data
+  // Merge all months
   const allN=new Map();
-  cur.ops.forEach(o=>{allN.set(o.n,{name:o.n,cfg:o.cfg,curA:o.a,curV:o.v,prevA:0,prevV:0,prevCfg:''})});
-  if(prev){prev.ops.forEach(o=>{
-    if(allN.has(o.n)){const r=allN.get(o.n);r.prevA=o.a;r.prevV=o.v;r.prevCfg=o.cfg}
-    else allN.set(o.n,{name:o.n,cfg:o.cfg||o.cfg,curA:0,curV:0,prevA:o.a,prevV:o.v,prevCfg:o.cfg})
-  })}
-  const od=[...allN.values()].sort((a,b)=>b.curV-a.curV||b.curA-a.curA);
-  const totA=od.reduce((s,o)=>s+o.curA,0);
-  const totV=od.reduce((s,o)=>s+o.curV,0);
+  ms.forEach((m,mi)=>{m.ops.forEach(o=>{
+    if(!allN.has(o.n))allN.set(o.n,{name:o.n,cfg:o.cfg,m:new Array(ms.length).fill(null)});
+    const r=allN.get(o.n);r.m[mi]={a:o.a,v:o.v};if(o.cfg)r.cfg=o.cfg;
+  });});
+  const od=[...allN.values()].sort((a,b)=>(b.m[nowIdx]?b.m[nowIdx].v:0)-(a.m[nowIdx]?a.m[nowIdx].v:0));
 
   if(isA()){
     let h='';
-    // Summary cards
+    const totA=od.reduce((s,o)=>s+(o.m[nowIdx]?o.m[nowIdx].a:0),0);
+    const totV=od.reduce((s,o)=>s+(o.m[nowIdx]?o.m[nowIdx].v:0),0);
     h+='<div class="comp-summary">';
-    h+='<div class="comp-stat"><div class="cs-val" style="color:var(--green)">'+totA+'</div><div class="cs-lbl">Total Acordos</div></div>';
-    h+='<div class="comp-stat"><div class="cs-val" style="color:var(--purple)">'+fm(totV)+'</div><div class="cs-lbl">Valor Total</div></div>';
-    h+='<div class="comp-stat"><div class="cs-val" style="color:var(--cyan)">'+od.filter(o=>o.curA>0).length+'</div><div class="cs-lbl">Operadores Ativos</div></div>';
+    h+='<div class="comp-stat"><div class="cs-val" style="color:var(--green)">'+totA+'</div><div class="cs-lbl">Total Acordos (atual)</div></div>';
+    h+='<div class="comp-stat"><div class="cs-val" style="color:var(--purple)">'+fm(totV)+'</div><div class="cs-lbl">Valor Total (atual)</div></div>';
+    h+='<div class="comp-stat"><div class="cs-val" style="color:var(--cyan)">'+od.filter(o=>o.m[nowIdx]&&o.m[nowIdx].a>0).length+'</div><div class="cs-lbl">Operadores Ativos</div></div>';
     h+='</div>';
-
-    // Period info
-    h+='<div style="text-align:center;margin-bottom:16px"><span style="font-size:.65rem;color:var(--text3)">'+cur.period;
-    if(prev)h+=' vs '+prev.period;
-    h+='</span></div>';
-
-    // Table
+    h+='<div style="text-align:center;margin-bottom:16px;font-size:.62rem;color:var(--text3)">';
+    ms.forEach((m,i)=>{h+=(i>0?' vs ':'')+shortPeriod(m.period);});h+='</div>';
     h+='<div class="comp-section"><table class="comp-table"><thead><tr>';
     h+='<th style="width:30px">#</th><th>Operador</th><th class="eq-col">Equipe</th>';
-    h+='<th class="num">Acordos</th><th class="num">Valor</th>';
-    h+='<th class="meta-col">Meta</th>';
-    if(prev)h+='<th class="num" style="width:60px">Var</th>';
-    h+='</tr></thead><tbody>';
-
+    ms.forEach((m,i)=>{h+='<th class="num">Qtd</th><th class="num">Valor</th>';});
+    h+='<th class="meta-col">Meta (atual)</th>';
+    if(ms.length>=2)h+='<th class="num" style="width:60px">Var</th>';
+    h+='</tr><tr><th></th><th></th><th></th>';
+    ms.forEach(m=>{h+='<th class="num" style="font-size:.45rem;color:var(--text3);font-weight:500" colspan="2">'+shortPeriod(m.period)+'</th>';});
+    h+='<th></th>';if(ms.length>=2)h+='<th></th>';h+='</tr></thead><tbody>';
     od.forEach((op,i)=>{
       const hl=mU(op.name,uN)?' hl':'';
-      const cfg=op.cfg||op.prevCfg;
-      h+='<tr class="'+hl+'">';
-      h+='<td style="font-size:.7rem;font-weight:700;color:var(--text3)">'+(i+1)+'</td>';
-      h+='<td class="nmcell">'+op.name+'</td>';
-      h+='<td>'+eqBadge(cfg)+'</td>';
-      h+='<td class="num" style="font-weight:800;color:var(--green)">'+op.curA+'</td>';
-      h+='<td class="num">'+fm(op.curV)+'</td>';
-      h+='<td>'+metaBarHTML(op.curV,cfg)+'</td>';
-      if(prev){
-        if(op.prevV===0&&op.curV===0)h+='<td class="num"><span class="trend-same">—</span></td>';
-        else if(op.prevV===0)h+='<td class="num"><span class="trend-up">NOVO</span></td>';
-        else{const pct=Math.round(((op.curV-op.prevV)/op.prevV)*100);
-          h+='<td class="num"><span class="'+(pct>0?'trend-up':pct<0?'trend-down':'trend-same')+'">'+(pct>0?'▲+'+pct+'%':pct<0?'▼'+Math.abs(pct)+'%':'=')+'</span></td>'}
-      }
+      h+='<tr class="'+hl+'"><td style="font-size:.7rem;font-weight:700;color:var(--text3)">'+(i+1)+'</td><td class="nmcell">'+op.name+'</td><td>'+eqBadge(op.cfg)+'</td>';
+      ms.forEach((m,mi)=>{const d=op.m[mi],isN=mi===nowIdx;
+        if(d){h+='<td class="num" style="'+(isN?'font-weight:800;color:var(--green)':'color:var(--text2)')+'">'+d.a+'</td><td class="num" style="'+(isN?'font-weight:600':'')+'">'+fm(d.v)+'</td>';}
+        else h+='<td class="num" style="color:var(--text3)">-</td><td class="num" style="color:var(--text3)">-</td>';
+      });
+      const curV=op.m[nowIdx]?op.m[nowIdx].v:0;
+      h+='<td>'+metaBarHTML(curV,op.cfg)+'</td>';
+      if(ms.length>=2){const pv=op.m[nowIdx-1]?op.m[nowIdx-1].v:0,cv=op.m[nowIdx]?op.m[nowIdx].v:0;
+        if(pv===0&&cv===0)h+='<td class="num"><span class="trend-same">—</span></td>';
+        else if(pv===0)h+='<td class="num"><span class="trend-up">NOVO</span></td>';
+        else{const pct=Math.round(((cv-pv)/pv)*100);h+='<td class="num"><span class="'+(pct>0?'trend-up':pct<0?'trend-down':'trend-same')+'">'+(pct>0?'▲+'+pct+'%':pct<0?'▼'+Math.abs(pct)+'%':'=')+'</span></td>';}}
       h+='</tr>';
     });
     h+='</tbody></table></div>';
     document.getElementById('compR').innerHTML=h;
   }
   else{
-    // Collaborator: find own data
-    const myD=od.find(op=>mU(op.name,uN));
-    let h='<div class="comp-personal">';
+    // ========== COLLABORATOR VIEW ==========
+    const myD=od.find(op=>mU(op.name,uN));let h='';
     if(myD){
-      const cfg=myD.cfg||myD.prevCfg;
-      const meta=getMeta(cfg);
-      h+='<h3>Seu Desempenho</h3>';
-      h+='<div style="margin-bottom:8px">'+eqBadge(cfg)+'</div>';
+      const meta=getMeta(myD.cfg);
+      const curD=myD.m[nowIdx],prevD=ms.length>=2?myD.m[nowIdx-1]:null,oldD=ms.length>=3?myD.m[0]:null;
+      const curA=curD?curD.a:0,curV=curD?curD.v:0;
+      const prevA=prevD?prevD.a:0,prevV=prevD?prevD.v:0;
 
-      // Meta progress (large)
+      h+='<div class="collab-hero"><div class="collab-name">'+myD.name+'</div><div class="collab-equipe">'+eqBadge(myD.cfg)+'</div></div>';
+
+      // Meta bar (big)
       if(meta&&meta.max>0){
-        const pct=Math.min(Math.round((myD.curV/meta.max)*100),100);
-        const exceeded=myD.curV>=meta.max;
-        const barColor=exceeded?'#22e477':meta.color;
-        const remaining=Math.max(0,meta.max-myD.curV);
-        h+='<div class="personal-meta">';
-        h+='<h4>Meta: '+meta.label+' ('+fm(meta.max)+')</h4>';
-        h+='<div class="pm-bar-wrap"><div class="pm-bar-bg"><div class="pm-bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,'+barColor+','+barColor+'cc)"></div>';
-        h+='<span class="pm-bar-label">'+pct+'%</span></div></div>';
-        h+='<div class="pm-detail"><span>'+fm(myD.curV)+'</span><span>'+fm(meta.max)+'</span></div>';
-        if(exceeded)h+='<div class="pm-remaining" style="color:#22e477">🌟 Meta atingida! +'+fm(myD.curV-meta.max)+' acima 🌟</div>';
-        else h+='<div class="pm-remaining" style="color:var(--text2)">Faltam '+fm(remaining)+' para a meta</div>';
+        const pct=Math.min(Math.round((curV/meta.max)*100),100),exceeded=curV>=meta.max;
+        const barColor=exceeded?'#22e477':meta.color,remaining=Math.max(0,meta.max-curV);
+        h+='<div class="collab-meta"><h4>🎯 Meta '+meta.label+': '+fm(meta.max)+'</h4>';
+        h+='<div style="position:relative"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,'+barColor+','+barColor+'cc)"></div>';
+        h+='<span class="cm-bar-pct">'+pct+'%'+(exceeded?' ⭐':'')+'</span></div></div>';
+        h+='<div class="cm-detail"><span>Atual: <strong>'+fm(curV)+'</strong></span><span>Meta: '+fm(meta.max)+'</span></div>';
+        if(exceeded)h+='<div class="cm-remaining" style="color:#22e477">🌟 Meta batida! +'+fm(curV-meta.max)+' acima!</div>';
+        else h+='<div class="cm-remaining" style="color:var(--text2)">Faltam <strong style="color:var(--text)">'+fm(remaining)+'</strong></div>';
         h+='</div>';
       }
 
-      // Current month card
-      h+='<div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin:20px 0 8px">'+cur.period+'</div>';
-      h+='<div class="personal-card"><div><div class="pc-val">'+myD.curA+'</div><div class="pc-lbl">Acordos</div></div><div><div class="pc-val" style="color:var(--purple)">'+fm(myD.curV)+'</div><div class="pc-lbl">Valor</div></div></div>';
+      // Month cards (2 or 3)
+      const numCards=(oldD?1:0)+(prevD?1:0)+1;
+      h+='<div class="collab-cards'+(numCards>=3?' three-cols':'')+'">';
+      if(oldD){
+        h+='<div class="collab-card card-old"><div class="cc-period">'+shortPeriod(ms[0].period)+'</div>';
+        h+='<div class="cc-row"><div class="cc-item"><div class="cc-val" style="color:var(--text3)">'+oldD.a+'</div><div class="cc-lbl">Acordos</div></div>';
+        h+='<div class="cc-item"><div class="cc-val" style="color:var(--text3)">'+fm(oldD.v)+'</div><div class="cc-lbl">Valor</div></div></div></div>';
+      }
+      if(prevD){
+        h+='<div class="collab-card card-prev"><div class="cc-period">'+shortPeriod(ms[ms.length-2].period)+'</div>';
+        h+='<div class="cc-row"><div class="cc-item"><div class="cc-val" style="color:var(--text2)">'+prevA+'</div><div class="cc-lbl">Acordos</div></div>';
+        h+='<div class="cc-item"><div class="cc-val" style="color:var(--text2)">'+fm(prevV)+'</div><div class="cc-lbl">Valor</div></div></div></div>';
+      }
+      h+='<div class="collab-card card-curr"><div class="cc-period">'+shortPeriod(now.period)+' (atual)</div>';
+      h+='<div class="cc-row"><div class="cc-item"><div class="cc-val" style="color:var(--green)">'+curA+'</div><div class="cc-lbl">Acordos</div></div>';
+      h+='<div class="cc-item"><div class="cc-val" style="color:var(--purple)">'+fm(curV)+'</div><div class="cc-lbl">Valor</div></div></div></div>';
+      h+='</div>';
 
-      // Previous month comparison
-      if(prev&&myD.prevV>0){
-        h+='<div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin:20px 0 8px">'+prev.period+'</div>';
-        h+='<div class="personal-card"><div><div class="pc-val">'+myD.prevA+'</div><div class="pc-lbl">Acordos</div></div><div><div class="pc-val" style="color:var(--purple)">'+fm(myD.prevV)+'</div><div class="pc-lbl">Valor</div></div></div>';
-        const vPct=Math.round(((myD.curV-myD.prevV)/myD.prevV)*100);
-        const aPct=myD.prevA>0?Math.round(((myD.curA-myD.prevA)/myD.prevA)*100):0;
-        h+='<div class="personal-trend '+(vPct>=0?'trend-up':'trend-down')+'" style="font-size:.85rem">'+(vPct>=0?'▲ +'+vPct+'%':'▼ '+Math.abs(vPct)+'%')+' em valor vs mês anterior</div>';
-      }else if(prev&&myD.prevV===0&&myD.curV>0){
-        h+='<div class="personal-trend trend-up" style="font-size:.85rem">🎉 Primeiro mês no comparativo!</div>';
+      // Comparison block
+      if(prev){
+        h+='<div class="collab-diff"><div class="diff-title">📊 Comparativo vs Mês Anterior</div><div class="diff-grid">';
+        const aDiff=curA-prevA,aCls=aDiff>0?'up':aDiff<0?'down':'same';
+        h+='<div class="diff-item"><div class="diff-arrow '+aCls+'">'+(aDiff>0?'▲ +'+aDiff:aDiff<0?'▼ '+aDiff:'= 0')+'</div><div class="diff-label '+aCls+'">Acordos</div></div>';
+        const vDiff=curV-prevV,vCls=vDiff>0?'up':vDiff<0?'down':'same';
+        h+='<div class="diff-item"><div class="diff-arrow '+vCls+'">'+(vDiff>0?'▲':'▼')+'</div><div class="diff-label '+vCls+'">'+(vDiff>=0?'+':'')+fm(vDiff)+'</div></div>';
+        if(prevV>0){const vPct=Math.round(((curV-prevV)/prevV)*100),pCls=vPct>0?'up':vPct<0?'down':'same';
+          h+='<div class="diff-item"><div class="diff-arrow '+pCls+'">'+(vPct>0?'+':'')+vPct+'%</div><div class="diff-label '+pCls+'">Variação</div></div>';}
+        h+='</div>';
+        if(prevV===0&&curV>0)h+='<div class="diff-verdict newop">🎉 Primeiro mês!</div>';
+        else if(vDiff>0)h+='<div class="diff-verdict better">🚀 Você está melhor que o mês passado!</div>';
+        else if(vDiff<0)h+='<div class="diff-verdict worse">⚡ Bora recuperar! Foco no próximo acordo.</div>';
+        else h+='<div class="diff-verdict equal">Mesmo resultado. Hora de subir!</div>';
+        h+='</div>';
       }
     }else{
-      h+='<p style="color:var(--text2);font-size:.85rem;margin-top:24px">Seus dados ainda não apareceram nos relatórios.</p>';
+      h+='<div style="text-align:center;padding:60px 20px"><p style="color:var(--text2);font-size:.9rem">Seus dados ainda não apareceram nos relatórios.</p></div>';
     }
-    h+='</div>';
     document.getElementById('compR').innerHTML=h;
   }
 }
