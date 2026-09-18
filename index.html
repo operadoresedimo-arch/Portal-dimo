@@ -121,6 +121,172 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 .admin-only{display:none}
 .section-title{font-size:.58rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:20px}
 </style>
+
+<style id="edimo-modern-overrides">
+:root{
+  --bg:#040b18;--bg2:#071226;--card:#0a1930;--card2:#0d203c;
+  --border:#18365c;--border2:#214b78;--gold:#f5b91f;
+  --text:#eef5ff;--text2:#91a9c7;--text3:#506987;
+  --green:#22e477;--purple:#a96cff;--cyan:#25c9ff;
+  --blue:#168cff;--blue2:#36a4ff;--blue3:#68c2ff;
+  --silver:#d4dfeb;--bronze:#f18a32;
+}
+body{
+  background:
+    radial-gradient(circle at 50% -15%,rgba(0,132,255,.13),transparent 38%),
+    radial-gradient(circle at 90% 95%,rgba(0,101,255,.08),transparent 32%),
+    #040b18;
+}
+body::before,body::after{
+  content:"";position:fixed;z-index:0;pointer-events:none;
+  width:210px;height:210px;opacity:.55;
+  background:linear-gradient(135deg,transparent 0 32%,rgba(23,135,255,.45) 33% 43%,transparent 44% 55%,rgba(23,135,255,.18) 56% 66%,transparent 67%);
+}
+body::before{left:-80px;top:-55px;transform:rotate(0deg)}
+body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
+.bg-layer{
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(25,123,255,.12),transparent 55%),
+    linear-gradient(180deg,rgba(3,11,24,.15),rgba(3,11,24,.55));
+}
+.nav{
+  top:10px;
+  background:rgba(7,19,38,.88);
+  border:1px solid #234b77;
+  border-radius:18px;
+  box-shadow:0 12px 40px rgba(0,0,0,.28),0 0 30px rgba(20,123,255,.06);
+  padding:0 7px;
+}
+.nav-inner{height:54px;padding:0 10px;gap:4px}
+.nav-brand{font-size:.78rem;color:var(--gold);margin-right:18px}
+.nav-tab{
+  padding:9px 18px;border-radius:10px;font-size:.72rem;
+  color:#66809f;
+}
+.nav-tab.active{
+  background:linear-gradient(135deg,#096fe8,#197ff0);
+  box-shadow:0 5px 18px rgba(14,119,241,.34);
+}
+.nav-user{font-size:.68rem;color:#a7bad2}
+.nav-logout{padding:7px 11px;border-color:#234b77;font-size:.62rem}
+.main{max-width:1240px;padding:78px 24px 50px}
+.date-header{margin-bottom:28px}
+.date-header .firm{
+  font-size:.72rem;letter-spacing:.2em;color:#f2b81c;
+  text-shadow:0 0 18px rgba(242,184,28,.15);
+}
+.date-header .dt{
+  font-size:2.65rem;letter-spacing:-.04em;
+  text-shadow:0 5px 25px rgba(0,0,0,.25);
+}
+.stat-cards{gap:16px;margin-bottom:24px}
+.stat-card{
+  min-height:126px;padding:20px 22px;border-radius:16px;
+  background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));
+  border:1px solid #21466f;
+  box-shadow:inset 0 1px rgba(255,255,255,.025),0 12px 30px rgba(0,0,0,.18);
+}
+.stat-card:nth-child(1){border-left:4px solid #159cff}
+.stat-card:nth-child(2){border-left:4px solid #12d886}
+.stat-card:nth-child(3){border-left:4px solid #a95bff}
+.sc-left{
+  width:58px;height:58px;border-radius:50%;
+  font-size:1.35rem;background:#0b274b!important;
+}
+.sc-left.sc-acordos{border:1px solid rgba(28,157,255,.55)}
+.sc-left.sc-valor{border:1px solid rgba(18,216,134,.55)}
+.sc-left.sc-ops{border:1px solid rgba(169,91,255,.55)}
+.sc-label{font-size:.62rem;color:#87a1c1}
+.sc-val{font-size:2rem}
+.sc-val.green{color:#28e486}.sc-val.purple{color:#a96cff}.sc-val.cyan{color:#b06dff}
+.dash-grid{grid-template-columns:390px 1fr;gap:18px}
+.podium-panel,.table-panel{
+  background:linear-gradient(145deg,rgba(10,28,52,.97),rgba(6,19,37,.97));
+  border:1px solid #1d426a;border-radius:16px;
+  box-shadow:0 14px 35px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.025);
+}
+.podium-panel{padding:20px}
+.podium-title{
+  font-size:.9rem;letter-spacing:.04em;margin-bottom:18px;
+  color:#f1f5fb;
+}
+.podium-title::after{
+  content:"";display:block;width:54px;height:3px;margin-top:9px;
+  background:#20a2ff;border-radius:3px;box-shadow:0 0 12px rgba(32,162,255,.45);
+}
+.pod-card{
+  min-height:92px;padding:14px 13px;border-radius:13px;margin-bottom:10px;
+  box-shadow:inset 0 1px rgba(255,255,255,.025);
+}
+.pod-card.p1{
+  background:linear-gradient(100deg,rgba(219,166,20,.18),rgba(10,27,49,.82));
+  border:1px solid rgba(236,183,31,.55);
+  box-shadow:0 0 22px rgba(231,177,22,.07),inset 0 1px rgba(255,255,255,.03);
+}
+.pod-card.p2{
+  background:linear-gradient(100deg,rgba(73,142,222,.12),rgba(10,27,49,.82));
+  border:1px solid rgba(86,161,238,.28);
+}
+.pod-card.p3{
+  background:linear-gradient(100deg,rgba(223,111,28,.11),rgba(10,27,49,.82));
+  border:1px solid rgba(222,116,37,.3);
+}
+.pod-medal{font-size:2rem}
+.pod-name{font-size:.86rem}
+.pod-stats{font-size:.68rem}
+.pod-pos{font-size:1.55rem}
+.table-panel{overflow:hidden}
+.tp-header{
+  padding:14px 18px;background:linear-gradient(180deg,#0d2341,#0b1d36);
+  border-bottom:1px solid #1c3c60;font-size:.59rem;color:#617b9a;
+}
+.tp-rank{width:38px}.tp-ac{width:92px}.tp-val{width:105px}.tp-bar{width:150px}
+.trow{
+  padding:10px 18px;min-height:42px;
+  border-bottom:1px solid rgba(26,58,91,.5);
+}
+.trow:nth-child(even){background:rgba(8,24,45,.46)}
+.trow:hover{background:rgba(23,133,255,.075)!important}
+.trow .rk{width:38px;font-size:.73rem;color:#54708f}
+.trow .nm{font-size:.79rem;font-weight:600}
+.trow .ac{width:92px;font-size:.9rem;color:#20e28a}
+.trow .vl{width:105px;font-size:.7rem}
+.trow .bar{width:150px;padding-left:14px}
+.bar-bg{height:8px;background:#102b4d;border-radius:8px;box-shadow:inset 0 1px 2px rgba(0,0,0,.3)}
+.bar-fill{
+  background:linear-gradient(90deg,#138cf4,#55b7ff);
+  box-shadow:0 0 9px rgba(37,151,255,.32);
+}
+.dash-footer{padding:38px 16px 12px}
+.dash-footer .brand-ft{color:#2e4867}
+.toolbar{
+  background:rgba(7,20,39,.94);border-color:#21466f;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+.comp-slot{background:linear-gradient(145deg,#0c213c,#08182d);border-color:#21466f}
+.personal-card{background:linear-gradient(145deg,#0c213c,#08182d);border-color:#21466f}
+@media(max-width:900px){
+  .dash-grid{grid-template-columns:1fr}
+  .main{padding-left:14px;padding-right:14px}
+  .tp-bar{width:110px}
+  .trow .bar{width:110px}
+}
+@media(max-width:650px){
+  .nav{width:calc(100% - 16px)}
+  .nav-inner{padding:0 5px}
+  .nav-brand{margin-right:3px}
+  .nav-tab{padding:8px 9px;font-size:.62rem}
+  .nav-user{display:none}
+  .date-header .dt{font-size:2rem}
+  .stat-cards{grid-template-columns:1fr}
+  .stat-card{min-height:96px}
+  .tp-val,.tp-header .tp-val{width:88px}
+  .tp-bar,.trow .bar{width:95px}
+  .tp-ac,.trow .ac{width:62px}
+  .tp-rank,.trow .rk{width:26px}
+}
+</style>
+
 </head>
 <body>
 <div class="bg-layer"></div>
@@ -135,7 +301,7 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 </div></div>
 
 <div class="nav" id="nav"><div class="nav-inner">
-<div class="nav-brand">🏆 ÉDIMO</div>
+<div class="nav-brand">👑 ÉDIMO</div>
 <button class="nav-tab active" onclick="showPage('ranking')" id="tabR">📊 Ranking</button>
 <button class="nav-tab" onclick="showPage('comparativo')" id="tabC">📈 Comparativo</button>
 <div class="nav-right"><span class="nav-user" id="navUser">👤 </span><button class="nav-logout" onclick="doLogout()">🚪 Sair</button></div>
