@@ -1136,6 +1136,35 @@ body::before,body::after{display:none!important}
 .collab-card.card-curr::before,.cd-month-card.mc-curr::before{background:#2ECC71!important}
 .goals-block::before{background:linear-gradient(90deg,#2ECC71,#D4A937,#E67E22)!important}
 
+
+
+/* TIGHTER LAYOUT (keep all info, remove dead space) */
+.comp-summary{gap:10px!important;margin-bottom:16px!important;padding:0!important}
+.comp-hero{margin-bottom:16px!important}
+.comp-filters{margin-bottom:12px!important}
+.app-with-sidebar .main{padding:18px 16px 30px!important}
+
+/* Sidebar slightly narrower */
+.sidebar{width:220px!important;padding:18px 14px!important}
+.app-with-sidebar .main{margin-left:220px!important}
+.app-with-sidebar .toolbar{margin-left:220px!important}
+
+/* Scale up table text */
+.comp-table th{font-size:.65rem!important}
+.comp-table td{font-size:.8rem!important}
+.comp-table .nmcell{font-size:.82rem!important}
+.comp-table .num{font-size:.82rem!important}
+.trend-up,.trend-down,.trend-same{font-size:.78rem!important}
+.cell-meta-bar{max-width:100%!important}
+
+/* Period text less gap */
+div[style*="text-align:center;margin-bottom:16px"]{margin-bottom:10px!important}
+
+@media(max-width:900px){
+  .sidebar{width:190px!important}
+  .app-with-sidebar .main{margin-left:190px!important}
+}
+
 </style>
 
 </head>
