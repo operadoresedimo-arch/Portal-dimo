@@ -1044,6 +1044,98 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 /* Wider main area */
 .app-with-sidebar .main{padding:24px 16px 40px}
 
+
+/* GRAPHITE MATTE THEME */
+:root{
+  --bg:#1a1c1e!important;--bg2:#1e2022!important;
+  --card:#232628!important;--card2:#282a2d!important;
+  --border:#2e3133!important;--border2:#383b3e!important;
+  --gold:#D4A937!important;
+  --text:#e8e9ea!important;--text2:#8c8f93!important;--text3:#585b5f!important;
+  --green:#2ECC71!important;--purple:#a96cff!important;--cyan:#25c9ff!important;
+  --blue:#5a6672!important;--blue2:#6b7580!important;--blue3:#8a939e!important;
+  --red:#f87171!important;
+}
+body{
+  background:#1a1c1e!important;
+}
+body::before,body::after{display:none!important}
+.bg-layer{
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.02),transparent 60%)!important;
+}
+
+/* Cards & panels */
+.stat-card,.podium-panel,.table-panel,.comp-stat,.collab-card,.cd-month-card,.cd-comp,.cd-ben-card,.cd-rules,.cd-premio,.cd-timeline,.goals-block,.collab-meta,.cd-meta-compact{
+  background:#232628!important;
+  border-color:#2e3133!important;
+  box-shadow:0 2px 8px rgba(0,0,0,.2)!important;
+}
+.stat-card:nth-child(1){border-left-color:#8c8f93!important}
+.stat-card:nth-child(2){border-left-color:#6b7580!important}
+.stat-card:nth-child(3){border-left-color:#585b5f!important}
+
+/* Table */
+.tp-header,.trow:nth-child(even){background:rgba(35,38,40,.6)!important}
+.trow{border-bottom-color:#2e3133!important}
+.trow:hover{background:rgba(255,255,255,.03)!important}
+.trow.hl{background:rgba(212,169,55,.04)!important}
+.bar-bg,.cell-meta-bar,.cm-bar-bg,.gp-bar,.pm-bar-bg{background:#2e3133!important}
+.bar-fill{background:linear-gradient(90deg,#5a6672,#8a939e)!important}
+
+/* Podium */
+.pod-card.p1{background:linear-gradient(100deg,rgba(212,169,55,.12),#232628)!important;border-color:rgba(212,169,55,.3)!important}
+.pod-card.p2{background:linear-gradient(100deg,rgba(140,143,147,.08),#232628)!important;border-color:rgba(140,143,147,.2)!important}
+.pod-card.p3{background:linear-gradient(100deg,rgba(205,127,50,.08),#232628)!important;border-color:rgba(205,127,50,.2)!important}
+
+/* Nav */
+.nav{background:rgba(26,28,30,.95)!important;border-color:#2e3133!important;box-shadow:0 4px 16px rgba(0,0,0,.3)!important}
+.nav-tab.active{background:#3a3d41!important;box-shadow:none!important;color:#e8e9ea!important}
+.nav-tab{color:#8c8f93!important}
+
+/* Login */
+.login-box{background:#232628!important;border-color:#2e3133!important}
+.login-box input{background:#1a1c1e!important;border-color:#2e3133!important;color:#e8e9ea!important}
+.login-box input:focus{border-color:#585b5f!important}
+.login-btn{background:#3a3d41!important;color:#e8e9ea!important}
+
+/* Toolbar */
+.toolbar{background:rgba(26,28,30,.95)!important;border-color:#2e3133!important}
+
+/* Comp table headers */
+.comp-table .mh-old{background:rgba(88,91,95,.12)!important;color:#8c8f93!important;border-bottom-color:#585b5f!important}
+.comp-table .mh-prev{background:rgba(107,117,128,.08)!important;color:#8a939e!important;border-bottom-color:#6b7580!important}
+.comp-table .mh-curr{background:rgba(46,204,113,.06)!important;color:#2ECC71!important;border-bottom-color:rgba(46,204,113,.3)!important}
+.comp-table .curr-col{background:rgba(46,204,113,.02)!important}
+.comp-table td.mg-start{border-left-color:#2e3133!important}
+
+/* Filter buttons */
+.comp-filter-group{background:#1a1c1e!important;border-color:#2e3133!important}
+.comp-filter-btn{color:#8c8f93!important}
+.comp-filter-btn.active{background:#3a3d41!important;color:#e8e9ea!important}
+.comp-month-tab{border-color:#2e3133!important;color:#8c8f93!important}
+.comp-month-tab.active{border-color:#585b5f!important;color:#e8e9ea!important;background:rgba(255,255,255,.04)!important}
+
+/* Comp slot upload */
+.comp-slot{background:#232628!important;border-color:#2e3133!important}
+
+/* Misc overrides */
+.sc-left{background:#2e3133!important}
+.sc-left.sc-acordos{border-color:#585b5f!important}
+.sc-left.sc-valor{border-color:#585b5f!important}
+.sc-left.sc-ops{border-color:#585b5f!important}
+.toast{background:#2ECC71!important}
+
+/* Search */
+.comp-search input{background:#1a1c1e!important;border-color:#2e3133!important}
+.comp-search input:focus{border-color:#585b5f!important}
+
+/* Benefits locked/unlocked */
+.ben-unlocked{border-color:rgba(46,204,113,.25)!important}
+
+/* Collab card accents keep their color */
+.collab-card.card-curr::before,.cd-month-card.mc-curr::before{background:#2ECC71!important}
+.goals-block::before{background:linear-gradient(90deg,#2ECC71,#D4A937,#E67E22)!important}
+
 </style>
 
 </head>
