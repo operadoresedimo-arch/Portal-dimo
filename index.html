@@ -1018,7 +1018,6 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 .sb-month-val{font-size:1.4rem;letter-spacing:.02em}
 
 
-/* SIDEBAR GRAY THEME (like edimo.com.br header) */
 .sidebar{background:linear-gradient(180deg,#3d3f43,#333538)!important;border-right:1px solid #4a4c50!important}
 .sb-month-box{background:linear-gradient(145deg,#484a4e,#3d3f43)!important;border-color:#5a5c60!important}
 .sb-month-label{color:#D4A937!important}
@@ -1030,6 +1029,14 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 .sb-motivation{background:linear-gradient(145deg,rgba(212,169,55,.08),rgba(212,169,55,.03))!important;border-color:rgba(212,169,55,.2)!important}
 .sb-mot-title{color:#D4A937!important}
 .sb-mot-sub{color:#a0a2a6!important}
+
+/* RANKING LAYOUT WITH SIDEBAR */
+.app-with-sidebar .dash-grid{grid-template-columns:1fr!important;gap:16px}
+.app-with-sidebar .podium-panel{max-width:100%}
+.app-with-sidebar .podium-panel .podium-title{font-size:1rem}
+.app-with-sidebar .pod-card{display:inline-flex;width:calc(33.3% - 8px);vertical-align:top;margin-right:8px;margin-bottom:0}
+.app-with-sidebar .pod-card:last-child{margin-right:0}
+@media(max-width:900px){.app-with-sidebar .pod-card{width:100%;display:flex;margin-right:0}}
 
 </style>
 
@@ -1048,7 +1055,7 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 
 <div class="nav" id="nav"><div class="nav-inner">
 <div class="nav-brand"><img src="https://edimo.com.br/wp-content/uploads/2024/01/cropped-logo-horizontal-negativa.png" alt="Édimo" style="height:24px;width:auto;vertical-align:middle"> ÉDIMO</div>
-<button class="nav-tab active" onclick="showPage('ranking')" id="tabR">📊 Ranking</button>
+<button class="nav-tab active" onclick="showPage('ranking')" id="tabR">📊 Acordos do Dia</button>
 <button class="nav-tab" onclick="showPage('comparativo')" id="tabC">📈 Comparativo</button>
 <div class="nav-right"><span class="nav-user" id="navUser">👤 </span><button class="nav-logout" onclick="doLogout()">🚪 Sair</button></div>
 </div></div>
@@ -1063,10 +1070,15 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 <div style="font-size:.7rem;color:#91a9c7" id="sbAcordos">0 acordos</div>
 <div style="font-size:.6rem;color:#f5b91f;margin-top:6px;display:none" id="sbTempo">⏱️ </div>
 </div>
+<div id="sbRankStats" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #4a4c50">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:.55rem;font-weight:600;color:#a0a2a6;text-transform:uppercase;letter-spacing:.08em">Acordos</span><span style="font-size:1.2rem;font-weight:900;color:#22e477" id="sbRkAcordos">0</span></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:.55rem;font-weight:600;color:#a0a2a6;text-transform:uppercase;letter-spacing:.08em">Valor</span><span style="font-size:1rem;font-weight:800;color:#a96cff" id="sbRkValor">R$ 0</span></div>
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:.55rem;font-weight:600;color:#a0a2a6;text-transform:uppercase;letter-spacing:.08em">Operadores</span><span style="font-size:1rem;font-weight:800;color:#25c9ff" id="sbRkOps">0</span></div>
+</div>
 <div class="sb-month-sub">Acompanhamento de desempenho</div>
 </div>
 <nav class="sb-nav">
-<button class="sb-item" onclick="showPage('ranking')" id="sbR">🏆 Ranking</button>
+<button class="sb-item" onclick="showPage('ranking')" id="sbR">🏆 Acordos do Dia</button>
 <button class="sb-item active" onclick="showPage('comparativo')" id="sbC">📊 Comparativo</button>
 <button class="sb-item" onclick="doLogout()">🚪 Sair</button>
 </nav>
@@ -1160,13 +1172,11 @@ function showPage(p){
   document.getElementById('pageRanking').classList.toggle('active',p==='ranking');
   document.getElementById('pageComp').classList.toggle('active',p==='comparativo');
   toolbar.style.display=(p==='ranking'&&cRD)?'flex':'none';
-  // Sidebar
   const sb=document.getElementById('sidebar');
   const sbR=document.getElementById('sbR');
   const sbC=document.getElementById('sbC');
   if(sb){
-    if(p==='comparativo'){sb.classList.add('vis');document.body.classList.add('app-with-sidebar');}
-    else{sb.classList.remove('vis');document.body.classList.remove('app-with-sidebar');}
+    sb.classList.add('vis');document.body.classList.add('app-with-sidebar');
     if(sbR)sbR.classList.toggle('active',p==='ranking');
     if(sbC)sbC.classList.toggle('active',p==='comparativo');
   }
@@ -1177,14 +1187,17 @@ function renderR(data){
   document.getElementById('rankLoading').style.display='none';
   const{d:date,ta,tv,ops}=data,t3=ops.slice(0,3),mx=Math.max(...ops.map(o=>o.a));
   const uN=cU?cU.nome.toLowerCase():'';
+  // Fill sidebar rank stats
+  const rs=document.getElementById('sbRankStats');
+  if(rs){rs.style.display='block';document.getElementById('sbRkAcordos').textContent=ta;document.getElementById('sbRkValor').textContent=fs(tv);document.getElementById('sbRkOps').textContent=ops.length;}
   let h='';
-  h+='<div class="date-header"><div class="firm">🏆 ÉDIMO DEBARBA JUNIOR</div><div class="dt">📅 '+(date||'Hoje')+'</div></div>';
+  h+='<div class="date-header"><div class="firm">🏆 ÉDIMO DEBARBA JUNIOR</div><div class="dt">📅 Acordos do Dia · '+(date||'Hoje')+'</div></div>';
   h+='<div class="stat-cards">';
   h+='<div class="stat-card"><div class="sc-left sc-acordos">📋</div><div class="sc-right"><div class="sc-label">Acordos</div><div class="sc-val green">'+ta+'</div></div></div>';
   h+='<div class="stat-card"><div class="sc-left sc-valor">💰</div><div class="sc-right"><div class="sc-label">Valor Total</div><div class="sc-val purple">'+fs(tv)+'</div></div></div>';
   h+='<div class="stat-card"><div class="sc-left sc-ops">👥</div><div class="sc-right"><div class="sc-label">Operadores</div><div class="sc-val cyan">'+ops.length+'</div></div></div>';
   h+='</div>';
-  h+='<div class="dash-grid">';
+  h+='<div class="dash-grid" style="grid-template-columns:1fr">';
   if(t3.length>=3){
     h+='<div class="podium-panel"><div class="podium-title">🏆 TOP 3 DO DIA</div>';
     const md=['🥇','🥈','🥉'],cl=['p1','p2','p3'],po=['👑 1°','2°','3°'];
