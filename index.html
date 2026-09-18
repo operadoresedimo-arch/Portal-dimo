@@ -272,6 +272,15 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
   .trow .bar{width:110px}
 }
 
+
+/* MONTH COLUMN SEPARATORS */
+.comp-table .month-group-start{border-left:2px solid var(--border2);padding-left:12px}
+.comp-table .month-header{padding:8px;text-align:center;font-size:.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-radius:6px 6px 0 0}
+.comp-table .mh-old{background:rgba(61,85,117,.15);color:#7e93b0;border-bottom:2px solid #3d5575}
+.comp-table .mh-prev{background:rgba(139,92,246,.08);color:#a96cff;border-bottom:2px solid rgba(139,92,246,.3)}
+.comp-table .mh-curr{background:rgba(34,228,119,.08);color:#22e477;border-bottom:2px solid rgba(34,228,119,.3)}
+.comp-table td.mg-start{border-left:2px solid rgba(21,37,68,.8)}
+.comp-table .curr-col{background:rgba(34,228,119,.03)!important}
 /* META BARS */
 .meta-bar-wrap{display:flex;align-items:center;gap:6px;margin-bottom:2px}
 .meta-bar-bg{flex:1;height:8px;background:#102b4d;border-radius:8px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.3);min-width:60px}
@@ -328,6 +337,15 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
   .tp-rank,.trow .rk{width:26px}
 }
 
+
+/* MONTH COLUMN SEPARATORS */
+.comp-table .month-group-start{border-left:2px solid var(--border2);padding-left:12px}
+.comp-table .month-header{padding:8px;text-align:center;font-size:.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-radius:6px 6px 0 0}
+.comp-table .mh-old{background:rgba(61,85,117,.15);color:#7e93b0;border-bottom:2px solid #3d5575}
+.comp-table .mh-prev{background:rgba(139,92,246,.08);color:#a96cff;border-bottom:2px solid rgba(139,92,246,.3)}
+.comp-table .mh-curr{background:rgba(34,228,119,.08);color:#22e477;border-bottom:2px solid rgba(34,228,119,.3)}
+.comp-table td.mg-start{border-left:2px solid rgba(21,37,68,.8)}
+.comp-table .curr-col{background:rgba(34,228,119,.03)!important}
 /* META BARS */
 .meta-bar-wrap{display:flex;align-items:center;gap:6px;margin-bottom:2px}
 .meta-bar-bg{flex:1;height:8px;background:#102b4d;border-radius:8px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.3);min-width:60px}
@@ -649,23 +667,32 @@ function genComp(){
     h+='</div>';
     h+='<div style="text-align:center;margin-bottom:16px;font-size:.62rem;color:var(--text3)">';
     ms.forEach((m,i)=>{h+=(i>0?' vs ':'')+shortPeriod(m.period);});h+='</div>';
-    h+='<div class="comp-section"><table class="comp-table"><thead><tr>';
-    h+='<th style="width:30px">#</th><th>Operador</th><th class="eq-col">Equipe</th>';
-    ms.forEach((m,i)=>{h+='<th class="num">Qtd</th><th class="num">Valor</th>';});
-    h+='<th class="meta-col">Meta (atual)</th>';
+    h+='<div class="comp-section"><table class="comp-table"><thead>';
+    // Month group header row
+    h+='<tr><th colspan="3"></th>';
+    const mhCls=['mh-old','mh-prev','mh-curr'];
+    const mhIcon=['📋','📋','📋'];
+    ms.forEach((m,i)=>{
+      const cls=ms.length===1?'mh-curr':ms.length===2?(i===0?'mh-prev':'mh-curr'):(i===0?'mh-old':i===1?'mh-prev':'mh-curr');
+      h+='<th colspan="2" class="month-header '+cls+'" style="text-align:center">'+shortPeriod(m.period)+'</th>';
+    });
+    h+='<th></th>';if(ms.length>=2)h+='<th></th>';h+='</tr>';
+    // Column labels row
+    h+='<tr><th style="width:30px">#</th><th>Operador</th><th class="eq-col">Equipe</th>';
+    ms.forEach((m,i)=>{h+='<th class="num month-group-start">Qtd</th><th class="num">Valor</th>';});
+    h+='<th class="meta-col month-group-start">Meta (atual)</th>';
     if(ms.length>=2)h+='<th class="num" style="width:60px">Var</th>';
-    h+='</tr><tr><th></th><th></th><th></th>';
-    ms.forEach(m=>{h+='<th class="num" style="font-size:.45rem;color:var(--text3);font-weight:500" colspan="2">'+shortPeriod(m.period)+'</th>';});
-    h+='<th></th>';if(ms.length>=2)h+='<th></th>';h+='</tr></thead><tbody>';
+    h+='</tr></thead><tbody>';
     od.forEach((op,i)=>{
       const hl=mU(op.name,uN)?' hl':'';
       h+='<tr class="'+hl+'"><td style="font-size:.7rem;font-weight:700;color:var(--text3)">'+(i+1)+'</td><td class="nmcell">'+op.name+'</td><td>'+eqBadge(op.cfg)+'</td>';
       ms.forEach((m,mi)=>{const d=op.m[mi],isN=mi===nowIdx;
-        if(d){h+='<td class="num" style="'+(isN?'font-weight:800;color:var(--green)':'color:var(--text2)')+'">'+d.a+'</td><td class="num" style="'+(isN?'font-weight:600':'')+'">'+fm(d.v)+'</td>';}
-        else h+='<td class="num" style="color:var(--text3)">-</td><td class="num" style="color:var(--text3)">-</td>';
+        const sep=' mg-start';const cc=isN?' curr-col':'';
+        if(d){h+='<td class="num'+sep+cc+'" style="'+(isN?'font-weight:800;color:var(--green)':'color:var(--text2)')+'">'+d.a+'</td><td class="num'+cc+'" style="'+(isN?'font-weight:600':'')+'">'+fm(d.v)+'</td>';}
+        else h+='<td class="num'+sep+'" style="color:var(--text3)">-</td><td class="num" style="color:var(--text3)">-</td>';
       });
       const curV=op.m[nowIdx]?op.m[nowIdx].v:0;
-      h+='<td>'+metaBarHTML(curV,op.cfg)+'</td>';
+      h+='<td class="mg-start">'+metaBarHTML(curV,op.cfg)+'</td>';
       if(ms.length>=2){const pv=op.m[nowIdx-1]?op.m[nowIdx-1].v:0,cv=op.m[nowIdx]?op.m[nowIdx].v:0;
         if(pv===0&&cv===0)h+='<td class="num"><span class="trend-same">—</span></td>';
         else if(pv===0)h+='<td class="num"><span class="trend-up">NOVO</span></td>';
