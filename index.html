@@ -351,6 +351,53 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
   .comp-filters{flex-direction:column;align-items:flex-start}
 }
 
+
+/* BENEFITS SECTION */
+.benefits-section{max-width:700px;margin:28px auto 0}
+.benefits-title{font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.benefits-title::before,.benefits-title::after{content:'';flex:1;height:1px;background:var(--border);max-width:80px}
+.benefits-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.ben-card{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:18px 14px;text-align:center;position:relative;overflow:hidden}
+.ben-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.ben-card.ben-com::before{background:linear-gradient(90deg,#22e477,#1bcc66)}
+.ben-card.ben-flex::before{background:linear-gradient(90deg,#25c9ff,#168cff)}
+.ben-card.ben-folga::before{background:linear-gradient(90deg,#f5b91f,#f18a32)}
+.ben-icon{font-size:1.8rem;margin-bottom:8px}
+.ben-label{font-size:.72rem;font-weight:800;color:var(--text);margin-bottom:4px}
+.ben-desc{font-size:.58rem;color:#7e93b0;line-height:1.4}
+.ben-value{font-size:1.1rem;font-weight:900;margin-top:6px}
+.ben-card.ben-com .ben-value{color:#22e477}
+.ben-card.ben-flex .ben-value{color:#25c9ff}
+.ben-card.ben-folga .ben-value{color:#f5b91f}
+
+.ben-locked{opacity:.4;position:relative}
+.ben-locked::after{content:'🔒';position:absolute;top:8px;right:8px;font-size:.9rem}
+.ben-unlocked{border-color:rgba(34,228,119,.3);box-shadow:0 0 15px rgba(34,228,119,.06)}
+.ben-unlocked::after{content:'✅';position:absolute;top:8px;right:8px;font-size:.8rem}
+
+/* RULES BLOCK */
+.rules-block{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:20px;max-width:700px;margin:0 auto}
+.rules-title{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#f87171;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rule-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.08)}
+.rule-icon{font-size:.85rem;flex-shrink:0;margin-top:1px}
+.rule-text{font-size:.6rem;color:#91a9c7;line-height:1.4}
+
+/* PREMIO TIME */
+.premio-block{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:20px;max-width:700px;margin:16px auto 0;text-align:center}
+.premio-title{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:6px}
+.premio-levels{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.premio-lv{padding:10px 14px;border-radius:10px;background:#0a1930;border:1px solid #18365c;text-align:center;min-width:100px}
+.premio-lv.active{border-color:#f5b91f;background:rgba(245,185,31,.06)}
+.premio-lv .pv-val{font-size:1rem;font-weight:900;color:#f5b91f}
+.premio-lv .pv-lbl{font-size:.5rem;color:#7e93b0;margin-top:2px}
+
+@media(max-width:600px){
+  .benefits-cards{grid-template-columns:1fr}
+  .rules-grid{grid-template-columns:1fr}
+  .premio-levels{flex-direction:column;align-items:center}
+}
+
 /* META BARS */
 .meta-bar-wrap{display:flex;align-items:center;gap:6px;margin-bottom:2px}
 .meta-bar-bg{flex:1;height:8px;background:#102b4d;border-radius:8px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.3);min-width:60px}
@@ -484,6 +531,53 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
   .comp-hero{flex-direction:column;align-items:flex-start}
   .comp-search input{width:100%}
   .comp-filters{flex-direction:column;align-items:flex-start}
+}
+
+
+/* BENEFITS SECTION */
+.benefits-section{max-width:700px;margin:28px auto 0}
+.benefits-title{font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.benefits-title::before,.benefits-title::after{content:'';flex:1;height:1px;background:var(--border);max-width:80px}
+.benefits-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.ben-card{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:18px 14px;text-align:center;position:relative;overflow:hidden}
+.ben-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.ben-card.ben-com::before{background:linear-gradient(90deg,#22e477,#1bcc66)}
+.ben-card.ben-flex::before{background:linear-gradient(90deg,#25c9ff,#168cff)}
+.ben-card.ben-folga::before{background:linear-gradient(90deg,#f5b91f,#f18a32)}
+.ben-icon{font-size:1.8rem;margin-bottom:8px}
+.ben-label{font-size:.72rem;font-weight:800;color:var(--text);margin-bottom:4px}
+.ben-desc{font-size:.58rem;color:#7e93b0;line-height:1.4}
+.ben-value{font-size:1.1rem;font-weight:900;margin-top:6px}
+.ben-card.ben-com .ben-value{color:#22e477}
+.ben-card.ben-flex .ben-value{color:#25c9ff}
+.ben-card.ben-folga .ben-value{color:#f5b91f}
+
+.ben-locked{opacity:.4;position:relative}
+.ben-locked::after{content:'🔒';position:absolute;top:8px;right:8px;font-size:.9rem}
+.ben-unlocked{border-color:rgba(34,228,119,.3);box-shadow:0 0 15px rgba(34,228,119,.06)}
+.ben-unlocked::after{content:'✅';position:absolute;top:8px;right:8px;font-size:.8rem}
+
+/* RULES BLOCK */
+.rules-block{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:20px;max-width:700px;margin:0 auto}
+.rules-title{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#f87171;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rule-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.08)}
+.rule-icon{font-size:.85rem;flex-shrink:0;margin-top:1px}
+.rule-text{font-size:.6rem;color:#91a9c7;line-height:1.4}
+
+/* PREMIO TIME */
+.premio-block{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:20px;max-width:700px;margin:16px auto 0;text-align:center}
+.premio-title{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:6px}
+.premio-levels{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.premio-lv{padding:10px 14px;border-radius:10px;background:#0a1930;border:1px solid #18365c;text-align:center;min-width:100px}
+.premio-lv.active{border-color:#f5b91f;background:rgba(245,185,31,.06)}
+.premio-lv .pv-val{font-size:1rem;font-weight:900;color:#f5b91f}
+.premio-lv .pv-lbl{font-size:.5rem;color:#7e93b0;margin-top:2px}
+
+@media(max-width:600px){
+  .benefits-cards{grid-template-columns:1fr}
+  .rules-grid{grid-template-columns:1fr}
+  .premio-levels{flex-direction:column;align-items:center}
 }
 
 /* META BARS */
@@ -974,6 +1068,8 @@ function genComp(){
         else h+='<div class="diff-verdict equal">Mesmo resultado. Hora de subir!</div>';
         h+='</div>';
       }
+      // Benefits section
+      h+=getBenefitsHTML(myD.cfg, curV);
     }else{
       h+='<div style="text-align:center;padding:60px 20px"><p style="color:var(--text2);font-size:.9rem">Seus dados ainda não apareceram nos relatórios.</p></div>';
     }
@@ -1017,6 +1113,72 @@ function updateSidebarMonth(){
     const m=p.match(/(\d{2})\/(\d{4})/);
     if(m)document.getElementById('sbMonth').textContent=m[1]+'/'+m[2];
   }
+}
+
+function getBenefitsHTML(cfg, curV){
+  const meta=getMeta(cfg);
+  const hitMeta=meta&&meta.max>0&&curV>=meta.max;
+  const isNovato=cfg&&cfg.toLowerCase().includes('novat');
+  const is20=meta&&meta.cls==='eq-20mais';
+
+  let h='<div class="benefits-section">';
+  h+='<div class="benefits-title">Ao bater sua meta você ganha</div>';
+  h+='<div class="benefits-cards">';
+
+  // Comissão card
+  const comLock=hitMeta?' ben-unlocked':' ben-locked';
+  h+='<div class="ben-card ben-com'+comLock+'"><div class="ben-icon">💰</div>';
+  h+='<div class="ben-label">Comissão</div>';
+  h+='<div class="ben-value">5% da Receita</div>';
+  if(isNovato)h+='<div class="ben-desc">Na experiência: recebe independente do valor</div>';
+  else if(is20)h+='<div class="ben-desc">20k+: comissão garantida independente das regras</div>';
+  else h+='<div class="ben-desc">Paga após atingir a meta mínima da faixa</div>';
+  h+='</div>';
+
+  // Flex card
+  const flexLock=(hitMeta&&!is20)?' ben-unlocked':is20?' ben-locked':' ben-locked';
+  const flexReal=hitMeta&&!is20;
+  h+='<div class="ben-card ben-flex'+(flexReal?' ben-unlocked':' ben-locked')+'"><div class="ben-icon">🕐</div>';
+  h+='<div class="ben-label">Flexibilidade</div>';
+  h+='<div class="ben-value">Horário Flexível</div>';
+  h+='<div class="ben-desc">Ajuste entrada/saída, 6h diárias + 20min pausa. Sábado sem flex.</div>';
+  if(is20)h+='<div class="ben-desc" style="color:#f87171;margin-top:4px">20k+: apenas comissão, sem flex/folga</div>';
+  h+='</div>';
+
+  // Folga card
+  const folgaReal=hitMeta&&!is20;
+  h+='<div class="ben-card ben-folga'+(folgaReal?' ben-unlocked':' ben-locked')+'"><div class="ben-icon">🏖️</div>';
+  h+='<div class="ben-label">Folgas</div>';
+  h+='<div class="ben-value">Dias de Folga</div>';
+  h+='<div class="ben-desc">Folgas conforme atingimento das metas estabelecidas</div>';
+  if(isNovato)h+='<div class="ben-desc" style="margin-top:4px">Novatos: folgas somente atingindo as expectativas</div>';
+  h+='</div>';
+  h+='</div>';
+
+  // Rules block
+  h+='<div class="rules-block">';
+  h+='<div class="rules-title">⚠️ Você perde tudo se:</div>';
+  h+='<div class="rules-grid">';
+  h+='<div class="rule-item"><span class="rule-icon">⏰</span><span class="rule-text">Atraso no ponto acima de 10 minutos</span></div>';
+  h+='<div class="rule-item"><span class="rule-icon">📋</span><span class="rule-text">Deixar de bater o ponto em qualquer dia</span></div>';
+  h+='<div class="rule-item"><span class="rule-icon">🚫</span><span class="rule-text">Falta sem atestado (declaração de horas não abona)</span></div>';
+  h+='<div class="rule-item"><span class="rule-icon">📄</span><span class="rule-text">Mais de 1 atestado OU 1 declaração no mês</span></div>';
+  h+='<div class="rule-item"><span class="rule-icon">⚡</span><span class="rule-text">Qualquer advertência (verbal, escrita ou suspensão)</span></div>';
+  h+='<div class="rule-item"><span class="rule-icon">📅</span><span class="rule-text">Não trabalhar o mês integralmente</span></div>';
+  h+='</div></div>';
+
+  // Premiação por tempo
+  h+='<div class="premio-block">';
+  h+='<div class="premio-title">🎁 Premiação por Tempo de Cobrança</div>';
+  h+='<div class="premio-levels">';
+  h+='<div class="premio-lv"><div class="pv-val">R$ 200</div><div class="pv-lbl">75 dias a 1 ano</div></div>';
+  h+='<div class="premio-lv"><div class="pv-val">R$ 300</div><div class="pv-lbl">+1 ano</div></div>';
+  h+='<div class="premio-lv"><div class="pv-val">R$ 400</div><div class="pv-lbl">+2 anos</div></div>';
+  h+='<div class="premio-lv"><div class="pv-val">R$ 600</div><div class="pv-lbl">+3 anos</div></div>';
+  h+='</div></div>';
+
+  h+='</div>';
+  return h;
 }
 
 function cn(r){if(r.toUpperCase().includes('WEBSERVICE'))return'Robô Edimo';let n=r.replace(/^[\d]+\.?(\d+\.)?/,'');return n.split('.').map(p=>p?p.charAt(0).toUpperCase()+p.slice(1).toLowerCase():'').filter(p=>p).join(' ')}
