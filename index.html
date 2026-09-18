@@ -486,7 +486,7 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 .cd-timeline{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:16px 18px}
 .cd-timeline-title{font-size:.55rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
 .tl-track{display:flex;align-items:stretch;gap:0;position:relative}
-.tl-track::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:#18365c;transform:translateY(-50%);z-index:0}
+.tl-track::before{display:none}
 .tl-stage{flex:1;position:relative;z-index:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
 .tl-dot{width:14px;height:14px;border-radius:50%;border:2px solid #21466f;background:#0a1930;flex-shrink:0;position:relative;transition:all .3s}
 .tl-stage.active .tl-dot{border-color:#22e477;background:#22e477;box-shadow:0 0 10px rgba(34,228,119,.4)}
@@ -780,7 +780,7 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 .cd-timeline{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:16px 18px}
 .cd-timeline-title{font-size:.55rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
 .tl-track{display:flex;align-items:stretch;gap:0;position:relative}
-.tl-track::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:#18365c;transform:translateY(-50%);z-index:0}
+.tl-track::before{display:none}
 .tl-stage{flex:1;position:relative;z-index:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
 .tl-dot{width:14px;height:14px;border-radius:50%;border:2px solid #21466f;background:#0a1930;flex-shrink:0;position:relative;transition:all .3s}
 .tl-stage.active .tl-dot{border-color:#22e477;background:#22e477;box-shadow:0 0 10px rgba(34,228,119,.4)}
@@ -923,6 +923,19 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 .comp-hero-title{font-size:1.8rem}
 .comp-hero-sub{font-size:.78rem}
 .comp-hero-icon{font-size:2.8rem}
+
+
+/* TIMELINE TEXT FIXES */
+.tl-stage{gap:6px}
+.tl-info{gap:3px}
+.tl-name{font-weight:900;letter-spacing:.02em}
+.tl-meta{font-weight:600;line-height:1.4;color:#91a9c7}
+.tl-stage.future .tl-meta{color:#506987}
+.tl-stage.current .tl-name{font-size:.8rem}
+.tl-stage.active .tl-name{font-size:.72rem}
+
+/* Sidebar month fix */
+.sb-month-val{font-size:1.4rem;letter-spacing:.02em}
 
 </style>
 
@@ -1327,6 +1340,12 @@ function genComp(){
         if(exceeded)h+='<div class="cm-remaining" style="color:#22e477">🌟 Meta batida! +'+fm(curV-meta.max)+' acima!</div>';
         else h+='<div class="cm-remaining" style="color:var(--text2)">Faltam <strong style="color:var(--text)">'+fm(remaining)+'</strong></div>';
         h+='</div>';
+      }else{
+        // No meta defined, show current value prominently
+        h+='<div class="cd-meta-compact collab-meta" style="text-align:center"><h4>📊 Valor Atual</h4>';
+        h+='<div style="font-size:2rem;font-weight:900;color:var(--green);margin:8px 0">'+fm(curV)+'</div>';
+        h+='<div style="font-size:.8rem;color:var(--text2)">'+curA+' acordos</div>';
+        h+='</div>';
       }
       h+='</div></div>';
 
@@ -1445,7 +1464,11 @@ function updateSidebarMonth(){
     const last=ms[ms.length-1];
     const p=last.period||'';
     const m=p.match(/(\d{2})\/(\d{4})/);
-    if(m)document.getElementById('sbMonth').textContent=m[1]+'/'+m[2];
+    if(m){
+      const months=['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      const mi=parseInt(m[1]);
+      document.getElementById('sbMonth').textContent=(months[mi]||m[1])+' '+m[2];
+    }
   }
 }
 
