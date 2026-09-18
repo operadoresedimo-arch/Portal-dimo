@@ -398,6 +398,118 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
   .premio-levels{flex-direction:column;align-items:center}
 }
 
+
+/* COLLAB DASHBOARD GRID */
+.collab-dash{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto auto;gap:16px;align-items:start}
+.collab-dash .cd-full{grid-column:1/-1}
+.collab-dash .cd-left{grid-column:1}
+.collab-dash .cd-right{grid-column:2}
+
+.cd-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.cd-header-left{display:flex;align-items:center;gap:14px}
+.cd-header .collab-name{font-size:1.8rem;margin:0}
+.cd-header .collab-equipe{margin:0}
+
+/* Compact meta for top-right */
+.cd-meta-compact{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:16px 20px;min-width:280px}
+.cd-meta-compact h4{font-size:.65rem;margin-bottom:10px}
+.cd-meta-compact .cm-bar-bg{height:14px}
+.cd-meta-compact .cm-remaining{font-size:.78rem;margin-top:10px}
+
+/* Month cards compact */
+.cd-months{display:flex;flex-direction:column;gap:10px}
+.cd-month-card{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
+.cd-month-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px}
+.cd-month-card.mc-old::before{background:#506987}
+.cd-month-card.mc-prev::before{background:#a96cff}
+.cd-month-card.mc-curr::before{background:#22e477}
+.cd-mc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.cd-mc-period{font-size:.52rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.cd-mc-tag{font-size:.48rem;padding:2px 6px;border-radius:4px;font-weight:700}
+.cd-month-card.mc-curr .cd-mc-tag{background:rgba(34,228,119,.1);color:#22e477}
+.cd-mc-row{display:flex;gap:24px}
+.cd-mc-item{text-align:left}
+.cd-mc-val{font-size:1.3rem;font-weight:900;line-height:1.1}
+.cd-mc-lbl{font-size:.48rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-top:1px}
+
+/* Comparison compact */
+.cd-comp{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:18px;display:flex;flex-direction:column;justify-content:center;height:100%}
+.cd-comp .diff-title{margin-bottom:12px}
+.cd-comp .diff-grid{margin-bottom:12px;gap:24px}
+.cd-comp .diff-arrow{font-size:1.6rem}
+.cd-comp .diff-label{font-size:.62rem}
+
+/* Benefits inline with rules */
+.cd-benefits-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cd-ben-col{display:flex;flex-direction:column;gap:10px}
+.cd-ben-cards{display:flex;flex-direction:column;gap:8px}
+.cd-ben-card{display:flex;align-items:center;gap:12px;background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:12px;padding:12px 14px;position:relative;overflow:hidden}
+.cd-ben-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px}
+.cd-ben-card.bc-com::before{background:#22e477}
+.cd-ben-card.bc-flex::before{background:#25c9ff}
+.cd-ben-card.bc-folga::before{background:#f5b91f}
+.cd-ben-card .bc-icon{font-size:1.4rem;flex-shrink:0}
+.cd-ben-card .bc-info{flex:1}
+.cd-ben-card .bc-title{font-size:.72rem;font-weight:800;color:var(--text)}
+.cd-ben-card .bc-val{font-size:.68rem;font-weight:700;margin-top:1px}
+.cd-ben-card.bc-com .bc-val{color:#22e477}
+.cd-ben-card.bc-flex .bc-val{color:#25c9ff}
+.cd-ben-card.bc-folga .bc-val{color:#f5b91f}
+.cd-ben-card .bc-desc{font-size:.5rem;color:#7e93b0;margin-top:2px}
+.cd-ben-card .bc-status{font-size:.85rem;flex-shrink:0}
+
+/* Rules compact */
+.cd-rules{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:16px;display:flex;flex-direction:column}
+.cd-rules .rules-title{font-size:.6rem;margin-bottom:10px}
+.cd-rules-list{display:flex;flex-direction:column;gap:6px;flex:1}
+.cd-rule{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.06)}
+.cd-rule .rule-icon{font-size:.7rem}
+.cd-rule .rule-text{font-size:.55rem;color:#91a9c7;line-height:1.3}
+
+/* Premio compact */
+.cd-premio{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:12px;padding:14px;text-align:center}
+.cd-premio .premio-title{font-size:.55rem;margin-bottom:10px}
+.cd-premio .premio-levels{gap:8px}
+.cd-premio .premio-lv{padding:8px 10px;min-width:80px}
+.cd-premio .pv-val{font-size:.85rem}
+.cd-premio .pv-lbl{font-size:.45rem}
+
+@media(max-width:800px){
+  .collab-dash{grid-template-columns:1fr}
+  .collab-dash .cd-left,.collab-dash .cd-right{grid-column:1}
+  .cd-benefits-row{grid-template-columns:1fr}
+  .cd-header{flex-direction:column;align-items:flex-start}
+}
+
+
+/* CAREER TIMELINE */
+.cd-timeline{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:16px 18px}
+.cd-timeline-title{font-size:.55rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+.tl-track{display:flex;align-items:stretch;gap:0;position:relative}
+.tl-track::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:#18365c;transform:translateY(-50%);z-index:0}
+.tl-stage{flex:1;position:relative;z-index:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tl-dot{width:14px;height:14px;border-radius:50%;border:2px solid #21466f;background:#0a1930;flex-shrink:0;position:relative;transition:all .3s}
+.tl-stage.active .tl-dot{border-color:#22e477;background:#22e477;box-shadow:0 0 10px rgba(34,228,119,.4)}
+.tl-stage.active .tl-dot::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.5rem;color:#040b18;font-weight:900}
+.tl-stage.current .tl-dot{border-color:#f5b91f;background:#f5b91f;box-shadow:0 0 12px rgba(245,185,31,.4);animation:tlPulse 2s ease-in-out infinite}
+@keyframes tlPulse{0%,100%{box-shadow:0 0 8px rgba(245,185,31,.3)}50%{box-shadow:0 0 16px rgba(245,185,31,.6)}}
+.tl-stage.future .tl-dot{border-color:#21466f;background:#0a1930}
+.tl-info{display:flex;flex-direction:column;align-items:center;gap:1px}
+.tl-name{font-size:.58rem;font-weight:800;color:var(--text)}
+.tl-stage.active .tl-name{color:#22e477}
+.tl-stage.current .tl-name{color:#f5b91f}
+.tl-stage.future .tl-name{color:#506987}
+.tl-meta{font-size:.45rem;color:#7e93b0;line-height:1.3;max-width:90px}
+.tl-stage.future .tl-meta{color:#3d5575}
+.tl-box{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.tl-rule-box{padding:8px 10px;border-radius:8px;text-align:center}
+.tl-rule-box.exp{background:rgba(37,201,255,.06);border:1px solid rgba(37,201,255,.15)}
+.tl-rule-box.pos{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.15)}
+.tl-rule-box .trb-title{font-size:.5rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+.tl-rule-box.exp .trb-title{color:#25c9ff}
+.tl-rule-box.pos .trb-title{color:#a96cff}
+.tl-rule-box .trb-text{font-size:.48rem;color:#7e93b0;line-height:1.3}
+
 /* META BARS */
 .meta-bar-wrap{display:flex;align-items:center;gap:6px;margin-bottom:2px}
 .meta-bar-bg{flex:1;height:8px;background:#102b4d;border-radius:8px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.3);min-width:60px}
@@ -579,6 +691,118 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
   .rules-grid{grid-template-columns:1fr}
   .premio-levels{flex-direction:column;align-items:center}
 }
+
+
+/* COLLAB DASHBOARD GRID */
+.collab-dash{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto auto;gap:16px;align-items:start}
+.collab-dash .cd-full{grid-column:1/-1}
+.collab-dash .cd-left{grid-column:1}
+.collab-dash .cd-right{grid-column:2}
+
+.cd-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.cd-header-left{display:flex;align-items:center;gap:14px}
+.cd-header .collab-name{font-size:1.8rem;margin:0}
+.cd-header .collab-equipe{margin:0}
+
+/* Compact meta for top-right */
+.cd-meta-compact{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:16px 20px;min-width:280px}
+.cd-meta-compact h4{font-size:.65rem;margin-bottom:10px}
+.cd-meta-compact .cm-bar-bg{height:14px}
+.cd-meta-compact .cm-remaining{font-size:.78rem;margin-top:10px}
+
+/* Month cards compact */
+.cd-months{display:flex;flex-direction:column;gap:10px}
+.cd-month-card{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:12px;padding:14px 16px;position:relative;overflow:hidden}
+.cd-month-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px}
+.cd-month-card.mc-old::before{background:#506987}
+.cd-month-card.mc-prev::before{background:#a96cff}
+.cd-month-card.mc-curr::before{background:#22e477}
+.cd-mc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.cd-mc-period{font-size:.52rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.cd-mc-tag{font-size:.48rem;padding:2px 6px;border-radius:4px;font-weight:700}
+.cd-month-card.mc-curr .cd-mc-tag{background:rgba(34,228,119,.1);color:#22e477}
+.cd-mc-row{display:flex;gap:24px}
+.cd-mc-item{text-align:left}
+.cd-mc-val{font-size:1.3rem;font-weight:900;line-height:1.1}
+.cd-mc-lbl{font-size:.48rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-top:1px}
+
+/* Comparison compact */
+.cd-comp{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:18px;display:flex;flex-direction:column;justify-content:center;height:100%}
+.cd-comp .diff-title{margin-bottom:12px}
+.cd-comp .diff-grid{margin-bottom:12px;gap:24px}
+.cd-comp .diff-arrow{font-size:1.6rem}
+.cd-comp .diff-label{font-size:.62rem}
+
+/* Benefits inline with rules */
+.cd-benefits-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cd-ben-col{display:flex;flex-direction:column;gap:10px}
+.cd-ben-cards{display:flex;flex-direction:column;gap:8px}
+.cd-ben-card{display:flex;align-items:center;gap:12px;background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:12px;padding:12px 14px;position:relative;overflow:hidden}
+.cd-ben-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px}
+.cd-ben-card.bc-com::before{background:#22e477}
+.cd-ben-card.bc-flex::before{background:#25c9ff}
+.cd-ben-card.bc-folga::before{background:#f5b91f}
+.cd-ben-card .bc-icon{font-size:1.4rem;flex-shrink:0}
+.cd-ben-card .bc-info{flex:1}
+.cd-ben-card .bc-title{font-size:.72rem;font-weight:800;color:var(--text)}
+.cd-ben-card .bc-val{font-size:.68rem;font-weight:700;margin-top:1px}
+.cd-ben-card.bc-com .bc-val{color:#22e477}
+.cd-ben-card.bc-flex .bc-val{color:#25c9ff}
+.cd-ben-card.bc-folga .bc-val{color:#f5b91f}
+.cd-ben-card .bc-desc{font-size:.5rem;color:#7e93b0;margin-top:2px}
+.cd-ben-card .bc-status{font-size:.85rem;flex-shrink:0}
+
+/* Rules compact */
+.cd-rules{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:16px;display:flex;flex-direction:column}
+.cd-rules .rules-title{font-size:.6rem;margin-bottom:10px}
+.cd-rules-list{display:flex;flex-direction:column;gap:6px;flex:1}
+.cd-rule{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.06)}
+.cd-rule .rule-icon{font-size:.7rem}
+.cd-rule .rule-text{font-size:.55rem;color:#91a9c7;line-height:1.3}
+
+/* Premio compact */
+.cd-premio{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:12px;padding:14px;text-align:center}
+.cd-premio .premio-title{font-size:.55rem;margin-bottom:10px}
+.cd-premio .premio-levels{gap:8px}
+.cd-premio .premio-lv{padding:8px 10px;min-width:80px}
+.cd-premio .pv-val{font-size:.85rem}
+.cd-premio .pv-lbl{font-size:.45rem}
+
+@media(max-width:800px){
+  .collab-dash{grid-template-columns:1fr}
+  .collab-dash .cd-left,.collab-dash .cd-right{grid-column:1}
+  .cd-benefits-row{grid-template-columns:1fr}
+  .cd-header{flex-direction:column;align-items:flex-start}
+}
+
+
+/* CAREER TIMELINE */
+.cd-timeline{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid #21466f;border-radius:14px;padding:16px 18px}
+.cd-timeline-title{font-size:.55rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+.tl-track{display:flex;align-items:stretch;gap:0;position:relative}
+.tl-track::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:#18365c;transform:translateY(-50%);z-index:0}
+.tl-stage{flex:1;position:relative;z-index:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tl-dot{width:14px;height:14px;border-radius:50%;border:2px solid #21466f;background:#0a1930;flex-shrink:0;position:relative;transition:all .3s}
+.tl-stage.active .tl-dot{border-color:#22e477;background:#22e477;box-shadow:0 0 10px rgba(34,228,119,.4)}
+.tl-stage.active .tl-dot::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.5rem;color:#040b18;font-weight:900}
+.tl-stage.current .tl-dot{border-color:#f5b91f;background:#f5b91f;box-shadow:0 0 12px rgba(245,185,31,.4);animation:tlPulse 2s ease-in-out infinite}
+@keyframes tlPulse{0%,100%{box-shadow:0 0 8px rgba(245,185,31,.3)}50%{box-shadow:0 0 16px rgba(245,185,31,.6)}}
+.tl-stage.future .tl-dot{border-color:#21466f;background:#0a1930}
+.tl-info{display:flex;flex-direction:column;align-items:center;gap:1px}
+.tl-name{font-size:.58rem;font-weight:800;color:var(--text)}
+.tl-stage.active .tl-name{color:#22e477}
+.tl-stage.current .tl-name{color:#f5b91f}
+.tl-stage.future .tl-name{color:#506987}
+.tl-meta{font-size:.45rem;color:#7e93b0;line-height:1.3;max-width:90px}
+.tl-stage.future .tl-meta{color:#3d5575}
+.tl-box{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.tl-rule-box{padding:8px 10px;border-radius:8px;text-align:center}
+.tl-rule-box.exp{background:rgba(37,201,255,.06);border:1px solid rgba(37,201,255,.15)}
+.tl-rule-box.pos{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.15)}
+.tl-rule-box .trb-title{font-size:.5rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+.tl-rule-box.exp .trb-title{color:#25c9ff}
+.tl-rule-box.pos .trb-title{color:#a96cff}
+.tl-rule-box .trb-text{font-size:.48rem;color:#7e93b0;line-height:1.3}
 
 /* META BARS */
 .meta-bar-wrap{display:flex;align-items:center;gap:6px;margin-bottom:2px}
@@ -1018,43 +1242,49 @@ function genComp(){
       const curD=myD.m[nowIdx],prevD=ms.length>=2?myD.m[nowIdx-1]:null,oldD=ms.length>=3?myD.m[0]:null;
       const curA=curD?curD.a:0,curV=curD?curD.v:0;
       const prevA=prevD?prevD.a:0,prevV=prevD?prevD.v:0;
+      const hitMeta=meta&&meta.max>0&&curV>=meta.max;
+      const is20=meta&&meta.cls==='eq-20mais';
+      const isNovato=myD.cfg&&myD.cfg.toLowerCase().includes('novat');
 
-      h+='<div class="collab-hero"><div class="collab-name">'+myD.name+'</div><div class="collab-equipe">'+eqBadge(myD.cfg)+'</div></div>';
+      h+='<div class="collab-dash">';
 
-      // Meta bar (big)
+      // ── ROW 1: Header (name+badge) + Meta bar ──
+      h+='<div class="cd-full"><div class="cd-header">';
+      h+='<div class="cd-header-left"><div><div class="collab-name">'+myD.name+'</div>'+eqBadge(myD.cfg)+'</div></div>';
+      // Compact meta
       if(meta&&meta.max>0){
         const pct=Math.min(Math.round((curV/meta.max)*100),100),exceeded=curV>=meta.max;
         const barColor=exceeded?'#22e477':meta.color,remaining=Math.max(0,meta.max-curV);
-        h+='<div class="collab-meta"><h4>🎯 Meta '+meta.label+': '+fm(meta.max)+'</h4>';
+        h+='<div class="cd-meta-compact collab-meta"><h4>🎯 Meta '+meta.label+': '+fm(meta.max)+'</h4>';
         h+='<div style="position:relative"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,'+barColor+','+barColor+'cc)"></div>';
         h+='<span class="cm-bar-pct">'+pct+'%'+(exceeded?' ⭐':'')+'</span></div></div>';
-        h+='<div class="cm-detail"><span>Atual: <strong>'+fm(curV)+'</strong></span><span>Meta: '+fm(meta.max)+'</span></div>';
+        h+='<div class="cm-detail"><span>'+fm(curV)+'</span><span>'+fm(meta.max)+'</span></div>';
         if(exceeded)h+='<div class="cm-remaining" style="color:#22e477">🌟 Meta batida! +'+fm(curV-meta.max)+' acima!</div>';
         else h+='<div class="cm-remaining" style="color:var(--text2)">Faltam <strong style="color:var(--text)">'+fm(remaining)+'</strong></div>';
         h+='</div>';
       }
+      h+='</div></div>';
 
-      // Month cards (2 or 3)
-      const numCards=(oldD?1:0)+(prevD?1:0)+1;
-      h+='<div class="collab-cards'+(numCards>=3?' three-cols':'')+'">';
+      // ── ROW 2: Month cards (left) + Comparison (right) ──
+      h+='<div class="cd-left"><div class="cd-months">';
       if(oldD){
-        h+='<div class="collab-card card-old"><div class="cc-period">'+shortPeriod(ms[0].period)+'</div>';
-        h+='<div class="cc-row"><div class="cc-item"><div class="cc-val" style="color:var(--text3)">'+oldD.a+'</div><div class="cc-lbl">Acordos</div></div>';
-        h+='<div class="cc-item"><div class="cc-val" style="color:var(--text3)">'+fm(oldD.v)+'</div><div class="cc-lbl">Valor</div></div></div></div>';
+        h+='<div class="cd-month-card mc-old"><div class="cd-mc-header"><span class="cd-mc-period">'+shortPeriod(ms[0].period)+'</span></div>';
+        h+='<div class="cd-mc-row"><div class="cd-mc-item"><div class="cd-mc-val" style="color:var(--text3)">'+oldD.a+'</div><div class="cd-mc-lbl">Acordos</div></div>';
+        h+='<div class="cd-mc-item"><div class="cd-mc-val" style="color:var(--text3)">'+fm(oldD.v)+'</div><div class="cd-mc-lbl">Valor</div></div></div></div>';
       }
       if(prevD){
-        h+='<div class="collab-card card-prev"><div class="cc-period">'+shortPeriod(ms[ms.length-2].period)+'</div>';
-        h+='<div class="cc-row"><div class="cc-item"><div class="cc-val" style="color:var(--text2)">'+prevA+'</div><div class="cc-lbl">Acordos</div></div>';
-        h+='<div class="cc-item"><div class="cc-val" style="color:var(--text2)">'+fm(prevV)+'</div><div class="cc-lbl">Valor</div></div></div></div>';
+        h+='<div class="cd-month-card mc-prev"><div class="cd-mc-header"><span class="cd-mc-period">'+shortPeriod(ms[ms.length-2].period)+'</span></div>';
+        h+='<div class="cd-mc-row"><div class="cd-mc-item"><div class="cd-mc-val" style="color:var(--text2)">'+prevA+'</div><div class="cd-mc-lbl">Acordos</div></div>';
+        h+='<div class="cd-mc-item"><div class="cd-mc-val" style="color:var(--text2)">'+fm(prevV)+'</div><div class="cd-mc-lbl">Valor</div></div></div></div>';
       }
-      h+='<div class="collab-card card-curr"><div class="cc-period">'+shortPeriod(now.period)+' (atual)</div>';
-      h+='<div class="cc-row"><div class="cc-item"><div class="cc-val" style="color:var(--green)">'+curA+'</div><div class="cc-lbl">Acordos</div></div>';
-      h+='<div class="cc-item"><div class="cc-val" style="color:var(--purple)">'+fm(curV)+'</div><div class="cc-lbl">Valor</div></div></div></div>';
-      h+='</div>';
+      h+='<div class="cd-month-card mc-curr"><div class="cd-mc-header"><span class="cd-mc-period">'+shortPeriod(now.period)+'</span><span class="cd-mc-tag">ATUAL</span></div>';
+      h+='<div class="cd-mc-row"><div class="cd-mc-item"><div class="cd-mc-val" style="color:var(--green)">'+curA+'</div><div class="cd-mc-lbl">Acordos</div></div>';
+      h+='<div class="cd-mc-item"><div class="cd-mc-val" style="color:var(--purple)">'+fm(curV)+'</div><div class="cd-mc-lbl">Valor</div></div></div></div>';
+      h+='</div></div>';
 
-      // Comparison block
+      // Comparison (right)
       if(prev){
-        h+='<div class="collab-diff"><div class="diff-title">📊 Comparativo vs Mês Anterior</div><div class="diff-grid">';
+        h+='<div class="cd-right"><div class="cd-comp"><div class="diff-title">📊 Comparativo vs Mês Anterior</div><div class="diff-grid">';
         const aDiff=curA-prevA,aCls=aDiff>0?'up':aDiff<0?'down':'same';
         h+='<div class="diff-item"><div class="diff-arrow '+aCls+'">'+(aDiff>0?'▲ +'+aDiff:aDiff<0?'▼ '+aDiff:'= 0')+'</div><div class="diff-label '+aCls+'">Acordos</div></div>';
         const vDiff=curV-prevV,vCls=vDiff>0?'up':vDiff<0?'down':'same';
@@ -1066,10 +1296,49 @@ function genComp(){
         else if(vDiff>0)h+='<div class="diff-verdict better">🚀 Você está melhor que o mês passado!</div>';
         else if(vDiff<0)h+='<div class="diff-verdict worse">⚡ Bora recuperar! Foco no próximo acordo.</div>';
         else h+='<div class="diff-verdict equal">Mesmo resultado. Hora de subir!</div>';
-        h+='</div>';
+        h+='</div></div>';
       }
-      // Benefits section
-      h+=getBenefitsHTML(myD.cfg, curV);
+
+      // ── ROW 3: Benefits (left) + Rules (right) ──
+      // ── ROW: Career Timeline ──
+      h+='<div class="cd-full">'+getTimelineHTML(myD.cfg)+'</div>';
+
+      h+='<div class="cd-full"><div class="cd-benefits-row">';
+      // Benefits column
+      h+='<div class="cd-ben-col">';
+      h+='<div style="font-size:.55rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">🎁 Ao bater sua meta você ganha</div>';
+      h+='<div class="cd-ben-cards">';
+      const comOk=hitMeta;const flexOk=hitMeta&&!is20;const folgaOk=hitMeta&&!is20;
+      h+='<div class="cd-ben-card bc-com"><div class="bc-icon">💰</div><div class="bc-info"><div class="bc-title">Comissão</div><div class="bc-val">5% da Receita</div>';
+      h+='<div class="bc-desc">'+(isNovato?'Experiência: independente do valor':(is20?'20k+: garantida':'Após atingir meta mínima'))+'</div></div><div class="bc-status">'+(comOk?'✅':'🔒')+'</div></div>';
+      h+='<div class="cd-ben-card bc-flex"><div class="bc-icon">🕐</div><div class="bc-info"><div class="bc-title">Flexibilidade</div><div class="bc-val">Horário Flexível</div>';
+      h+='<div class="bc-desc">6h diárias + 20min pausa. Sábado sem flex.</div></div><div class="bc-status">'+(flexOk?'✅':'🔒')+'</div></div>';
+      h+='<div class="cd-ben-card bc-folga"><div class="bc-icon">🏖️</div><div class="bc-info"><div class="bc-title">Folgas</div><div class="bc-val">Dias de Folga</div>';
+      h+='<div class="bc-desc">Conforme atingimento das metas</div></div><div class="bc-status">'+(folgaOk?'✅':'🔒')+'</div></div>';
+      h+='</div>';
+      // Premio inline
+      h+='<div class="cd-premio"><div class="premio-title">🎁 Premiação por Tempo</div><div class="premio-levels">';
+      h+='<div class="premio-lv"><div class="pv-val">R$ 200</div><div class="pv-lbl">75d-1a</div></div>';
+      h+='<div class="premio-lv"><div class="pv-val">R$ 300</div><div class="pv-lbl">+1a</div></div>';
+      h+='<div class="premio-lv"><div class="pv-val">R$ 400</div><div class="pv-lbl">+2a</div></div>';
+      h+='<div class="premio-lv"><div class="pv-val">R$ 600</div><div class="pv-lbl">+3a</div></div>';
+      h+='</div></div>';
+      h+='</div>';
+
+      // Rules column
+      h+='<div class="cd-rules">';
+      h+='<div class="rules-title">⚠️ Você perde tudo se:</div>';
+      h+='<div class="cd-rules-list">';
+      h+='<div class="cd-rule"><span class="rule-icon">⏰</span><span class="rule-text">Atraso no ponto acima de 10 minutos</span></div>';
+      h+='<div class="cd-rule"><span class="rule-icon">📋</span><span class="rule-text">Deixar de bater o ponto em qualquer dia</span></div>';
+      h+='<div class="cd-rule"><span class="rule-icon">🚫</span><span class="rule-text">Falta sem atestado (declaração não abona)</span></div>';
+      h+='<div class="cd-rule"><span class="rule-icon">📄</span><span class="rule-text">+1 atestado OU +1 declaração no mês</span></div>';
+      h+='<div class="cd-rule"><span class="rule-icon">⚡</span><span class="rule-text">Advertência (verbal, escrita ou suspensão)</span></div>';
+      h+='<div class="cd-rule"><span class="rule-icon">📅</span><span class="rule-text">Não trabalhar o mês integralmente</span></div>';
+      h+='</div></div>';
+      h+='</div></div>';
+
+      h+='</div>';
     }else{
       h+='<div style="text-align:center;padding:60px 20px"><p style="color:var(--text2);font-size:.9rem">Seus dados ainda não apareceram nos relatórios.</p></div>';
     }
@@ -1177,6 +1446,48 @@ function getBenefitsHTML(cfg, curV){
   h+='<div class="premio-lv"><div class="pv-val">R$ 600</div><div class="pv-lbl">+3 anos</div></div>';
   h+='</div></div>';
 
+  h+='</div>';
+  return h;
+}
+
+function getTimelineHTML(cfg){
+  const stages=[
+    {id:'exp1',name:'Experiência',sub:'1-30 dias',meta:'Expectativa 3 mil',time:'0-30d'},
+    {id:'exp2',name:'Experiência',sub:'31-75 dias',meta:'Expectativa 7 mil',time:'31-75d'},
+    {id:'t10',name:'10 mil',sub:'A partir de 2,5 meses',meta:'10 mil p/ comissão',time:'2.5m+'},
+    {id:'t14',name:'14 mil',sub:'A partir do 4° mês',meta:'14 mil p/ comissão',time:'4m+'},
+    {id:'t18',name:'18 mil',sub:'A partir do 6° mês',meta:'18 mil p/ comissão',time:'6m+'},
+    {id:'t20',name:'20 mil',sub:'A partir do 8° mês',meta:'20 mil p/ comissão',time:'8m+'}
+  ];
+  // Determine current stage from cfg
+  let curIdx=0;
+  if(!cfg)curIdx=0;
+  else{
+    const c=cfg.toLowerCase();
+    if(c.includes('novat'))curIdx=1;
+    else if(c.includes('10')&&c.includes('14'))curIdx=2;
+    else if(c.includes('14')&&c.includes('18'))curIdx=3;
+    else if(c.includes('18')&&c.includes('20'))curIdx=4;
+    else if(c.includes('20')&&(c.includes('mais')||c.includes('+')))curIdx=5;
+  }
+
+  let h='<div class="cd-timeline">';
+  h+='<div class="cd-timeline-title">📈 Comissão por Tempo de Empresa</div>';
+  h+='<div class="tl-track">';
+  stages.forEach((s,i)=>{
+    const cls=i<curIdx?'active':i===curIdx?'current':'future';
+    h+='<div class="tl-stage '+cls+'">';
+    h+='<div class="tl-info"><div class="tl-name">'+s.name+'</div><div class="tl-meta">'+s.sub+'</div><div class="tl-meta">'+s.meta+'</div></div>';
+    h+='<div class="tl-dot"></div>';
+    h+='</div>';
+  });
+  h+='</div>';
+
+  // Rules boxes
+  h+='<div class="tl-box">';
+  h+='<div class="tl-rule-box exp"><div class="trb-title">Regras na Experiência</div><div class="trb-text">Comissão independente do valor. Folgas somente atingindo expectativas.</div></div>';
+  h+='<div class="tl-rule-box pos"><div class="trb-title">Após a Experiência</div><div class="trb-text">Comissão só é paga se atingir a meta mínima do mês.</div></div>';
+  h+='</div>';
   h+='</div>';
   return h;
 }
