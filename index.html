@@ -403,6 +403,175 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 @media(max-width:650px){.collab-cards,.collab-cards.three-cols{grid-template-columns:1fr}.cc-val{font-size:1.3rem}}
 </style>
 
+
+<style id="edimo-comparativo-v2">
+/* ===== ÉDIMO COMPARATIVO — visual layer ===== */
+#pageComp{padding:0!important}
+#pageComp .date-header{display:none}
+#pageComp .comp-upload{
+  margin:0 0 14px!important;padding:10px 0!important;background:transparent!important;
+  border:0!important;box-shadow:none!important
+}
+#pageComp .comp-upload > div:first-child{margin-bottom:8px!important;text-align:right!important}
+#pageComp .comp-upload > div:first-child button{
+  padding:8px 14px!important;border:1px solid #1d5b9a!important;
+  background:rgba(9,34,67,.75)!important;color:#91c9ff!important;
+  border-radius:9px!important;font-size:.64rem!important
+}
+#pageComp .comp-slots{display:none!important}
+
+.comp-v2{
+  position:relative;display:grid;grid-template-columns:245px minmax(0,1fr);
+  gap:22px;min-height:calc(100vh - 100px)
+}
+.comp-side{
+  position:sticky;top:86px;height:calc(100vh - 118px);min-height:650px;
+  padding:20px 14px;border:1px solid #123e6d;border-radius:17px;
+  background:
+    radial-gradient(circle at 20% 5%,rgba(25,119,255,.15),transparent 30%),
+    linear-gradient(180deg,rgba(7,27,54,.98),rgba(3,17,35,.98));
+  box-shadow:0 20px 50px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.03);
+  overflow:hidden
+}
+.comp-side:after{
+  content:"";position:absolute;right:-70px;bottom:-80px;width:220px;height:220px;
+  border-radius:50%;background:rgba(0,126,255,.10);filter:blur(10px)
+}
+.cs-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 24px}
+.cs-crown{font-size:1.8rem;filter:drop-shadow(0 0 9px rgba(255,190,30,.25))}
+.cs-brand strong{display:block;color:#f6bd2d;font-size:1.05rem;letter-spacing:.03em}
+.cs-brand small{display:block;color:#7892b1;font-size:.49rem;margin-top:2px}
+.cs-date{
+  padding:15px 13px;border-radius:13px;border:1px solid #194c7e;
+  background:rgba(8,30,59,.72);margin-bottom:20px
+}
+.cs-date .mini{font-size:.52rem;color:#31b8ff;text-transform:uppercase;letter-spacing:.12em}
+.cs-date .big{font-size:1.02rem;color:#edf5ff;font-weight:800;margin-top:5px}
+.cs-date .day{font-size:.58rem;color:#7590ae;margin-top:3px}
+.cs-nav{display:grid;gap:7px}
+.cs-nav button{
+  width:100%;display:flex;align-items:center;gap:12px;text-align:left;
+  padding:12px 13px;border:1px solid transparent;border-radius:10px;
+  background:transparent;color:#8ea7c4;font:600 .72rem inherit;cursor:pointer
+}
+.cs-nav button:hover{background:rgba(31,125,230,.08);color:#d8e9fb}
+.cs-nav button.active{
+  color:#fff;background:linear-gradient(90deg,#0879ef,#1260d9);
+  box-shadow:0 7px 20px rgba(14,112,234,.27)
+}
+.cs-nav .ico{width:22px;text-align:center;font-size:1rem}
+.cs-motto{
+  position:absolute;left:14px;right:14px;bottom:14px;padding:18px 15px;
+  border:1px solid #14518c;border-radius:14px;
+  background:linear-gradient(145deg,rgba(10,51,97,.9),rgba(5,29,57,.95));
+  z-index:1
+}
+.cs-motto .target{font-size:1.65rem}.cs-motto strong{display:block;color:#fff;font-size:.9rem;margin-top:6px}
+.cs-motto span{color:#56bdff;font-size:.72rem}
+.comp-content{min-width:0;padding:2px 0 30px}
+.comp-top{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;margin:3px 0 18px
+}
+.comp-title-wrap{display:flex;align-items:center;gap:13px}
+.comp-title-icon{
+  width:52px;height:52px;border-radius:15px;display:grid;place-items:center;
+  font-size:1.6rem;color:#fff;background:linear-gradient(145deg,#1589ff,#1754db);
+  box-shadow:0 10px 24px rgba(14,112,234,.26)
+}
+.comp-title{font-size:1.7rem;line-height:1.1;font-weight:850;color:#f2f7ff;letter-spacing:-.035em}
+.comp-sub{font-size:.68rem;color:#7895b6;margin-top:6px}
+.comp-search{
+  width:min(330px,42vw);height:40px;padding:0 15px;border-radius:21px;
+  border:1px solid #1b538b;background:rgba(7,25,50,.85);color:#dcecff;
+  outline:none;font:500 .68rem inherit;box-shadow:inset 0 1px rgba(255,255,255,.025)
+}
+.comp-search:focus{border-color:#1c91ff;box-shadow:0 0 0 3px rgba(28,145,255,.08)}
+.comp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.comp-kpi{
+  min-height:90px;padding:15px 18px;border-radius:14px;
+  border:1px solid #1c4c7c;background:linear-gradient(145deg,#0a274a,#071a34);
+  display:flex;align-items:center;gap:14px;position:relative;overflow:hidden
+}
+.comp-kpi:after{content:"";position:absolute;right:-25px;bottom:-30px;width:100px;height:100px;border-radius:50%;background:rgba(0,143,255,.08)}
+.comp-kpi .ki{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:1.2rem;background:#0a3768;border:1px solid #1769ae}
+.comp-kpi:nth-child(2) .ki{background:#123c54;border-color:#13bca0}.comp-kpi:nth-child(3) .ki{background:#2b2459;border-color:#7c5bff}
+.comp-kpi .kl{font-size:.53rem;text-transform:uppercase;letter-spacing:.08em;color:#7591b0}
+.comp-kpi .kv{font-size:1.6rem;font-weight:850;margin-top:3px;letter-spacing:-.03em}
+.comp-kpi:nth-child(1) .kv{color:#26e48a}.comp-kpi:nth-child(2) .kv{color:#36e0c3}.comp-kpi:nth-child(3) .kv{color:#bd82ff}
+.comp-tools{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 10px;
+  padding:7px 9px;border:1px solid #133f6a;border-radius:12px;background:rgba(5,20,40,.72)
+}
+.comp-view button,.comp-months button{
+  border:0;color:#7895b6;background:transparent;padding:9px 15px;border-radius:9px;
+  font:600 .62rem inherit;cursor:pointer
+}
+.comp-view{display:flex;background:#071c37;border-radius:9px}
+.comp-view button.active{background:#117df0;color:#fff;box-shadow:0 4px 14px rgba(17,125,240,.3)}
+.comp-months{display:flex;gap:6px}
+.comp-months button{border:1px solid #174a79;background:#09233f}
+.comp-months button.old{color:#8ca3bd}.comp-months button.prev{color:#c78cff}.comp-months button.curr{color:#20e7bd;border-color:#0a9f8b;background:rgba(5,94,83,.2)}
+.comp-table-wrap{
+  border:1px solid #154675;border-radius:15px;overflow:auto;
+  background:linear-gradient(145deg,rgba(6,24,47,.98),rgba(3,16,32,.98));
+  box-shadow:0 18px 45px rgba(0,0,0,.22)
+}
+.comp-table-v2{width:100%;border-collapse:separate;border-spacing:0;min-width:950px}
+.comp-table-v2 th{height:50px;padding:7px 9px;color:#6e8baa;font-size:.53rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #17466f;background:#071c36}
+.comp-table-v2 td{padding:9px 9px;border-bottom:1px solid rgba(19,55,87,.52);font-size:.65rem;color:#9bb1ca}
+.comp-table-v2 tbody tr:nth-child(even){background:rgba(8,28,51,.38)}
+.comp-table-v2 tbody tr:hover{background:rgba(22,130,239,.08)}
+.comp-table-v2 .rank{width:38px;text-align:center;color:#557391;font-weight:800}
+.comp-table-v2 .operator{min-width:175px;color:#e6eef8;font-weight:750;font-size:.68rem}
+.comp-table-v2 .eq{min-width:105px}.comp-table-v2 .num{text-align:right;white-space:nowrap}
+.comp-table-v2 .month{min-width:92px;text-align:center}
+.comp-table-v2 .month.old{color:#63a9e6}.comp-table-v2 .month.prev{color:#bf7cff}
+.comp-table-v2 .month.curr{color:#12e7bc;background:rgba(0,151,126,.08)}
+.comp-table-v2 .curr-col{background:rgba(0,151,126,.055);color:#16e6ba!important;font-weight:800!important}
+.comp-table-v2 .value{min-width:115px}.comp-table-v2 .sep{border-left:1px solid #194b77}
+.comp-table-v2 .trend{min-width:90px;text-align:center}.trend-pill{
+  display:inline-block;padding:4px 7px;border-radius:12px;font-size:.55rem;font-weight:800
+}
+.trend-pill.up{color:#1ff0a5;background:rgba(15,191,124,.12);border:1px solid rgba(15,191,124,.25)}
+.trend-pill.down{color:#ff7080;background:rgba(255,65,84,.08);border:1px solid rgba(255,65,84,.18)}
+.trend-pill.same{color:#9eb2c8;background:rgba(120,145,170,.08)}
+.meta-mini{min-width:130px}.meta-line{height:6px;background:#0c2a49;border-radius:7px;overflow:hidden;margin-bottom:4px}
+.meta-fill{height:100%;border-radius:7px;background:linear-gradient(90deg,#12d987,#26e7a0)}
+.meta-text{font-size:.48rem;color:#6f8ba8}.eq-badge-v2{display:inline-block;padding:3px 7px;border-radius:7px;font-size:.5rem;font-weight:800}
+.eq-badge-v2.green{color:#14e8a0;background:rgba(8,183,118,.11);border:1px solid rgba(8,183,118,.28)}
+.eq-badge-v2.purple{color:#bd82ff;background:rgba(120,71,211,.13);border:1px solid rgba(120,71,211,.3)}
+.eq-badge-v2.gold{color:#ffc82e;background:rgba(198,142,10,.11);border:1px solid rgba(198,142,10,.3)}
+.eq-badge-v2.blue{color:#55b7ff;background:rgba(42,139,224,.1);border:1px solid rgba(42,139,224,.25)}
+.comp-footer{display:flex;justify-content:space-between;align-items:center;padding:13px 5px;color:#597694;font-size:.57rem}
+.comp-footer .pages{display:flex;gap:5px}.comp-footer button{border:1px solid #174b7d;background:#071e3b;color:#8fb0d1;border-radius:8px;width:32px;height:30px}
+.comp-footer button.active{background:#0e78ed;color:#fff;border-color:#168bff}
+.comp-user-card{
+  border:1px solid #164a7b;border-radius:15px;padding:18px;background:linear-gradient(145deg,#0a284a,#071a33)
+}
+.comp-user-name{font-size:1.4rem;font-weight:850;color:#f4f8ff}.comp-user-sub{margin-top:5px;color:#7895b6;font-size:.62rem}
+.comp-user-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.comp-user-month{padding:16px;border-radius:12px;border:1px solid #18466f;background:#071d38}
+.comp-user-month.current{border-color:#0aa98d;background:rgba(4,87,77,.18)}
+.comp-user-month .period{font-size:.56rem;color:#7795b4;text-transform:uppercase}
+.comp-user-month .vals{display:flex;justify-content:space-between;gap:10px;margin-top:14px}
+.comp-user-month .val strong{display:block;font-size:1.15rem;color:#dfeaf8}.comp-user-month.current .val strong{color:#16e6ba}
+.comp-user-month .val span{display:block;font-size:.48rem;color:#6e89a6;margin-top:3px}
+@media(max-width:1000px){
+  .comp-v2{grid-template-columns:1fr}.comp-side{display:none}.comp-content{padding-top:8px}
+}
+@media(max-width:700px){
+  .comp-top{align-items:flex-start;flex-direction:column}.comp-search{width:100%}
+  .comp-stats{grid-template-columns:1fr}.comp-tools{align-items:stretch;flex-direction:column}
+  .comp-months{overflow:auto}.comp-user-grid{grid-template-columns:1fr}
+}
+</style>
+
+
+<style id="edimo-comp-view-css">
+#compTable.view-qtd .col-val,#compTable.view-qtd th:nth-of-type(5n){opacity:.28}
+#compTable.view-val .col-qtd,#compTable.view-val th:nth-of-type(4n){opacity:.28}
+</style>
+
 </head>
 <body>
 <div class="bg-layer"></div>
@@ -647,124 +816,100 @@ function genComp(){
   const now=ms[ms.length-1],prev=ms.length>=2?ms[ms.length-2]:null,oldest=ms.length>=3?ms[0]:null;
   const uN=cU?cU.nome.toLowerCase():'';
   const nowIdx=ms.length-1;
-
-  // Merge all months
   const allN=new Map();
-  ms.forEach((m,mi)=>{m.ops.forEach(o=>{
+
+  ms.forEach((m,mi)=>m.ops.forEach(o=>{
     if(!allN.has(o.n))allN.set(o.n,{name:o.n,cfg:o.cfg,m:new Array(ms.length).fill(null)});
     const r=allN.get(o.n);r.m[mi]={a:o.a,v:o.v};if(o.cfg)r.cfg=o.cfg;
-  });});
+  }));
   const od=[...allN.values()].sort((a,b)=>(b.m[nowIdx]?b.m[nowIdx].v:0)-(a.m[nowIdx]?a.m[nowIdx].v:0));
+  const totA=od.reduce((s,o)=>s+(o.m[nowIdx]?o.m[nowIdx].a:0),0);
+  const totV=od.reduce((s,o)=>s+(o.m[nowIdx]?o.m[nowIdx].v:0),0);
+  const active=od.filter(o=>o.m[nowIdx]&&o.m[nowIdx].a>0).length;
+  const periodText=ms.map(m=>shortPeriod(m.period)).join('  vs  ');
 
-  if(isA()){
-    let h='';
-    const totA=od.reduce((s,o)=>s+(o.m[nowIdx]?o.m[nowIdx].a:0),0);
-    const totV=od.reduce((s,o)=>s+(o.m[nowIdx]?o.m[nowIdx].v:0),0);
-    h+='<div class="comp-summary">';
-    h+='<div class="comp-stat"><div class="cs-val" style="color:var(--green)">'+totA+'</div><div class="cs-lbl">Total Acordos (atual)</div></div>';
-    h+='<div class="comp-stat"><div class="cs-val" style="color:var(--purple)">'+fm(totV)+'</div><div class="cs-lbl">Valor Total (atual)</div></div>';
-    h+='<div class="comp-stat"><div class="cs-val" style="color:var(--cyan)">'+od.filter(o=>o.m[nowIdx]&&o.m[nowIdx].a>0).length+'</div><div class="cs-lbl">Operadores Ativos</div></div>';
-    h+='</div>';
-    h+='<div style="text-align:center;margin-bottom:16px;font-size:.62rem;color:var(--text3)">';
-    ms.forEach((m,i)=>{h+=(i>0?' vs ':'')+shortPeriod(m.period);});h+='</div>';
-    h+='<div class="comp-section"><table class="comp-table"><thead>';
-    // Month group header row
-    h+='<tr><th colspan="3"></th>';
-    const mhCls=['mh-old','mh-prev','mh-curr'];
-    const mhIcon=['📋','📋','📋'];
-    ms.forEach((m,i)=>{
-      const cls=ms.length===1?'mh-curr':ms.length===2?(i===0?'mh-prev':'mh-curr'):(i===0?'mh-old':i===1?'mh-prev':'mh-curr');
-      h+='<th colspan="2" class="month-header '+cls+'" style="text-align:center">'+shortPeriod(m.period)+'</th>';
-    });
-    h+='<th></th>';if(ms.length>=2)h+='<th></th>';h+='</tr>';
-    // Column labels row
-    h+='<tr><th style="width:30px">#</th><th>Operador</th><th class="eq-col">Equipe</th>';
-    ms.forEach((m,i)=>{h+='<th class="num month-group-start">Qtd</th><th class="num">Valor</th>';});
-    h+='<th class="meta-col month-group-start">Meta (atual)</th>';
-    if(ms.length>=2)h+='<th class="num" style="width:60px">Var</th>';
-    h+='</tr></thead><tbody>';
-    od.forEach((op,i)=>{
-      const hl=mU(op.name,uN)?' hl':'';
-      h+='<tr class="'+hl+'"><td style="font-size:.7rem;font-weight:700;color:var(--text3)">'+(i+1)+'</td><td class="nmcell">'+op.name+'</td><td>'+eqBadge(op.cfg)+'</td>';
-      ms.forEach((m,mi)=>{const d=op.m[mi],isN=mi===nowIdx;
-        const sep=' mg-start';const cc=isN?' curr-col':'';
-        if(d){h+='<td class="num'+sep+cc+'" style="'+(isN?'font-weight:800;color:var(--green)':'color:var(--text2)')+'">'+d.a+'</td><td class="num'+cc+'" style="'+(isN?'font-weight:600':'')+'">'+fm(d.v)+'</td>';}
-        else h+='<td class="num'+sep+'" style="color:var(--text3)">-</td><td class="num" style="color:var(--text3)">-</td>';
-      });
-      const curV=op.m[nowIdx]?op.m[nowIdx].v:0;
-      h+='<td class="mg-start">'+metaBarHTML(curV,op.cfg)+'</td>';
-      if(ms.length>=2){const pv=op.m[nowIdx-1]?op.m[nowIdx-1].v:0,cv=op.m[nowIdx]?op.m[nowIdx].v:0;
-        if(pv===0&&cv===0)h+='<td class="num"><span class="trend-same">—</span></td>';
-        else if(pv===0)h+='<td class="num"><span class="trend-up">NOVO</span></td>';
-        else{const pct=Math.round(((cv-pv)/pv)*100);h+='<td class="num"><span class="'+(pct>0?'trend-up':pct<0?'trend-down':'trend-same')+'">'+(pct>0?'▲+'+pct+'%':pct<0?'▼'+Math.abs(pct)+'%':'=')+'</span></td>';}}
-      h+='</tr>';
-    });
-    h+='</tbody></table></div>';
-    document.getElementById('compR').innerHTML=h;
+  function badge(cfg){
+    const m=getMeta(cfg);
+    if(!m)return '';
+    const cls=m.cls&&m.cls.includes('purple')?'purple':m.cls&&m.cls.includes('gold')?'gold':m.cls&&m.cls.includes('blue')?'blue':'green';
+    return '<span class="eq-badge-v2 '+cls+'">'+m.label+'</span>';
   }
-  else{
-    // ========== COLLABORATOR VIEW ==========
-    const myD=od.find(op=>mU(op.name,uN));let h='';
-    if(myD){
-      const meta=getMeta(myD.cfg);
-      const curD=myD.m[nowIdx],prevD=ms.length>=2?myD.m[nowIdx-1]:null,oldD=ms.length>=3?myD.m[0]:null;
-      const curA=curD?curD.a:0,curV=curD?curD.v:0;
-      const prevA=prevD?prevD.a:0,prevV=prevD?prevD.v:0;
+  function pctChange(a,b){
+    if(!b)return a?'NOVO':'—';
+    const p=Math.round(((a-b)/b)*100);
+    return p>0?'<span class="trend-pill up">▲ +'+p+'%</span>':p<0?'<span class="trend-pill down">▼ '+Math.abs(p)+'%</span>':'<span class="trend-pill same">= 0%</span>';
+  }
+  function metaMini(o){
+    const meta=getMeta(o.cfg),v=o.m[nowIdx]?o.m[nowIdx].v:0;
+    if(!meta||!meta.max)return '<span class="meta-text">—</span>';
+    const p=Math.min(Math.round(v/meta.max*100),100);
+    return '<div class="meta-mini"><div class="meta-line"><div class="meta-fill" style="width:'+p+'%"></div></div><div class="meta-text">'+p+'% · '+fm(v)+' / '+fm(meta.max)+'</div></div>';
+  }
 
-      h+='<div class="collab-hero"><div class="collab-name">'+myD.name+'</div><div class="collab-equipe">'+eqBadge(myD.cfg)+'</div></div>';
+  let h='<div class="comp-v2">';
+  h+='<aside class="comp-side">';
+  h+='<div class="cs-brand"><div class="cs-crown">👑</div><div><strong>ÉDIMO</strong><small>SOLUÇÕES EM COBRANÇAS</small></div></div>';
+  h+='<div class="cs-date"><div class="mini">Mês atual</div><div class="big">'+shortPeriod(now.period)+'</div><div class="day">Acompanhamento de desempenho</div></div>';
+  h+='<div class="cs-nav"><button onclick="showPage(\'ranking\')"><span class="ico">🏠</span>Visão Geral</button><button onclick="showPage(\'ranking\')"><span class="ico">🏆</span>Ranking</button><button class="active"><span class="ico">📊</span>Comparativo</button><button onclick="doLogout()"><span class="ico">🚪</span>Sair</button></div>';
+  h+='<div class="cs-motto"><div class="target">🎯</div><strong>Juntos batemos<br>mais metas!</strong><span>Foco no próximo acordo.</span></div>';
+  h+='</aside>';
 
-      // Meta bar (big)
-      if(meta&&meta.max>0){
-        const pct=Math.min(Math.round((curV/meta.max)*100),100),exceeded=curV>=meta.max;
-        const barColor=exceeded?'#22e477':meta.color,remaining=Math.max(0,meta.max-curV);
-        h+='<div class="collab-meta"><h4>🎯 Meta '+meta.label+': '+fm(meta.max)+'</h4>';
-        h+='<div style="position:relative"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,'+barColor+','+barColor+'cc)"></div>';
-        h+='<span class="cm-bar-pct">'+pct+'%'+(exceeded?' ⭐':'')+'</span></div></div>';
-        h+='<div class="cm-detail"><span>Atual: <strong>'+fm(curV)+'</strong></span><span>Meta: '+fm(meta.max)+'</span></div>';
-        if(exceeded)h+='<div class="cm-remaining" style="color:#22e477">🌟 Meta batida! +'+fm(curV-meta.max)+' acima!</div>';
-        else h+='<div class="cm-remaining" style="color:var(--text2)">Faltam <strong style="color:var(--text)">'+fm(remaining)+'</strong></div>';
-        h+='</div>';
-      }
+  h+='<main class="comp-content">';
+  h+='<div class="comp-top"><div class="comp-title-wrap"><div class="comp-title-icon">📈</div><div><div class="comp-title">Comparativo de Acordos</div><div class="comp-sub">Acompanhe o desempenho de cada operador nos últimos 3 meses.</div></div></div>';
+  h+='<input id="compSearch" class="comp-search" placeholder="🔎  Buscar operador..." oninput="filterCompRows(this.value)"></div>';
 
-      // Month cards (2 or 3)
-      const numCards=(oldD?1:0)+(prevD?1:0)+1;
-      h+='<div class="collab-cards'+(numCards>=3?' three-cols':'')+'">';
-      if(oldD){
-        h+='<div class="collab-card card-old"><div class="cc-period">'+shortPeriod(ms[0].period)+'</div>';
-        h+='<div class="cc-row"><div class="cc-item"><div class="cc-val" style="color:var(--text3)">'+oldD.a+'</div><div class="cc-lbl">Acordos</div></div>';
-        h+='<div class="cc-item"><div class="cc-val" style="color:var(--text3)">'+fm(oldD.v)+'</div><div class="cc-lbl">Valor</div></div></div></div>';
-      }
-      if(prevD){
-        h+='<div class="collab-card card-prev"><div class="cc-period">'+shortPeriod(ms[ms.length-2].period)+'</div>';
-        h+='<div class="cc-row"><div class="cc-item"><div class="cc-val" style="color:var(--text2)">'+prevA+'</div><div class="cc-lbl">Acordos</div></div>';
-        h+='<div class="cc-item"><div class="cc-val" style="color:var(--text2)">'+fm(prevV)+'</div><div class="cc-lbl">Valor</div></div></div></div>';
-      }
-      h+='<div class="collab-card card-curr"><div class="cc-period">'+shortPeriod(now.period)+' (atual)</div>';
-      h+='<div class="cc-row"><div class="cc-item"><div class="cc-val" style="color:var(--green)">'+curA+'</div><div class="cc-lbl">Acordos</div></div>';
-      h+='<div class="cc-item"><div class="cc-val" style="color:var(--purple)">'+fm(curV)+'</div><div class="cc-lbl">Valor</div></div></div></div>';
-      h+='</div>';
+  h+='<div class="comp-stats">';
+  h+='<div class="comp-kpi"><div class="ki">🤝</div><div><div class="kl">Total de acordos (atual)</div><div class="kv">'+totA+'</div></div></div>';
+  h+='<div class="comp-kpi"><div class="ki">💰</div><div><div class="kl">Valor total (atual)</div><div class="kv">'+fm(totV)+'</div></div></div>';
+  h+='<div class="comp-kpi"><div class="ki">👥</div><div><div class="kl">Operadores ativos</div><div class="kv">'+active+'</div></div></div>';
+  h+='</div>';
 
-      // Comparison block
-      if(prev){
-        h+='<div class="collab-diff"><div class="diff-title">📊 Comparativo vs Mês Anterior</div><div class="diff-grid">';
-        const aDiff=curA-prevA,aCls=aDiff>0?'up':aDiff<0?'down':'same';
-        h+='<div class="diff-item"><div class="diff-arrow '+aCls+'">'+(aDiff>0?'▲ +'+aDiff:aDiff<0?'▼ '+aDiff:'= 0')+'</div><div class="diff-label '+aCls+'">Acordos</div></div>';
-        const vDiff=curV-prevV,vCls=vDiff>0?'up':vDiff<0?'down':'same';
-        h+='<div class="diff-item"><div class="diff-arrow '+vCls+'">'+(vDiff>0?'▲':'▼')+'</div><div class="diff-label '+vCls+'">'+(vDiff>=0?'+':'')+fm(vDiff)+'</div></div>';
-        if(prevV>0){const vPct=Math.round(((curV-prevV)/prevV)*100),pCls=vPct>0?'up':vPct<0?'down':'same';
-          h+='<div class="diff-item"><div class="diff-arrow '+pCls+'">'+(vPct>0?'+':'')+vPct+'%</div><div class="diff-label '+pCls+'">Variação</div></div>';}
-        h+='</div>';
-        if(prevV===0&&curV>0)h+='<div class="diff-verdict newop">🎉 Primeiro mês!</div>';
-        else if(vDiff>0)h+='<div class="diff-verdict better">🚀 Você está melhor que o mês passado!</div>';
-        else if(vDiff<0)h+='<div class="diff-verdict worse">⚡ Bora recuperar! Foco no próximo acordo.</div>';
-        else h+='<div class="diff-verdict equal">Mesmo resultado. Hora de subir!</div>';
-        h+='</div>';
-      }
-    }else{
-      h+='<div style="text-align:center;padding:60px 20px"><p style="color:var(--text2);font-size:.9rem">Seus dados ainda não apareceram nos relatórios.</p></div>';
+  h+='<div class="comp-tools"><div class="comp-view"><button class="active" onclick="setCompView(\'all\',this)">Qtd + Valor</button><button onclick="setCompView(\'qtd\',this)">Acordos</button><button onclick="setCompView(\'val\',this)">Valor</button></div>';
+  h+='<div class="comp-months"><button class="old">'+(oldest?'📅 Mês 1 · '+shortPeriod(oldest.period):'Mês 1')+'</button><button class="prev">'+(prev?'📅 Mês 2 · '+shortPeriod(prev.period):'Mês 2')+'</button><button class="curr">📅 Mês Atual · '+shortPeriod(now.period)+'</button></div></div>';
+
+  h+='<div class="comp-table-wrap"><table class="comp-table-v2" id="compTable"><thead><tr>';
+  h+='<th class="rank">#</th><th class="operator">Operador</th><th class="eq">Equipe</th>';
+  ms.forEach((m,mi)=>{const cls=mi===nowIdx?'curr':mi===nowIdx-1?'prev':'old';h+='<th colspan="2" class="month '+cls+'">'+(mi===nowIdx?'MÊS ATUAL':mi===nowIdx-1?'MÊS 2':'MÊS 1')+'<br><small>'+shortPeriod(m.period)+'</small></th>';});
+  h+='<th class="meta-mini">Meta atual</th>';
+  if(prev)h+='<th class="trend">Variação<br><small>Mês 2 → Atual</small></th>';
+  h+='</tr><tr><th></th><th></th><th></th>';
+  ms.forEach((m,mi)=>{const cls=mi===nowIdx?'curr-col':'';h+='<th class="num '+cls+'">Acordos</th><th class="num value '+cls+'">Valor</th>';});
+  h+='<th></th>';if(prev)h+='<th></th>';h+='</tr></thead><tbody>';
+
+  od.forEach((op,i)=>{
+    const hl=mU(op.name,uN)?' my-row':'';
+    h+='<tr class="comp-row'+hl+'" data-name="'+op.name.toLowerCase()+'">';
+    h+='<td class="rank">'+(i+1)+'</td><td class="operator">'+(i<3?['🥇','🥈','🥉'][i]+' ':'')+op.name+'</td><td class="eq">'+badge(op.cfg)+'</td>';
+    ms.forEach((m,mi)=>{
+      const d=op.m[mi],cur=mi===nowIdx;
+      if(d)h+='<td class="num '+(cur?'curr-col ':'')+'col-qtd">'+d.a+'</td><td class="num value '+(cur?'curr-col ':'')+'col-val">'+fm(d.v)+'</td>';
+      else h+='<td class="num col-qtd">-</td><td class="num value col-val">-</td>';
+    });
+    h+='<td>'+metaMini(op)+'</td>';
+    if(prev){
+      const pv=op.m[nowIdx-1]?op.m[nowIdx-1].v:0,cv=op.m[nowIdx]?op.m[nowIdx].v:0;
+      h+='<td class="trend">'+pctChange(cv,pv)+'</td>';
     }
-    document.getElementById('compR').innerHTML=h;
-  }
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div class="comp-footer"><span>Mostrando '+od.length+' de '+od.length+' operadores · '+periodText+'</span><div class="pages"><button>‹</button><button class="active">1</button><button>›</button></div></div>';
+  h+='</main></div>';
+
+  document.getElementById('compR').innerHTML=h;
+}
+
+function filterCompRows(q){
+  q=(q||'').toLowerCase().trim();
+  document.querySelectorAll('#compTable .comp-row').forEach(r=>r.style.display=(!q||r.dataset.name.includes(q))?'':'none');
+}
+function setCompView(mode,btn){
+  document.querySelectorAll('.comp-view button').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const t=document.getElementById('compTable');if(!t)return;
+  t.classList.remove('view-qtd','view-val');
+  if(mode==='qtd')t.classList.add('view-qtd');
+  if(mode==='val')t.classList.add('view-val');
 }
 
 function cn(r){if(r.toUpperCase().includes('WEBSERVICE'))return'Robô Edimo';let n=r.replace(/^[\d]+\.?(\d+\.)?/,'');return n.split('.').map(p=>p?p.charAt(0).toUpperCase()+p.slice(1).toLowerCase():'').filter(p=>p).join(' ')}
