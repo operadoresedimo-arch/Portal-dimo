@@ -1603,6 +1603,97 @@ body::before,body::after{display:none!important}
 .cell-meta-txt{font-size:.7rem!important;color:#5a5d62!important}
 .cell-meta-bar{height:4px!important;max-width:100%!important}
 
+
+/* ====== MOBILE RESPONSIVE ====== */
+@media(max-width:768px){
+  /* Hide sidebar, show nav */
+  .sidebar{display:none!important}
+  .app-with-sidebar .main{margin-left:0!important;padding:10px 8px 20px!important}
+  .app-with-sidebar .nav{display:block!important}
+  .app-with-sidebar .toolbar{margin-left:0!important}
+  
+  /* Nav compact */
+  .nav{width:calc(100% - 12px)!important;top:6px!important}
+  .nav-inner{height:42px!important;padding:0 6px!important}
+  .nav-brand{font-size:.6rem!important;margin-right:6px!important}
+  .nav-tab{padding:6px 10px!important;font-size:.6rem!important}
+  .nav-user{display:none!important}
+  .nav-logout{padding:4px 8px!important;font-size:.5rem!important}
+  .main{padding:56px 8px 20px!important}
+  
+  /* Hero: stack vertically */
+  .comp-hero{flex-direction:column!important;align-items:flex-start!important;gap:8px!important}
+  .comp-hero-title{font-size:1.2rem!important}
+  .comp-hero-icon{font-size:1.6rem!important}
+  #compHeroPersonal{flex-direction:column!important;gap:8px!important}
+  .hero-card{padding:12px!important}
+  .hp-name{font-size:1.2rem!important}
+  .hc-val{font-size:1.2rem!important}
+  
+  /* Summary cards: stack */
+  .comp-summary{grid-template-columns:1fr!important;gap:8px!important}
+  .comp-stat .cs-val{font-size:1.4rem!important}
+  
+  /* Filters: wrap */
+  .comp-filters{flex-direction:column!important;align-items:stretch!important;gap:6px!important}
+  .comp-filter-group{flex-wrap:wrap!important}
+  .comp-filter-btn{padding:8px 10px!important;font-size:.65rem!important;flex:1!important;text-align:center!important}
+  .comp-month-tabs{flex-wrap:wrap!important;gap:4px!important}
+  .comp-month-tab{padding:6px 8px!important;font-size:.55rem!important;flex:1!important;text-align:center!important}
+  
+  /* Table: horizontal scroll but readable */
+  .comp-section{overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
+  .comp-table th,.comp-table td{font-size:1rem!important;padding:6px 8px!important}
+  .comp-table .nmcell{min-width:130px!important;position:sticky!important;left:0!important;background:#fff!important;z-index:2!important;box-shadow:2px 0 4px rgba(0,0,0,.08)!important}
+  .comp-table th:first-child{position:sticky!important;left:0!important;background:#f7f8f9!important;z-index:3!important}
+  .cell-meta-txt{font-size:.55rem!important}
+  .comp-table .month-header{font-size:.55rem!important}
+  
+  /* Ranking page */
+  .stat-cards{grid-template-columns:1fr!important}
+  .dash-grid{grid-template-columns:1fr!important}
+  .date-header .dt{font-size:1.4rem!important}
+  
+  /* Podium: stack */
+  .pod-card{display:flex!important;width:100%!important;margin-right:0!important;margin-bottom:8px!important}
+  
+  /* Collaborator: single column */
+  .collab-dash{grid-template-columns:1fr!important}
+  .collab-dash .cd-left,.collab-dash .cd-right{grid-column:1!important}
+  .cd-header{flex-direction:column!important;gap:10px!important}
+  .cd-meta-compact{min-width:auto!important;width:100%!important}
+  .cd-mc-val{font-size:1.2rem!important}
+  
+  /* Goals 2col: stack */
+  .goals-2col{grid-template-columns:1fr!important}
+  
+  /* Benefits: stack */
+  .cd-benefits-row{grid-template-columns:1fr!important}
+  
+  /* Login */
+  .login-box{padding:32px 20px!important;margin:0 12px!important}
+  
+  /* Search full width */
+  .comp-search{width:100%!important}
+  .comp-search input{width:100%!important}
+}
+
+/* Small phones */
+@media(max-width:480px){
+  .comp-table th,.comp-table td{font-size:.85rem!important;padding:5px 6px!important}
+  .comp-table .nmcell{min-width:110px!important}
+  .cell-meta-txt{font-size:.48rem!important}
+  .hp-name{font-size:1rem!important}
+  .hc-val{font-size:1rem!important}
+  .comp-stat .cs-val{font-size:1.2rem!important}
+}
+
+
+/* HIDE SIDEBAR STATS (already shown in page) */
+.sb-month-box{display:none!important}
+#sbPersonal{display:none!important}
+#sbRankStats{display:none!important}
+
 </style>
 
 </head>
