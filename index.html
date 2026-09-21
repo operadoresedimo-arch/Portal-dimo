@@ -1739,6 +1739,13 @@ body::before,body::after{display:none!important}
   .comp-table th,.comp-table td{font-size:.72rem!important;padding:4px 5px!important}
 }
 
+
+/* FIX NAV OVERLAP ON MOBILE */
+@media(max-width:768px){
+  .main{padding-top:100px!important}
+  .nav{top:0!important;left:0!important;right:0!important;width:100%!important;transform:none!important;border-radius:0!important;position:fixed!important;z-index:50!important}
+}
+
 </style>
 
 </head>
