@@ -1165,6 +1165,20 @@ div[style*="text-align:center;margin-bottom:16px"]{margin-bottom:10px!important}
   .app-with-sidebar .main{margin-left:190px!important}
 }
 
+
+/* HERO PERSONAL */
+#compHeroPersonal{display:flex;align-items:center;gap:24px}
+.hero-personal{display:flex;flex-direction:column;gap:4px}
+.hp-name{font-size:1.8rem;font-weight:900;color:var(--text);line-height:1.1}
+.hero-valor{background:#232628;border:1px solid #2e3133;border-radius:14px;padding:16px 24px;text-align:center;min-width:200px}
+.hv-label{font-size:.5rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.hv-val{font-size:1.8rem;font-weight:900;color:#2ECC71}
+.hv-sub{font-size:.7rem;color:var(--text2);margin-top:2px}
+@media(max-width:700px){
+  #compHeroPersonal{flex-direction:column;align-items:flex-start;gap:12px}
+  .hero-valor{min-width:auto;width:100%}
+}
+
 </style>
 
 </head>
@@ -1215,8 +1229,9 @@ div[style*="text-align:center;margin-bottom:16px"]{margin-bottom:10px!important}
 <div class="main">
 <div class="page" id="pageRanking"><div class="loading-msg" id="rankLoading">Carregando ranking...</div></div>
 <div class="page" id="pageComp">
-<div class="comp-hero">
+<div class="comp-hero" id="compHero">
 <div class="comp-hero-left"><span class="comp-hero-icon">📋</span><div><h1 class="comp-hero-title">Comparativo de Acordos</h1><p class="comp-hero-sub">Acompanhe o desempenho de cada operador nos últimos 3 meses.</p></div></div>
+<div id="compHeroPersonal" style="display:none"></div>
 <div class="comp-search admin-only"><span class="comp-search-icon">🔍</span><input type="text" id="compSearch" placeholder="Buscar operador..." oninput="filterCompTable()"></div>
 </div>
 <div class="comp-upload admin-only" id="compUpload">
@@ -1482,6 +1497,11 @@ function genComp(){
   const od=[...allN.values()].sort((a,b)=>(b.m[sortIdx]?b.m[sortIdx].v:0)-(a.m[sortIdx]?a.m[sortIdx].v:0));
 
   if(isA()){
+    // Reset hero for admin
+    const hp2=document.getElementById('compHeroPersonal');if(hp2)hp2.style.display='none';
+    const ht2=document.querySelector('.comp-hero-title');if(ht2)ht2.textContent='Comparativo de Acordos';
+    const hs2=document.querySelector('.comp-hero-sub');if(hs2)hs2.style.display='';
+    const hi2=document.querySelector('.comp-hero-icon');if(hi2)hi2.style.display='';
     let h='';
     const sumIdx=compMonthFilter==='all'?nowIdx:parseInt(compMonthFilter);
     const sumLabel=compMonthFilter==='all'?'(atual)':'('+shortPeriod(ms[sumIdx].period)+')';
@@ -1568,6 +1588,17 @@ function genComp(){
       const isNovato=myD.cfg&&myD.cfg.toLowerCase().includes('novat');
 
       updateSidebarMonth(curA,curV);
+      // Fill hero header with name + value
+      const hp=document.getElementById('compHeroPersonal');
+      if(hp){
+        hp.style.display='flex';
+        hp.innerHTML='<div class="hero-personal"><div class="hp-name">'+myD.name+'</div>'+eqBadge(myD.cfg)+'</div><div class="hero-valor"><div class="hv-label">VALOR ATUAL</div><div class="hv-val">'+fm(curV)+'</div><div class="hv-sub">'+curA+' acordos</div></div>';
+      }
+      // Hide the default title for collab
+      const ht=document.querySelector('.comp-hero-title');if(ht)ht.textContent='';
+      const hs=document.querySelector('.comp-hero-sub');if(hs)hs.style.display='none';
+      const hi=document.querySelector('.comp-hero-icon');if(hi)hi.style.display='none';
+
       h+='<div class="collab-dash">';
 
       // ── ROW 1: Header (name+badge) + Meta bar ──
