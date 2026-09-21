@@ -1166,17 +1166,16 @@ div[style*="text-align:center;margin-bottom:16px"]{margin-bottom:10px!important}
 }
 
 
-/* HERO PERSONAL */
-#compHeroPersonal{display:flex;align-items:center;gap:24px}
-.hero-personal{display:flex;flex-direction:column;gap:4px}
-.hp-name{font-size:1.8rem;font-weight:900;color:var(--text);line-height:1.1}
-.hero-valor{background:#232628;border:1px solid #2e3133;border-radius:14px;padding:16px 24px;text-align:center;min-width:200px}
-.hv-label{font-size:.5rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
-.hv-val{font-size:1.8rem;font-weight:900;color:#2ECC71}
-.hv-sub{font-size:.7rem;color:var(--text2);margin-top:2px}
+/* HERO PERSONAL - 3 CARDS CENTERED */
+#compHeroPersonal{display:flex;align-items:stretch;justify-content:center;gap:16px;width:100%}
+.hero-card{background:#232628;border:1px solid #2e3133;border-radius:14px;padding:16px 24px;text-align:center;flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.hero-card.hc-name{align-items:center}
+.hp-name{font-size:1.6rem;font-weight:900;color:var(--text);line-height:1.1;margin-bottom:4px}
+.hc-label{font-size:.5rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.hc-val{font-size:1.6rem;font-weight:900}
+.hc-sub{font-size:.65rem;color:var(--text2);margin-top:2px}
 @media(max-width:700px){
-  #compHeroPersonal{flex-direction:column;align-items:flex-start;gap:12px}
-  .hero-valor{min-width:auto;width:100%}
+  #compHeroPersonal{flex-direction:column;gap:10px}
 }
 
 </style>
@@ -1500,6 +1499,7 @@ function genComp(){
     // Reset hero for admin
     const hp2=document.getElementById('compHeroPersonal');if(hp2)hp2.style.display='none';
     const ht2=document.querySelector('.comp-hero-title');if(ht2)ht2.textContent='Comparativo de Acordos';
+    const hl2=document.querySelector('.comp-hero-left');if(hl2)hl2.style.display='';
     const hs2=document.querySelector('.comp-hero-sub');if(hs2)hs2.style.display='';
     const hi2=document.querySelector('.comp-hero-icon');if(hi2)hi2.style.display='';
     let h='';
@@ -1592,10 +1592,13 @@ function genComp(){
       const hp=document.getElementById('compHeroPersonal');
       if(hp){
         hp.style.display='flex';
-        hp.innerHTML='<div class="hero-personal"><div class="hp-name">'+myD.name+'</div>'+eqBadge(myD.cfg)+'</div><div class="hero-valor"><div class="hv-label">VALOR ATUAL</div><div class="hv-val">'+fm(curV)+'</div><div class="hv-sub">'+curA+' acordos</div></div>';
+        const comVal=meta&&meta.max>0?fm(meta.max):'—';
+        const comHitH=hitMeta;
+        hp.innerHTML='<div class="hero-card hc-name"><div class="hp-name">'+myD.name+'</div>'+eqBadge(myD.cfg)+'</div><div class="hero-card hc-valor"><div class="hc-label">VALOR ATUAL</div><div class="hc-val" style="color:#2ECC71">'+fm(curV)+'</div><div class="hc-sub">'+curA+' acordos</div></div><div class="hero-card hc-comissao"><div class="hc-label">COMISSÃO</div><div class="hc-val" style="color:#D4A937">'+comVal+'</div><div class="hc-sub">'+(comHitH?'✅ Meta atingida':(isNovato?'Garantida na experiência':'Faltam '+fm(Math.max(0,(meta&&meta.max||0)-curV))))+'</div></div>';
       }
       // Hide the default title for collab
       const ht=document.querySelector('.comp-hero-title');if(ht)ht.textContent='';
+      const hl=document.querySelector('.comp-hero-left');if(hl)hl.style.display='none';
       const hs=document.querySelector('.comp-hero-sub');if(hs)hs.style.display='none';
       const hi=document.querySelector('.comp-hero-icon');if(hi)hi.style.display='none';
 
