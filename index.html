@@ -1694,6 +1694,51 @@ body::before,body::after{display:none!important}
 #sbPersonal{display:none!important}
 #sbRankStats{display:none!important}
 
+
+/* HIDE RANKING PROGRESS BAR */
+.tp-bar{display:none!important}
+.trow .bar{display:none!important}
+
+
+/* ====== MOBILE FIX v2 ====== */
+@media(max-width:768px){
+  /* Table: show full names, remove progress */
+  .tp-bar,.trow .bar{display:none!important}
+  .trow .nm{white-space:nowrap!important;overflow:visible!important;text-overflow:unset!important;font-size:.85rem!important}
+  .trow .rk{font-size:.75rem!important;width:22px!important;min-width:22px!important}
+  .trow .ac{font-size:.9rem!important;width:auto!important;min-width:30px!important}
+  .trow .vl{font-size:.75rem!important;width:auto!important}
+  .trow{padding:8px 10px!important}
+  .tp-header{padding:8px 10px!important}
+  .tp-rank{width:22px!important}.tp-name{min-width:auto!important}.tp-ac{width:auto!important}.tp-val{width:auto!important}
+  
+  /* Table panel: allow horizontal scroll if needed */
+  .table-panel{overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
+  
+  /* Podium cards: full width, no inline */
+  .pod-card{display:flex!important;width:100%!important;margin-right:0!important;margin-bottom:6px!important}
+  
+  /* Stat cards tighter */
+  .stat-card{min-height:70px!important;padding:12px 14px!important}
+  .sc-left{width:36px!important;height:36px!important;font-size:.9rem!important}
+  .sc-val{font-size:1.4rem!important}
+  
+  /* Nav: safe area */
+  .main{padding-top:60px!important}
+  
+  /* Comparativo table on mobile */
+  .comp-table th,.comp-table td{font-size:.8rem!important;padding:5px 6px!important}
+  .comp-table .nmcell{min-width:110px!important;position:sticky!important;left:0!important;background:#fff!important;z-index:2!important;box-shadow:2px 0 4px rgba(0,0,0,.06)!important;white-space:nowrap!important;overflow:visible!important;text-overflow:unset!important}
+  .cell-meta-txt{font-size:.5rem!important}
+}
+
+@media(max-width:480px){
+  .trow .nm{font-size:.78rem!important}
+  .trow .ac{font-size:.82rem!important}
+  .trow .vl{font-size:.68rem!important}
+  .comp-table th,.comp-table td{font-size:.72rem!important;padding:4px 5px!important}
+}
+
 </style>
 
 </head>
