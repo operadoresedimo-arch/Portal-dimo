@@ -1818,7 +1818,7 @@ function genComp(){
   const allN=new Map();
   ms.forEach((m,mi)=>{m.ops.forEach(o=>{
     if(!allN.has(o.n))allN.set(o.n,{name:o.n,cfg:o.cfg,t:o.t,m:new Array(ms.length).fill(null)});
-    const r=allN.get(o.n);r.m[mi]={a:o.a,v:o.v};if(o.cfg)r.cfg=o.cfg;if(o.t!==undefined)r.t=o.t;
+    const r=allN.get(o.n);r.m[mi]={a:o.a,v:o.v};if(o.cfg)r.cfg=o.cfg;if(o.t!==undefined)r.t=o.t;if(o.t!==undefined)r.t=o.t;
   });});
   const sortIdx=compMonthFilter==='all'?nowIdx:parseInt(compMonthFilter);
   const od=[...allN.values()].sort((a,b)=>(b.m[sortIdx]?b.m[sortIdx].v:0)-(a.m[sortIdx]?a.m[sortIdx].v:0));
@@ -1967,10 +1967,29 @@ function genComp(){
       }
 
       // ── ROW 3: Benefits (left) + Rules (right) ──
-      // ── ROW: Personal Goals + Progress ──
-      h+='<div class="cd-full">';
-      h+=getGoalsHTML(myD.cfg, curV, curA);
+      // ── ROW: Goals (left) + Turno chart (right) ──
       h+='</div>';
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">';
+      h+='<div>'+getGoalsHTML(myD.cfg, curV, curA)+'</div>';
+      // Turno chart
+      const turnoData={1:{label:'Turno 1 (Manhã)',val:0,count:0},2:{label:'Turno 2 (Tarde)',val:0,count:0}};
+      od.forEach(op=>{const d=op.m[ms.length-1];if(d&&op.t>0&&turnoData[op.t]){turnoData[op.t].val+=d.v;turnoData[op.t].count++;}});
+      const maxT=Math.max(turnoData[1].val,turnoData[2].val)||1;
+      const winT=turnoData[1].val>=turnoData[2].val?1:2;
+      let tc='<div style="background:#ffffff;border:1px solid #d0d3d6;padding:20px;height:100%;display:flex;flex-direction:column">';
+      tc+='<div style="font-size:.7rem;font-weight:600;color:#5a5d62;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;text-align:center">Recebimento por Turno</div>';
+      tc+='<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px">';
+      [1,2].forEach(function(t){const d=turnoData[t];const pct=Math.round((d.val/maxT)*100);const isW=t===winT;
+        tc+='<div><div style="font-size:.7rem;font-weight:500;color:#1a1a1a;margin-bottom:4px">'+d.label+'</div>';
+        tc+='<div style="height:28px;background:#e0e2e5;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(isW?'#D4A937':'#bcc0c4')+'"></div></div>';
+        tc+='<div style="font-size:.7rem;color:#5a5d62;margin-top:4px">'+fm(d.val)+' ('+d.count+' operadores)</div></div>';
+      });
+      tc+='</div>';
+      tc+='<div style="text-align:center;padding:10px;background:#f7f8f9;border:1px solid #e0e2e5;font-size:.75rem;color:#5a5d62;margin-top:12px">☕ '+turnoData[winT].label+' ganha um café!</div>';
+      tc+='</div>';
+      h+='<div>'+tc+'</div>';
+      h+='</div>';
+      h+='<div class="collab-dash">';
 
       h+='<div class="cd-full"><div class="cd-benefits-row">';
       // Benefits column
