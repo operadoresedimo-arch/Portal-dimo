@@ -1525,7 +1525,7 @@ body::before,body::after{display:none!important}
 .comp-section{overflow-x:visible!important;padding:0!important}
 .comp-table{width:100%!important;table-layout:auto!important}
 
-.comp-table .nmcell{max-width:none!important;min-width:120px!important;white-space:nowrap!important}
+
 .comp-table th:first-child,.comp-table td:first-child{width:24px!important}
 
 /* Mini bars even smaller */
@@ -1554,11 +1554,11 @@ body::before,body::after{display:none!important}
 
 
 /* TIGHT + BIG TEXT */
-.comp-table th,.comp-table td{padding:4px 6px!important;font-size:.82rem!important;white-space:nowrap!important}
+
 .comp-table .nmcell{font-size:.85rem!important}
 .comp-table th{font-size:.7rem!important}
-.comp-table{table-layout:auto!important;border-spacing:0!important;border-collapse:collapse!important}
-.comp-table th:first-child,.comp-table td:first-child{width:20px!important;padding:4px 2px!important}
+
+
 
 /* Month headers: tighter */
 .comp-table .month-header{padding:4px 6px!important;font-size:.6rem!important}
@@ -1575,6 +1575,11 @@ body::before,body::after{display:none!important}
 
 /* Stat cards: tighter */
 .comp-stat .cs-val{font-size:1.8rem!important}
+
+
+/* SHRINK COLUMNS TO CONTENT */
+.comp-table{width:auto!important;table-layout:auto!important}
+.comp-table th,.comp-table td{width:1px!important;white-space:nowrap!important;padding:4px 8px!important}
 
 </style>
 
