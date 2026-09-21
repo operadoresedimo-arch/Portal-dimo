@@ -1598,6 +1598,11 @@ body::before,body::after{display:none!important}
 .comp-table th{font-size:.9rem!important}
 .comp-table .nmcell{overflow:visible!important;text-overflow:unset!important;max-width:none!important}
 
+
+/* BIGGER VALUES + META TEXT */
+.cell-meta-txt{font-size:.7rem!important;color:#5a5d62!important}
+.cell-meta-bar{height:4px!important;max-width:100%!important}
+
 </style>
 
 </head>
@@ -1959,7 +1964,7 @@ function genComp(){
 
     h+='<div class="comp-section"><table class="comp-table"><thead>';
     // Month group row
-    h+='<tr><th colspan="2"></th>';
+    h+='<tr><th></th>';
     ms.forEach((m,i)=>{
       if(!showAll&&compMonthFilter!==String(i))return;
       const cls=ms.length===1?'mh-curr':ms.length===2?(i===0?'mh-prev':'mh-curr'):(i===0?'mh-old':i===1?'mh-prev':'mh-curr');
@@ -1968,7 +1973,7 @@ function genComp(){
     });
     h+='</tr>';
     // Column labels
-    h+='<tr><th style="width:30px">#</th><th>Operador</th>';
+    h+='<tr><th>Operador</th>';
     ms.forEach((m,i)=>{
       if(!showAll&&compMonthFilter!==String(i))return;
       if(showAcordos)h+='<th class="num month-group-start">Acordos</th>';
@@ -1980,7 +1985,7 @@ function genComp(){
     od.forEach((op,i)=>{
       const hl=mU(op.name,uN)?' hl':'';
       const medal=i<3?'<span class="medal-'+(i+1)+'"></span>':'';
-      h+='<tr class="'+hl+'"><td style="font-size:.7rem;font-weight:700;color:var(--text3)">'+(i+1)+'</td><td class="nmcell">'+medal+op.name+'</td>';
+      h+='<tr class="'+hl+'"><td class="nmcell">'+medal+op.name+'</td>';
       ms.forEach((m,mi)=>{
         if(!showAll&&compMonthFilter!==String(mi))return;
         const d=op.m[mi],isN=mi===nowIdx;
