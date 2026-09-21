@@ -1469,6 +1469,29 @@ body::before,body::after{display:none!important}
 /* Keep ONLY these colored: progress bar fills, trend arrows, meta status */
 /* trend-up stays green, trend-down stays red - those are important signals */
 
+
+/* GOALS UNIFIED CARD */
+.goals-unified{background:#ffffff;border:1px solid #d0d3d6;padding:20px;height:100%}
+.gu-row{display:flex;gap:1px;margin-bottom:16px;background:#d0d3d6}
+.gu-item{flex:1;background:#ffffff;padding:12px 10px;text-align:center}
+.gu-icon{font-size:1.2rem;margin-bottom:4px}
+.gu-label{font-size:.6rem;font-weight:500;color:#5a5d62;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.gu-val{font-size:.85rem;font-weight:500;color:#1a1a1a}
+.gu-progress{margin-bottom:12px}
+.gu-prog-header{display:flex;justify-content:space-between;font-size:.75rem;color:#1a1a1a;margin-bottom:6px}
+.gu-bar{height:20px;background:#e0e2e5;overflow:hidden;position:relative}
+.gu-bar-fill{height:100%;position:relative;transition:width 1s ease}
+.gu-bar-pct{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.65rem;font-weight:600;color:#fff}
+.gu-remaining{text-align:center;font-size:.8rem;color:#5a5d62;margin-top:8px}
+.gu-remaining strong{color:#1a1a1a}
+.gu-motiv{text-align:center;padding:10px;background:#f7f8f9;border:1px solid #e0e2e5;font-size:.78rem;color:#5a5d62;margin-top:10px}
+
+
+.cd-goals-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cd-goals-left{min-height:0}
+.cd-goals-right{min-height:100px}
+@media(max-width:800px){.cd-goals-row{grid-template-columns:1fr}}
+
 </style>
 
 </head>
@@ -2196,66 +2219,49 @@ function getGoalsHTML(cfg, curV, curA){
   const exceeded=target>0&&curV>=target;
   const remaining=Math.max(0,target-curV);
   const barColor=pctColor(pct);
-
-  // Determine comissão target (same as meta for most, always gets for 20k+)
   const comTarget=target;
-  const comHit=exceeded||(isNovato); // novatos always get comissão
-  // Flex: same target, but 20k+ doesn't get flex
-  const flexTarget=is20?0:target;
+  const comHit=exceeded||(isNovato);
   const flexHit=exceeded&&!is20;
-  // Folga: same as flex
   const folgaHit=exceeded&&!is20;
 
-  let h='<div class="goals-block">';
-  h+='<div class="goals-title">🎯 Suas Metas do Mês</div>';
+  let h='<div class="goals-unified">';
 
-  // 3 target cards
-  h+='<div class="goals-targets">';
+  // Row: 3 mini items inline
+  h+='<div class="gu-row">';
   // Comissão
-  h+='<div class="goal-card gc-com"><div class="gc-icon">💰</div><div class="gc-label">Comissão</div>';
-  if(isNovato)h+='<div class="gc-value">Garantida</div><div class="gc-status hit">✅ Na experiência</div>';
-  else if(comTarget>0)h+='<div class="gc-value">'+fm(comTarget)+'</div><div class="gc-status '+(comHit?'hit':'miss')+'">'+(comHit?'✅ Atingida':'Faltam '+fm(remaining))+'</div>';
-  else h+='<div class="gc-value">—</div>';
-  h+='</div>';
-  // Flex
-  h+='<div class="goal-card gc-flex"><div class="gc-icon">🕐</div><div class="gc-label">Flexibilidade</div>';
-  if(is20)h+='<div class="gc-value" style="font-size:.85rem;color:var(--text3)">Não disponível</div><div class="gc-status miss">20k+ só comissão</div>';
-  else if(flexTarget>0)h+='<div class="gc-value">'+fm(flexTarget)+'</div><div class="gc-status '+(flexHit?'hit':'miss')+'">'+(flexHit?'✅ Desbloqueada':'Faltam '+fm(remaining))+'</div>';
-  else h+='<div class="gc-value">—</div>';
-  h+='</div>';
-  // Folga
-  h+='<div class="goal-card gc-folga"><div class="gc-icon">🏖️</div><div class="gc-label">Folgas</div>';
-  if(is20)h+='<div class="gc-value" style="font-size:.85rem;color:var(--text3)">Não disponível</div><div class="gc-status miss">20k+ só comissão</div>';
-  else if(target>0)h+='<div class="gc-value">'+fm(target)+'</div><div class="gc-status '+(folgaHit?'hit':'miss')+'">'+(folgaHit?'✅ Desbloqueada':(isNovato?'Atingindo expectativa':'Faltam '+fm(remaining)))+'</div>';
-  else h+='<div class="gc-value">—</div>';
-  h+='</div>';
+  h+='<div class="gu-item"><div class="gu-icon">💰</div><div class="gu-label">Comissão</div><div class="gu-val">';
+  if(isNovato)h+='Garantida';
+  else if(comTarget>0)h+=fm(comTarget);
+  else h+='—';
+  h+='</div></div>';
+  // Flexibilidade
+  h+='<div class="gu-item"><div class="gu-icon">🕐</div><div class="gu-label">Flexibilidade</div><div class="gu-val">';
+  if(is20)h+='Não disponível';
+  else if(target>0)h+=fm(target);
+  else h+='—';
+  h+='</div></div>';
+  // Folgas
+  h+='<div class="gu-item"><div class="gu-icon">🏖️</div><div class="gu-label">Folgas</div><div class="gu-val">';
+  if(is20)h+='Não disponível';
+  else if(target>0)h+=fm(target);
+  else h+='—';
+  h+='</div></div>';
   h+='</div>';
 
-  // Big progress bar
+  // Progress bar
   if(target>0){
-    h+='<div class="goals-progress">';
-    h+='<div class="gp-header"><span class="gp-current">'+fm(curV)+'</span><span class="gp-target">Meta: '+fm(target)+'</span></div>';
-    h+='<div class="gp-bar"><div class="gp-fill" style="width:'+pct+'%;background:linear-gradient(90deg,'+barColor+','+barColor+'cc)">';
-    h+='<span class="gp-pct">'+pct+'%</span></div></div>';
-    h+='<div class="gp-labels"><span>R$ 0</span><span>'+fm(target)+'</span></div>';
-
-    if(exceeded){
-      h+='<div class="gp-remaining" style="color:#22e477">🌟 Meta batida! +'+fm(curV-target)+' acima!</div>';
-    }else{
-      h+='<div class="gp-remaining" style="color:var(--text2)">Faltam <strong style="color:var(--text);font-size:1.3rem">'+fm(remaining)+'</strong> para desbloquear tudo</div>';
-    }
+    h+='<div class="gu-progress">';
+    h+='<div class="gu-prog-header"><span>'+fm(curV)+'</span><span>Meta: '+fm(target)+'</span></div>';
+    h+='<div class="gu-bar"><div class="gu-bar-fill" style="width:'+pct+'%;background:'+barColor+'"><span class="gu-bar-pct">'+pct+'%</span></div></div>';
+    if(exceeded)h+='<div class="gu-remaining" style="color:#27ae60">Meta batida! +'+fm(curV-target)+' acima</div>';
+    else h+='<div class="gu-remaining">Faltam <strong>'+fm(remaining)+'</strong> para desbloquear tudo</div>';
     h+='</div>';
 
-    // Incentive message
-    if(exceeded){
-      h+='<div class="goals-incentive gi-done">🏆 Parabéns! Você já garantiu comissão'+(is20?'!':' + flexibilidade + folgas!')+'</div>';
-    }else if(pct>=75){
-      h+='<div class="goals-incentive gi-close">🔥 Quase lá! Mais '+fm(remaining)+' e você desbloqueia tudo!</div>';
-    }else if(pct>=50){
-      h+='<div class="goals-incentive gi-go">💪 Metade do caminho! Cada acordo te aproxima dos benefícios.</div>';
-    }else{
-      h+='<div class="goals-incentive gi-go">🚀 Bora! Foco nos acordos, a meta tá ao seu alcance!</div>';
-    }
+    // Motivational
+    if(exceeded)h+='<div class="gu-motiv">🏆 Parabéns! Benefícios garantidos.</div>';
+    else if(pct>=75)h+='<div class="gu-motiv">🔥 Quase lá! Mais '+fm(remaining)+' e você desbloqueia tudo!</div>';
+    else if(pct>=50)h+='<div class="gu-motiv">💪 Metade do caminho! Cada acordo te aproxima.</div>';
+    else h+='<div class="gu-motiv">🚀 Bora! A meta tá ao seu alcance!</div>';
   }
 
   h+='</div>';
