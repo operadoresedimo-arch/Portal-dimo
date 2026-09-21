@@ -1601,29 +1601,6 @@ function genComp(){
 
       h+='<div class="collab-dash">';
 
-      // ── ROW 1: Header (name+badge) + Meta bar ──
-      h+='<div class="cd-full"><div class="cd-header">';
-      h+='<div class="cd-header-left"><div><div class="collab-name">'+myD.name+'</div>'+eqBadge(myD.cfg)+'</div></div>';
-      // Compact meta
-      if(meta&&meta.max>0){
-        const pct=Math.min(Math.round((curV/meta.max)*100),100),exceeded=curV>=meta.max;
-        const pctC=Math.min(Math.round((curV/meta.max)*100),100);const barColor=pctColor(pctC),remaining=Math.max(0,meta.max-curV);
-        h+='<div class="cd-meta-compact collab-meta"><h4>🎯 Meta '+meta.label+': '+fm(meta.max)+'</h4>';
-        h+='<div style="position:relative"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,'+barColor+','+barColor+'cc)"></div>';
-        h+='<span class="cm-bar-pct">'+pct+'%'+(exceeded?' ⭐':'')+'</span></div></div>';
-        h+='<div class="cm-detail"><span>'+fm(curV)+'</span><span>'+fm(meta.max)+'</span></div>';
-        if(exceeded)h+='<div class="cm-remaining" style="color:#22e477">🌟 Meta batida! +'+fm(curV-meta.max)+' acima!</div>';
-        else h+='<div class="cm-remaining" style="color:var(--text2)">Faltam <strong style="color:var(--text)">'+fm(remaining)+'</strong></div>';
-        h+='</div>';
-      }else{
-        // No meta defined, show current value prominently
-        h+='<div class="cd-meta-compact collab-meta" style="text-align:center"><h4>📊 Valor Atual</h4>';
-        h+='<div style="font-size:2rem;font-weight:900;color:var(--green);margin:8px 0">'+fm(curV)+'</div>';
-        h+='<div style="font-size:.8rem;color:var(--text2)">'+curA+' acordos</div>';
-        h+='</div>';
-      }
-      h+='</div></div>';
-
       // ── ROW 2: Month cards (left) + Comparison (right) ──
       h+='<div class="cd-left"><div class="cd-months">';
       if(oldD){
