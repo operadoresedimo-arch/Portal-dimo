@@ -1514,6 +1514,44 @@ body::before,body::after{display:none!important}
 .comp-table td.mg-start{border-left:1px solid #e0e2e5!important;padding-left:4px!important}
 .comp-section{overflow-x:auto!important}
 
+
+/* MAXIMIZE TABLE SPACE */
+.sidebar{width:180px!important;padding:14px 10px!important}
+.app-with-sidebar .main{margin-left:180px!important;padding:14px 10px 30px!important;max-width:none!important}
+.app-with-sidebar .toolbar{margin-left:180px!important}
+.sb-logo img,.sb-logo div{transform:scale(.9)}
+
+/* Table: no overflow, fit to width */
+.comp-section{overflow-x:visible!important;padding:0!important}
+.comp-table{width:100%!important;table-layout:fixed!important}
+.comp-table th,.comp-table td{overflow:hidden!important;text-overflow:ellipsis!important;font-size:.72rem!important}
+.comp-table .nmcell{max-width:none!important;min-width:100px!important}
+.comp-table th:first-child,.comp-table td:first-child{width:24px!important}
+
+/* Mini bars even smaller */
+.cell-meta-bar{max-width:40px!important;height:2px!important}
+.cell-meta-txt{font-size:.4rem!important}
+
+/* Filters: compact */
+.comp-filters{gap:6px!important}
+.comp-filter-btn{padding:6px 12px!important;font-size:.62rem!important}
+.comp-month-tab{padding:6px 10px!important;font-size:.58rem!important}
+.sort-btn{font-size:.62rem!important}
+
+/* Summary cards compact */
+.comp-summary{gap:8px!important;margin-bottom:12px!important}
+.comp-stat{padding:10px!important}
+.comp-stat .cs-val{font-size:1.5rem!important}
+
+/* Hero compact */
+.comp-hero{margin-bottom:10px!important}
+
+@media(max-width:1200px){
+  .sidebar{width:160px!important}
+  .app-with-sidebar .main{margin-left:160px!important}
+  .comp-table th,.comp-table td{font-size:.65rem!important;padding:4px 3px!important}
+}
+
 </style>
 
 </head>
