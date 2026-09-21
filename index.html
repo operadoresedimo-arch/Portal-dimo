@@ -1178,6 +1178,225 @@ div[style*="text-align:center;margin-bottom:16px"]{margin-bottom:10px!important}
   #compHeroPersonal{flex-direction:column;gap:10px}
 }
 
+
+/* ====== LIGHT THEME (Cobmais style) ====== */
+:root{
+  --bg:#f0f1f3!important;--bg2:#e8e9eb!important;
+  --card:#ffffff!important;--card2:#f7f8f9!important;
+  --border:#d0d3d6!important;--border2:#bcc0c4!important;
+  --gold:#D4A937!important;
+  --text:#1a1a1a!important;--text2:#5a5d62!important;--text3:#8a8d92!important;
+  --green:#2ECC71!important;--purple:#8e44ad!important;--cyan:#2980b9!important;
+  --blue:#5a6672!important;--blue2:#6b7580!important;--blue3:#4a5058!important;
+  --red:#e74c3c!important;--silver:#7f8c8d!important;--bronze:#cd7f32!important;
+}
+body{background:#f0f1f3!important;color:#1a1a1a!important}
+body::before,body::after{display:none!important}
+.bg-layer{background:none!important}
+
+/* SQUARE CORNERS EVERYWHERE */
+*{border-radius:0!important}
+
+/* Cards & panels */
+.stat-card,.podium-panel,.table-panel,.comp-stat,.collab-card,.cd-month-card,.cd-comp,
+.cd-ben-card,.cd-rules,.cd-premio,.cd-timeline,.goals-block,.collab-meta,.cd-meta-compact,
+.hero-card,.comp-slot,.personal-card,.premio-lv,.rule-item,.cd-rule{
+  background:#ffffff!important;
+  border:1px solid #d0d3d6!important;
+  box-shadow:0 1px 3px rgba(0,0,0,.06)!important;
+}
+.stat-card:nth-child(1){border-left:3px solid #5a6672!important}
+.stat-card:nth-child(2){border-left:3px solid #2ECC71!important}
+.stat-card:nth-child(3){border-left:3px solid #8e44ad!important}
+
+/* Table */
+.tp-header{background:#f7f8f9!important;border-bottom:2px solid #d0d3d6!important;color:#5a5d62!important}
+.trow{border-bottom:1px solid #e8e9eb!important}
+.trow:nth-child(even){background:#fafbfc!important}
+.trow:hover{background:#f0f1f3!important}
+.trow.hl{background:rgba(212,169,55,.06)!important}
+.trow .rk{color:#8a8d92!important}
+.trow .nm{color:#1a1a1a!important}
+.trow .ac{color:#2ECC71!important}
+.trow .vl{color:#5a5d62!important}
+.bar-bg,.cell-meta-bar,.cm-bar-bg,.gp-bar,.pm-bar-bg{background:#e0e2e5!important}
+.bar-fill{background:linear-gradient(90deg,#5a6672,#8a939e)!important}
+
+/* Podium */
+.pod-card.p1{background:linear-gradient(100deg,rgba(212,169,55,.08),#ffffff)!important;border:1px solid rgba(212,169,55,.3)!important}
+.pod-card.p2{background:linear-gradient(100deg,rgba(127,140,141,.06),#ffffff)!important;border:1px solid rgba(127,140,141,.2)!important}
+.pod-card.p3{background:linear-gradient(100deg,rgba(205,127,50,.06),#ffffff)!important;border:1px solid rgba(205,127,50,.2)!important}
+.pod-name{color:#1a1a1a!important}
+.pod-stats{color:#5a5d62!important}
+
+/* Nav */
+.nav{background:rgba(255,255,255,.97)!important;border:1px solid #d0d3d6!important;box-shadow:0 2px 8px rgba(0,0,0,.06)!important}
+.nav-tab{color:#5a5d62!important}
+.nav-tab.active{background:#5a6672!important;color:#fff!important;box-shadow:none!important}
+.nav-brand{color:#1a1a1a!important}
+.nav-user{color:#5a5d62!important}
+.nav-logout{border-color:#d0d3d6!important;color:#5a5d62!important}
+.nav-logout:hover{border-color:#e74c3c!important;color:#e74c3c!important}
+
+/* Login */
+.login-screen{background:#f0f1f3!important}
+.login-box{background:#ffffff!important;border:1px solid #d0d3d6!important}
+.login-box input{background:#f7f8f9!important;border:1px solid #d0d3d6!important;color:#1a1a1a!important}
+.login-box input:focus{border-color:#5a6672!important}
+.login-box input::placeholder{color:#8a8d92!important}
+.login-btn{background:#5a6672!important;color:#fff!important}
+.login-logo{color:#D4A937!important}
+.login-error{color:#e74c3c!important}
+
+/* Sidebar - light gray */
+.sidebar{background:#ffffff!important;border-right:1px solid #d0d3d6!important}
+.sb-month-box{background:#f7f8f9!important;border-color:#d0d3d6!important}
+.sb-month-label{color:#D4A937!important}
+.sb-month-val{color:#1a1a1a!important}
+.sb-month-sub{color:#8a8d92!important}
+.sb-nav .sb-item{color:#5a5d62!important}
+.sb-nav .sb-item:hover{background:#f0f1f3!important}
+.sb-nav .sb-item.active{background:#8B1A1A!important;color:#fff!important;box-shadow:none!important}
+.sb-motivation{background:#f7f8f9!important;border-color:#d0d3d6!important}
+.sb-mot-title{color:#2ECC71!important}
+.sb-mot-sub{color:#8a8d92!important}
+#sbRankStats{border-top-color:#d0d3d6!important}
+#sbRankStats span[style*="color:#a0a2a6"]{color:#8a8d92!important}
+#sbPersonal div[style*="color:#22e477"]{color:#2ECC71!important}
+#sbPersonal div[style*="color:#91a9c7"]{color:#5a5d62!important}
+#sbPersonal div[style*="color:#f5b91f"]{color:#D4A937!important}
+
+/* Toolbar */
+.toolbar{background:rgba(255,255,255,.97)!important;border-color:#d0d3d6!important}
+.btn-new{background:#f7f8f9!important;color:#5a5d62!important}
+.btn-link{background:#5a6672!important;color:#fff!important}
+
+/* Comp table headers */
+.comp-table th{color:#5a5d62!important;border-bottom:1px solid #d0d3d6!important}
+.comp-table td{color:#1a1a1a!important;border-bottom:1px solid #e8e9eb!important}
+.comp-table td.num{color:#5a5d62!important}
+.comp-table .nmcell{color:#1a1a1a!important}
+.comp-table tr:nth-child(odd) td{background:#fafbfc!important}
+.comp-table tr.hl td{background:rgba(212,169,55,.05)!important}
+.comp-table .month-header{color:#fff!important}
+.comp-table .mh-old{background:#8a8d92!important;border-bottom:none!important}
+.comp-table .mh-prev{background:#6b7580!important;border-bottom:none!important}
+.comp-table .mh-curr{background:#2ECC71!important;border-bottom:none!important;color:#fff!important}
+.comp-table .curr-col{background:rgba(46,204,113,.04)!important}
+.comp-table td.mg-start{border-left:2px solid #e0e2e5!important}
+
+/* Filter buttons */
+.comp-filter-group{background:#ffffff!important;border-color:#d0d3d6!important}
+.comp-filter-btn{color:#5a5d62!important}
+.comp-filter-btn.active{background:#5a6672!important;color:#fff!important}
+.comp-filter-btn:hover:not(.active){background:#f0f1f3!important}
+.comp-month-tab{border-color:#d0d3d6!important;color:#5a5d62!important;background:#fff!important}
+.comp-month-tab.active{border-color:#5a6672!important;color:#1a1a1a!important;background:#f0f1f3!important}
+
+/* Comp search */
+.comp-search input{background:#ffffff!important;border-color:#d0d3d6!important;color:#1a1a1a!important}
+.comp-search input:focus{border-color:#5a6672!important}
+
+/* Comp summary */
+.comp-stat .cs-lbl{color:#8a8d92!important}
+
+/* Hero personal */
+.hero-card{background:#ffffff!important;border:1px solid #d0d3d6!important}
+.hp-name{color:#1a1a1a!important}
+.hc-label{color:#8a8d92!important}
+.hc-sub{color:#5a5d62!important}
+.comp-hero-title{color:#1a1a1a!important}
+.comp-hero-sub{color:#5a5d62!important}
+
+/* Collab elements */
+.collab-name{color:#1a1a1a!important}
+.cd-mc-period{color:#8a8d92!important}
+.cd-mc-lbl{color:#8a8d92!important}
+.cd-mc-val{color:#1a1a1a!important}
+.cd-month-card.mc-curr .cd-mc-tag{background:rgba(46,204,113,.1)!important;color:#2ECC71!important}
+.diff-title{color:#8a8d92!important}
+.diff-verdict.better{background:rgba(46,204,113,.08)!important;border-color:rgba(46,204,113,.2)!important;color:#27ae60!important}
+.diff-verdict.worse{background:rgba(231,76,60,.08)!important;border-color:rgba(231,76,60,.2)!important;color:#e74c3c!important}
+.diff-verdict.equal{background:#f7f8f9!important;border-color:#d0d3d6!important;color:#5a5d62!important}
+.diff-verdict.newop{background:rgba(41,128,185,.08)!important;border-color:rgba(41,128,185,.2)!important;color:#2980b9!important}
+
+/* Goals */
+.goal-card.gc-com{background:rgba(46,204,113,.04)!important;border-color:rgba(46,204,113,.2)!important}
+.goal-card.gc-flex{background:rgba(41,128,185,.04)!important;border-color:rgba(41,128,185,.2)!important}
+.goal-card.gc-folga{background:rgba(212,169,55,.04)!important;border-color:rgba(212,169,55,.2)!important}
+.gc-label{color:#1a1a1a!important}
+.gc-status.hit{background:rgba(46,204,113,.1)!important;color:#27ae60!important}
+.gc-status.miss{background:rgba(231,76,60,.08)!important;color:#e74c3c!important}
+.goals-title{color:#8a8d92!important}
+.gp-current{color:#2ECC71!important}
+.gp-target{color:#5a5d62!important}
+.gp-labels span{color:#8a8d92!important}
+.goals-incentive.gi-go{background:#f7f8f9!important;border-color:#d0d3d6!important;color:#5a5d62!important}
+.goals-incentive.gi-close{background:rgba(212,169,55,.06)!important;border-color:rgba(212,169,55,.2)!important;color:#D4A937!important}
+.goals-incentive.gi-done{background:rgba(46,204,113,.06)!important;border-color:rgba(46,204,113,.2)!important;color:#27ae60!important}
+
+/* Benefits */
+.cd-ben-card .bc-title{color:#1a1a1a!important}
+.cd-ben-card .bc-desc{color:#8a8d92!important}
+.cd-rules .rules-title{color:#e74c3c!important}
+.cd-rule .rule-text{color:#5a5d62!important}
+.cd-rule{background:rgba(231,76,60,.03)!important;border-color:rgba(231,76,60,.1)!important}
+.cd-premio .premio-title{color:#8a8d92!important}
+.premio-lv .pv-val{color:#D4A937!important}
+.premio-lv .pv-lbl{color:#8a8d92!important}
+.premio-lv.active{border-color:#D4A937!important;background:rgba(212,169,55,.04)!important}
+
+/* Timeline */
+.cd-timeline-title{color:#8a8d92!important}
+.tl-name{color:#1a1a1a!important}
+.tl-meta{color:#5a5d62!important}
+.tl-stage.future .tl-name{color:#bcc0c4!important}
+.tl-stage.future .tl-meta{color:#d0d3d6!important}
+.tl-stage.active .tl-dot{border-color:#2ECC71!important;background:#2ECC71!important}
+.tl-stage.current .tl-dot{border-color:#D4A937!important;background:#D4A937!important}
+.tl-stage.future .tl-dot{border-color:#d0d3d6!important;background:#f0f1f3!important}
+.tl-rule-box{background:#f7f8f9!important;border-color:#d0d3d6!important}
+.trb-title{color:#5a5d62!important}
+.trb-text{color:#8a8d92!important}
+.tl-rule-box.exp .trb-title{color:#2980b9!important}
+.tl-rule-box.pos .trb-title{color:#8e44ad!important}
+
+/* Badges */
+.eq-badge{border:1px solid #d0d3d6!important;background:#f7f8f9!important;color:#5a5d62!important}
+
+/* Toast */
+.toast{background:#2ECC71!important;color:#fff!important}
+
+/* Date header */
+.date-header .firm{color:#D4A937!important}
+.date-header .dt{color:#1a1a1a!important}
+
+/* Section title */
+.section-title{color:#8a8d92!important}
+
+/* Dash footer */
+.dash-footer{color:#8a8d92!important}
+.dash-footer .brand-ft{color:#bcc0c4!important}
+
+/* SC icons */
+.sc-left{background:#f0f1f3!important;border-color:#d0d3d6!important}
+.sc-label{color:#8a8d92!important}
+.sc-val.green{color:#2ECC71!important}
+.sc-val.purple{color:#8e44ad!important}
+.sc-val.cyan{color:#2980b9!important}
+
+/* Podium title */
+.podium-title{color:#1a1a1a!important}
+.podium-title::after{background:#5a6672!important;box-shadow:none!important}
+
+/* Logo in sidebar */
+.sidebar div[style*="font-size:1.1rem"]{color:#1a1a1a!important}
+.sidebar div[style*="font-size:.4rem"]{color:#8a8d92!important}
+.sidebar div[style*="background:#8B1A1A"]{background:#8B1A1A!important}
+.sidebar div[style*="background:#D4A937"]{background:#D4A937!important}
+.sidebar div[style*="background:#6b7280"]{background:#bcc0c4!important}
+.sidebar div[style*="background:#9ca3af"]{background:#d0d3d6!important}
+
 </style>
 
 </head>
