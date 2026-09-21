@@ -1155,7 +1155,7 @@ body::before,body::after{display:none!important}
 .comp-table .nmcell{font-size:.82rem!important}
 .comp-table .num{font-size:.82rem!important}
 .trend-up,.trend-down,.trend-same{font-size:.78rem!important}
-.cell-meta-bar{max-width:100%!important}
+.cell-meta{display:none!important}
 
 /* Period text less gap */
 div[style*="text-align:center;margin-bottom:16px"]{margin-bottom:10px!important}
@@ -1575,6 +1575,11 @@ body::before,body::after{display:none!important}
 <button class="comp-filter-btn" onclick="setViewMode('acordos',this)">Acordos</button>
 <button class="comp-filter-btn" onclick="setViewMode('valor',this)">Valor</button>
 </div>
+<div class="comp-filter-group">
+<button class="sort-btn comp-filter-btn" onclick="setSort('nome',this)">↕ Nome</button>
+<button class="sort-btn comp-filter-btn active" onclick="setSort('valor',this)">↕ Valor</button>
+<button class="sort-btn comp-filter-btn" onclick="setSort('acordos',this)">↕ Acordos</button>
+</div>
 <div class="comp-month-tabs" id="compMonthTabs"></div>
 </div>
 <div id="compR"></div>
@@ -1820,8 +1825,12 @@ function genComp(){
     if(!allN.has(o.n))allN.set(o.n,{name:o.n,cfg:o.cfg,t:o.t,m:new Array(ms.length).fill(null)});
     const r=allN.get(o.n);r.m[mi]={a:o.a,v:o.v};if(o.cfg)r.cfg=o.cfg;if(o.t!==undefined)r.t=o.t;if(o.t!==undefined)r.t=o.t;
   });});
-  const sortIdx=compMonthFilter==='all'?nowIdx:parseInt(compMonthFilter);
-  const od=[...allN.values()].sort((a,b)=>(b.m[sortIdx]?b.m[sortIdx].v:0)-(a.m[sortIdx]?a.m[sortIdx].v:0));
+  const sortMIdx=compMonthFilter==='all'?nowIdx:parseInt(compMonthFilter);
+  const od=[...allN.values()].sort(function(a,b){
+    if(compSortBy==='nome')return a.name.localeCompare(b.name);
+    if(compSortBy==='acordos'){return(b.m[sortMIdx]?b.m[sortMIdx].a:0)-(a.m[sortMIdx]?a.m[sortMIdx].a:0);}
+    return(b.m[sortMIdx]?b.m[sortMIdx].v:0)-(a.m[sortMIdx]?a.m[sortMIdx].v:0);
+  });
 
   if(isA()){
     // Reset hero for admin
@@ -1874,6 +1883,7 @@ function genComp(){
       if(showValor)h+='<th class="num'+(showAcordos?'':' month-group-start')+'">Valor</th>';
       if(i>0)h+='<th class="num" style="width:55px">Var</th>';
     });
+    h+='<th class="num" style="border-left:2px solid #d0d3d6">Média Acordos</th><th class="num">Média Valor</th>';
     h+='</tr></thead><tbody>';
     od.forEach((op,i)=>{
       const hl=mU(op.name,uN)?' hl':'';
@@ -1898,6 +1908,13 @@ function genComp(){
           else if(pv===0)h+='<td class="num"><span class="trend-up">NOVO</span></td>';
           else{const pct=Math.round(((cv-pv)/pv)*100);h+='<td class="num"><span class="'+(pct>0?'trend-up':pct<0?'trend-down':'trend-same')+'">'+(pct>0?'▲+'+pct+'%':pct<0?'▼'+Math.abs(pct)+'%':'=')+'</span></td>';}}
       });
+      // Média columns
+      let sumA=0,sumV=0,cnt=0;
+      ms.forEach(function(m,mi){const d=op.m[mi];if(d){sumA+=d.a;sumV+=d.v;cnt++;}});
+      const avgA=cnt>0?Math.round(sumA/cnt):0;
+      const avgV=cnt>0?Math.round(sumV*100/cnt)/100:0;
+      h+='<td class="num" style="border-left:2px solid #d0d3d6;font-weight:500">'+avgA+'</td>';
+      h+='<td class="num" style="font-weight:500">'+fm(avgV)+'</td>';
       h+='</tr>';
     });
     h+='</tbody></table></div>';
@@ -1963,8 +1980,37 @@ function genComp(){
         else if(vDiff>0)h+='<div class="diff-verdict better">🚀 Você está melhor que o mês passado!</div>';
         else if(vDiff<0)h+='<div class="diff-verdict worse">⚡ Bora recuperar! Foco no próximo acordo.</div>';
         else h+='<div class="diff-verdict equal">Mesmo resultado. Hora de subir!</div>';
-        h+='</div></div>';
+        h+='</div>';
       }
+
+      // Meta progress card (same column, below comparativo)
+      if(meta&&meta.max>0){
+        const metaPct=Math.min(Math.round((curV/meta.max)*100),100);
+        const metaExc=curV>=meta.max;
+        const metaRem=Math.max(0,meta.max-curV);
+        const metaBar=pctColor(metaPct);
+        const prevTarget=prevD?meta.max:0;
+        const prevPct=prevD&&meta.max>0?Math.min(Math.round((prevV/meta.max)*100),100):0;
+        h+='<div style="background:#fff;border:1px solid #d0d3d6;padding:18px;margin-top:14px">';
+        h+='<div style="font-size:.6rem;font-weight:600;color:#5a5d62;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;text-align:center">📊 Progresso da Meta</div>';
+        h+='<div style="display:flex;justify-content:center;gap:32px;margin-bottom:14px">';
+        if(metaExc){
+          h+='<div style="text-align:center"><div style="font-size:1.8rem;color:#27ae60">✅</div><div style="font-size:.65rem;color:#5a5d62">Meta atingida</div></div>';
+          h+='<div style="text-align:center"><div style="font-size:1.4rem;color:#1a1a1a">+'+fm(curV-meta.max)+'</div><div style="font-size:.65rem;color:#5a5d62">Acima da meta</div></div>';
+        }else{
+          h+='<div style="text-align:center"><div style="font-size:1.4rem;color:#e74c3c">'+fm(metaRem)+'</div><div style="font-size:.65rem;color:#5a5d62">Falta p/ meta</div></div>';
+          h+='<div style="text-align:center"><div style="font-size:1.4rem;color:#1a1a1a">'+metaPct+'%</div><div style="font-size:.65rem;color:#5a5d62">Atingido</div></div>';
+        }
+        if(prev&&prevPct>0){
+          const pctDiff=metaPct-prevPct;
+          h+='<div style="text-align:center"><div style="font-size:1.4rem;color:'+(pctDiff>=0?'#27ae60':'#e74c3c')+'">'+(pctDiff>=0?'▲':'▼')+Math.abs(pctDiff)+'%</div><div style="font-size:.65rem;color:#5a5d62">vs mês anterior</div></div>';
+        }
+        h+='</div>';
+        h+='<div style="height:16px;background:#e0e2e5;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:'+metaPct+'%;background:'+metaBar+'"></div></div>';
+        h+='<div style="display:flex;justify-content:space-between;font-size:.65rem;color:#5a5d62"><span>R$ 0</span><span>'+fm(meta.max)+'</span></div>';
+        h+='</div>';
+      }
+      h+='</div>';
 
       // ── ROW 3: Benefits (left) + Rules (right) ──
       // ── ROW: Goals (left) + Turno chart (right) ──
@@ -2036,6 +2082,7 @@ function genComp(){
 }
 
 let compViewMode='all';
+let compSortBy='valor';
 let compMonthFilter='all';
 
 function setViewMode(mode,btn){
@@ -2048,6 +2095,13 @@ function setViewMode(mode,btn){
 function setMonthFilter(mode,btn){
   compMonthFilter=mode;
   document.querySelectorAll('.comp-month-tabs .comp-month-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  genComp();
+}
+
+function setSort(mode,btn){
+  compSortBy=mode;
+  document.querySelectorAll('.sort-btn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
   genComp();
 }
