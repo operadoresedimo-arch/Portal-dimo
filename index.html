@@ -1524,7 +1524,7 @@ body::before,body::after{display:none!important}
 /* Table: no overflow, fit to width */
 .comp-section{overflow-x:visible!important;padding:0!important}
 .comp-table{width:100%!important;table-layout:auto!important}
-.comp-table th,.comp-table td{overflow:hidden!important;text-overflow:ellipsis!important;font-size:.72rem!important}
+
 .comp-table .nmcell{max-width:none!important;min-width:120px!important;white-space:nowrap!important}
 .comp-table th:first-child,.comp-table td:first-child{width:24px!important}
 
@@ -1551,6 +1551,30 @@ body::before,body::after{display:none!important}
   .app-with-sidebar .main{margin-left:160px!important}
   .comp-table th,.comp-table td{font-size:.65rem!important;padding:4px 3px!important}
 }
+
+
+/* TIGHT + BIG TEXT */
+.comp-table th,.comp-table td{padding:4px 6px!important;font-size:.82rem!important;white-space:nowrap!important}
+.comp-table .nmcell{font-size:.85rem!important}
+.comp-table th{font-size:.7rem!important}
+.comp-table{table-layout:auto!important;border-spacing:0!important;border-collapse:collapse!important}
+.comp-table th:first-child,.comp-table td:first-child{width:20px!important;padding:4px 2px!important}
+
+/* Month headers: tighter */
+.comp-table .month-header{padding:4px 6px!important;font-size:.6rem!important}
+
+/* Remove all extra spacing */
+.comp-section{padding:0!important;margin:0!important;overflow-x:auto!important}
+.month-group-start{padding-left:6px!important}
+.mg-start{padding-left:6px!important}
+
+/* Mini bars: tiny but visible */
+.cell-meta{margin-top:1px!important}
+.cell-meta-bar{height:2px!important;max-width:100%!important}
+.cell-meta-txt{display:none!important}
+
+/* Stat cards: tighter */
+.comp-stat .cs-val{font-size:1.8rem!important}
 
 </style>
 
@@ -1929,7 +1953,7 @@ function genComp(){
       if(showValor)h+='<th class="num'+(showAcordos?'':' month-group-start')+'">Valor</th>';
       
     });
-    h+='<th class="num" style="border-left:2px solid #d0d3d6">Média Acordos</th><th class="num">Média Valor</th>';
+    h+='<th class="num" style="border-left:2px solid #d0d3d6">Acordos</th><th class="num">Valor</th>';
     h+='</tr></thead><tbody>';
     od.forEach((op,i)=>{
       const hl=mU(op.name,uN)?' hl':'';
@@ -1957,7 +1981,7 @@ function genComp(){
       const avgA=cnt>0?Math.round(sumA/cnt):0;
       const avgV=cnt>0?Math.round(sumV*100/cnt)/100:0;
       h+='<td class="num" style="border-left:2px solid #d0d3d6;font-weight:500">'+avgA+'</td>';
-      h+='<td class="num" style="font-weight:500">'+fm(avgV)+'</td>';
+      h+='<td class="num" style="font-weight:500">'+fm(avgV)+miniMetaBar(avgV,op.cfg)+'</td>';
       h+='</tr>';
     });
     h+='</tbody></table></div>';
