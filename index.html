@@ -1756,6 +1756,47 @@ body::before,body::after{display:none!important}
 /* HIDE FOOTER */
 .dash-footer{display:none!important}
 
+
+/* LOGO FULL WIDTH */
+.sb-logo{justify-content:center!important;padding:8px 0 16px!important;border-bottom:1px solid #d0d3d6;margin-bottom:16px!important}
+.sb-logo img{height:auto!important;width:100%!important;max-width:160px!important}
+
+
+/* TREINAMENTOS LMS */
+.trn-layout{display:grid;grid-template-columns:1fr 340px;gap:0;min-height:calc(100vh - 80px)}
+.trn-main{display:flex;flex-direction:column}
+.trn-player{background:#1a1a1a;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.trn-player iframe,.trn-player video{width:100%;height:100%;border:none}
+.trn-placeholder{text-align:center;color:#8a8d92}
+.trn-info{padding:16px 20px}
+.trn-lesson-title{font-size:1.2rem;font-weight:600;color:#1a1a1a;margin-bottom:6px}
+.trn-lesson-desc{font-size:.8rem;color:#5a5d62}
+.trn-modules{background:#f7f8f9;border-left:1px solid #d0d3d6;overflow-y:auto;max-height:calc(100vh - 80px)}
+.trn-progress{padding:14px 16px;border-bottom:1px solid #d0d3d6}
+.trn-search{padding:8px 16px;border-bottom:1px solid #d0d3d6}
+.trn-search input{width:100%;padding:8px 12px;border:1px solid #d0d3d6;background:#fff;font-family:inherit;font-size:.75rem;color:#1a1a1a;outline:none}
+.trn-search input:focus{border-color:#5a6672}
+.trn-module{border-bottom:1px solid #e0e2e5}
+.trn-mod-header{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;transition:background .15s}
+.trn-mod-header:hover{background:#eee}
+.trn-mod-num{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:2px solid #d0d3d6;font-size:.7rem;font-weight:700;color:#5a5d62;flex-shrink:0}
+.trn-mod-num.done{border-color:#2ECC71;color:#2ECC71}
+.trn-mod-title{flex:1;font-size:.8rem;font-weight:600;color:#1a1a1a}
+.trn-mod-status{font-size:.6rem;color:#2ECC71;font-weight:600}
+.trn-mod-arrow{font-size:.7rem;color:#8a8d92;transition:transform .2s}
+.trn-mod-header.open .trn-mod-arrow{transform:rotate(180deg)}
+.trn-mod-lessons{display:none;padding:4px 0}
+.trn-mod-header.open+.trn-mod-lessons{display:block}
+.trn-lesson{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 54px;cursor:pointer;transition:background .15s}
+.trn-lesson:hover{background:#eee}
+.trn-lesson.active{background:#e8e9eb}
+.trn-lesson-thumb{width:80px;height:45px;background:#d0d3d6;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#8a8d92}
+.trn-lesson-thumb img{width:100%;height:100%;object-fit:cover}
+.trn-lesson-name{flex:1;font-size:.75rem;color:#1a1a1a}
+.trn-lesson-check{font-size:.9rem;flex-shrink:0}
+@media(max-width:900px){.trn-layout{grid-template-columns:1fr}.trn-modules{max-height:none;border-left:none;border-top:1px solid #d0d3d6}}
+@media(max-width:768px){.trn-layout{grid-template-columns:1fr}}
+
 </style>
 
 </head>
@@ -1775,6 +1816,7 @@ body::before,body::after{display:none!important}
 <div class="nav-brand">⚖️ ÉDIMO</div>
 <button class="nav-tab active" onclick="showPage('ranking')" id="tabR">📊 Acordos do Dia</button>
 <button class="nav-tab" onclick="showPage('comparativo')" id="tabC">📈 Comparativo</button>
+<button class="nav-tab" onclick="showPage('treinamentos')" id="tabT">🎓 Treinamentos</button>
 <div class="nav-right"><span class="nav-user" id="navUser">👤 </span><button class="nav-logout" onclick="doLogout()">🚪 Sair</button></div>
 </div></div>
 
@@ -1798,6 +1840,7 @@ body::before,body::after{display:none!important}
 <nav class="sb-nav">
 <button class="sb-item" onclick="showPage('ranking')" id="sbR">🏆 Acordos do Dia</button>
 <button class="sb-item active" onclick="showPage('comparativo')" id="sbC">📊 Comparativo</button>
+<button class="sb-item" onclick="showPage('treinamentos')" id="sbT">🎓 Treinamentos</button>
 <button class="sb-item" onclick="doLogout()">🚪 Sair</button>
 </nav>
 <div class="sb-motivation"><div class="sb-mot-icon">🎯</div><div class="sb-mot-title">Juntos batemos mais metas!</div><div class="sb-mot-sub">Foco no próximo acordo.</div></div>
@@ -1833,6 +1876,36 @@ body::before,body::after{display:none!important}
 <div class="comp-month-tabs" id="compMonthTabs"></div>
 </div>
 <div id="compR"></div>
+</div>
+</div>
+
+<div class="page" id="pageTreinamentos">
+<div class="trn-layout">
+<!-- VIDEO PLAYER -->
+<div class="trn-main">
+<div class="trn-player" id="trnPlayer">
+<div class="trn-placeholder">
+<div style="font-size:3rem;margin-bottom:12px">🎬</div>
+<p style="font-size:1rem;color:#5a5d62">Selecione uma aula ao lado</p>
+</div>
+</div>
+<div class="trn-info" id="trnInfo" style="display:none">
+<div class="trn-lesson-title" id="trnTitle"></div>
+<div class="trn-lesson-desc" id="trnDesc"></div>
+</div>
+</div>
+<!-- MODULES SIDEBAR -->
+<div class="trn-modules">
+<div class="trn-progress">
+<div style="font-size:.65rem;font-weight:600;color:#8a8d92;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Progresso</div>
+<div style="display:flex;align-items:center;gap:8px">
+<div style="flex:1;height:6px;background:#e0e2e5;overflow:hidden"><div id="trnProgressBar" style="height:100%;width:0%;background:#2ECC71;transition:width .5s"></div></div>
+<span id="trnProgressText" style="font-size:.7rem;color:#5a5d62">0%</span>
+</div>
+</div>
+<div class="trn-search"><input type="text" placeholder="Buscar aula..." oninput="filterLessons(this.value)"></div>
+<div id="trnModuleList"></div>
+</div>
 </div>
 </div>
 
@@ -1907,8 +1980,10 @@ function showNav(){document.getElementById('nav').style.display='block'}
 function showPage(p){
   document.getElementById('tabR').classList.toggle('active',p==='ranking');
   document.getElementById('tabC').classList.toggle('active',p==='comparativo');
+  var tabT=document.getElementById('tabT');if(tabT)tabT.classList.toggle('active',p==='treinamentos');
   document.getElementById('pageRanking').classList.toggle('active',p==='ranking');
   document.getElementById('pageComp').classList.toggle('active',p==='comparativo');
+  var pageT=document.getElementById('pageTreinamentos');if(pageT){pageT.classList.toggle('active',p==='treinamentos');if(p==='treinamentos')renderModules();}
   toolbar.style.display=(p==='ranking'&&cRD)?'flex':'none';
   const sb=document.getElementById('sidebar');
   const sbR=document.getElementById('sbR');
@@ -1917,6 +1992,7 @@ function showPage(p){
     sb.classList.add('vis');document.body.classList.add('app-with-sidebar');
     if(sbR)sbR.classList.toggle('active',p==='ranking');
     if(sbC)sbC.classList.toggle('active',p==='comparativo');
+    var sbT=document.getElementById('sbT');if(sbT)sbT.classList.toggle('active',p==='treinamentos');
   }
 }
 const toolbar=document.getElementById('toolbar');
@@ -2647,6 +2723,94 @@ function getTempoForOperator(cleanName){
   }
   
   return'-';
+}
+
+
+// ========== TREINAMENTOS ==========
+const trnData=[
+  {title:'Boas-Vindas',lessons:[
+    {id:'bv1',name:'Apresentação da Empresa',desc:'Conheça a história e os valores da Édimo.',url:'',thumb:'🏢'},
+    {id:'bv2',name:'Como funciona a cobrança',desc:'Entenda o fluxo de trabalho.',url:'',thumb:'📋'},
+    {id:'bv3',name:'Regras e Regulamento',desc:'O que você precisa saber.',url:'',thumb:'📄'}
+  ]},
+  {title:'Sistema Cobmais',lessons:[
+    {id:'cb1',name:'Login e navegação',desc:'Primeiros passos no sistema.',url:'',thumb:'💻'},
+    {id:'cb2',name:'Registrando acordos',desc:'Como registrar um acordo.',url:'',thumb:'🤝'},
+    {id:'cb3',name:'Relatórios',desc:'Como consultar seus números.',url:'',thumb:'📊'}
+  ]},
+  {title:'Técnicas de Negociação',lessons:[
+    {id:'ng1',name:'Abordagem inicial',desc:'Como iniciar a conversa.',url:'',thumb:'📞'},
+    {id:'ng2',name:'Lidando com objeções',desc:'Técnicas para contornar.',url:'',thumb:'💬'},
+    {id:'ng3',name:'Fechando o acordo',desc:'Como concluir a negociação.',url:'',thumb:'✅'}
+  ]}
+];
+let trnCompleted=JSON.parse(localStorage.getItem('trnCompleted')||'[]');
+let trnCurrentLesson=null;
+
+function renderModules(){
+  const list=document.getElementById('trnModuleList');if(!list)return;
+  let total=0,done=0;
+  trnData.forEach(function(m){m.lessons.forEach(function(l){total++;if(trnCompleted.includes(l.id))done++;});});
+  const pct=total>0?Math.round(done/total*100):0;
+  document.getElementById('trnProgressBar').style.width=pct+'%';
+  document.getElementById('trnProgressText').textContent=done+'/'+total+' ('+pct+'%)';
+  let h='';
+  trnData.forEach(function(mod,mi){
+    const modDone=mod.lessons.every(function(l){return trnCompleted.includes(l.id);});
+    const modPct=mod.lessons.length>0?Math.round(mod.lessons.filter(function(l){return trnCompleted.includes(l.id);}).length/mod.lessons.length*100):0;
+    h+='<div class="trn-module">';
+    h+='<div class="trn-mod-header'+(mi===0?' open':'')+'" onclick="this.classList.toggle(\'open\')">';
+    h+='<div class="trn-mod-num'+(modDone?' done':'')+'">'+(mi+1)+'</div>';
+    h+='<div class="trn-mod-title">'+mod.title+'</div>';
+    if(modDone)h+='<div class="trn-mod-status">✅ Completo</div>';
+    else if(modPct>0)h+='<div class="trn-mod-status" style="color:#E67E22">'+modPct+'%</div>';
+    h+='<div class="trn-mod-arrow">▼</div>';
+    h+='</div>';
+    h+='<div class="trn-mod-lessons"'+(mi===0?' style="display:block"':'')+'>';
+    mod.lessons.forEach(function(l){
+      const isDone=trnCompleted.includes(l.id);
+      const isActive=trnCurrentLesson===l.id;
+      h+='<div class="trn-lesson'+(isActive?' active':'')+'" onclick="playLesson(\''+l.id+'\')">';
+      h+='<div class="trn-lesson-thumb">'+l.thumb+'</div>';
+      h+='<div class="trn-lesson-name">'+l.name+'</div>';
+      h+='<div class="trn-lesson-check">'+(isDone?'✅':'○')+'</div>';
+      h+='</div>';
+    });
+    h+='</div></div>';
+  });
+  list.innerHTML=h;
+}
+
+function playLesson(id){
+  let lesson=null;
+  trnData.forEach(function(m){m.lessons.forEach(function(l){if(l.id===id)lesson=l;});});
+  if(!lesson)return;
+  trnCurrentLesson=id;
+  const player=document.getElementById('trnPlayer');
+  if(lesson.url){
+    if(lesson.url.includes('youtube')||lesson.url.includes('youtu.be')){
+      const vid=lesson.url.match(/(?:v=|youtu\.be\/)([\w-]+)/);
+      if(vid)player.innerHTML='<iframe src="https://www.youtube.com/embed/'+vid[1]+'" allowfullscreen></iframe>';
+    }else{
+      player.innerHTML='<video controls src="'+lesson.url+'"></video>';
+    }
+  }else{
+    player.innerHTML='<div class="trn-placeholder"><div style="font-size:3rem;margin-bottom:12px">'+lesson.thumb+'</div><p style="font-size:1rem;color:#5a5d62">Vídeo em breve</p><p style="font-size:.8rem;color:#8a8d92">'+lesson.name+'</p></div>';
+  }
+  document.getElementById('trnInfo').style.display='block';
+  document.getElementById('trnTitle').textContent=lesson.name;
+  document.getElementById('trnDesc').textContent=lesson.desc;
+  // Mark as completed
+  if(!trnCompleted.includes(id)){trnCompleted.push(id);localStorage.setItem('trnCompleted',JSON.stringify(trnCompleted));}
+  renderModules();
+}
+
+function filterLessons(q){
+  const term=q.toLowerCase();
+  document.querySelectorAll('.trn-lesson').forEach(function(el){
+    const name=el.querySelector('.trn-lesson-name').textContent.toLowerCase();
+    el.style.display=name.includes(term)?'':'none';
+  });
 }
 
 function cn(r){if(r.toUpperCase().includes('WEBSERVICE'))return'Robô Edimo';let n=r.replace(/^[\d]+\.?(\d+\.)?/,'');return n.split('.').map(p=>p?p.charAt(0).toUpperCase()+p.slice(1).toLowerCase():'').filter(p=>p).join(' ')}
