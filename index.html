@@ -1746,6 +1746,12 @@ body::before,body::after{display:none!important}
   .nav{top:0!important;left:0!important;right:0!important;width:100%!important;transform:none!important;border-radius:0!important;position:fixed!important;z-index:50!important}
 }
 
+
+/* ALL HEADERS SAME COLOR */
+.comp-table .mh-old,.comp-table .mh-prev,.comp-table .mh-curr{
+  background:#8a8d92!important;color:#fff!important;border-bottom:none!important;
+}
+
 </style>
 
 </head>
@@ -2130,8 +2136,8 @@ function genComp(){
       const span=(showAcordos?1:0)+(showValor?1:0);
       h+='<th colspan="'+span+'" class="month-header '+cls+'">'+shortPeriod(m.period)+'</th>';
     });
-    h+='<th colspan="2" style="background:#5a6672;color:#fff;text-align:center;font-size:.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px">MÉDIA 3 MESES</th>';
-    h+='<th style="background:#8B1A1A;color:#fff;text-align:center;font-size:.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px">TEMPO DE EMPRESA</th>';
+    h+='<th colspan="2" class="month-header mh-old">MÉDIA 3 MESES</th>';
+    h+='<th class="month-header mh-old">TEMPO DE EMPRESA</th>';
     h+='</tr>';
     // Column labels
     h+='<tr><th>Operador</th>';
