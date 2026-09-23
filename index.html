@@ -1976,7 +1976,7 @@ function pC(rows){
     const cfg=cols.cfg!==undefined?String(row[cols.cfg]||'').trim():'';
     if(!nm||nm==='Subtotal'||nm.startsWith('NÃO')||nm==='Total'||nm==='Totais'||nm.startsWith('*'))continue;
     if(cfg==='Subtotal')continue;
-    if(nm.toLowerCase().includes('suporte'))continue;
+    if(nm.toLowerCase().includes('suporte'))continue;if(/^[Zz]-/.test(nm))continue;
     const qtd=cols.qtd!==undefined?(parseInt(row[cols.qtd])||0):0;
     const val=cols.val!==undefined?(parseFloat(row[cols.val])||0):0;
     if(qtd===0&&val===0)continue;
@@ -2012,7 +2012,7 @@ function parseCompCSV(text){
     const cells=csvSplit(line);
     const nm=(cells[cols.op]||'').trim().replace(/^"|"$/g,'');
     if(!nm||nm==='Subtotal'||nm==='Total'||nm==='Totais'||nm.startsWith('NÃO')||nm.startsWith('NAO')||nm.startsWith('*'))continue;
-    if(nm.toLowerCase().includes('suporte'))continue;
+    if(nm.toLowerCase().includes('suporte'))continue;if(/^[Zz]-/.test(nm))continue;
     const cfg=cols.cfg!==undefined?(cells[cols.cfg]||'').trim().replace(/^"|"$/g,''):'';
     if(cfg==='Subtotal')continue;
     const qtd=cols.qtd!==undefined?(parseInt(parseBR(cells[cols.qtd]))||0):0;
@@ -2130,6 +2130,8 @@ function genComp(){
       const span=(showAcordos?1:0)+(showValor?1:0);
       h+='<th colspan="'+span+'" class="month-header '+cls+'">'+shortPeriod(m.period)+'</th>';
     });
+    h+='<th colspan="2" style="background:#5a6672;color:#fff;text-align:center;font-size:.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px">MÉDIA 3 MESES</th>';
+    h+='<th style="background:#8B1A1A;color:#fff;text-align:center;font-size:.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px">TEMPO DE EMPRESA</th>';
     h+='</tr>';
     // Column labels
     h+='<tr><th>Operador</th>';
@@ -2139,7 +2141,7 @@ function genComp(){
       if(showValor)h+='<th class="num'+(showAcordos?'':' month-group-start')+'">Valor</th>';
       
     });
-    h+='<th class="num" style="border-left:2px solid #d0d3d6">Acordos</th><th class="num">Valor</th><th class="num" style="border-left:2px solid #d0d3d6">Empresa</th>';
+    h+='<th class="num" style="border-left:2px solid #d0d3d6">Acordos</th><th class="num">Valor</th><th class="num" style="border-left:2px solid #d0d3d6">Tempo</th>';
     h+='</tr></thead><tbody>';
     od.forEach((op,i)=>{
       const hl=mU(op.name,uN)?' hl':'';
@@ -2637,7 +2639,7 @@ function getTempoForOperator(cleanName){
   return'-';
 }
 
-function cn(r){if(r.toUpperCase().includes('WEBSERVICE'))return'Robô Edimo';r=r.replace(/^[Zz]-?\d*\.?/,'');let n=r.replace(/^[\d]+\.?(\d+\.)?/,'');return n.split('.').map(p=>p?p.charAt(0).toUpperCase()+p.slice(1).toLowerCase():'').filter(p=>p).join(' ')}
+function cn(r){if(r.toUpperCase().includes('WEBSERVICE'))return'Robô Edimo';let n=r.replace(/^[\d]+\.?(\d+\.)?/,'');return n.split('.').map(p=>p?p.charAt(0).toUpperCase()+p.slice(1).toLowerCase():'').filter(p=>p).join(' ')}
 function fm(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function fs(v){return'R$ '+Math.round(v).toLocaleString('pt-BR')}
 function copyLink(){const json=JSON.stringify(cRD),comp=LZString.compressToEncodedURIComponent(json),url=window.location.origin+window.location.pathname+'#d='+comp;navigator.clipboard.writeText(url).then(()=>sT('Link copiado!')).catch(()=>{const t=document.createElement('textarea');t.value=url;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);sT('Link copiado!')})}
