@@ -1835,7 +1835,7 @@ const RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XS
 const CP_M1='https://docs.google.com/spreadsheets/d/e/2PACX-1vRd-WnBwsOyBqVeunc1jH3sTzou9KGZllzJYA1QpKC_wk21Y4Cw9A2KprRbowWDRw/pub?output=csv';
 const CP_M2='https://docs.google.com/spreadsheets/d/e/2PACX-1vTgVTpekyWnlnCtyKnOgisBZ9YM8WOOoNGe6XKH2PslfxaI3GIdjt4g_hEtLJtqYQ/pub?output=csv';
 const CP_NOW='https://docs.google.com/spreadsheets/d/e/2PACX-1vRrs4woT4Rad3tsqEnkRBkBy4mOvXlP-3s24bIOQ3gaxRgPjfH3Lqw4PgMa1qfo-Q/pub?output=csv';
-let cU=null,cRD=null;const cD=[null,null,null];
+let cU=null,cRD=null;const cD=[null,null,null];let allEntradas={};
 
 function parseBR(s){if(!s)return 0;s=s.replace(/"/g,'').trim();if(!s||s==='0')return 0;s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0;}
 
@@ -1868,7 +1868,7 @@ function parseCSV(text){
   return{d:dt,ta,tv:Math.round(tv*100)/100,ops};
 }
 
-async function doLogin(){const u=document.getElementById('loginUser').value.trim().toLowerCase(),p=document.getElementById('loginPass').value;if(!u||!p)return;document.getElementById('loginError').style.display='none';document.getElementById('loginLoading').style.display='block';try{const r=await fetch(SH),c=await r.text(),rows=c.split('\n').map(r=>{const cells=[];let cell='',inQ=false;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){cells.push(cell.trim());cell=''}else cell+=ch;}cells.push(cell.trim());return cells;});let f=null;for(let i=1;i<rows.length;i++){if(rows[i].length>=3){const n=rows[i][0].toLowerCase().trim(),s=rows[i][2].trim(),pf=rows[i][3].toLowerCase().trim();if(n===u&&s===p){f={nome:rows[i][0].trim(),perfil:pf,entrada:rows[i][1].trim()};break}}}document.getElementById('loginLoading').style.display='none';if(f){cU=f;sessionStorage.setItem('user',JSON.stringify(f));document.getElementById('loginScreen').style.display='none';setupUI();startApp()}else{document.getElementById('loginError').style.display='block'}}catch(e){document.getElementById('loginLoading').style.display='none';document.getElementById('loginError').textContent='Erro de conexão';document.getElementById('loginError').style.display='block'}}
+async function doLogin(){const u=document.getElementById('loginUser').value.trim().toLowerCase(),p=document.getElementById('loginPass').value;if(!u||!p)return;document.getElementById('loginError').style.display='none';document.getElementById('loginLoading').style.display='block';try{const r=await fetch(SH),c=await r.text(),rows=c.split('\n').map(r=>{const cells=[];let cell='',inQ=false;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){cells.push(cell.trim());cell=''}else cell+=ch;}cells.push(cell.trim());return cells;});let f=null;for(let i=1;i<rows.length;i++){if(rows[i].length>=3){allEntradas[rows[i][0].toLowerCase().trim()]=rows[i][1]?rows[i][1].trim():'';const n=rows[i][0].toLowerCase().trim(),s=rows[i][2].trim(),pf=rows[i][3].toLowerCase().trim();if(n===u&&s===p){f={nome:rows[i][0].trim(),perfil:pf,entrada:rows[i][1].trim()};break}}}document.getElementById('loginLoading').style.display='none';if(f){cU=f;sessionStorage.setItem('user',JSON.stringify(f));document.getElementById('loginScreen').style.display='none';setupUI();startApp()}else{document.getElementById('loginError').style.display='block'}}catch(e){document.getElementById('loginLoading').style.display='none';document.getElementById('loginError').textContent='Erro de conexão';document.getElementById('loginError').style.display='block'}}
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 function setupUI(){document.getElementById('navUser').innerHTML='👤 '+cU.nome;if(isA())document.querySelectorAll('.admin-only').forEach(el=>el.style.display='')}
 function doLogout(){sessionStorage.removeItem('user');cU=null;cRD=null;window.location.hash='';window.location.reload()}
@@ -2125,7 +2125,7 @@ function genComp(){
       if(showValor)h+='<th class="num'+(showAcordos?'':' month-group-start')+'">Valor</th>';
       
     });
-    h+='<th class="num" style="border-left:2px solid #d0d3d6">Acordos</th><th class="num">Valor</th>';
+    h+='<th class="num" style="border-left:2px solid #d0d3d6">Acordos</th><th class="num">Valor</th><th class="num" style="border-left:2px solid #d0d3d6">Empresa</th>';
     h+='</tr></thead><tbody>';
     od.forEach((op,i)=>{
       const hl=mU(op.name,uN)?' hl':'';
@@ -2154,6 +2154,9 @@ function genComp(){
       const avgV=cnt>0?Math.round(sumV*100/cnt)/100:0;
       h+='<td class="num" style="border-left:2px solid #d0d3d6;font-weight:500">'+avgA+'</td>';
       h+='<td class="num" style="font-weight:500">'+fm(avgV)+miniMetaBar(avgV,op.cfg)+'</td>';
+      // Tempo column: real time at company
+      const tempoLabel=getTempoForOperator(op.name);
+      h+='<td class="num" style="border-left:2px solid #d0d3d6;font-size:.75rem">'+tempoLabel+'</td>';
       h+='</tr>';
     });
     h+='</tbody></table></div>';
@@ -2592,6 +2595,28 @@ function getGoalsHTML(cfg, curV, curA){
 
   h+='</div>';
   return h;
+}
+
+function getTempoForOperator(cleanName){
+  if(!cleanName)return'';
+  const cn2=cleanName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  for(const key in allEntradas){
+    const k2=key.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    // Match by first name
+    const keyFirst=k2.split(' ')[0];
+    const nameFirst=cn2.split(' ')[0];
+    if(keyFirst===nameFirst||k2.includes(cn2)||cn2.includes(k2)){
+      const d=parseDateBR(allEntradas[key]);
+      if(d){
+        const days=Math.floor((new Date()-d)/(1000*60*60*24));
+        if(days<30)return days+'d';
+        if(days<365){const m=Math.floor(days/30);return m+' mes'+(m>1?'es':'');}
+        const y=Math.floor(days/365);const mo=Math.floor((days%365)/30);
+        return y+'a'+(mo>0?' '+mo+'m':'');
+      }
+    }
+  }
+  return'-';
 }
 
 function cn(r){if(r.toUpperCase().includes('WEBSERVICE'))return'Robô Edimo';r=r.replace(/^[Zz]-?\d*\.?/,'');let n=r.replace(/^[\d]+\.?(\d+\.)?/,'');return n.split('.').map(p=>p?p.charAt(0).toUpperCase()+p.slice(1).toLowerCase():'').filter(p=>p).join(' ')}
