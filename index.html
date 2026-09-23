@@ -2598,22 +2598,25 @@ function getGoalsHTML(cfg, curV, curA){
 }
 
 function getTempoForOperator(cleanName){
-  if(!cleanName)return'';
-  const cn2=cleanName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(!cleanName)return'-';
+  const cn2=cleanName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  const nameFirst=cn2.split(' ')[0];
+  // Try matching: exact, first name, partial
   for(const key in allEntradas){
-    const k2=key.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    // Match by first name
-    const keyFirst=k2.split(' ')[0];
-    const nameFirst=cn2.split(' ')[0];
-    if(keyFirst===nameFirst||k2.includes(cn2)||cn2.includes(k2)){
-      const d=parseDateBR(allEntradas[key]);
-      if(d){
-        const days=Math.floor((new Date()-d)/(1000*60*60*24));
-        if(days<30)return days+'d';
-        if(days<365){const m=Math.floor(days/30);return m+' mes'+(m>1?'es':'');}
-        const y=Math.floor(days/365);const mo=Math.floor((days%365)/30);
-        return y+'a'+(mo>0?' '+mo+'m':'');
-      }
+    const k2=key.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    if(!k2)continue;
+    const keyFirst=k2.split(' ')[0].split('.')[0]; // handle "1.gislaine" format
+    if(k2===cn2||keyFirst===nameFirst||cn2.startsWith(k2)||k2.startsWith(nameFirst)){
+      const dateStr=allEntradas[key];
+      if(!dateStr)continue;
+      const d=parseDateBR(dateStr);
+      if(!d)continue;
+      const days=Math.floor((new Date()-d)/(1000*60*60*24));
+      if(days<0)return'-';
+      if(days<30)return days+'d';
+      if(days<365){const m=Math.floor(days/30);return m+(m>1?' meses':' mês');}
+      const y=Math.floor(days/365);const mo=Math.floor((days%365)/30);
+      return y+'a'+(mo>0?' '+mo+'m':'');
     }
   }
   return'-';
