@@ -60,6 +60,8 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 .pt-tag.pt-late{color:#f5b91f}
 .pt-tag.pt-miss{color:#f87171}
 .pt-tag.pt-off{color:#3d5575}
+.pt-tag.pt-pend{color:#506987}
+.pt-badge.pt-pend{color:#506987}
 .pt-badge{font-size:.55rem;padding:1px 5px;margin-left:4px;font-weight:600;vertical-align:middle}
 .pt-badge.pt-ok{color:#22d872}
 .pt-badge.pt-late{color:#f5b91f}
@@ -1150,6 +1152,8 @@ body::before,body::after{display:none!important}
 .pt-tag.pt-late{color:#e67e22}
 .pt-tag.pt-miss{color:#e74c3c}
 .pt-tag.pt-off{color:#8a8d92}
+.pt-tag.pt-pend{color:#8a8d92}
+.pt-badge.pt-pend{color:#8a8d92}
 .pt-badge{font-size:.55rem;padding:1px 5px;margin-left:4px;font-weight:600;vertical-align:middle}
 .pt-badge.pt-ok{color:#27ae60}
 .pt-badge.pt-late{color:#e67e22}
@@ -1309,6 +1313,8 @@ body::before,body::after{display:none!important}
 .pt-tag.pt-late{color:#e67e22}
 .pt-tag.pt-miss{color:#e74c3c}
 .pt-tag.pt-off{color:#8a8d92}
+.pt-tag.pt-pend{color:#8a8d92}
+.pt-badge.pt-pend{color:#8a8d92}
 .pt-badge{font-size:.55rem;padding:1px 5px;margin-left:4px;font-weight:600;vertical-align:middle}
 .pt-badge.pt-ok{color:#27ae60}
 .pt-badge.pt-late{color:#e67e22}
@@ -2002,28 +2008,67 @@ function matchPonto(opName){
   return best;
 }
 
-function pontoStatus(p){
+function getShiftTime(opName){
+  // Find shift start time from login sheet (allEntradas: {loginName: entradaTime})
+  if(!opName||!allEntradas)return null;
+  const a=normN(opName).split(/\s+/).filter(x=>x);
+  if(!a.length)return null;
+  for(const [k,v] of Object.entries(allEntradas)){
+    const b=normN(k).split(/\s+/).filter(x=>x);
+    if(!b.length)continue;
+    // Match by last name first (same logic as matchPonto)
+    const lastA=a[a.length-1],lastB=b[b.length-1];
+    let score=0;
+    if(lastA===lastB)score+=10;
+    const surA=a.slice(1),surB=b.slice(1);
+    for(const sa of surA){for(const sb of surB){if(sa===sb)score+=5;}}
+    if(a[0]===b[0])score+=3;
+    else if(simil(a[0],b[0]))score+=2;
+    if(score>=2)return v;
+  }
+  return null;
+}
+
+function shiftStarted(opName){
+  const t=getShiftTime(opName);
+  if(!t)return true; // if we can't find shift, assume started (safe default)
+  const parts=t.match(/(\d{1,2})[:\.]?(\d{2})?/);
+  if(!parts)return true;
+  const sh=parseInt(parts[1]),sm=parseInt(parts[2]||'0');
+  const now=new Date();
+  const nh=now.getHours(),nm=now.getMinutes();
+  // Give 15 min grace after shift start before marking as falta
+  const shiftMin=sh*60+sm+15;
+  const nowMin=nh*60+nm;
+  return nowMin>=shiftMin;
+}
+
+function pontoStatus(p,opName){
   if(!p)return'off';
   const s=p.status.toUpperCase();
   if(s.includes('PRESENTE'))return'ok';
   if(s.includes('ATRASADO'))return'late';
+  // FALTOU: only if their shift already started
+  if(!shiftStarted(opName||p.nome))return'pending';
   return'miss';
 }
 
-function pontoTag(p){
-  const s=pontoStatus(p);
+function pontoTag(p,opName){
+  const s=pontoStatus(p,opName);
   if(s==='ok')return'<span class="pt-tag pt-ok">✓</span>';
   if(s==='late')return'<span class="pt-tag pt-late">⏰</span>';
   if(s==='miss')return'<span class="pt-tag pt-miss">✗</span>';
+  if(s==='pending')return'<span class="pt-tag pt-pend">⏳</span>';
   return'<span class="pt-tag pt-off">--</span>';
 }
 
-function pontoBadge(p){
+function pontoBadge(p,opName){
   if(!p)return'';
-  const s=pontoStatus(p);
+  const s=pontoStatus(p,opName);
   if(s==='ok')return' <span class="pt-badge pt-ok">'+p.entrada+'</span>';
   if(s==='late')return' <span class="pt-badge pt-late">'+p.entrada+' ⏰</span>';
   if(s==='miss')return' <span class="pt-badge pt-miss">FALTOU</span>';
+  if(s==='pending')return' <span class="pt-badge pt-pend">aguardando</span>';
   return'';
 }
 
@@ -2035,14 +2080,20 @@ function toggleFaltaPanel(){
 function updateFaltaAlert(){
   const el=document.getElementById('sbAlert');
   if(!el||!pontoData)return;
-  const faltas=pontoData.filter(p=>!p.status.toUpperCase().includes('PRESENTE')&&!p.status.toUpperCase().includes('ATRASADO'));
-  if(faltas.length===0){el.style.display='none';return;}
+  const faltas=pontoData.filter(p=>{
+    const s=p.status.toUpperCase();
+    if(s.includes('PRESENTE')||s.includes('ATRASADO'))return false;
+    // Only count as falta if their shift already started
+    return shiftStarted(p.nome);
+  });
+  if(faltas.length===0){el.style.display='none';document.getElementById('sbFaltaPanel').style.display='none';return;}
   el.style.display='flex';
   document.getElementById('sbAlertBadge').textContent=faltas.length;
   let h='';
   faltas.forEach(p=>{
     const nm=p.nome.split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
-    h+='<div class="sb-falta-item">'+nm+'</div>';
+    const turno=getShiftTime(p.nome);
+    h+='<div class="sb-falta-item">'+nm+(turno?' <span style="opacity:.5">('+turno+')</span>':'')+'</div>';
   });
   document.getElementById('sbFaltaList').innerHTML=h;
 }
@@ -2148,14 +2199,14 @@ function renderR(data){
   allOps.forEach((o,i)=>{
     const hl=mU(o.n,uN)?' hl':'';
     const pt=matchPonto(o.n);
-    const st=pontoStatus(pt);
+    const st=pontoStatus(pt,o.n);
     const isFaltou=st==='miss';
     const pct=mx>0?Math.round((o.a/mx)*100):0;
     const rowCls='trow'+(isFaltou?' trow-miss':'')+(o.a===0?' trow-zero':'')+hl;
     h+='<div class="'+rowCls+'" style="animation-delay:'+(i*20)+'ms">';
     h+='<div class="rk">'+(i+1)+'</div>';
-    h+='<div class="nm">'+(isFaltou?'<span class="nm-miss">'+o.n+'</span>':o.n)+pontoBadge(pt)+'</div>';
-    h+='<div class="pt-cell">'+pontoTag(pt)+'</div>';
+    h+='<div class="nm">'+(isFaltou?'<span class="nm-miss">'+o.n+'</span>':o.n)+pontoBadge(pt,o.n)+'</div>';
+    h+='<div class="pt-cell">'+pontoTag(pt,o.n)+'</div>';
     h+='<div class="ac">'+(o.a>0?o.a:'<span class="ac-zero">0</span>')+'</div>';
     h+='<div class="vl">'+(o.v>0?fm(o.v):'<span class="vl-zero">R$ 0</span>')+'</div>';
     h+='<div class="bar"><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%"></div></div></div>';
