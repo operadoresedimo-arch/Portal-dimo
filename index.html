@@ -310,6 +310,42 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 .sb-mot-title{font-size:.78rem;font-weight:800;color:#22e477;margin-bottom:4px}
 .sb-mot-sub{font-size:.6rem;color:#7e93b0}
 
+/* Sidebar alert bell */
+.sb-alert{
+  position:relative;display:flex;align-items:center;gap:10px;
+  padding:14px 16px;margin-top:16px;cursor:pointer;
+  background:linear-gradient(145deg,rgba(248,113,113,.12),rgba(248,113,113,.04));
+  border:1px solid rgba(248,113,113,.25);border-radius:14px;
+  transition:all .2s;
+}
+.sb-alert:hover{background:linear-gradient(145deg,rgba(248,113,113,.18),rgba(248,113,113,.08))}
+.sb-alert-icon{font-size:1.4rem;animation:bellShake 2s ease infinite}
+@keyframes bellShake{
+  0%,100%{transform:rotate(0)}
+  5%{transform:rotate(15deg)}
+  10%{transform:rotate(-13deg)}
+  15%{transform:rotate(10deg)}
+  20%{transform:rotate(-8deg)}
+  25%{transform:rotate(0)}
+}
+.sb-alert-badge{
+  position:absolute;top:-4px;left:28px;
+  background:#f87171;color:#fff;font-size:.55rem;font-weight:800;
+  min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;
+  border-radius:9px;padding:0 4px;
+  animation:pulseBadge 1.5s ease infinite;
+}
+@keyframes pulseBadge{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.sb-alert-text{font-size:.72rem;font-weight:700;color:#f87171}
+.sb-falta-panel{
+  margin-top:8px;background:var(--card);border:1px solid rgba(248,113,113,.2);
+  border-radius:14px;padding:12px;max-height:200px;overflow-y:auto;
+}
+.sb-falta-title{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#f87171;margin-bottom:8px}
+.sb-falta-list{display:flex;flex-direction:column;gap:4px}
+.sb-falta-item{font-size:.7rem;color:var(--text2);padding:4px 8px;border-radius:6px;background:rgba(248,113,113,.06)}
+.sb-falta-item::before{content:'✗ ';color:#f87171;font-weight:700}
+
 /* SIDEBAR LAYOUT SHIFT */
 .app-with-sidebar .main{margin-left:240px;max-width:none;padding:24px 28px 40px}
 .app-with-sidebar .nav{display:none!important}
@@ -1042,6 +1078,14 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 .sb-nav .sb-item.active{background:linear-gradient(135deg,#8B1A1A,#A52020);color:#fff;box-shadow:0 4px 16px rgba(139,26,26,.3)}
 .sb-motivation{background:linear-gradient(145deg,rgba(212,169,55,.08),rgba(212,169,55,.03))!important;border-color:rgba(212,169,55,.2)!important}
 .sb-mot-title{color:#D4A937!important}.sb-mot-sub{color:#a0a2a6!important}
+.sb-alert{background:linear-gradient(145deg,rgba(231,76,60,.08),rgba(231,76,60,.03))!important;border-color:rgba(231,76,60,.2)!important}
+.sb-alert:hover{background:linear-gradient(145deg,rgba(231,76,60,.14),rgba(231,76,60,.06))!important}
+.sb-alert-text{color:#e74c3c!important}
+.sb-alert-badge{background:#e74c3c!important}
+.sb-falta-panel{background:#fff!important;border-color:rgba(231,76,60,.15)!important}
+.sb-falta-title{color:#e74c3c!important}
+.sb-falta-item{background:rgba(231,76,60,.04)!important;color:#5a5d62!important}
+.sb-falta-item::before{color:#e74c3c!important}
 .app-with-sidebar .dash-grid{grid-template-columns:1fr!important;gap:16px}
 .app-with-sidebar .podium-panel{max-width:100%}
 .app-with-sidebar .podium-panel .podium-title{font-size:1rem}
@@ -1840,6 +1884,15 @@ body::before,body::after{display:none!important}
 <button class="sb-item active" onclick="showPage('comparativo')" id="sbC">📊 Comparativo</button>
 <button class="sb-item" onclick="doLogout()">🚪 Sair</button>
 </nav>
+<div class="sb-alert" id="sbAlert" style="display:none" onclick="toggleFaltaPanel()">
+<div class="sb-alert-icon">🔔</div>
+<div class="sb-alert-badge" id="sbAlertBadge">0</div>
+<div class="sb-alert-text">Faltas Hoje</div>
+</div>
+<div class="sb-falta-panel" id="sbFaltaPanel" style="display:none">
+<div class="sb-falta-title">⚠️ Ausências</div>
+<div class="sb-falta-list" id="sbFaltaList"></div>
+</div>
 <div class="sb-motivation"><div class="sb-mot-icon">🎯</div><div class="sb-mot-title">Juntos batemos mais metas!</div><div class="sb-mot-sub">Foco no próximo acordo.</div></div>
 </div>
 
@@ -1908,19 +1961,42 @@ async function loadPonto(){
 
 function normN(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z\s]/g,'').trim();}
 
+function simil(a,b){
+  // Levenshtein-like: returns true if strings are close enough (max 2 edits for short, or one starts with the other)
+  if(a===b)return true;
+  if(a.length>3&&b.length>3&&(a.startsWith(b.substring(0,3))||b.startsWith(a.substring(0,3)))){
+    // count differences
+    const mx=Math.max(a.length,b.length),mn=Math.min(a.length,b.length);
+    if(mx-mn>3)return false;
+    let diff=mx-mn;
+    for(let i=0;i<mn;i++){if(a[i]!==b[i])diff++;}
+    return diff<=2;
+  }
+  return false;
+}
+
 function matchPonto(opName){
   if(!pontoData||!opName)return null;
   const a=normN(opName).split(/\s+/).filter(x=>x);
   if(!a.length)return null;
-  // Score-based match: first name match = 1pt, each additional shared word = 1pt
+  // Strategy: match by last name (sobrenome) first, then first name as tiebreaker
+  // This handles spelling variations like Andrieli/Andrielli and duplicate first names like Ana
   let best=null,bestScore=0;
   for(const p of pontoData){
     const b=normN(p.nome).split(/\s+/).filter(x=>x);
     if(!b.length)continue;
-    if(b[0]!==a[0])continue;
-    let score=1;
-    for(let i=1;i<a.length;i++){if(b.includes(a[i]))score++;}
-    for(let i=1;i<b.length;i++){if(a.includes(b[i]))score++;}
+    let score=0;
+    // Check last name match (exact)
+    const lastA=a[a.length-1], lastB=b[b.length-1];
+    if(lastA===lastB)score+=10;
+    // Check all shared surnames (middle/last names exact match)
+    const surA=a.slice(1),surB=b.slice(1);
+    for(const sa of surA){for(const sb of surB){if(sa===sb)score+=5;}}
+    // Check first name (fuzzy)
+    if(a[0]===b[0])score+=3;
+    else if(simil(a[0],b[0]))score+=2;
+    // Must have at least a first name fuzzy match OR a surname match
+    if(score<2)continue;
     if(score>bestScore){bestScore=score;best=p;}
   }
   return best;
@@ -1949,6 +2025,26 @@ function pontoBadge(p){
   if(s==='late')return' <span class="pt-badge pt-late">'+p.entrada+' ⏰</span>';
   if(s==='miss')return' <span class="pt-badge pt-miss">FALTOU</span>';
   return'';
+}
+
+function toggleFaltaPanel(){
+  const p=document.getElementById('sbFaltaPanel');
+  p.style.display=p.style.display==='none'?'block':'none';
+}
+
+function updateFaltaAlert(){
+  const el=document.getElementById('sbAlert');
+  if(!el||!pontoData)return;
+  const faltas=pontoData.filter(p=>!p.status.toUpperCase().includes('PRESENTE')&&!p.status.toUpperCase().includes('ATRASADO'));
+  if(faltas.length===0){el.style.display='none';return;}
+  el.style.display='flex';
+  document.getElementById('sbAlertBadge').textContent=faltas.length;
+  let h='';
+  faltas.forEach(p=>{
+    const nm=p.nome.split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
+    h+='<div class="sb-falta-item">'+nm+'</div>';
+  });
+  document.getElementById('sbFaltaList').innerHTML=h;
 }
 
 function mergeOpsWithPonto(ops){
@@ -2067,7 +2163,7 @@ function renderR(data){
   });
   h+='</div></div>';
   h+='<div class="dash-footer"><div class="brand-ft">ÉDIMO</div>Soluções em Cobranças</div>';
-  document.getElementById('pageRanking').innerHTML=h;toolbar.style.display='flex';
+  document.getElementById('pageRanking').innerHTML=h;toolbar.style.display='flex';updateFaltaAlert();
 }
 
 function mU(op,u){if(!u)return false;const a=op.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''),b=u.normalize('NFD').replace(/[\u0300-\u036f]/g,''),ps=b.split(' ').filter(p=>p.length>2);return ps.every(p=>a.includes(p))}
