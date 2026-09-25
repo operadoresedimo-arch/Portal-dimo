@@ -312,41 +312,29 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 .sb-mot-title{font-size:.78rem;font-weight:800;color:#22e477;margin-bottom:4px}
 .sb-mot-sub{font-size:.6rem;color:#7e93b0}
 
-/* Sidebar alert bell */
-.sb-alert{
-  position:relative;display:flex;align-items:center;gap:10px;
-  padding:14px 16px;margin-top:16px;cursor:pointer;
-  background:linear-gradient(145deg,rgba(248,113,113,.12),rgba(248,113,113,.04));
-  border:1px solid rgba(248,113,113,.25);border-radius:14px;
-  transition:all .2s;
+/* Sidebar bell */
+.sb-bell-wrap{
+  position:relative;display:flex;align-items:center;gap:8px;
+  padding:10px 14px;margin-top:16px;cursor:pointer;
+  transition:opacity .3s;
 }
-.sb-alert:hover{background:linear-gradient(145deg,rgba(248,113,113,.18),rgba(248,113,113,.08))}
-.sb-alert-icon{font-size:1.4rem;animation:bellShake 2s ease infinite}
-@keyframes bellShake{
-  0%,100%{transform:rotate(0)}
-  5%{transform:rotate(15deg)}
-  10%{transform:rotate(-13deg)}
-  15%{transform:rotate(10deg)}
-  20%{transform:rotate(-8deg)}
+.sb-bell-wrap:hover{opacity:.7}
+.sb-bell{font-size:1.1rem;animation:bellSwing 2.5s ease infinite}
+@keyframes bellSwing{
+  0%,30%,100%{transform:rotate(0)}
+  5%{transform:rotate(12deg)}
+  10%{transform:rotate(-10deg)}
+  15%{transform:rotate(6deg)}
+  20%{transform:rotate(-4deg)}
   25%{transform:rotate(0)}
 }
-.sb-alert-badge{
-  position:absolute;top:-4px;left:28px;
-  background:#f87171;color:#fff;font-size:.55rem;font-weight:800;
-  min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;
-  border-radius:9px;padding:0 4px;
-  animation:pulseBadge 1.5s ease infinite;
+.sb-bell-badge{
+  position:absolute;top:2px;left:22px;
+  background:#e74c3c;color:#fff;font-size:.5rem;font-weight:800;
+  min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;padding:0 3px;
 }
-@keyframes pulseBadge{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
-.sb-alert-text{font-size:.72rem;font-weight:700;color:#f87171}
-.sb-falta-panel{
-  margin-top:8px;background:var(--card);border:1px solid rgba(248,113,113,.2);
-  border-radius:14px;padding:12px;max-height:200px;overflow-y:auto;
-}
-.sb-falta-title{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#f87171;margin-bottom:8px}
-.sb-falta-list{display:flex;flex-direction:column;gap:4px}
-.sb-falta-item{font-size:.7rem;color:var(--text2);padding:4px 8px;border-radius:6px;background:rgba(248,113,113,.06)}
-.sb-falta-item::before{content:'✗ ';color:#f87171;font-weight:700}
+.sb-bell-label{font-size:.72rem;font-weight:500;color:var(--text)}
 
 /* SIDEBAR LAYOUT SHIFT */
 .app-with-sidebar .main{margin-left:240px;max-width:none;padding:24px 28px 40px}
@@ -1080,14 +1068,8 @@ body::after{right:-80px;bottom:-60px;transform:rotate(180deg)}
 .sb-nav .sb-item.active{background:linear-gradient(135deg,#8B1A1A,#A52020);color:#fff;box-shadow:0 4px 16px rgba(139,26,26,.3)}
 .sb-motivation{background:linear-gradient(145deg,rgba(212,169,55,.08),rgba(212,169,55,.03))!important;border-color:rgba(212,169,55,.2)!important}
 .sb-mot-title{color:#D4A937!important}.sb-mot-sub{color:#a0a2a6!important}
-.sb-alert{background:linear-gradient(145deg,rgba(231,76,60,.08),rgba(231,76,60,.03))!important;border-color:rgba(231,76,60,.2)!important}
-.sb-alert:hover{background:linear-gradient(145deg,rgba(231,76,60,.14),rgba(231,76,60,.06))!important}
-.sb-alert-text{color:#e74c3c!important}
-.sb-alert-badge{background:#e74c3c!important}
-.sb-falta-panel{background:#fff!important;border-color:rgba(231,76,60,.15)!important}
-.sb-falta-title{color:#e74c3c!important}
-.sb-falta-item{background:rgba(231,76,60,.04)!important;color:#5a5d62!important}
-.sb-falta-item::before{color:#e74c3c!important}
+.sb-bell-label{color:#1a1a1a!important}
+.sb-bell-badge{background:#e74c3c!important}
 .app-with-sidebar .dash-grid{grid-template-columns:1fr!important;gap:16px}
 .app-with-sidebar .podium-panel{max-width:100%}
 .app-with-sidebar .podium-panel .podium-title{font-size:1rem}
@@ -1890,14 +1872,10 @@ body::before,body::after{display:none!important}
 <button class="sb-item active" onclick="showPage('comparativo')" id="sbC">📊 Comparativo</button>
 <button class="sb-item" onclick="doLogout()">🚪 Sair</button>
 </nav>
-<div class="sb-alert" id="sbAlert" style="display:none" onclick="toggleFaltaPanel()">
-<div class="sb-alert-icon">🔔</div>
-<div class="sb-alert-badge" id="sbAlertBadge">0</div>
-<div class="sb-alert-text">Faltas Hoje</div>
-</div>
-<div class="sb-falta-panel" id="sbFaltaPanel" style="display:none">
-<div class="sb-falta-title">⚠️ Ausências</div>
-<div class="sb-falta-list" id="sbFaltaList"></div>
+<div class="sb-bell-wrap" id="sbAlert" style="display:none" onclick="dismissFalta()">
+<div class="sb-bell">🔔</div>
+<div class="sb-bell-badge" id="sbAlertBadge">0</div>
+<div class="sb-bell-label">Faltas Hoje</div>
 </div>
 <div class="sb-motivation"><div class="sb-mot-icon">🎯</div><div class="sb-mot-title">Juntos batemos mais metas!</div><div class="sb-mot-sub">Foco no próximo acordo.</div></div>
 </div>
@@ -2072,9 +2050,9 @@ function pontoBadge(p,opName){
   return'';
 }
 
-function toggleFaltaPanel(){
-  const p=document.getElementById('sbFaltaPanel');
-  p.style.display=p.style.display==='none'?'block':'none';
+function dismissFalta(){
+  const b=document.getElementById('sbAlertBadge');
+  if(b)b.style.display='none';
 }
 
 function updateFaltaAlert(){
@@ -2083,19 +2061,11 @@ function updateFaltaAlert(){
   const faltas=pontoData.filter(p=>{
     const s=p.status.toUpperCase();
     if(s.includes('PRESENTE')||s.includes('ATRASADO'))return false;
-    // Only count as falta if their shift already started
     return shiftStarted(p.nome);
   });
-  if(faltas.length===0){el.style.display='none';document.getElementById('sbFaltaPanel').style.display='none';return;}
+  if(faltas.length===0){el.style.display='none';return;}
   el.style.display='flex';
   document.getElementById('sbAlertBadge').textContent=faltas.length;
-  let h='';
-  faltas.forEach(p=>{
-    const nm=p.nome.split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
-    const turno=getShiftTime(p.nome);
-    h+='<div class="sb-falta-item">'+nm+(turno?' <span style="opacity:.5">('+turno+')</span>':'')+'</div>';
-  });
-  document.getElementById('sbFaltaList').innerHTML=h;
 }
 
 function mergeOpsWithPonto(ops){
