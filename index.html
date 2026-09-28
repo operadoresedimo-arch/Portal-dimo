@@ -1972,7 +1972,7 @@ async function loadPonto(){
       const cells=[];let cell='',inQ=false;
       for(let j=0;j<lines[i].length;j++){const c=lines[i][j];if(c==='"')inQ=!inQ;else if(c===','&&!inQ){cells.push(cell.trim());cell=''}else cell+=c;}
       cells.push(cell.trim());
-      if(cells[0])rows.push({nome:cells[0],status:cells[1]||'',entrada:cells[2]||'',saida:cells[3]||'',batidas:cells[4]||''});
+      if(cells[0]&&!cells[0].includes('RESUMO')&&!cells[0].includes('---'))rows.push({nome:cells[0],status:cells[1]||'',entrada:cells[2]||'',saida:cells[3]||'',batidas:cells[4]||''});
     }
     pontoData=rows;
   }catch(e){pontoData=null;}
@@ -2059,7 +2059,7 @@ function pontoTag(p,opName){
   if(s==='late')return'<span class="pt-tag pt-late">⏰</span>';
   if(s==='miss')return'<span class="pt-tag pt-miss">✗</span>';
   if(s==='pending')return'<span class="pt-tag pt-pend">⏳</span>';
-  return'<span class="pt-tag pt-off">--</span>';
+  return'';
 }
 
 function pontoBadge(p,opName){
@@ -2141,6 +2141,9 @@ function parseCSV(text){
     const totalQtd=Math.round(allNums[allNums.length-2].n);
     if(name==='Totais'){ta=totalQtd;tv=totalVal;continue;}
     if(totalQtd===0&&totalVal===0)continue;
+    // Filtra: só operadores (prefixo 0, 1, 2) + Andrieli
+    const prefix=name.charAt(0);
+    if(prefix!=='0'&&prefix!=='1'&&prefix!=='2'&&!name.toLowerCase().includes('andriel'))continue;
     ops.push({n:cn(name),a:totalQtd,v:Math.round(totalVal*100)/100});
   }
   ops.sort((a,b)=>b.a-a.a||b.v-a.v);
