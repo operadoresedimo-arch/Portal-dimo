@@ -123,6 +123,14 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 .comp-table th{font-size:.56rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);padding:10px 8px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}.comp-table th.num{text-align:right}
 .comp-table td{padding:9px 8px;font-size:.75rem;border-bottom:1px solid rgba(21,37,68,.4)}.comp-table td.num{text-align:right;font-size:.72rem;color:var(--text2)}.comp-table td.nmcell{font-weight:500}
 .comp-table tr:nth-child(odd) td{background:rgba(10,20,41,.3)}.comp-table tr.hl td{background:rgba(212,169,55,.05)!important}
+/* Comp table compact */
+.comp-table{width:100%;table-layout:fixed}
+.comp-table th,.comp-table td{padding:5px 4px;font-size:.6rem;overflow:hidden;text-overflow:ellipsis}
+.comp-table td.num{font-size:.58rem}
+.comp-table .nmcell{max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.comp-table th.num{font-size:.5rem}
+.comp-section{overflow-x:auto}
+
 .trend-up{color:var(--green);font-weight:700;font-size:.68rem}.trend-down{color:var(--red);font-weight:700;font-size:.68rem}.trend-same{color:var(--text3);font-size:.68rem}
 .comp-personal{padding:24px 16px;text-align:center}.comp-personal h3{font-size:.9rem;font-weight:700;margin-bottom:16px;color:var(--gold)}
 .personal-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:12px;display:flex;justify-content:space-around;text-align:center}.personal-card .pc-val{font-size:1.5rem;font-weight:800;color:var(--green)}.personal-card .pc-lbl{font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-top:2px}
