@@ -62,6 +62,10 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 .pt-cell{width:30px;text-align:center;flex-shrink:0}
 .tp-pt{width:30px;text-align:center;font-size:.65rem}
 .trow-miss{opacity:.5}.nm-miss{text-decoration:line-through}
+.turno-tag{font-size:.5rem;font-weight:800;padding:2px 5px;margin-left:6px;vertical-align:middle;letter-spacing:.04em}
+.turno-m{color:#22d872;background:rgba(34,216,114,.1);border:1px solid rgba(34,216,114,.2)}
+.turno-t{color:#f5b91f;background:rgba(245,185,31,.1);border:1px solid rgba(245,185,31,.2)}
+.turno-n{color:#a96cff;background:rgba(169,108,255,.1);border:1px solid rgba(169,108,255,.2)}
 .trow-zero .ac{color:var(--text3)!important}.ac-zero{color:var(--text3)}.vl-zero{color:var(--text3)}
 .sc-right{flex:1}
 .sc-label{font-size:.55rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
@@ -129,6 +133,19 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--green);color:#060e1e;padding:12px 24px;border-radius:12px;font-size:.8rem;font-weight:600;z-index:60;transition:transform .4s;pointer-events:none}.toast.show{transform:translateX(-50%) translateY(0)}
 .admin-only{display:none}
 .section-title{font-size:.58rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:20px}
+
+/* Responsive */
+@media(max-width:1200px){
+  .sidebar{width:200px!important}
+  .app-with-sidebar .main{margin-left:200px!important}
+}
+@media(max-width:900px){
+  .sidebar{display:none!important}
+  .app-with-sidebar .main{margin-left:0!important}
+  .nav{display:flex!important}
+  .comp-section{overflow-x:auto}
+  .comp-table{min-width:800px}
+}
 </style>
 
 <style id="edimo-modern-overrides">
@@ -1105,6 +1122,10 @@ body::before,body::after{display:none!important}
 .pt-tag.pt-ok{color:#27ae60}.pt-tag.pt-late{color:#e67e22}.pt-tag.pt-miss{color:#e74c3c}.pt-tag.pt-off{color:#8a8d92}.pt-tag.pt-pend{color:#8a8d92}
 .pt-badge.pt-ok{color:#27ae60}.pt-badge.pt-late{color:#e67e22}.pt-badge.pt-miss{color:#e74c3c}.pt-badge.pt-pend{color:#8a8d92}
 .trow-miss{opacity:.5}.nm-miss{text-decoration:line-through}
+.turno-tag{font-size:.5rem;font-weight:800;padding:2px 5px;margin-left:6px;vertical-align:middle;letter-spacing:.04em}
+.turno-m{color:#27ae60;background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.15)}
+.turno-t{color:#e67e22;background:rgba(230,126,34,.08);border:1px solid rgba(230,126,34,.15)}
+.turno-n{color:#8e44ad;background:rgba(142,68,173,.08);border:1px solid rgba(142,68,173,.15)}
 .trow-zero .ac{color:#8a8d92!important}.ac-zero{color:#8a8d92}.vl-zero{color:#8a8d92}
 .sb-bell-label{color:#1a1a1a!important}
 .sb-bell-badge{background:#e74c3c!important}
@@ -2072,6 +2093,29 @@ function pontoBadge(p,opName){
   return'';
 }
 
+function getTurnoTag(opName){
+  if(!opName)return'';
+  const n=normN(opName).split(/\s+/).filter(x=>x);
+  if(!n.length)return'';
+  for(const [k,v] of Object.entries(allLogins)){
+    const b=normN(k).split(/\s+/).filter(x=>x);
+    if(!b.length)continue;
+    const lastA=n[n.length-1],lastB=b[b.length-1];
+    let score=0;
+    if(lastA===lastB)score+=10;
+    if(n[0]===b[0])score+=3;
+    else if(simil(n[0],b[0]))score+=2;
+    if(score>=5){
+      const p=v.charAt(0);
+      if(p==='1')return'<span class="turno-tag turno-m">M</span>';
+      if(p==='2')return'<span class="turno-tag turno-t">T</span>';
+      if(p==='0')return'<span class="turno-tag turno-n">N</span>';
+      return'';
+    }
+  }
+  return'';
+}
+
 function isOperator(name){
   if(!name)return false;
   const n=normN(name).split(/\s+/).filter(x=>x);
@@ -2268,7 +2312,7 @@ function renderR(data){
     const rowCls='trow'+(isFaltou?' trow-miss':'')+(o.a===0?' trow-zero':'')+hl;
     h+='<div class="'+rowCls+'" style="animation-delay:'+(i*20)+'ms">';
     h+='<div class="rk">'+(i+1)+'</div>';
-    h+='<div class="nm">'+(isFaltou?'<span class="nm-miss">'+o.n+'</span>':o.n)+pontoBadge(pt,o.n)+'</div>';
+    h+='<div class="nm">'+(isFaltou?'<span class="nm-miss">'+o.n+'</span>':o.n)+pontoBadge(pt,o.n)+getTurnoTag(o.n)+'</div>';
     h+='<div class="pt-cell">'+pontoTag(pt,o.n)+'</div>';
     h+='<div class="ac">'+(o.a>0?o.a:'<span class="ac-zero">0</span>')+'</div>';
     h+='<div class="vl">'+(o.v>0?fm(o.v):'<span class="vl-zero">R$ 0</span>')+'</div>';
@@ -2960,12 +3004,12 @@ function getTempoForOperator(cleanName){
   const cn2=cleanName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
   const nameFirst=cn2.split(' ')[0];
   // Try matching: exact, first name, partial
-  for(const key in allEntradas){
+  for(const key in allAdmissao){
     const k2=key.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
     if(!k2)continue;
-    const keyFirst=k2.split(' ')[0].split('.')[0]; // handle "1.gislaine" format
+    const keyFirst=k2.split(' ')[0].split('.')[0];
     if(k2===cn2||keyFirst===nameFirst||cn2.startsWith(k2)||k2.startsWith(nameFirst)){
-      const dateStr=allEntradas[key];
+      const dateStr=allAdmissao[key];
       if(!dateStr)continue;
       const d=parseDateBR(dateStr);
       if(!d)continue;
