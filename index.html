@@ -2365,7 +2365,21 @@ function renderR(data){
   document.getElementById('pageRanking').innerHTML=h;toolbar.style.display='flex';updateFaltaAlert();
 }
 
-function mU(op,u){if(!u)return false;const a=op.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''),b=u.normalize('NFD').replace(/[\u0300-\u036f]/g,''),ps=b.split(' ').filter(p=>p.length>2);return ps.every(p=>a.includes(p))}
+function mU(op,u){
+  if(!u)return false;
+  const a=op.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  // Try matching with full name
+  const b=u.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const ps=b.split(' ').filter(p=>p.length>2);
+  if(ps.length>0&&ps.every(p=>a.includes(p)))return true;
+  // Try matching with login name (cU.login)
+  if(cU&&cU.login){
+    const lg=cU.login.replace(/^\d+\.?/,'').replace(/\./g,' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const lps=lg.split(' ').filter(p=>p.length>2);
+    if(lps.length>0&&lps.every(p=>a.includes(p)))return true;
+  }
+  return false;
+}
 
 function loadCF(idx,input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=new Uint8Array(e.target.result),wb=XLSX.read(d,{type:'array'}),ws=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});cD[idx]=pC(rows);document.getElementById('slot'+idx).classList.add('loaded');document.getElementById('slot'+idx).querySelector('.slot-icon').textContent='✅';const de=document.getElementById('sd'+idx);de.textContent=cD[idx].period;de.style.display='block';autoComp()}catch(err){sT('Erro ao ler: '+err.message)}};r.readAsArrayBuffer(f)}
 
