@@ -1957,7 +1957,7 @@ const CP_M1='https://docs.google.com/spreadsheets/d/e/2PACX-1vRd-WnBwsOyBqVeunc1
 const CP_M2='https://docs.google.com/spreadsheets/d/e/2PACX-1vTgVTpekyWnlnCtyKnOgisBZ9YM8WOOoNGe6XKH2PslfxaI3GIdjt4g_hEtLJtqYQ/pub?output=csv';
 const CP_NOW='https://docs.google.com/spreadsheets/d/e/2PACX-1vRrs4woT4Rad3tsqEnkRBkBy4mOvXlP-3s24bIOQ3gaxRgPjfH3Lqw4PgMa1qfo-Q/pub?output=csv';
 const PT='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?output=csv';
-let cU=null,cRD=null;const cD=[null,null,null];let allEntradas={};let pontoData=null;
+let cU=null,cRD=null;const cD=[null,null,null];let allEntradas={};let allLogins={};let pontoData=null;
 
 function parseBR(s){if(!s)return 0;s=s.replace(/"/g,'').trim();if(!s||s==='0')return 0;s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0;}
 
@@ -2072,6 +2072,26 @@ function pontoBadge(p,opName){
   return'';
 }
 
+function isOperator(name){
+  if(!name)return false;
+  const n=normN(name).split(/\s+/).filter(x=>x);
+  if(!n.length)return false;
+  for(const [k,v] of Object.entries(allLogins)){
+    const b=normN(k).split(/\s+/).filter(x=>x);
+    if(!b.length)continue;
+    const lastA=n[n.length-1],lastB=b[b.length-1];
+    let score=0;
+    if(lastA===lastB)score+=10;
+    if(n[0]===b[0])score+=3;
+    else if(simil(n[0],b[0]))score+=2;
+    if(score>=5){
+      const p=v.charAt(0);
+      return p==='0'||p==='1'||p==='2';
+    }
+  }
+  return false;
+}
+
 function mergeOpsWithPonto(ops){
   if(!pontoData)return ops;
   const matched=new Set();
@@ -2080,7 +2100,7 @@ function mergeOpsWithPonto(ops){
   pontoData.forEach(p=>{
     if(!matched.has(p.nome)){
       const nm=p.nome.split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
-      extra.push({n:nm,a:0,v:0,fromPonto:true});
+      if(isOperator(p.nome))extra.push({n:nm,a:0,v:0,fromPonto:true});
     }
   });
   return [...ops,...extra];
@@ -2150,7 +2170,8 @@ function parseCSV(text){
   return{d:dt,ta,tv:Math.round(tv*100)/100,ops};
 }
 
-async function doLogin(){const u=document.getElementById('loginUser').value.trim().toLowerCase(),p=document.getElementById('loginPass').value;if(!u||!p)return;document.getElementById('loginError').style.display='none';document.getElementById('loginLoading').style.display='block';try{const r=await fetch(SH),c=await r.text(),rows=c.split('\n').map(r=>{const cells=[];let cell='',inQ=false;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){cells.push(cell.trim());cell=''}else cell+=ch;}cells.push(cell.trim());return cells;});let f=null;for(let i=1;i<rows.length;i++){if(rows[i].length>=4){allEntradas[rows[i][0].toLowerCase().trim()]=loginToShift(rows[i][1]?rows[i][1].trim():'');const n=rows[i][0].toLowerCase().trim(),s=rows[i][3].trim(),pf=rows[i][4]?rows[i][4].toLowerCase().trim():'colaborador';if(n===u&&s===p){f={nome:rows[i][0].trim(),perfil:pf,entrada:rows[i][2].trim(),login:rows[i][1]?rows[i][1].trim():''};break}}}document.getElementById('loginLoading').style.display='none';if(f){cU=f;sessionStorage.setItem('user',JSON.stringify(f));document.getElementById('loginScreen').style.display='none';setupUI();startApp()}else{document.getElementById('loginError').style.display='block'}}catch(e){document.getElementById('loginLoading').style.display='none';document.getElementById('loginError').textContent='Erro de conexão';document.getElementById('loginError').style.display='block'}}
+async function doLogin(){const u=document.getElementById('loginUser').value.trim().toLowerCase(),p=document.getElementById('loginPass').value;if(!u||!p)return;document.getElementById('loginError').style.display='none';document.getElementById('loginLoading').style.display='block';try{const r=await fetch(SH),c=await r.text(),rows=c.split('\n').map(r=>{const cells=[];let cell='',inQ=false;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){cells.push(cell.trim());cell=''}else cell+=ch;}cells.push(cell.trim());return cells;});let f=null;for(let i=1;i<rows.length;i++){if(rows[i].length>=4){allEntradas[rows[i][0].toLowerCase().trim()]=loginToShift(rows[i][1]?rows[i][1].trim():'');
+        allLogins[rows[i][0].toLowerCase().trim()]=rows[i][1]?rows[i][1].trim():'';const n=rows[i][0].toLowerCase().trim(),s=rows[i][3].trim(),pf=rows[i][4]?rows[i][4].toLowerCase().trim():'colaborador';if(n===u&&s===p){f={nome:rows[i][0].trim(),perfil:pf,entrada:rows[i][2].trim(),login:rows[i][1]?rows[i][1].trim():''};break}}}document.getElementById('loginLoading').style.display='none';if(f){cU=f;sessionStorage.setItem('user',JSON.stringify(f));document.getElementById('loginScreen').style.display='none';setupUI();startApp()}else{document.getElementById('loginError').style.display='block'}}catch(e){document.getElementById('loginLoading').style.display='none';document.getElementById('loginError').textContent='Erro de conexão';document.getElementById('loginError').style.display='block'}}
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 function setupUI(){document.getElementById('navUser').innerHTML='👤 '+cU.nome;if(isA())document.querySelectorAll('.admin-only').forEach(el=>el.style.display='')}
 function doLogout(){sessionStorage.removeItem('user');cU=null;cRD=null;window.location.hash='';window.location.reload()}
@@ -2180,6 +2201,7 @@ async function loadEntradas(){
       if(rows[i].length>=3){
         const login=rows[i][1]?rows[i][1].trim():'';
         allEntradas[rows[i][0].toLowerCase().trim()]=loginToShift(login);
+        allLogins[rows[i][0].toLowerCase().trim()]=login;
       }
     }
     console.log('Entradas loaded:',Object.keys(allEntradas).length,'entries');
