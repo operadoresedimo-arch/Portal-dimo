@@ -139,12 +139,24 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
   .sidebar{width:200px!important}
   .app-with-sidebar .main{margin-left:200px!important}
 }
+
+@media(max-width:1400px){
+  .comp-table th,.comp-table td{padding:6px 4px;font-size:.62rem}
+  .comp-table td.num{font-size:.58rem}
+  .comp-table .nmcell{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+@media(max-width:1100px){
+  .comp-table th,.comp-table td{padding:4px 3px;font-size:.55rem}
+  .comp-table td.num{font-size:.52rem}
+  .comp-table .nmcell{max-width:90px}
+  .cell-meta-bar,.cm-bar-bg,.gp-bar,.pm-bar-bg{display:none!important}
+}
 @media(max-width:900px){
   .sidebar{display:none!important}
   .app-with-sidebar .main{margin-left:0!important}
   .nav{display:flex!important}
   .comp-section{overflow-x:auto}
-  .comp-table{min-width:800px}
+  .comp-table{width:100%;table-layout:auto}
 }
 </style>
 
