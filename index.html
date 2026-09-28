@@ -1398,6 +1398,14 @@ body::before,body::after{display:none!important}
 .gc-label{color:#1a1a1a!important}
 .gc-status.hit{background:rgba(46,204,113,.1)!important;color:#27ae60!important}
 .gc-status.miss{background:rgba(231,76,60,.08)!important;color:#e74c3c!important}
+/* Force comp table fit */
+.comp-section{overflow-x:auto!important;max-width:100%!important}
+.comp-table{width:100%!important;table-layout:auto!important;font-size:.58rem!important}
+.comp-table th{padding:4px 3px!important;font-size:.5rem!important;white-space:nowrap!important}
+.comp-table td{padding:4px 3px!important;font-size:.58rem!important}
+.comp-table td.num{font-size:.55rem!important}
+.comp-table .nmcell{max-width:130px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+
 .goals-title{color:#8a8d92!important}
 .gp-current{color:#2ECC71!important}
 .gp-target{color:#5a5d62!important}
@@ -1867,6 +1875,60 @@ body::before,body::after{display:none!important}
 .trn-lesson-check{font-size:.9rem;flex-shrink:0}
 @media(max-width:900px){.trn-layout{grid-template-columns:1fr}.trn-modules{max-height:none;border-left:none;border-top:1px solid #d0d3d6}}
 @media(max-width:768px){.trn-layout{grid-template-columns:1fr}}
+
+
+/* Compact meta bars for 19" screens */
+.cell-meta-bar{font-size:.45rem!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:150px!important}
+.cm-bar-bg{max-width:120px!important}
+
+/* Comp table: sticky name + sticky header + always-visible scroll */
+.comp-section{
+  overflow:auto!important;
+  max-height:75vh!important;
+  padding:0!important;
+  margin:0 16px 16px!important;
+  border:1px solid #d0d3d6!important;
+}
+.comp-table{width:max-content!important;table-layout:auto!important;border-collapse:separate!important;border-spacing:0!important}
+.comp-table th,.comp-table td{padding:5px 6px!important;font-size:.62rem!important;white-space:nowrap!important}
+.comp-table td.num{font-size:.6rem!important}
+
+/* Sticky first column (Operador name) */
+.comp-table th:first-child,
+.comp-table td:first-child,
+.comp-table td.nmcell{
+  position:sticky!important;
+  left:0!important;
+  z-index:2!important;
+  background:#fff!important;
+  box-shadow:2px 0 4px rgba(0,0,0,.06)!important;
+}
+
+/* Sticky header rows */
+.comp-table thead tr:first-child th,
+.comp-table tr:first-child th{
+  position:sticky!important;
+  top:0!important;
+  z-index:3!important;
+  background:#fff!important;
+}
+.comp-table .month-header{
+  position:sticky!important;
+  top:0!important;
+  z-index:3!important;
+}
+.comp-table tr:nth-child(2) th{
+  position:sticky!important;
+  top:28px!important;
+  z-index:3!important;
+  background:#fff!important;
+}
+
+/* Sticky name + header intersection */
+.comp-table tr:first-child th:first-child,
+.comp-table tr:nth-child(2) th:first-child{
+  z-index:4!important;
+}
 
 </style>
 
