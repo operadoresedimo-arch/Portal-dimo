@@ -2229,7 +2229,7 @@ const CP_M1='https://docs.google.com/spreadsheets/d/e/2PACX-1vRd-WnBwsOyBqVeunc1
 const CP_M2='https://docs.google.com/spreadsheets/d/e/2PACX-1vTgVTpekyWnlnCtyKnOgisBZ9YM8WOOoNGe6XKH2PslfxaI3GIdjt4g_hEtLJtqYQ/pub?output=csv';
 const CP_NOW='https://docs.google.com/spreadsheets/d/e/2PACX-1vRrs4woT4Rad3tsqEnkRBkBy4mOvXlP-3s24bIOQ3gaxRgPjfH3Lqw4PgMa1qfo-Q/pub?output=csv';
 const PT='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?output=csv';
-let cU=null,cRD=null;const cD=[null,null,null];let allEntradas={};let allLogins={};let allAdmissao={};let pontoData=null;
+let cU=null,cRD=null;const cD=[null,null,null];let allEntradas={};let allLogins={};let allAdmissao={};let pontoData=null;var isMobile=window.innerWidth<=640;var currentMobTab='inicio';
 
 function parseBR(s){if(!s)return 0;s=s.replace(/"/g,'').trim();if(!s||s==='0')return 0;s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0;}
 
@@ -3391,8 +3391,6 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
 // ============================================================
 // MOBILE PWA LOGIC
 // ============================================================
-var isMobile=window.innerWidth<=640;
-var currentMobTab='inicio';
 
 function detectMobile(){
   isMobile=window.innerWidth<=640;
