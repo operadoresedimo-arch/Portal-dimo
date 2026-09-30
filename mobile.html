@@ -105,6 +105,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 .duo-lbl{font-size:.65rem;font-weight:700;color:#1a1f36}
 .duo-val{font-size:1.7rem;font-weight:900;color:#1a1f36;margin-top:1px;display:flex;align-items:center;gap:6px}
 .duo-pct{font-size:.55rem;font-weight:700;color:#16a34a}
+
+/* Acordos table */
+.tbl-hdr{display:flex;align-items:center;padding:10px 8px;border-bottom:2px solid #e5e7eb;margin-top:8px}
+.tbl-h-rk{width:24px;font-size:.5rem;font-weight:700;color:#9ca3af}
+.tbl-h-nm{flex:1;font-size:.5rem;font-weight:700;color:#9ca3af;padding-left:40px}
+.tbl-h-ac{width:60px;text-align:center;font-size:.5rem;font-weight:700;color:#9ca3af}
+.tbl-h-vl{width:80px;text-align:right;font-size:.5rem;font-weight:700;color:#9ca3af}
+.tbl-h-t{width:28px}
+.tbl-row{display:flex;align-items:center;padding:12px 8px;border-bottom:1px solid #f0f2f5}
+.tbl-rk{width:24px;font-size:.72rem;font-weight:600;color:#9ca3af;text-align:center}
+.tbl-av{width:32px;height:32px;border-radius:50%;background:#d0d5dd;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff;margin:0 8px;flex-shrink:0}
+.tbl-nm{flex:1;font-size:.78rem;font-weight:600;color:#1a1f36;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl-ac{width:60px;text-align:center;font-size:.82rem;font-weight:800;color:#1a1f36}
+.tbl-vl{width:80px;text-align:right;font-size:.65rem;color:#6b7280}
+.tbl-turno{width:28px;text-align:center;font-size:.42rem;font-weight:700;padding:2px 0;border-radius:4px}
 </style>
 </head>
 <body>
@@ -390,23 +405,31 @@ function renderAcordos(){
   var h='<div class="hdr"><div><div class="hdr-title">Acordos</div><div class="hdr-date">\uD83D\uDCC5 '+(d.d||'Hoje')+'</div></div></div>';
   h+='<div style="padding:0 14px 16px">';
   h+='<input class="srch" type="text" placeholder="\uD83D\uDD0D Buscar operador..." oninput="filterRank(this.value)">';
-  // Filter buttons
-  h+='<div class="filters"><button class="flt on" onclick="filterAccordos(\'todos\')">Todos</button><button class="flt" onclick="filterAccordos(\'com\')">Com Acordo</button><button class="flt" onclick="filterAccordos(\'sem\')">Sem Acordo</button></div>';
+  h+='<div class="filters"><button class="flt on" onclick="filterAccordos(\'todos\',this)">Todos</button><button class="flt" onclick="filterAccordos(\'com\',this)">Com acordo</button><button class="flt" onclick="filterAccordos(\'sem\',this)">Sem acordo</button></div>';
+  // Table header
+  h+='<div class="tbl-hdr"><div class="tbl-h-rk">#</div><div class="tbl-h-nm">OPERADOR</div><div class="tbl-h-ac">ACORDOS</div><div class="tbl-h-vl">VALOR</div><div class="tbl-h-t"></div></div>';
+  // Rows
   ops.forEach(function(o,i){
     var tl=o.turno==='m'?'M':o.turno==='t'?'T':o.turno==='n'?'N':'';
-    h+='<div class="rw" data-nm="'+o.n.toLowerCase()+'" data-a="'+o.a+'">';
-    h+='<div class="rw-rk">'+(i+1)+'</div><div class="rw-av">'+o.n.charAt(0)+'</div>';
-    h+='<div class="rw-info"><div class="rw-nm">'+o.n+(tl?' <span class="turno t-'+o.turno+'">'+tl+'</span>':'')+'</div></div>';
-    h+='<div class="rw-val"><div class="rw-a">'+o.a+'</div><div class="rw-v">'+fm(o.v)+'</div></div></div>';
+    var tc=o.turno||'';
+    h+='<div class="tbl-row" data-nm="'+o.n.toLowerCase()+'" data-a="'+o.a+'">';
+    h+='<div class="tbl-rk">'+(i+1)+'</div>';
+    h+='<div class="tbl-av">'+o.n.charAt(0)+'</div>';
+    h+='<div class="tbl-nm">'+o.n+'</div>';
+    h+='<div class="tbl-ac">'+o.a+'</div>';
+    h+='<div class="tbl-vl">'+fm(o.v)+'</div>';
+    h+=(tl?'<div class="tbl-turno t-'+tc+'">'+tl+'</div>':'<div class="tbl-turno"></div>');
+    h+='</div>';
   });
   h+='</div>';
   document.getElementById('pgAcordos').innerHTML=h;
+  window.scrollTo(0,0);
 }
-function filterRank(q){q=q.toLowerCase();document.querySelectorAll('.rw').forEach(function(r){r.style.display=r.getAttribute('data-nm').includes(q)?'flex':'none'})}
-function filterAccordos(tipo){
+function filterRank(q){q=q.toLowerCase();document.querySelectorAll('.tbl-row').forEach(function(r){r.style.display=r.getAttribute('data-nm').includes(q)?'flex':'none'})}
+function filterAccordos(tipo,btn){
   document.querySelectorAll('.flt').forEach(function(b){b.classList.remove('on')});
-  event.target.classList.add('on');
-  document.querySelectorAll('.rw').forEach(function(r){
+  btn.classList.add('on');
+  document.querySelectorAll('.tbl-row').forEach(function(r){
     var a=parseInt(r.getAttribute('data-a'));
     if(tipo==='todos')r.style.display='flex';
     else if(tipo==='com')r.style.display=a>0?'flex':'none';
