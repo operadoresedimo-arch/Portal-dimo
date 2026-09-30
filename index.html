@@ -6,8 +6,7 @@
 <title>Portal | Édimo Soluções em Cobranças</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1930">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="logo192.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
@@ -163,172 +162,6 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
   .comp-section{overflow-x:auto}
   
 }
-
-/* ============================================================
-   MOBILE V2 — LAYOUT SEPARADO / BRANCO + CINZA
-   ============================================================ */
-@media(max-width:640px){
-  body{background:#f3f5f7!important}
-  .mob-header{
-    min-height:64px!important;padding:10px 16px!important;
-    box-shadow:0 1px 0 rgba(17,24,39,.04);
-  }
-  .mob-header::before{
-    content:"☰";font-size:20px;color:#1f2937;margin-right:10px;line-height:1;
-  }
-  .mob-header > div:first-child{flex:1}
-  .mob-header-title{font-size:.98rem!important;letter-spacing:-.02em}
-  .mob-header-date{font-size:.62rem!important}
-  .mob-header-right::after{
-    content:"Hoje";display:inline-flex;align-items:center;justify-content:center;
-    min-height:30px;padding:0 10px;border:1px solid #e2e6eb;border-radius:9px;
-    color:#374151;background:#fff;font-size:.6rem;font-weight:700;
-  }
-
-  .mob-inicio,.mob-acordos{padding:0 14px 18px!important}
-  .mob-hero{
-    background:#fff!important;color:#18212f!important;border:1px solid #e2e6eb!important;
-    border-radius:16px!important;margin:14px 0 10px!important;padding:18px!important;
-    box-shadow:0 5px 18px rgba(24,33,47,.05)!important;
-  }
-  .mob-hero::after{display:none!important}
-  .mob-hero-label{color:#8b95a3!important;font-size:.57rem!important}
-  .mob-hero-val{color:#172033!important;font-size:1.8rem!important;letter-spacing:-.03em}
-  .mob-hero-sub{color:#7d8794!important}
-  .mob-hero-icon{color:#64748b!important;opacity:.8!important;font-size:1.6rem!important}
-
-  .mob-stats{grid-template-columns:1fr 1fr!important;gap:9px!important;margin-bottom:18px!important}
-  .mob-stat{
-    border:1px solid #e2e6eb!important;border-radius:14px!important;padding:15px!important;
-    box-shadow:0 3px 12px rgba(24,33,47,.035);
-  }
-  .mob-stat-icon{font-size:1rem!important}
-  .mob-stat-label{font-size:.52rem!important;color:#8a94a1!important}
-  .mob-stat-val{font-size:1.3rem!important;color:#172033!important}
-
-  .mob-section{margin:20px 2px 10px!important}
-  .mob-section-title{font-size:.86rem!important}
-  .mob-section-link{color:#526174!important}
-
-  .mob-pod{
-    border:1px solid #e2e6eb!important;border-radius:13px!important;
-    padding:13px!important;background:#fff!important;
-    box-shadow:0 2px 9px rgba(24,33,47,.025);
-  }
-  .mob-pod:first-child{
-    border-color:#d8dde3!important;background:#fff!important;
-  }
-  .mob-pod-pos{color:#667085!important}
-  .mob-pod:first-child .mob-pod-pos{color:#a47b21!important}
-
-  /* Separate sections / cards */
-  .mob-v2-card{
-    background:#fff;border:1px solid #e1e5ea;border-radius:15px;
-    padding:15px;margin:10px 0;box-shadow:0 3px 12px rgba(24,33,47,.035);
-  }
-  .mob-v2-title{
-    display:flex;align-items:center;justify-content:space-between;
-    font-size:.78rem;font-weight:800;color:#1d2939;margin-bottom:12px;
-  }
-  .mob-v2-kicker{
-    font-size:.53rem;font-weight:700;color:#98a2b3;
-    text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;
-  }
-  .mob-v2-value{font-size:1.45rem;font-weight:900;color:#172033;letter-spacing:-.02em}
-  .mob-v2-muted{font-size:.61rem;color:#7b8794}
-  .mob-v2-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .mob-v2-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-  .mob-v2-mini{
-    border:1px solid #e7eaee;border-radius:11px;padding:11px;background:#fafbfc;
-  }
-  .mob-v2-mini .v{font-size:.98rem;font-weight:800;color:#1d2939;margin-top:3px}
-  .mob-v2-mini .l{font-size:.52rem;color:#8b95a3}
-  .mob-v2-bar{height:9px;background:#e7eaee;border-radius:6px;overflow:hidden;margin:10px 0 6px}
-  .mob-v2-fill{height:100%;background:#596b80;border-radius:6px}
-  .mob-v2-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .mob-v2-delta.up{color:#16a34a}.mob-v2-delta.down{color:#dc2626}.mob-v2-delta.same{color:#667085}
-  .mob-v2-tag{font-size:.52rem;font-weight:800;padding:4px 7px;border-radius:999px;background:#f1f3f5;color:#596579}
-  .mob-v2-list{display:flex;flex-direction:column}
-  .mob-v2-listrow{
-    display:flex;align-items:center;gap:9px;padding:12px 0;border-top:1px solid #edf0f2;
-  }
-  .mob-v2-listrow:first-child{border-top:0}
-  .mob-v2-icon{
-    width:34px;height:34px;border-radius:10px;background:#f1f3f5;
-    display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;
-  }
-  .mob-v2-listinfo{flex:1;min-width:0}
-  .mob-v2-listname{font-size:.72rem;font-weight:700;color:#273244}
-  .mob-v2-listsub{font-size:.57rem;color:#8a94a1;margin-top:2px}
-  .mob-v2-arrow{color:#9aa3af;font-size:.8rem}
-  .mob-v2-alert{background:#f8f9fa;border:1px solid #e3e6ea;border-radius:11px;padding:11px;font-size:.62rem;color:#5b6572}
-
-  /* Mobile agreements */
-  .mob-acordos .mob-search{margin:12px 0 10px!important;background:#fff!important;border-color:#e0e4e8!important}
-  .mob-rank-row{
-    border-color:#e1e5ea!important;border-radius:12px!important;
-    box-shadow:0 2px 8px rgba(24,33,47,.025);
-  }
-
-  /* Hide desktop content when mobile V2 is active */
-  #pageComp.mob-active > .comp-hero,
-  #pageComp.mob-active > .comp-upload,
-  #pageComp.mob-active > .comp-filters,
-  #pageComp.mob-active > #compR{display:none!important}
-  #pageTreinamentos.mob-active > .trn-layout{display:none!important}
-  .mob-only-page{display:none!important}
-  .page.mob-active .mob-only-page{display:block!important}
-  #pageComp.mob-active #mobCompPage{display:block!important}
-  #pageTreinamentos.mob-active #mobTrainingPage{display:block!important}
-
-  /* Extra pages */
-  #pageMobExtra.mob-active{display:block!important}
-  #pageMobExtra{background:#f3f5f7;min-height:100vh}
-  .mob-extra{padding:0 14px 22px}
-  .mob-extra-head{display:flex;align-items:center;justify-content:space-between;margin:14px 2px 10px}
-  .mob-extra-title{font-size:.9rem;font-weight:800;color:#1d2939}
-  .mob-extra-sub{font-size:.59rem;color:#8993a0;margin-top:2px}
-
-  /* Training V2 */
-  .mob-training{padding:0 14px 20px}
-  .mob-training-hero{
-    background:#fff;border:1px solid #e0e4e8;border-radius:16px;padding:17px;
-    margin:14px 0;box-shadow:0 4px 14px rgba(24,33,47,.035);
-  }
-  .mob-training-hero h2{font-size:1rem;color:#1d2939;margin-bottom:5px}
-  .mob-training-hero p{font-size:.62rem;color:#7b8794;line-height:1.45}
-  .mob-training-progress{margin-top:13px}
-  .mob-training-progressline{display:flex;justify-content:space-between;font-size:.58rem;color:#667085}
-  .mob-training-progressbar{height:8px;background:#e7eaee;border-radius:6px;overflow:hidden;margin-top:6px}
-  .mob-training-progressfill{height:100%;background:#596b80;border-radius:6px}
-  .mob-course{
-    background:#fff;border:1px solid #e1e5ea;border-radius:14px;
-    margin:10px 0;overflow:hidden;box-shadow:0 3px 10px rgba(24,33,47,.025);
-  }
-  .mob-course-head{padding:14px;display:flex;align-items:center;gap:10px}
-  .mob-course-num{width:32px;height:32px;border-radius:10px;background:#eef1f4;color:#445266;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.7rem}
-  .mob-course-info{flex:1}
-  .mob-course-title{font-size:.73rem;font-weight:800;color:#273244}
-  .mob-course-sub{font-size:.56rem;color:#8b95a3;margin-top:2px}
-  .mob-course-arrow{color:#9aa3af}
-  .mob-course-lessons{border-top:1px solid #edf0f2;padding:2px 12px 6px}
-  .mob-lesson{display:flex;align-items:center;gap:9px;padding:10px 2px;border-bottom:1px solid #f0f2f4;cursor:pointer}
-  .mob-lesson:last-child{border-bottom:0}
-  .mob-lesson-thumb{width:29px;text-align:center;font-size:.95rem}
-  .mob-lesson-name{flex:1;font-size:.63rem;color:#344054}
-  .mob-lesson-check{font-size:.75rem;color:#7c8795}
-
-  /* Bottom nav more separated */
-  .mob-tabbar{
-    padding:7px 4px calc(7px + env(safe-area-inset-bottom,0px))!important;
-    box-shadow:0 -4px 18px rgba(17,24,39,.06)!important;
-  }
-  .mob-tab{min-width:58px;padding:5px 5px!important}
-  .mob-tab svg{width:20px!important;height:20px!important}
-  .mob-tab span{font-size:.52rem!important}
-  .mob-tab.active{font-weight:800}
-}
-
 </style>
 
 <style id="edimo-modern-overrides">
@@ -2058,215 +1891,103 @@ body::before,body::after{display:none!important}
   body{overflow-x:hidden!important}
   .comp-section{overflow-x:auto!important}
 }
-
-/* ============================================================
-   MOBILE PWA LAYOUT
-   ============================================================ */
-@media(max-width:640px){
-  /* Hide desktop elements */
-  .nav{display:none!important}
-  .sidebar{display:none!important}
-  .toolbar{display:none!important}
-  .bg-layer{display:none!important}
-  body::before,body::after{display:none!important}
-  
-  /* Reset body */
-  body{background:#f5f7fa!important;color:#1a1f36!important}
-  body.app-with-sidebar{background:#f5f7fa!important}
-  
-  /* Main content */
-  .main,.app-with-sidebar .main{
-    margin-left:0!important;
-    max-width:100%!important;
-    padding:0 0 80px 0!important;
-    min-height:100vh;
-  }
-  
-  /* Hide all pages by default - mobile JS controls visibility */
-  .page{display:none!important}
-  .page.mob-active{display:block!important}
-  
-  /* Mobile header */
-  .mob-header{
-    display:flex!important;
-    align-items:center;
-    justify-content:space-between;
-    padding:14px 16px 10px;
-    background:#fff;
-    border-bottom:1px solid #e8ecf1;
-    position:sticky;top:0;z-index:30;
-  }
-  .mob-header-title{font-size:1rem;font-weight:800;color:#1a1f36}
-  .mob-header-date{font-size:.65rem;color:#8892a4;margin-top:2px}
-  .mob-header-right{display:flex;align-items:center;gap:8px}
-  
-  /* Bottom tab bar */
-  .mob-tabbar{
-    display:flex!important;
-    position:fixed;bottom:0;left:0;right:0;
-    background:#fff;
-    border-top:1px solid #e8ecf1;
-    padding:6px 0 env(safe-area-inset-bottom,8px);
-    z-index:40;
-    justify-content:space-around;
-  }
-  .mob-tab{
-    display:flex;flex-direction:column;align-items:center;gap:2px;
-    border:none;background:none;
-    color:#8892a4;font-size:.55rem;font-weight:600;
-    font-family:inherit;cursor:pointer;padding:4px 8px;
-    transition:color .15s;
-  }
-  .mob-tab.active{color:#2563eb}
-  .mob-tab svg{width:22px;height:22px}
-  
-  /* ---- MOBILE INICIO PAGE ---- */
-  .mob-inicio{display:block;padding:0 12px 16px}
-  
-  /* Hero card */
-  .mob-hero{
-    background:linear-gradient(135deg,#1a2744,#0f1d35);
-    border-radius:16px;padding:20px;margin:12px 0;color:#fff;
-    position:relative;overflow:hidden;
-  }
-  .mob-hero::after{content:"";position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.04)}
-  .mob-hero-label{font-size:.6rem;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em}
-  .mob-hero-val{font-size:2rem;font-weight:900;margin:4px 0}
-  .mob-hero-sub{font-size:.7rem;color:rgba(255,255,255,.5)}
-  .mob-hero-icon{position:absolute;top:16px;right:16px;font-size:2rem;opacity:.3}
-  
-  /* Stat grid (2x2) */
-  .mob-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 16px}
-  .mob-stat{
-    background:#fff;border-radius:12px;padding:14px;
-    border:1px solid #e8ecf1;
-  }
-  .mob-stat-icon{font-size:1.2rem;margin-bottom:4px}
-  .mob-stat-label{font-size:.55rem;font-weight:600;color:#8892a4;text-transform:uppercase;letter-spacing:.06em}
-  .mob-stat-val{font-size:1.4rem;font-weight:800;color:#1a1f36;margin-top:2px}
-  .mob-stat-val.green{color:#22c55e}
-  .mob-stat-val.ponto{font-size:.8rem;font-weight:700}
-  .mob-stat-val.ponto .p-ok{color:#22c55e}.mob-stat-val.ponto .p-late{color:#f59e0b}.mob-stat-val.ponto .p-miss{color:#ef4444}
-  
-  /* Section headers */
-  .mob-section{
-    display:flex;align-items:center;justify-content:space-between;
-    margin:20px 0 10px;
-  }
-  .mob-section-title{font-size:.85rem;font-weight:800;color:#1a1f36;display:flex;align-items:center;gap:6px}
-  .mob-section-link{font-size:.65rem;color:#2563eb;font-weight:600;cursor:pointer}
-  
-  /* Top 3 cards */
-  .mob-pod{
-    background:#fff;border-radius:14px;padding:14px;margin-bottom:8px;
-    display:flex;align-items:center;gap:12px;
-    border:1px solid #e8ecf1;
-  }
-  .mob-pod-medal{font-size:1.6rem}
-  .mob-pod-info{flex:1}
-  .mob-pod-name{font-size:.8rem;font-weight:700;color:#1a1f36}
-  .mob-pod-stats{font-size:.65rem;color:#8892a4;margin-top:2px}
-  .mob-pod-pos{font-size:1.1rem;font-weight:900;color:#8892a4}
-  .mob-pod:first-child{border:1px solid rgba(212,169,55,.3);background:linear-gradient(135deg,rgba(212,169,55,.04),#fff)}
-  .mob-pod:first-child .mob-pod-pos{color:#d4a937}
-  
-  /* Progress card */
-  .mob-progress{
-    background:#fff;border-radius:14px;padding:16px;
-    border:1px solid #e8ecf1;margin:12px 0;
-  }
-  .mob-prog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-  .mob-prog-falta{font-size:1.1rem;font-weight:800;color:#ef4444}
-  .mob-prog-pct{font-size:.8rem;font-weight:700;color:#22c55e;background:rgba(34,197,94,.08);padding:4px 10px;border-radius:20px}
-  .mob-prog-vs{font-size:.65rem;color:#ef4444;font-weight:600}
-  .mob-prog-bar{height:10px;background:#e8ecf1;border-radius:6px;overflow:hidden;margin:10px 0 6px}
-  .mob-prog-fill{height:100%;background:linear-gradient(90deg,#22c55e,#4ade80);border-radius:6px;transition:width .5s}
-  .mob-prog-range{display:flex;justify-content:space-between;font-size:.55rem;color:#8892a4}
-  .mob-prog-msg{
-    margin-top:12px;padding:10px 14px;border-radius:10px;
-    font-size:.72rem;font-weight:600;display:flex;align-items:center;gap:8px;
-  }
-  .mob-prog-msg.good{background:rgba(34,197,94,.06);color:#16a34a;border:1px solid rgba(34,197,94,.15)}
-  .mob-prog-msg.bad{background:rgba(239,68,68,.06);color:#dc2626;border:1px solid rgba(239,68,68,.15)}
-  
-  /* ---- MOBILE ACORDOS PAGE ---- */
-  .mob-acordos{padding:0 12px 16px}
-  .mob-search{
-    width:100%;padding:10px 14px;margin:12px 0;
-    border:1px solid #e8ecf1;border-radius:10px;
-    background:#fff;font-family:inherit;font-size:.8rem;color:#1a1f36;
-    outline:none;
-  }
-  .mob-search:focus{border-color:#2563eb}
-  .mob-filters{display:flex;gap:6px;margin-bottom:12px}
-  .mob-filter{
-    padding:6px 14px;border-radius:20px;border:1px solid #e8ecf1;
-    background:#fff;font-size:.65rem;font-weight:600;color:#8892a4;
-    font-family:inherit;cursor:pointer;
-  }
-  .mob-filter.active{background:#2563eb;color:#fff;border-color:#2563eb}
-  .mob-rank-list{}
-  .mob-rank-row{
-    display:flex;align-items:center;gap:10px;
-    padding:12px 14px;background:#fff;
-    border-radius:12px;margin-bottom:6px;
-    border:1px solid #e8ecf1;
-  }
-  .mob-rank-pos{font-size:.75rem;font-weight:700;color:#8892a4;width:20px;text-align:center}
-  .mob-rank-avatar{width:32px;height:32px;border-radius:50%;background:#e8ecf1;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#8892a4}
-  .mob-rank-info{flex:1}
-  .mob-rank-name{font-size:.78rem;font-weight:600;color:#1a1f36}
-  .mob-rank-sub{font-size:.6rem;color:#8892a4}
-  .mob-rank-val{text-align:right}
-  .mob-rank-acordos{font-size:.85rem;font-weight:800;color:#1a1f36}
-  .mob-rank-valor{font-size:.6rem;color:#8892a4}
-  .mob-rank-turno{font-size:.45rem;font-weight:700;padding:2px 5px;border-radius:4px;margin-left:4px}
-  .mob-rank-turno.m{color:#16a34a;background:rgba(22,163,74,.08)}
-  .mob-rank-turno.t{color:#f59e0b;background:rgba(245,158,11,.08)}
-  .mob-rank-turno.n{color:#8b5cf6;background:rgba(139,92,246,.08)}
-  
-  /* ---- MAIS MENU (bottom sheet) ---- */
-  .mob-mais-menu{position:fixed;inset:0;z-index:50}
-  .mob-mais-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4)}
-  .mob-mais-sheet{
-    position:absolute;bottom:0;left:0;right:0;
-    background:#fff;border-radius:20px 20px 0 0;
-    padding:12px 16px 32px;
-  }
-  .mob-mais-handle{width:40px;height:4px;background:#d1d5db;border-radius:4px;margin:0 auto 16px}
-  .mob-mais-item{
-    display:flex;align-items:center;gap:10px;
-    width:100%;padding:14px 12px;border:none;background:none;
-    font-size:.85rem;font-weight:600;color:#1a1f36;
-    font-family:inherit;cursor:pointer;border-radius:10px;
-    text-align:left;
-  }
-  .mob-mais-item:hover{background:#f5f7fa}
-  .mob-mais-logout{color:#ef4444;margin-top:8px;border-top:1px solid #e8ecf1;padding-top:14px;border-radius:0}
-  
-  /* Date header - hide on mobile */
-  .date-header{display:none!important}
-  
-  /* Hide desktop stat cards */
-  .stat-cards{display:none!important}
-  .dash-grid{display:none!important}
-  .dash-footer{display:none!important}
-  
-  /* Login screen mobile */
-  .login-screen{background:#f5f7fa!important;padding:20px!important}
-  .login-box{background:#fff!important;border:1px solid #e8ecf1!important;border-radius:16px!important}
-  .login-box input{background:#f5f7fa!important;border:1px solid #e8ecf1!important;color:#1a1f36!important}
-  .login-btn{background:#2563eb!important;border-radius:10px!important}
-  .login-logo{color:#d4a937!important}
-}
-
-/* Hide mobile elements on desktop */
-@media(min-width:641px){
-  .mob-tabbar,.mob-header,.mob-inicio,.mob-acordos,.mob-mais-menu{display:none!important}
-}
-
 </style>
 
+
+<style id="mobile-pwa">
+@media(max-width:640px){
+  /* Hide entire desktop UI */
+  .bg-layer,.nav,.sidebar,.toolbar,.main{display:none!important}
+  body::before,body::after{display:none!important}
+  body{background:#f0f2f5!important;color:#1a1f36!important;margin:0;padding:0}
+  body.app-with-sidebar{background:#f0f2f5!important}
+  
+  /* Show mobile app */
+  #mobApp{display:flex!important;flex-direction:column;min-height:100vh}
+  #mobContent{flex:1;overflow-y:auto;padding-bottom:70px}
+  
+  /* Bottom bar */
+  .mob-bar{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;padding:6px 0 max(6px,env(safe-area-inset-bottom));z-index:50;justify-content:space-around}
+  .mob-btn{display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;color:#9ca3af;font-size:.55rem;font-weight:600;font-family:inherit;cursor:pointer;padding:4px 12px}
+  .mob-btn.active{color:#2563eb}
+  .mob-btn svg{width:22px;height:22px}
+  
+  /* Mobile pages */
+  .mh{padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:10}
+  .mh-title{font-size:1.05rem;font-weight:800;color:#1a1f36}
+  .mh-date{font-size:.62rem;color:#9ca3af;margin-top:2px}
+  .mp{padding:12px}
+  
+  /* Hero card (dark) */
+  .m-hero{background:linear-gradient(135deg,#1e3a5f,#0f2440);border-radius:16px;padding:20px;color:#fff;position:relative;overflow:hidden;margin-bottom:12px}
+  .m-hero-icon{position:absolute;top:14px;right:16px;font-size:2.2rem;opacity:.25}
+  .m-hero-label{font-size:.6rem;font-weight:600;opacity:.6;text-transform:uppercase;letter-spacing:.06em}
+  .m-hero-val{font-size:2.1rem;font-weight:900;margin:6px 0 2px}
+  .m-hero-sub{font-size:.7rem;opacity:.5}
+  
+  /* Stat grid */
+  .m-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+  .m-stat{background:#fff;border-radius:12px;padding:14px;border:1px solid #e5e7eb}
+  .m-stat-icon{font-size:1.1rem;margin-bottom:6px}
+  .m-stat-lbl{font-size:.52rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em}
+  .m-stat-val{font-size:1.3rem;font-weight:800;color:#1a1f36;margin-top:2px}
+  .m-stat-val.grn{color:#16a34a}
+  
+  /* Section */
+  .m-sec{display:flex;justify-content:space-between;align-items:center;margin:18px 0 10px}
+  .m-sec-t{font-size:.85rem;font-weight:800;color:#1a1f36}
+  .m-sec-link{font-size:.62rem;color:#2563eb;font-weight:600}
+  
+  /* Podium */
+  .m-pod{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;border:1px solid #e5e7eb}
+  .m-pod:first-child{border-color:rgba(212,169,55,.3);background:linear-gradient(135deg,rgba(212,169,55,.05),#fff)}
+  .m-pod-medal{font-size:1.5rem;flex-shrink:0}
+  .m-pod-info{flex:1;min-width:0}
+  .m-pod-nm{font-size:.8rem;font-weight:700;color:#1a1f36;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-pod-st{font-size:.62rem;color:#9ca3af;margin-top:2px}
+  .m-pod-pos{font-size:1.1rem;font-weight:900;color:#9ca3af}
+  .m-pod:first-child .m-pod-pos{color:#d4a937}
+  
+  /* Rank list */
+  .m-row{display:flex;align-items:center;gap:10px;padding:12px;background:#fff;border-radius:12px;margin-bottom:6px;border:1px solid #e5e7eb}
+  .m-row-miss{opacity:.45}
+  .m-rk{font-size:.7rem;font-weight:700;color:#9ca3af;width:22px;text-align:center}
+  .m-av{width:34px;height:34px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#6b7280;flex-shrink:0}
+  .m-nm{flex:1;min-width:0}
+  .m-nm-n{font-size:.78rem;font-weight:600;color:#1a1f36;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-nm-s{font-size:.58rem;color:#9ca3af;margin-top:1px}
+  .m-vl{text-align:right}
+  .m-vl-a{font-size:.85rem;font-weight:800;color:#1a1f36}
+  .m-vl-v{font-size:.58rem;color:#9ca3af}
+  .m-turno{font-size:.45rem;font-weight:700;padding:2px 5px;border-radius:4px;margin-left:4px}
+  .m-turno-m{color:#16a34a;background:rgba(22,163,74,.08)}
+  .m-turno-t{color:#f59e0b;background:rgba(245,158,11,.08)}
+  .m-turno-n{color:#8b5cf6;background:rgba(139,92,246,.08)}
+  .m-search{width:100%;padding:10px 14px;margin:12px 0;border:1px solid #e5e7eb;border-radius:10px;background:#fff;font-family:inherit;font-size:.8rem;color:#1a1f36;outline:none}
+  .m-search:focus{border-color:#2563eb}
+  
+  /* Mais menu */
+  .m-menu{position:fixed;inset:0;z-index:60;display:none}
+  .m-menu.show{display:block}
+  .m-menu-bg{position:absolute;inset:0;background:rgba(0,0,0,.4)}
+  .m-menu-sheet{position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:12px 16px max(24px,env(safe-area-inset-bottom))}
+  .m-menu-handle{width:40px;height:4px;background:#d1d5db;border-radius:4px;margin:0 auto 16px}
+  .m-menu-item{display:flex;align-items:center;gap:12px;width:100%;padding:14px 12px;border:none;background:none;font-size:.85rem;font-weight:600;color:#1a1f36;font-family:inherit;cursor:pointer;border-radius:10px;text-align:left}
+  .m-menu-item:active{background:#f3f4f6}
+  .m-menu-item.logout{color:#ef4444;margin-top:8px;border-top:1px solid #e5e7eb;padding-top:14px;border-radius:0}
+  
+  /* Login on mobile */
+  .login-screen{display:flex!important;background:#f0f2f5!important;padding:20px!important}
+  .login-box{background:#fff!important;border:1px solid #e5e7eb!important}
+  .login-box input{background:#f9fafb!important;border:1px solid #e5e7eb!important;color:#1a1f36!important}
+  .login-btn{background:#2563eb!important}
+  .login-logo{color:#d4a937!important}
+  .login-error{color:#ef4444!important}
+}
+@media(min-width:641px){
+  #mobApp{display:none!important}
+}
+</style>
 </head>
 <body>
 <div class="bg-layer"></div>
@@ -2352,7 +2073,6 @@ body::before,body::after{display:none!important}
 <div class="comp-month-tabs" id="compMonthTabs"></div>
 </div>
 <div id="compR"></div>
-<div id="mobCompPage" class="mob-only-page"></div>
 </div>
 </div>
 
@@ -2385,7 +2105,6 @@ body::before,body::after{display:none!important}
 </div>
 </div>
 </div>
-<div id="mobTrainingPage" class="mob-only-page"></div>
 
 <div class="toolbar" id="toolbar"><button class="btn-new admin-only" onclick="loadDrive()">↻ Atualizar</button><button class="btn-link admin-only" onclick="copyLink()">🔗 Link</button></div>
 <div class="toast" id="toast"></div>
@@ -2397,7 +2116,7 @@ const CP_M1='https://docs.google.com/spreadsheets/d/e/2PACX-1vRd-WnBwsOyBqVeunc1
 const CP_M2='https://docs.google.com/spreadsheets/d/e/2PACX-1vTgVTpekyWnlnCtyKnOgisBZ9YM8WOOoNGe6XKH2PslfxaI3GIdjt4g_hEtLJtqYQ/pub?output=csv';
 const CP_NOW='https://docs.google.com/spreadsheets/d/e/2PACX-1vRrs4woT4Rad3tsqEnkRBkBy4mOvXlP-3s24bIOQ3gaxRgPjfH3Lqw4PgMa1qfo-Q/pub?output=csv';
 const PT='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?output=csv';
-let cU=null,cRD=null;const cD=[null,null,null];let allEntradas={};let allLogins={};let allAdmissao={};let pontoData=null;var isMobile=window.innerWidth<=640;var currentMobTab='inicio';
+let cU=null,cRD=null;const cD=[null,null,null];let allEntradas={};let allLogins={};let allAdmissao={};let pontoData=null;
 
 function parseBR(s){if(!s)return 0;s=s.replace(/"/g,'').trim();if(!s||s==='0')return 0;s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0;}
 
@@ -2633,6 +2352,15 @@ function parseCSV(text){
   return{d:dt,ta,tv:Math.round(tv*100)/100,ops};
 }
 
+async function doLogin(){const u=document.getElementById('loginUser').value.trim().toLowerCase(),p=document.getElementById('loginPass').value;if(!u||!p)return;document.getElementById('loginError').style.display='none';document.getElementById('loginLoading').style.display='block';try{const r=await fetch(SH),c=await r.text(),rows=c.split('\n').map(r=>{const cells=[];let cell='',inQ=false;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){cells.push(cell.trim());cell=''}else cell+=ch;}cells.push(cell.trim());return cells;});let f=null;for(let i=1;i<rows.length;i++){if(rows[i].length>=4){allEntradas[rows[i][0].toLowerCase().trim()]=loginToShift(rows[i][1]?rows[i][1].trim():'');
+        allLogins[rows[i][0].toLowerCase().trim()]=rows[i][1]?rows[i][1].trim():'';
+        allAdmissao[rows[i][0].toLowerCase().trim()]=rows[i][2]?rows[i][2].trim():'';const n=rows[i][0].toLowerCase().trim(),s=rows[i][3].trim(),pf=rows[i][4]?rows[i][4].toLowerCase().trim():'colaborador';if(n===u&&s===p){f={nome:rows[i][0].trim(),perfil:pf,entrada:rows[i][2].trim(),login:rows[i][1]?rows[i][1].trim():''};break}}}document.getElementById('loginLoading').style.display='none';if(f){cU=f;sessionStorage.setItem('user',JSON.stringify(f));document.getElementById('loginScreen').style.display='none';setupUI();startApp()}else{document.getElementById('loginError').style.display='block'}}catch(e){document.getElementById('loginLoading').style.display='none';document.getElementById('loginError').textContent='Erro de conexão';document.getElementById('loginError').style.display='block'}}
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+function setupUI(){document.getElementById('navUser').innerHTML='👤 '+cU.nome;if(isA())document.querySelectorAll('.admin-only').forEach(el=>el.style.display='')}
+function doLogout(){sessionStorage.removeItem('user');cU=null;cRD=null;window.location.hash='';window.location.reload()}
+window.addEventListener('load',()=>{const s=sessionStorage.getItem('user');if(s){try{cU=JSON.parse(s);document.getElementById('loginScreen').style.display='none';setupUI();startApp()}catch(e){}}});
+function isA(){return cU&&cU.perfil==='admin'}
+
 function loginToShift(login){
   if(!login)return'';
   const p=login.charAt(0);
@@ -2646,15 +2374,6 @@ function loginToShift(login){
   }
   return'';
 }
-
-async function doLogin(){const u=document.getElementById('loginUser').value.trim().toLowerCase(),p=document.getElementById('loginPass').value;if(!u||!p)return;document.getElementById('loginError').style.display='none';document.getElementById('loginLoading').style.display='block';try{const r=await fetch(SH),c=await r.text(),rows=c.split('\n').map(r=>{const cells=[];let cell='',inQ=false;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){cells.push(cell.trim());cell=''}else cell+=ch;}cells.push(cell.trim());return cells;});let f=null;for(let i=1;i<rows.length;i++){if(rows[i].length>=4){allEntradas[rows[i][0].toLowerCase().trim()]=loginToShift(rows[i][1]?rows[i][1].trim():'');
-        allLogins[rows[i][0].toLowerCase().trim()]=rows[i][1]?rows[i][1].trim():'';
-        allAdmissao[rows[i][0].toLowerCase().trim()]=rows[i][2]?rows[i][2].trim():'';const n=rows[i][0].toLowerCase().trim(),s=rows[i][3].trim(),pf=rows[i][4]?rows[i][4].toLowerCase().trim():'colaborador';if(n===u&&s===p){f={nome:rows[i][0].trim(),perfil:pf,entrada:rows[i][2].trim(),login:rows[i][1]?rows[i][1].trim():''};break}}}document.getElementById('loginLoading').style.display='none';if(f){cU=f;sessionStorage.setItem('user',JSON.stringify(f));document.getElementById('loginScreen').style.display='none';setupUI();startApp()}else{document.getElementById('loginError').style.display='block'}}catch(e){document.getElementById('loginLoading').style.display='none';document.getElementById('loginError').textContent='Erro de conexão';document.getElementById('loginError').style.display='block'}}
-document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
-function setupUI(){document.getElementById('navUser').innerHTML='👤 '+cU.nome;if(isA())document.querySelectorAll('.admin-only').forEach(el=>el.style.display='')}
-function doLogout(){sessionStorage.removeItem('user');cU=null;cRD=null;window.location.hash='';window.location.reload()}
-window.addEventListener('load',()=>{const s=sessionStorage.getItem('user');if(s){try{cU=JSON.parse(s);document.getElementById('loginScreen').style.display='none';setupUI();startApp()}catch(e){}}});
-function isA(){return cU&&cU.perfil==='admin'}
 
 async function loadEntradas(){
   try{
@@ -2742,7 +2461,7 @@ function renderR(data){
   });
   h+='</div></div>';
   h+='<div class="dash-footer"><div class="brand-ft">ÉDIMO</div>Soluções em Cobranças</div>';
-  document.getElementById('pageRanking').innerHTML=h;toolbar.style.display='flex';updateFaltaAlert();if(isMobile&&currentMobTab==='inicio')renderMobInicio();else if(isMobile&&currentMobTab==='acordos')renderMobAcordos();
+  document.getElementById('pageRanking').innerHTML=h;toolbar.style.display='flex';updateFaltaAlert();
 }
 
 function mU(op,u){
@@ -3158,7 +2877,6 @@ function genComp(){
     }
     document.getElementById('compR').innerHTML=h;
   }
-  if(isMobile && currentMobTab==='comparativo')renderMobComparativo();
 }
 
 let compViewMode='all';
@@ -3555,414 +3273,190 @@ function fs(v){return'R$ '+Math.round(v).toLocaleString('pt-BR')}
 function copyLink(){const json=JSON.stringify(cRD),comp=LZString.compressToEncodedURIComponent(json),url=window.location.origin+window.location.pathname+'#d='+comp;navigator.clipboard.writeText(url).then(()=>sT('Link copiado!')).catch(()=>{const t=document.createElement('textarea');t.value=url;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);sT('Link copiado!')})}
 function sT(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 
-/* ============================================================
-   MOBILE V2 — SEPARATED SCREENS
-   ============================================================ */
-function mobHidePages(){
-  ['pageRanking','pageComp','pageTreinamentos','pageMobExtra'].forEach(function(id){
-    var el=document.getElementById(id); if(el)el.classList.remove('mob-active');
-  });
-  var mm=document.getElementById('mobMaisMenu');if(mm)mm.style.display='none';
-}
-function mobSetPage(id){
-  mobHidePages();
-  var el=document.getElementById(id);if(el)el.classList.add('mob-active');
-}
-function mobileHeader(title,date){
-  return '<div class="mob-header"><div><div class="mob-header-title">'+title+'</div><div class="mob-header-date">📅 '+(date||'Hoje')+'</div></div><div class="mob-header-right"></div></div>';
-}
-function getMyMobileComp(){
-  var ms=cD.filter(function(d){return d!==null;});
-  if(!ms.length)return null;
-  var now=ms[ms.length-1], prev=ms.length>1?ms[ms.length-2]:null, old=ms.length>2?ms[0]:null;
-  var uN=cU?cU.nome.toLowerCase():'';
-  var allN=new Map();
-  ms.forEach(function(m,mi){(m.ops||[]).forEach(function(o){
-    if(!allN.has(o.n))allN.set(o.n,{name:o.n,cfg:o.cfg,t:o.t,m:new Array(ms.length).fill(null)});
-    var r=allN.get(o.n);r.m[mi]={a:o.a,v:o.v};if(o.cfg)r.cfg=o.cfg;
-  });});
-  var rows=[...allN.values()];
-  var mine=rows.find(function(o){return mU(o.name,uN);});
-  if(!mine)return null;
-  var ci=ms.length-1, cur=mine.m[ci], pd=prev?mine.m[ci-1]:null, od=old?mine.m[0]:null;
-  var meta=getMeta(mine.cfg);
-  return {ms:ms,now:now,prev:prev,old:old,mine:mine,cur:cur||{a:0,v:0},prevD:pd,oldD:od,meta:meta};
-}
-function renderMobInicio(){
-  if(!isMobile||!cRD)return;
-  var d=cRD, ops=mergeOpsWithPonto(d.ops||[]), t3=ops.slice(0,3);
-  var h=mobileHeader('Início',d.d||'Hoje');
-  h+='<div class="mob-inicio">';
-  h+='<div class="mob-hero"><div class="mob-hero-icon">◫</div><div class="mob-hero-label">VALOR TOTAL DO DIA</div><div class="mob-hero-val">'+fs(d.tv)+'</div><div class="mob-hero-sub">'+d.ta+' acordos realizados</div></div>';
-  h+='<div class="mob-stats">';
-  h+='<div class="mob-stat"><div class="mob-stat-icon">▣</div><div class="mob-stat-label">Total de acordos</div><div class="mob-stat-val">'+d.ta+'</div></div>';
-  h+='<div class="mob-stat"><div class="mob-stat-icon">◉</div><div class="mob-stat-label">Operadores</div><div class="mob-stat-val">'+ops.length+'</div></div>';
-  h+='</div>';
-  if(t3.length){
-    h+='<div class="mob-section"><div class="mob-section-title">Top 3 do dia</div><div class="mob-section-link" onclick="mobNav(\'acordos\')">Ver lista ›</div></div>';
-    var medals=['🥇','🥈','🥉'];
-    t3.forEach(function(o,i){
-      h+='<div class="mob-pod"><div class="mob-pod-medal">'+medals[i]+'</div><div class="mob-pod-info"><div class="mob-pod-name">'+o.n+'</div><div class="mob-pod-stats">'+o.a+' acordos · '+fs(o.v)+'</div></div><div class="mob-pod-pos">'+(i+1)+'º</div></div>';
-    });
-  }
-  h+='</div>';
-  document.getElementById('pageRanking').innerHTML=h;
-  mobSetPage('pageRanking');
-  currentMobTab='inicio';
-  document.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active')});
-  document.getElementById('mobTabInicio').classList.add('active');
-}
-function renderMobAcordos(){
-  if(!isMobile||!cRD)return;
-  var allOps=mergeOpsWithPonto(cRD.ops||[]);
-  var h=mobileHeader('Acordos',cRD.d||'Hoje');
-  h+='<div class="mob-acordos">';
-  h+='<input class="mob-search" type="text" placeholder="🔍  Buscar operador..." oninput="filterMobRank(this.value)">';
-  h+='<div class="mob-v2-card" style="padding:10px 12px;margin-bottom:10px"><div class="mob-v2-row"><div><div class="mob-v2-kicker">Resumo</div><div class="mob-v2-value" style="font-size:1.1rem">'+cRD.ta+' acordos</div></div><div style="text-align:right"><div class="mob-v2-kicker">Valor</div><div style="font-size:.82rem;font-weight:800;color:#344054">'+fs(cRD.tv)+'</div></div></div></div>';
-  h+='<div class="mob-rank-list" id="mobRankList">';
-  allOps.forEach(function(o,i){
-    var pt=matchPonto(o.n),st=pontoStatus(pt,o.n),initial=o.n.charAt(0).toUpperCase();
-    h+='<div class="mob-rank-row'+(st==='miss'?' mob-rank-miss':'')+'" data-name="'+o.n.toLowerCase()+'">';
-    h+='<div class="mob-rank-pos">'+(i+1)+'</div><div class="mob-rank-avatar">'+initial+'</div>';
-    h+='<div class="mob-rank-info"><div class="mob-rank-name">'+o.n+'</div><div class="mob-rank-sub">'+(st==='ok'?'✓ Presente':st==='late'?'⏰ Atrasado':st==='miss'?'✕ Faltou':'')+getTurnoTag(o.n)+'</div></div>';
-    h+='<div class="mob-rank-val"><div class="mob-rank-acordos">'+o.a+'</div><div class="mob-rank-valor">'+fm(o.v)+'</div></div></div>';
-  });
-  h+='</div></div>';
-  document.getElementById('pageRanking').innerHTML=h;
-  mobSetPage('pageRanking');
-  currentMobTab='acordos';
-  document.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active')});
-  document.getElementById('mobTabAcordos').classList.add('active');
-}
-function renderMobComparativo(){
-  var host=document.getElementById('mobCompPage');if(!host)return;
-  var p=getMyMobileComp();
-  var h=mobileHeader('Comparativo',p&&p.now?p.now.period:'Hoje');
-  h+='<div class="mob-extra">';
-  if(!p){
-    h+='<div class="mob-v2-card"><div class="mob-v2-title">Seu resultado</div><div class="mob-v2-alert">Seus dados individuais ainda não apareceram nos relatórios.</div></div></div>';
-    host.innerHTML=h;mobSetPage('pageComp');return;
-  }
-  var cur=p.cur,prev=p.prevD,old=p.oldD,meta=p.meta;
-  h+='<div class="mob-v2-card"><div class="mob-v2-title">Seu resultado atual <span class="mob-v2-tag">ATUAL</span></div>';
-  h+='<div class="mob-v2-grid3"><div class="mob-v2-mini"><div class="l">Acordos</div><div class="v">'+cur.a+'</div></div><div class="mob-v2-mini"><div class="l">Valor</div><div class="v">'+fm(cur.v)+'</div></div><div class="mob-v2-mini"><div class="l">Média/acordo</div><div class="v">'+fm(cur.a?cur.v/cur.a:0)+'</div></div></div></div>';
-  h+='<div class="mob-v2-card"><div class="mob-v2-title">Comparação com meses anteriores</div>';
-  if(old){h+='<div class="mob-v2-row" style="margin-bottom:9px"><span class="mob-v2-muted">2 meses atrás</span><b>'+old.a+' acordos · '+fm(old.v)+'</b></div>';}
-  if(prev){h+='<div class="mob-v2-row" style="margin-bottom:9px"><span class="mob-v2-muted">Mês passado</span><b>'+prev.a+' acordos · '+fm(prev.v)+'</b></div>';}
-  h+='<div class="mob-v2-row" style="border-top:1px solid #edf0f2;padding-top:10px"><span class="mob-v2-muted">Mês atual</span><b>'+cur.a+' acordos · '+fm(cur.v)+'</b></div>';
-  if(prev){
-    var da=cur.a-prev.a,dv=cur.v-prev.v,pct=prev.v?Math.round(dv/prev.v*100):0;
-    h+='<div class="mob-v2-grid3" style="margin-top:12px"><div class="mob-v2-mini"><div class="l">Acordos</div><div class="v mob-v2-delta '+(da>=0?'up':'down')+'">'+(da>=0?'+':'')+da+'</div></div><div class="mob-v2-mini"><div class="l">Valor</div><div class="v mob-v2-delta '+(dv>=0?'up':'down')+'">'+(dv>=0?'+':'')+fm(dv)+'</div></div><div class="mob-v2-mini"><div class="l">Variação</div><div class="v mob-v2-delta '+(pct>=0?'up':'down')+'">'+(pct>=0?'+':'')+pct+'%</div></div></div>';
-  }
-  h+='</div>';
-  if(meta&&meta.max>0){
-    var pctMeta=Math.min(Math.round(cur.v/meta.max*100),100),rem=Math.max(0,meta.max-cur.v);
-    h+='<div class="mob-v2-card"><div class="mob-v2-title">Comissão e meta</div>';
-    h+='<div class="mob-v2-grid2"><div><div class="mob-v2-kicker">Valor atual</div><div class="mob-v2-value">'+fm(cur.v)+'</div></div><div style="text-align:right"><div class="mob-v2-kicker">Meta</div><div class="mob-v2-value">'+fm(meta.max)+'</div></div></div>';
-    h+='<div class="mob-v2-bar"><div class="mob-v2-fill" style="width:'+pctMeta+'%"></div></div>';
-    h+='<div class="mob-v2-row"><span class="mob-v2-muted">'+pctMeta+'% atingido</span><b style="font-size:.68rem">'+(rem>0?'Falta '+fm(rem):'Meta atingida ✓')+'</b></div></div>';
-  }
-  h+='<div class="mob-v2-card"><div class="mob-v2-title">O que muda ao bater a meta</div>';
-  h+='<div class="mob-v2-list">';
-  h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">R$</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">Comissão</div><div class="mob-v2-listsub">5% da receita, conforme sua faixa</div></div><div class="mob-v2-arrow">›</div></div>';
-  h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">◷</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">Flexibilidade</div><div class="mob-v2-listsub">Benefício liberado conforme a meta</div></div><div class="mob-v2-arrow">›</div></div>';
-  h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">★</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">Folgas</div><div class="mob-v2-listsub">Conforme cumprimento das metas</div></div><div class="mob-v2-arrow">›</div></div>';
-  h+='</div></div></div>';
-  host.innerHTML=h;
-  mobSetPage('pageComp');
-}
-function renderMobComissao(){
-  var host=document.getElementById('pageMobExtra');if(!host)return;
-  var p=getMyMobileComp(),h=mobileHeader('Comissão',p&&p.now?p.now.period:'Hoje');
-  h+='<div class="mob-extra">';
-  if(!p||!p.meta||!p.meta.max){
-    h+='<div class="mob-v2-card"><div class="mob-v2-title">Sua comissão</div><div class="mob-v2-alert">A meta da sua faixa ainda não está disponível.</div></div>';
+
+// ============================================================
+// MOBILE APP
+// ============================================================
+var _mob=window.innerWidth<=640;
+window.addEventListener('resize',function(){_mob=window.innerWidth<=640;_mobToggle();});
+
+function _mobToggle(){
+  var el=document.getElementById('mobApp');
+  if(!el)return;
+  if(_mob){
+    el.style.display='flex';
+    document.querySelector('.main').style.display='none';
+    document.querySelector('.nav').style.display='none';
+    var sb=document.querySelector('.sidebar');if(sb)sb.style.display='none';
   }else{
-    var cur=p.cur,prev=p.prevD,m=p.meta,pct=Math.min(Math.round(cur.v/m.max*100),100),rem=Math.max(0,m.max-cur.v);
-    var comissao=Math.round(cur.v*.05*100)/100;
-    var prevCom=prev?Math.round(prev.v*.05*100)/100:0;
-    h+='<div class="mob-v2-card"><div class="mob-v2-title">Sua comissão <span class="mob-v2-tag">'+pct+'% da meta</span></div>';
-    h+='<div class="mob-v2-value">'+fm(comissao)+'</div><div class="mob-v2-muted">estimativa de 5% da receita atual</div>';
-    h+='<div class="mob-v2-bar"><div class="mob-v2-fill" style="width:'+pct+'%"></div></div>';
-    h+='<div class="mob-v2-row"><span class="mob-v2-muted">Atual '+fm(cur.v)+'</span><b>'+(rem?'Falta '+fm(rem):'Meta atingida ✓')+'</b></div></div>';
-    h+='<div class="mob-v2-card"><div class="mob-v2-title">Sua meta</div><div class="mob-v2-grid3"><div class="mob-v2-mini"><div class="l">Atual</div><div class="v">'+fm(cur.v)+'</div></div><div class="mob-v2-mini"><div class="l">Meta</div><div class="v">'+fm(m.max)+'</div></div><div class="mob-v2-mini"><div class="l">Falta</div><div class="v">'+fm(rem)+'</div></div></div></div>';
-    if(prev){
-      var diff=cur.v-prev.v,pc=prev.v?Math.round(diff/prev.v*100):0;
-      h+='<div class="mob-v2-card"><div class="mob-v2-title">Comparação com o mês passado</div><div class="mob-v2-row"><div><div class="mob-v2-kicker">Mês passado</div><div class="mob-v2-value" style="font-size:1.1rem">'+fm(prev.v)+'</div></div><div style="text-align:right"><div class="mob-v2-kicker">Variação</div><div class="mob-v2-value '+(pc>=0?'mob-v2-delta up':'mob-v2-delta down')+'" style="font-size:1.1rem">'+(pc>=0?'+':'')+pc+'%</div></div></div><div class="mob-v2-muted" style="margin-top:8px">Comissão estimada anterior: '+fm(prevCom)+'</div></div>';
-    }
+    el.style.display='none';
   }
-  h+='</div>';host.innerHTML=h;mobSetPage('pageMobExtra');
-}
-function renderMobBeneficios(){
-  var host=document.getElementById('pageMobExtra');if(!host)return;
-  var p=getMyMobileComp(),h=mobileHeader('Benefícios',p&&p.now?p.now.period:'Hoje');
-  h+='<div class="mob-extra">';
-  var hit=p&&p.meta&&p.meta.max>0&&p.cur.v>=p.meta.max;
-  h+='<div class="mob-v2-card"><div class="mob-v2-title">Benefícios da meta <span class="mob-v2-tag">'+(hit?'LIBERADOS':'BLOQUEADOS')+'</span></div><div class="mob-v2-muted">Acompanhe o que é liberado conforme o atingimento da sua meta.</div></div>';
-  h+='<div class="mob-v2-card"><div class="mob-v2-title">Ao bater sua meta</div><div class="mob-v2-list">';
-  [['💰','Comissão','5% da receita conforme a faixa'],['◷','Flexibilidade','Horário flexível conforme as regras'],['🏖','Folgas','Dias de folga conforme as metas'],['🏆','Premiação por tempo','Valores progressivos conforme o tempo de empresa']].forEach(function(x){
-    h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">'+x[0]+'</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">'+x[1]+'</div><div class="mob-v2-listsub">'+x[2]+'</div></div><div class="mob-v2-arrow">'+(hit?'✓':'🔒')+'</div></div>';
-  });
-  h+='</div></div>';
-  h+='<div class="mob-v2-card"><div class="mob-v2-title">Premiação por tempo</div><div class="mob-v2-grid2">';
-  [['R$ 200','75 dias a 1 ano'],['R$ 300','+1 ano'],['R$ 400','+2 anos'],['R$ 600','+3 anos']].forEach(function(x){h+='<div class="mob-v2-mini"><div class="l">'+x[1]+'</div><div class="v">'+x[0]+'</div></div>';});
-  h+='</div></div>';
-  h+='<div class="mob-v2-card"><div class="mob-v2-title">Regras importantes</div><div class="mob-v2-list">';
-  ['Atraso no ponto acima de 10 minutos','Deixar de bater o ponto em qualquer dia','Falta sem atestado','Advertência verbal, escrita ou suspensão','Não trabalhar o mês integralmente'].forEach(function(x){h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">!</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">'+x+'</div></div></div>';});
-  h+='</div></div></div>';
-  host.innerHTML=h;mobSetPage('pageMobExtra');
-}
-function renderMobTreinamento(){
-  var host=document.getElementById('mobTrainingPage');if(!host)return;
-  var total=0,done=0;trnData.forEach(function(m){m.lessons.forEach(function(l){total++;if(trnCompleted.includes(l.id))done++;});});
-  var pct=total?Math.round(done/total*100):0;
-  var h=mobileHeader('Treinamento','Hoje');
-  h+='<div class="mob-training"><div class="mob-training-hero"><h2>Seu desenvolvimento também gera resultados</h2><p>Conteúdos rápidos para melhorar seu desempenho e ajudar você a bater suas metas.</p><div class="mob-training-progress"><div class="mob-training-progressline"><span>Seu progresso</span><b>'+pct+'%</b></div><div class="mob-training-progressbar"><div class="mob-training-progressfill" style="width:'+pct+'%"></div></div></div></div>';
-  trnData.forEach(function(mod,mi){
-    var md=mod.lessons.filter(function(l){return trnCompleted.includes(l.id)}).length;
-    h+='<div class="mob-course"><div class="mob-course-head"><div class="mob-course-num">'+(mi+1)+'</div><div class="mob-course-info"><div class="mob-course-title">'+mod.title+'</div><div class="mob-course-sub">'+md+'/'+mod.lessons.length+' módulos concluídos</div></div><div class="mob-course-arrow">›</div></div><div class="mob-course-lessons">';
-    mod.lessons.forEach(function(l){
-      h+='<div class="mob-lesson" onclick="playLesson(\''+l.id+'\');renderMobTreinamento()"><div class="mob-lesson-thumb">'+l.thumb+'</div><div class="mob-lesson-name">'+l.name+'</div><div class="mob-lesson-check">'+(trnCompleted.includes(l.id)?'✓':'○')+'</div></div>';
-    });
-    h+='</div></div>';
-  });
-  h+='</div>';host.innerHTML=h;mobSetPage('pageTreinamentos');
-}
-function renderMobFaltas(){
-  var host=document.getElementById('pageMobExtra');if(!host)return;
-  var h=mobileHeader('Faltas do Dia','Hoje')+'<div class="mob-extra"><div class="mob-v2-card"><div class="mob-v2-title">Status do ponto</div><div class="mob-v2-list">';
-  if(pontoData){
-    var found=0;pontoData.forEach(function(p){
-      var s=p.status.toUpperCase();if(s.includes('PRESENTE')||s.includes('ATRASADO'))return;
-      found++;h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">!</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">'+p.nome+'</div><div class="mob-v2-listsub">'+(s||'Sem registro')+'</div></div></div>';
-    });
-    if(!found)h+='<div class="mob-v2-alert">Nenhuma falta registrada.</div>';
-  }else h+='<div class="mob-v2-alert">Dados de ponto indisponíveis.</div>';
-  h+='</div></div></div>';host.innerHTML=h;mobSetPage('pageMobExtra');
-}
-function mobNav(tab){
-  currentMobTab=tab;
-  document.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active')});
-  var map={inicio:'mobTabInicio',acordos:'mobTabAcordos',comparativo:'mobTabComp',treinamento:'mobTabTreino',mais:'mobTabMais',comissao:'mobTabMais',beneficios:'mobTabMais',faltas:'mobTabMais'};
-  var tid=map[tab];if(tid&&document.getElementById(tid))document.getElementById(tid).classList.add('active');
-  if(tab==='mais'){var mm=document.getElementById('mobMaisMenu');if(mm)mm.style.display='block';return;}
-  if(tab==='inicio')renderMobInicio();
-  else if(tab==='acordos')renderMobAcordos();
-  else if(tab==='comparativo')renderMobComparativo();
-  else if(tab==='treinamento')renderMobTreinamento();
-  else if(tab==='comissao')renderMobComissao();
-  else if(tab==='beneficios')renderMobBeneficios();
-  else if(tab==='faltas')renderMobFaltas();
-}
-function closeMaisMenu(){var mm=document.getElementById('mobMaisMenu');if(mm)mm.style.display='none';}
-
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
-
-
-// ============================================================
-// MOBILE PWA LOGIC
-// ============================================================
-
-function detectMobile(){
-  isMobile=window.innerWidth<=640;
-  var tb=document.getElementById('mobTabbar');
-  if(tb)tb.style.display=isMobile?'flex':'none';
-}
-window.addEventListener('resize',detectMobile);
-
-function mobNav(tab){
-  currentMobTab=tab;
-  // Reset all tabs
-  document.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active')});
-  var tabMap={inicio:'mobTabInicio',acordos:'mobTabAcordos',comparativo:'mobTabComp',treinamento:'mobTabTreino',mais:'mobTabMais',comissao:'mobTabMais',beneficios:'mobTabMais',faltas:'mobTabMais'};
-  var tid=tabMap[tab];
-  if(tid)document.getElementById(tid).classList.add('active');
-  
-  if(tab==='mais'){
-    document.getElementById('mobMaisMenu').style.display='block';
-    return;
-  }
-  
-  if(tab==='inicio')renderMobInicio();
-  else if(tab==='acordos')renderMobAcordos();
-  else if(tab==='comparativo'){showPage('comparativo');}
-  else if(tab==='treinamento'){showPage('treinamentos');}
-  else if(tab==='comissao')renderMobComissao();
-  else if(tab==='beneficios')renderMobBeneficios();
-  else if(tab==='faltas')renderMobFaltas();
 }
 
-function closeMaisMenu(){
-  document.getElementById('mobMaisMenu').style.display='none';
+function mobGo(tab){
+  // Update active tab
+  document.querySelectorAll('.mob-btn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-tab')===tab)});
+  var mc=document.getElementById('mobContent');
+  if(tab==='inicio')_mobInicio(mc);
+  else if(tab==='acordos')_mobAcordos(mc);
+  else if(tab==='comp')_mobComp(mc);
+  else if(tab==='treino')_mobTreino(mc);
+  else if(tab==='mais')_mobMais();
 }
 
-function renderMobInicio(){
-  if(!isMobile||!cRD)return;
-  var d=cRD;
-  var ops=d.ops||[];
-  var t3=ops.slice(0,3);
+function _mobInicio(mc){
+  if(!cRD){mc.innerHTML='<div style="padding:60px 20px;text-align:center;color:#9ca3af">Carregando...</div>';return;}
+  var d=cRD,ops=d.ops||[],t3=ops.slice(0,3);
   var ptOk=0,ptLate=0,ptMiss=0;
   if(pontoData)pontoData.forEach(function(p){var s=p.status.toUpperCase();if(s.includes('PRESENTE'))ptOk++;else if(s.includes('ATRASADO'))ptLate++;else ptMiss++;});
   
-  var h='<div class="mob-header"><div><div class="mob-header-title">Acordos do Dia</div><div class="mob-header-date">📅 '+(d.d||'Hoje')+'</div></div></div>';
-  h+='<div class="mob-inicio">';
-  
+  var h='<div class="mh"><div><div class="mh-title">Acordos do Dia</div><div class="mh-date">\u{1F4C5} '+(d.d||'Hoje')+'</div></div></div><div class="mp">';
   // Hero
-  h+='<div class="mob-hero"><div class="mob-hero-icon">🏆</div><div class="mob-hero-label">Valor Total</div><div class="mob-hero-val">'+fs(d.tv)+'</div><div class="mob-hero-sub">'+d.ta+' acordos</div></div>';
-  
+  h+='<div class="m-hero"><div class="m-hero-icon">\u{1F3C6}</div><div class="m-hero-label">Valor Total</div><div class="m-hero-val">'+fs(d.tv)+'</div><div class="m-hero-sub">'+d.ta+' acordos</div></div>';
   // Stats 2x2
-  h+='<div class="mob-stats">';
-  h+='<div class="mob-stat"><div class="mob-stat-icon">📋</div><div class="mob-stat-label">Acordos</div><div class="mob-stat-val">'+d.ta+'</div></div>';
-  h+='<div class="mob-stat"><div class="mob-stat-icon">👥</div><div class="mob-stat-label">Operadores</div><div class="mob-stat-val">'+ops.length+'</div></div>';
+  h+='<div class="m-stats"><div class="m-stat"><div class="m-stat-icon">\u{1F4CB}</div><div class="m-stat-lbl">Acordos</div><div class="m-stat-val">'+d.ta+'</div></div>';
+  h+='<div class="m-stat"><div class="m-stat-icon">\u{1F465}</div><div class="m-stat-lbl">Operadores</div><div class="m-stat-val">'+ops.length+'</div></div>';
   if(pontoData){
-    h+='<div class="mob-stat"><div class="mob-stat-icon">📍</div><div class="mob-stat-label">Ponto</div><div class="mob-stat-val ponto"><span class="p-ok">'+ptOk+'</span> · <span class="p-late">'+ptLate+'</span> · <span class="p-miss">'+ptMiss+'</span></div></div>';
+    h+='<div class="m-stat"><div class="m-stat-icon">\u{1F4CD}</div><div class="m-stat-lbl">Ponto</div><div class="m-stat-val" style="font-size:.85rem"><span style="color:#16a34a">'+ptOk+'</span> \u00B7 <span style="color:#f59e0b">'+ptLate+'</span> \u00B7 <span style="color:#ef4444">'+ptMiss+'</span></div></div>';
   }
   h+='</div>';
-  
   // Top 3
   if(t3.length>=3){
-    h+='<div class="mob-section"><div class="mob-section-title">🏆 Top 3 do Dia</div><div class="mob-section-link" onclick="mobNav(\'acordos\')">Ver todos ›</div></div>';
-    var medals=['🥇','🥈','🥉'];
-    var posLabels=['👑 1°','2°','3°'];
-    t3.forEach(function(o,i){
-      h+='<div class="mob-pod"><div class="mob-pod-medal">'+medals[i]+'</div><div class="mob-pod-info"><div class="mob-pod-name">'+o.n+'</div><div class="mob-pod-stats">'+o.a+' acordos · '+fs(o.v)+'</div></div><div class="mob-pod-pos">'+posLabels[i]+'</div></div>';
-    });
+    h+='<div class="m-sec"><div class="m-sec-t">\u{1F3C6} Top 3 do Dia</div><div class="m-sec-link" onclick="mobGo(\x27acordos\x27)">Ver todos \u203A</div></div>';
+    var md=['\u{1F947}','\u{1F948}','\u{1F949}'],po=['\u{1F451} 1\u00BA','2\u00BA','3\u00BA'];
+    t3.forEach(function(o,i){h+='<div class="m-pod"><div class="m-pod-medal">'+md[i]+'</div><div class="m-pod-info"><div class="m-pod-nm">'+o.n+'</div><div class="m-pod-st">'+o.a+' acordos \u00B7 '+fs(o.v)+'</div></div><div class="m-pod-pos">'+po[i]+'</div></div>';});
   }
-  
-  // Progress (for logged-in operator)
-  // We'll add this when comp data is available
-  
   h+='</div>';
-  
-  // Render into pageRanking
-  document.getElementById('pageRanking').innerHTML=h;
-  document.getElementById('pageRanking').classList.add('mob-active');
-  document.getElementById('pageComp').classList.remove('mob-active');
-  var pt=document.getElementById('pageTreinamentos');
-  if(pt)pt.classList.remove('mob-active');
+  mc.innerHTML=h;
+  mc.scrollTop=0;
 }
 
-function renderMobAcordos(){
-  if(!isMobile||!cRD)return;
-  var d=cRD;
-  var allOps=mergeOpsWithPonto(d.ops||[]);
-  
-  var h='<div class="mob-header"><div><div class="mob-header-title">Acordos</div><div class="mob-header-date">📅 '+(d.d||'Hoje')+'</div></div></div>';
-  h+='<div class="mob-acordos">';
-  h+='<input class="mob-search" type="text" placeholder="🔍 Buscar operador..." oninput="filterMobRank(this.value)">';
-  
-  // Rank list
-  h+='<div class="mob-rank-list" id="mobRankList">';
+function _mobAcordos(mc){
+  if(!cRD){mc.innerHTML='<div style="padding:60px 20px;text-align:center;color:#9ca3af">Carregando...</div>';return;}
+  var d=cRD,allOps=mergeOpsWithPonto(d.ops||[]);
+  var h='<div class="mh"><div><div class="mh-title">Acordos</div><div class="mh-date">\u{1F4C5} '+(d.d||'Hoje')+'</div></div></div><div class="mp">';
+  h+='<input class="m-search" type="text" placeholder="\u{1F50D} Buscar operador..." oninput="_mobFilter(this.value)">';
   allOps.forEach(function(o,i){
     var pt=matchPonto(o.n);
     var st=pontoStatus(pt,o.n);
-    var badge=pontoBadge(pt,o.n);
-    var turnoTag=getTurnoTag(o.n);
-    var turnoClass='';
-    if(turnoTag.includes('turno-m'))turnoClass='m';
-    else if(turnoTag.includes('turno-t'))turnoClass='t';
-    else if(turnoTag.includes('turno-n'))turnoClass='n';
-    var turnoLetter=turnoClass==='m'?'M':turnoClass==='t'?'T':turnoClass==='n'?'N':'';
-    
-    var rowCls='mob-rank-row'+(st==='miss'?' mob-rank-miss':'');
-    var initial=o.n.charAt(0).toUpperCase();
-    
-    h+='<div class="'+rowCls+'" data-name="'+o.n.toLowerCase()+'">';
-    h+='<div class="mob-rank-pos">'+(i+1)+'</div>';
-    h+='<div class="mob-rank-avatar">'+initial+'</div>';
-    h+='<div class="mob-rank-info"><div class="mob-rank-name">'+o.n;
-    if(turnoLetter)h+=' <span class="mob-rank-turno '+turnoClass+'">'+turnoLetter+'</span>';
-    h+='</div>';
-    h+='<div class="mob-rank-sub">'+(st==='ok'?'✓ Presente':st==='late'?'⏰ Atrasado':st==='miss'?'✗ Faltou':st==='pending'?'⏳ Aguardando':'')+'</div>';
-    h+='</div>';
-    h+='<div class="mob-rank-val"><div class="mob-rank-acordos">'+o.a+'</div><div class="mob-rank-valor">'+fm(o.v)+'</div></div>';
-    h+='</div>';
+    var tg=getTurnoTag(o.n);
+    var tc=tg.includes('turno-m')?'m':tg.includes('turno-t')?'t':tg.includes('turno-n')?'n':'';
+    var tl=tc==='m'?'M':tc==='t'?'T':tc==='n'?'N':'';
+    var ini=o.n.charAt(0).toUpperCase();
+    var stTxt=st==='ok'?'\u2713 Presente':st==='late'?'\u23F0 Atrasado':st==='miss'?'\u2717 Faltou':st==='pending'?'\u23F3 Aguardando':'';
+    h+='<div class="m-row'+(st==='miss'?' m-row-miss':'')+'" data-nm="'+o.n.toLowerCase()+'">';
+    h+='<div class="m-rk">'+(i+1)+'</div>';
+    h+='<div class="m-av">'+ini+'</div>';
+    h+='<div class="m-nm"><div class="m-nm-n">'+o.n+(tl?' <span class="m-turno m-turno-'+tc+'">'+tl+'</span>':'')+'</div><div class="m-nm-s">'+stTxt+'</div></div>';
+    h+='<div class="m-vl"><div class="m-vl-a">'+o.a+'</div><div class="m-vl-v">'+fm(o.v)+'</div></div></div>';
   });
-  h+='</div></div>';
-  
-  document.getElementById('pageRanking').innerHTML=h;
-  document.getElementById('pageRanking').classList.add('mob-active');
-  document.getElementById('pageComp').classList.remove('mob-active');
-  var pt=document.getElementById('pageTreinamentos');
-  if(pt)pt.classList.remove('mob-active');
-}
-
-function filterMobRank(q){
-  q=q.toLowerCase();
-  document.querySelectorAll('.mob-rank-row').forEach(function(r){
-    r.style.display=r.getAttribute('data-name').includes(q)?'flex':'none';
-  });
-}
-
-function renderMobFaltas(){
-  if(!isMobile)return;
-  var h='<div class="mob-header"><div><div class="mob-header-title">🔔 Faltas do Dia</div></div></div>';
-  h+='<div style="padding:12px">';
-  if(pontoData){
-    var faltas=pontoData.filter(function(p){
-      var s=p.status.toUpperCase();
-      if(s.includes('PRESENTE')||s.includes('ATRASADO'))return false;
-      return shiftStarted(p.nome);
-    });
-    if(faltas.length===0)h+='<div style="text-align:center;padding:40px;color:#8892a4">Nenhuma falta registrada hoje 🎉</div>';
-    else{
-      h+='<div style="font-size:.7rem;color:#8892a4;margin-bottom:12px">'+faltas.length+' ausência(s)</div>';
-      faltas.forEach(function(p){
-        var nm=p.nome.split(/\s+/).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()}).join(' ');
-        h+='<div class="mob-rank-row"><div class="mob-rank-avatar" style="background:#fecaca;color:#ef4444">✗</div><div class="mob-rank-info"><div class="mob-rank-name">'+nm+'</div></div></div>';
-      });
-    }
-  }else h+='<div style="text-align:center;padding:40px;color:#8892a4">Dados de ponto indisponíveis</div>';
   h+='</div>';
-  
-  document.getElementById('pageRanking').innerHTML=h;
-  document.getElementById('pageRanking').classList.add('mob-active');
-  document.getElementById('pageComp').classList.remove('mob-active');
+  mc.innerHTML=h;
+  mc.scrollTop=0;
 }
 
-// Override startApp to also render mobile
-var _origStartApp=typeof startApp==='function'?startApp:null;
+function _mobFilter(q){
+  q=q.toLowerCase();
+  document.querySelectorAll('.m-row').forEach(function(r){r.style.display=r.getAttribute('data-nm').includes(q)?'flex':'none';});
+}
 
-// Hook into renderR to also render mobile
-var _origRenderR=typeof renderR==='function'?renderR:null;
+function _mobComp(mc){
+  var h='<div class="mh"><div><div class="mh-title">Comparativo</div></div></div><div class="mp" style="padding:0">';
+  // Reuse desktop comparativo - just show it
+  h+='<div id="mobCompWrap" style="overflow-x:auto;padding:8px"></div></div>';
+  mc.innerHTML=h;
+  // Trigger comp load into the mobile wrapper
+  var compR=document.getElementById('compR');
+  if(compR&&compR.innerHTML){
+    document.getElementById('mobCompWrap').innerHTML=compR.innerHTML;
+  }else{
+    document.getElementById('mobCompWrap').innerHTML='<div style="padding:40px;text-align:center;color:#9ca3af;font-size:.8rem">Carregando comparativo...</div>';
+    // Try loading
+    if(typeof loadCompDrive==='function')loadCompDrive().then(function(){
+      var cr=document.getElementById('compR');
+      if(cr){document.getElementById('mobCompWrap').innerHTML=cr.innerHTML;}
+    });
+  }
+  mc.scrollTop=0;
+}
+
+function _mobTreino(mc){
+  var h='<div class="mh"><div><div class="mh-title">Treinamento</div></div></div><div class="mp">';
+  h+='<div style="background:linear-gradient(135deg,#1e3a5f,#0f2440);border-radius:16px;padding:24px;color:#fff;text-align:center;margin-bottom:16px">';
+  h+='<div style="font-size:2rem;margin-bottom:8px">\u{1F393}</div>';
+  h+='<div style="font-size:.9rem;font-weight:700">Seu desenvolvimento gera resultados!</div>';
+  h+='<div style="font-size:.65rem;opacity:.6;margin-top:4px">Conteúdos para evoluir no desempenho e bater metas.</div></div>';
+  h+='<div style="font-size:.8rem;font-weight:700;color:#1a1f36;margin-bottom:12px">Em breve</div>';
+  h+='<div style="background:#fff;border-radius:12px;padding:20px;border:1px solid #e5e7eb;text-align:center;color:#9ca3af;font-size:.75rem">Conteúdo de treinamento em desenvolvimento</div>';
+  h+='</div>';
+  mc.innerHTML=h;
+  mc.scrollTop=0;
+}
+
+function _mobMais(){
+  var el=document.getElementById('mobMenu');
+  if(el)el.classList.add('show');
+}
+function _mobCloseMais(){
+  var el=document.getElementById('mobMenu');
+  if(el)el.classList.remove('show');
+}
+
+// Hook: after login, if mobile, show mobile UI
+var _origSetupUI=setupUI;
+setupUI=function(){
+  _origSetupUI();
+  if(_mob){
+    _mobToggle();
+    setTimeout(function(){mobGo('inicio');},100);
+  }
+};
+
+// Hook: after data loads, refresh mobile if active
+var _origRenderR=renderR;
+renderR=function(data){
+  _origRenderR(data);
+  if(_mob){
+    var activeTab=document.querySelector('.mob-btn.active');
+    if(activeTab){
+      var tab=activeTab.getAttribute('data-tab');
+      if(tab==='inicio'||tab==='acordos')mobGo(tab);
+    }
+  }
+};
+
+// On load, if mobile and already logged in, show mobile
+window.addEventListener('load',function(){
+  if(_mob&&cU){
+    _mobToggle();
+    setTimeout(function(){mobGo('inicio');},200);
+  }
+});
+
+// SW registration
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
 
 </script>
 
-<!-- MOBILE BOTTOM TAB BAR -->
-<div class="page" id="pageMobExtra"></div>
-
-<div class="mob-tabbar" id="mobTabbar">
-  <button class="mob-tab active" onclick="mobNav('inicio')" id="mobTabInicio">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-    <span>Início</span>
-  </button>
-  <button class="mob-tab" onclick="mobNav('acordos')" id="mobTabAcordos">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-    <span>Acordos</span>
-  </button>
-  <button class="mob-tab" onclick="mobNav('comparativo')" id="mobTabComp">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-    <span>Comparativo</span>
-  </button>
-  <button class="mob-tab" onclick="mobNav('treinamento')" id="mobTabTreino">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-    <span>Treino</span>
-  </button>
-  <button class="mob-tab" onclick="mobNav('mais')" id="mobTabMais">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-    <span>Mais</span>
-  </button>
+<!-- MOBILE APP -->
+<div id="mobApp" style="display:none">
+  <div id="mobContent"></div>
+  <div class="mob-bar">
+    <button class="mob-btn active" data-tab="inicio" onclick="mobGo('inicio')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span>Início</span></button>
+    <button class="mob-btn" data-tab="acordos" onclick="mobGo('acordos')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><span>Acordos</span></button>
+    <button class="mob-btn" data-tab="comp" onclick="mobGo('comp')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>Comparativo</span></button>
+    <button class="mob-btn" data-tab="treino" onclick="mobGo('treino')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><span>Treinamento</span></button>
+    <button class="mob-btn" data-tab="mais" onclick="mobGo('mais')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg><span>Mais</span></button>
+  </div>
 </div>
 
-<!-- MOBILE "MAIS" MENU -->
-<div class="mob-mais-menu" id="mobMaisMenu" style="display:none">
-  <div class="mob-mais-overlay" onclick="closeMaisMenu()"></div>
-  <div class="mob-mais-sheet">
-    <div class="mob-mais-handle"></div>
-    <button class="mob-mais-item" onclick="mobNav('comissao');closeMaisMenu()">💰 Comissão</button>
-    <button class="mob-mais-item" onclick="mobNav('beneficios');closeMaisMenu()">🎯 Benefícios e Regras</button>
-    <button class="mob-mais-item" onclick="mobNav('faltas');closeMaisMenu()">🔔 Faltas do Dia</button>
-    <button class="mob-mais-item mob-mais-logout" onclick="doLogout()">🚪 Sair</button>
+<div class="m-menu" id="mobMenu">
+  <div class="m-menu-bg" onclick="_mobCloseMais()"></div>
+  <div class="m-menu-sheet">
+    <div class="m-menu-handle"></div>
+    <button class="m-menu-item" onclick="_mobCloseMais();mobGo('inicio')">🏠 Tela Inicial</button>
+    <button class="m-menu-item" onclick="_mobCloseMais();">🔔 Notificações</button>
+    <button class="m-menu-item logout" onclick="doLogout()">🚪 Sair</button>
   </div>
 </div>
 </body>
