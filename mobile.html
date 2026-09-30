@@ -525,7 +525,7 @@ function parseCompCSV(csv){
     var cells=[],cell='',inQ=false,line=lines[i];if(!line.trim())continue;
     for(var j=0;j<line.length;j++){var c=line[j];if(c==='"')inQ=!inQ;else if(c===','&&!inQ){cells.push(cell);cell=''}else cell+=c}cells.push(cell);
     var name='';for(var k=0;k<cells.length;k++){if(cells[k].trim()){name=cells[k].trim();break}}
-    if(!name||name==='Totais')continue;
+    if(!name||name.toLowerCase().includes('totai')||name.toLowerCase().includes('total'))continue;
     var prefix=name.charAt(0);if(prefix!=='0'&&prefix!=='1'&&prefix!=='2')continue;
     var nums=[];for(var k=0;k<cells.length;k++){var v=cells[k].trim().replace(/"/g,'');if(v&&v.match(/[\d]/)){var n=parseBR(v);if(!isNaN(n))nums.push(n)}}
     if(nums.length<2)continue;
@@ -537,14 +537,20 @@ function parseCompCSV(csv){
 function mU(op,u){
   if(!u)return false;
   var a=op.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  var b=u.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  var ps=b.split(' ').filter(function(p){return p.length>2});
-  if(ps.length>0&&ps.every(function(p){return a.includes(p)}))return true;
+  // Try login-based match first (most reliable)
   if(cU&&cU.login){
     var lg=cU.login.replace(/^\d+\.?/,'').replace(/\./g,' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    var lps=lg.split(' ').filter(function(p){return p.length>2});
-    if(lps.length>0&&lps.every(function(p){return a.includes(p)}))return true;
+    var lps=lg.split(/\s+/).filter(function(p){return p.length>2});
+    if(lps.length>=2){
+      // Require ALL login name parts to match
+      if(lps.every(function(p){return a.includes(p)}))return true;
+      return false; // If we have a login, only match by login
+    }
   }
+  // Fallback: match by typed name
+  var b=u.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  var ps=b.split(' ').filter(function(p){return p.length>2});
+  if(ps.length>=2&&ps.every(function(p){return a.includes(p)}))return true;
   return false;
 }
 
