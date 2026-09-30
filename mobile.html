@@ -197,7 +197,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f5;color:#1a1f36;m
 <!-- LOGIN -->
 <div class="login" id="loginScreen">
 <div class="login-box">
-<div class="login-logo">🏛️ Édimo · Soluções em Cobranças</div><div style="font-size:.45rem;color:#ccc;margin-top:-20px;margin-bottom:12px">v4</div>
+<div class="login-logo">🏛️ Édimo · Soluções em Cobranças</div><div style="font-size:.45rem;color:#ccc;margin-top:-20px;margin-bottom:12px">v6</div>
 <input type="text" id="loginUser" placeholder="Nome ou Login" autocomplete="off">
 <input type="password" id="loginPass" placeholder="Senha">
 <button class="login-btn" onclick="doLogin()">Entrar</button>
@@ -512,45 +512,61 @@ function loadCompData(){
   }).catch(function(){});
 }
 
-function parseCompCSV(csv){
-  var lines=csv.split('\n');
-  var period='',hI=-1;
-  for(var i=0;i<lines.length;i++){
-    var m=lines[i].match(/(\w+\/\d{4})/);if(m&&!period)period=m[1];
-    if(lines[i].includes(',Operador,')||lines[i].includes('Operador')){hI=i;break}
+function csvSplit(line){
+  var cells=[],cell='',inQ=false;
+  for(var i=0;i<line.length;i++){var c=line[i];if(c==='"')inQ=!inQ;else if(c===','&&!inQ){cells.push(cell);cell=''}else cell+=c}
+  cells.push(cell);return cells;
+}
+
+function parseCompCSV(text){
+  var lines=text.split('\n');var period='';
+  for(var i=0;i<Math.min(lines.length,30);i++){
+    var m=lines[i].match(/(\d{2}\/\d{2}\/\d{4})\s*at/);
+    if(m){var m2=lines[i].match(/(\d{2}\/\d{2}\/\d{4})\s*at[^\d]*(\d{2}\/\d{2}\/\d{4})/);period=m2?m2[1]+' a '+m2[2]:m[1];break}
   }
+  var hI=-1,hCells=[];
+  for(var i=0;i<lines.length;i++){if(lines[i].includes('Operador')){hCells=csvSplit(lines[i]);if(hCells.join(' ').toLowerCase().match(/quantidade|valor/)){hI=i;break}}}
   if(hI===-1)return{period:period,ops:[]};
+  var cols={};
+  hCells.forEach(function(h,j){var hv=h.trim().replace(/"/g,'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(hv==='operador')cols.op=j;else if(hv.startsWith('configura'))cols.cfg=j;else if(hv==='quantidade')cols.qtd=j;else if(hv==='valor')cols.val=j});
+  if(cols.op===undefined)return{period:period,ops:[]};
   var ops=[];
   for(var i=hI+1;i<lines.length;i++){
-    var cells=[],cell='',inQ=false,line=lines[i];if(!line.trim())continue;
-    for(var j=0;j<line.length;j++){var c=line[j];if(c==='"')inQ=!inQ;else if(c===','&&!inQ){cells.push(cell);cell=''}else cell+=c}cells.push(cell);
-    var name='';for(var k=0;k<cells.length;k++){if(cells[k].trim()){name=cells[k].trim();break}}
-    if(!name||name.toLowerCase().includes('totai')||name.toLowerCase().includes('total'))continue;
-    var prefix=name.charAt(0);if(prefix!=='0'&&prefix!=='1'&&prefix!=='2')continue;
-    var nums=[];for(var k=0;k<cells.length;k++){var v=cells[k].trim().replace(/"/g,'');if(v&&v.match(/[\d]/)){var n=parseBR(v);if(!isNaN(n))nums.push(n)}}
-    if(nums.length<2)continue;
-    ops.push({n:cn(name),a:Math.round(nums[nums.length-2]),v:Math.round(nums[nums.length-1]*100)/100});
+    var line=lines[i].trim();if(!line)continue;
+    var cells=csvSplit(line);
+    var nm=(cells[cols.op]||'').trim().replace(/^"|"$/g,'');
+    if(!nm||nm==='Subtotal'||nm==='Total'||nm==='Totais'||nm.startsWith('NAO')||nm.startsWith('NÃO')||nm.startsWith('*'))continue;
+    if(nm.toLowerCase().includes('suporte'))continue;if(/^[Zz]-/.test(nm))continue;
+    var cfg=cols.cfg!==undefined?(cells[cols.cfg]||'').trim().replace(/^"|"$/g,''):'';
+    if(cfg==='Subtotal')continue;
+    var qtd=cols.qtd!==undefined?(parseInt(parseBR(cells[cols.qtd]))||0):0;
+    var val=cols.val!==undefined?parseBR(cells[cols.val]):0;
+    if(qtd===0&&val===0)continue;
+    var prefix=nm.charAt(0);
+    if(prefix!=='0'&&prefix!=='1'&&prefix!=='2')continue;
+    ops.push({n:cn(nm),cfg:cfg,a:qtd,v:Math.round(val*100)/100});
   }
+  ops.sort(function(a,b){return b.v-a.v||b.a-a.a});
   return{period:period,ops:ops};
 }
 
 function mU(op,u){
   if(!u)return false;
   var a=op.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  // Try login-based match first (most reliable)
+  // Match by login (extract name parts from Cobmais login like "1.gislaine.batista")
   if(cU&&cU.login){
-    var lg=cU.login.replace(/^\d+\.?/,'').replace(/\./g,' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    var lps=lg.split(/\s+/).filter(function(p){return p.length>2});
-    if(lps.length>=2){
-      // Require ALL login name parts to match
-      if(lps.every(function(p){return a.includes(p)}))return true;
-      return false; // If we have a login, only match by login
-    }
+    var parts=cU.login.replace(/^\d+\.?/,'').split('.');
+    var cleanParts=parts.filter(function(p){return p.length>2}).map(function(p){return p.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')});
+    if(cleanParts.length>=2&&cleanParts.every(function(p){return a.includes(p)}))return true;
   }
-  // Fallback: match by typed name
-  var b=u.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  // Fallback: match by full name parts
+  var b=u.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   var ps=b.split(' ').filter(function(p){return p.length>2});
-  if(ps.length>=2&&ps.every(function(p){return a.includes(p)}))return true;
+  // Need at least 2 parts matching and both first and last name must match
+  if(ps.length>=2){
+    var first=ps[0],last=ps[ps.length-1];
+    if(a.includes(first)&&a.includes(last))return true;
+  }
   return false;
 }
 
@@ -569,6 +585,7 @@ function renderComp(){
       var found=null;m.ops.forEach(function(op){if(mU(op.n,uN))found=op});
       return found;
     });
+
     
     var cur=myData[2],prev=myData[1],old=myData[0];
     var curA=cur?cur.a:0,curV=cur?cur.v:0;
