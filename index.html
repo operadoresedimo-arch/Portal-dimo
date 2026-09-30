@@ -2232,9 +2232,11 @@ const CP_NOW='https://docs.google.com/spreadsheets/d/e/2PACX-1vRrs4woT4Rad3tsqEn
 const PT='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?output=csv';
 let cU=null,cRD=null;const cD=[null,null,null];let allEntradas={};let allLogins={};let allAdmissao={};let pontoData=null;var isMobile=window.innerWidth<=640;var currentMobTab='inicio';
 
+console.log('[EDIMO] parseBR defined');
 function parseBR(s){if(!s)return 0;s=s.replace(/"/g,'').trim();if(!s||s==='0')return 0;s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0;}
 
 // === PONTO INTEGRATION ===
+console.log('[EDIMO] loadPonto defined');
 async function loadPonto(){
   try{
     const r=await fetch(PT+'&t='+Date.now());
@@ -2251,8 +2253,10 @@ async function loadPonto(){
   }catch(e){pontoData=null;}
 }
 
+console.log('[EDIMO] normN defined');
 function normN(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z\s]/g,'').trim();}
 
+console.log('[EDIMO] simil defined');
 function simil(a,b){
   if(a===b)return true;
   if(a.length>3&&b.length>3&&(a.startsWith(b.substring(0,3))||b.startsWith(a.substring(0,3)))){
@@ -2265,6 +2269,7 @@ function simil(a,b){
   return false;
 }
 
+console.log('[EDIMO] matchPonto defined');
 function matchPonto(opName){
   if(!pontoData||!opName)return null;
   const a=normN(opName).split(/\s+/).filter(x=>x);
@@ -2286,6 +2291,7 @@ function matchPonto(opName){
   return best;
 }
 
+console.log('[EDIMO] getShiftTime defined');
 function getShiftTime(opName){
   if(!opName||!allEntradas)return null;
   const a=normN(opName).split(/\s+/).filter(x=>x);
@@ -2305,6 +2311,7 @@ function getShiftTime(opName){
   return null;
 }
 
+console.log('[EDIMO] shiftStarted defined');
 function shiftStarted(opName){
   const t=getShiftTime(opName);
   if(!t)return true;
@@ -2317,6 +2324,7 @@ function shiftStarted(opName){
   return nowMin>=shiftMin;
 }
 
+console.log('[EDIMO] pontoStatus defined');
 function pontoStatus(p,opName){
   if(!p)return'off';
   const s=p.status.toUpperCase();
@@ -2466,6 +2474,7 @@ function parseCSV(text){
   return{d:dt,ta,tv:Math.round(tv*100)/100,ops};
 }
 
+console.log('[EDIMO] loginToShift defined');
 function loginToShift(login){
   if(!login)return'';
   const p=login.charAt(0);
