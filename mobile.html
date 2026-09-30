@@ -99,6 +99,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f5;color:#1a1f36;m
 .top3-nm{font-size:.88rem;font-weight:700;color:#1a1f36}
 .top3-st{font-size:.65rem;color:#9ca3af;margin-top:3px}
 .top3-pos{font-size:1.3rem;font-weight:900;flex-shrink:0}
+
+.duo-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.duo{background:#fff;border-radius:14px;padding:16px;border:1px solid #e5e7eb;display:flex;align-items:center;gap:12px}
+.duo-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.duo-lbl{font-size:.55rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em}
+.duo-val{font-size:1.5rem;font-weight:900;color:#1a1f36;margin-top:2px}
 </style>
 </head>
 <body>
@@ -352,20 +358,25 @@ function renderInicio(){
   h+='<div style="padding:0 14px 16px">';
   // Hero
   h+='<div class="hero"><div class="hero-icon">\uD83C\uDFC6</div><div class="hero-lbl">Valor Total</div><div class="hero-val">'+fs(d.tv)+'</div><div class="hero-sub">'+d.ta+' acordos \u00B7 '+ops.length+' operadores</div></div>';
+  // Acordos + Operadores cards
+  h+='<div class="duo-cards">';
+  h+='<div class="duo"><div class="duo-icon" style="background:rgba(37,99,235,.08)">\uD83D\uDCCB</div><div class="duo-data"><div class="duo-lbl">Acordos</div><div class="duo-val">'+d.ta+'</div></div></div>';
+  h+='<div class="duo"><div class="duo-icon" style="background:rgba(234,88,12,.08)">\uD83D\uDC65</div><div class="duo-data"><div class="duo-lbl">Operadores</div><div class="duo-val">'+ops.length+'</div></div></div>';
+  h+='</div>';
   // Top 3
   if(t3.length>=3){
     h+='<div class="sec"><div class="sec-t">\uD83C\uDFC6 Top 3 do Dia</div><div class="sec-link" onclick="go(\'acordos\')">Ver todos \u203A</div></div>';
     var md=['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'];
     var posLbl=['\uD83D\uDC51','2\u00BA','3\u00BA'];
-    var bgColors=['linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,215,0,.02))','linear-gradient(135deg,rgba(192,192,192,.06),#fff)','linear-gradient(135deg,rgba(205,127,50,.06),#fff)'];
-    var borderColors=['rgba(212,169,55,.3)','#e5e7eb','rgba(205,127,50,.2)'];
+    var avColors=['#d4a937','#9ca3af','#cd7f32'];
+    var bgColors=['linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,215,0,.02))','#fff','#fff'];
+    var borderColors=['rgba(212,169,55,.3)','#e5e7eb','#e5e7eb'];
     t3.forEach(function(o,i){
       var initial=o.n.charAt(0);
-      var avColors=['#d4a937','#6b7280','#cd7f32'];
       h+='<div class="top3-card" style="background:'+bgColors[i]+';border-color:'+borderColors[i]+'">';
       h+='<div class="top3-left">';
       h+='<div class="top3-medal">'+md[i]+'</div>';
-      h+='<div class="top3-av" style="border-color:'+avColors[i]+'">'+initial+'</div>';
+      h+='<div class="top3-av" style="background:'+avColors[i]+';border-color:'+avColors[i]+'">'+initial+'</div>';
       h+='</div>';
       h+='<div class="top3-info"><div class="top3-nm">'+o.n+'</div><div class="top3-st">'+o.a+' acordos \u00B7 '+fs(o.v)+'</div></div>';
       h+='<div class="top3-pos" style="color:'+avColors[i]+'">'+posLbl[i]+'</div>';
