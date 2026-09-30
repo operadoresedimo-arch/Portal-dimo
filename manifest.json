@@ -1,0 +1,22 @@
+{
+  "name": "Édimo Portal",
+  "short_name": "Édimo",
+  "description": "Portal de desempenho - Édimo Soluções em Cobranças",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a1930",
+  "theme_color": "#0a1930",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "logo192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

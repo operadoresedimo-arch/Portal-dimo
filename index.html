@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
 <title>Portal | Édimo Soluções em Cobranças</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a1930">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="logo192.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 <style>
@@ -1887,6 +1892,213 @@ body::before,body::after{display:none!important}
   body{overflow-x:hidden!important}
   .comp-section{overflow-x:auto!important}
 }
+
+/* ============================================================
+   MOBILE PWA LAYOUT
+   ============================================================ */
+@media(max-width:640px){
+  /* Hide desktop elements */
+  .nav{display:none!important}
+  .sidebar{display:none!important}
+  .toolbar{display:none!important}
+  .bg-layer{display:none!important}
+  body::before,body::after{display:none!important}
+  
+  /* Reset body */
+  body{background:#f5f7fa!important;color:#1a1f36!important}
+  body.app-with-sidebar{background:#f5f7fa!important}
+  
+  /* Main content */
+  .main,.app-with-sidebar .main{
+    margin-left:0!important;
+    max-width:100%!important;
+    padding:0 0 80px 0!important;
+    min-height:100vh;
+  }
+  
+  /* Hide all pages by default - mobile JS controls visibility */
+  .page{display:none!important}
+  .page.mob-active{display:block!important}
+  
+  /* Mobile header */
+  .mob-header{
+    display:flex!important;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px 16px 10px;
+    background:#fff;
+    border-bottom:1px solid #e8ecf1;
+    position:sticky;top:0;z-index:30;
+  }
+  .mob-header-title{font-size:1rem;font-weight:800;color:#1a1f36}
+  .mob-header-date{font-size:.65rem;color:#8892a4;margin-top:2px}
+  .mob-header-right{display:flex;align-items:center;gap:8px}
+  
+  /* Bottom tab bar */
+  .mob-tabbar{
+    display:flex!important;
+    position:fixed;bottom:0;left:0;right:0;
+    background:#fff;
+    border-top:1px solid #e8ecf1;
+    padding:6px 0 env(safe-area-inset-bottom,8px);
+    z-index:40;
+    justify-content:space-around;
+  }
+  .mob-tab{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    border:none;background:none;
+    color:#8892a4;font-size:.55rem;font-weight:600;
+    font-family:inherit;cursor:pointer;padding:4px 8px;
+    transition:color .15s;
+  }
+  .mob-tab.active{color:#2563eb}
+  .mob-tab svg{width:22px;height:22px}
+  
+  /* ---- MOBILE INICIO PAGE ---- */
+  .mob-inicio{display:block;padding:0 12px 16px}
+  
+  /* Hero card */
+  .mob-hero{
+    background:linear-gradient(135deg,#1a2744,#0f1d35);
+    border-radius:16px;padding:20px;margin:12px 0;color:#fff;
+    position:relative;overflow:hidden;
+  }
+  .mob-hero::after{content:"";position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.04)}
+  .mob-hero-label{font-size:.6rem;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em}
+  .mob-hero-val{font-size:2rem;font-weight:900;margin:4px 0}
+  .mob-hero-sub{font-size:.7rem;color:rgba(255,255,255,.5)}
+  .mob-hero-icon{position:absolute;top:16px;right:16px;font-size:2rem;opacity:.3}
+  
+  /* Stat grid (2x2) */
+  .mob-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 16px}
+  .mob-stat{
+    background:#fff;border-radius:12px;padding:14px;
+    border:1px solid #e8ecf1;
+  }
+  .mob-stat-icon{font-size:1.2rem;margin-bottom:4px}
+  .mob-stat-label{font-size:.55rem;font-weight:600;color:#8892a4;text-transform:uppercase;letter-spacing:.06em}
+  .mob-stat-val{font-size:1.4rem;font-weight:800;color:#1a1f36;margin-top:2px}
+  .mob-stat-val.green{color:#22c55e}
+  .mob-stat-val.ponto{font-size:.8rem;font-weight:700}
+  .mob-stat-val.ponto .p-ok{color:#22c55e}.mob-stat-val.ponto .p-late{color:#f59e0b}.mob-stat-val.ponto .p-miss{color:#ef4444}
+  
+  /* Section headers */
+  .mob-section{
+    display:flex;align-items:center;justify-content:space-between;
+    margin:20px 0 10px;
+  }
+  .mob-section-title{font-size:.85rem;font-weight:800;color:#1a1f36;display:flex;align-items:center;gap:6px}
+  .mob-section-link{font-size:.65rem;color:#2563eb;font-weight:600;cursor:pointer}
+  
+  /* Top 3 cards */
+  .mob-pod{
+    background:#fff;border-radius:14px;padding:14px;margin-bottom:8px;
+    display:flex;align-items:center;gap:12px;
+    border:1px solid #e8ecf1;
+  }
+  .mob-pod-medal{font-size:1.6rem}
+  .mob-pod-info{flex:1}
+  .mob-pod-name{font-size:.8rem;font-weight:700;color:#1a1f36}
+  .mob-pod-stats{font-size:.65rem;color:#8892a4;margin-top:2px}
+  .mob-pod-pos{font-size:1.1rem;font-weight:900;color:#8892a4}
+  .mob-pod:first-child{border:1px solid rgba(212,169,55,.3);background:linear-gradient(135deg,rgba(212,169,55,.04),#fff)}
+  .mob-pod:first-child .mob-pod-pos{color:#d4a937}
+  
+  /* Progress card */
+  .mob-progress{
+    background:#fff;border-radius:14px;padding:16px;
+    border:1px solid #e8ecf1;margin:12px 0;
+  }
+  .mob-prog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .mob-prog-falta{font-size:1.1rem;font-weight:800;color:#ef4444}
+  .mob-prog-pct{font-size:.8rem;font-weight:700;color:#22c55e;background:rgba(34,197,94,.08);padding:4px 10px;border-radius:20px}
+  .mob-prog-vs{font-size:.65rem;color:#ef4444;font-weight:600}
+  .mob-prog-bar{height:10px;background:#e8ecf1;border-radius:6px;overflow:hidden;margin:10px 0 6px}
+  .mob-prog-fill{height:100%;background:linear-gradient(90deg,#22c55e,#4ade80);border-radius:6px;transition:width .5s}
+  .mob-prog-range{display:flex;justify-content:space-between;font-size:.55rem;color:#8892a4}
+  .mob-prog-msg{
+    margin-top:12px;padding:10px 14px;border-radius:10px;
+    font-size:.72rem;font-weight:600;display:flex;align-items:center;gap:8px;
+  }
+  .mob-prog-msg.good{background:rgba(34,197,94,.06);color:#16a34a;border:1px solid rgba(34,197,94,.15)}
+  .mob-prog-msg.bad{background:rgba(239,68,68,.06);color:#dc2626;border:1px solid rgba(239,68,68,.15)}
+  
+  /* ---- MOBILE ACORDOS PAGE ---- */
+  .mob-acordos{padding:0 12px 16px}
+  .mob-search{
+    width:100%;padding:10px 14px;margin:12px 0;
+    border:1px solid #e8ecf1;border-radius:10px;
+    background:#fff;font-family:inherit;font-size:.8rem;color:#1a1f36;
+    outline:none;
+  }
+  .mob-search:focus{border-color:#2563eb}
+  .mob-filters{display:flex;gap:6px;margin-bottom:12px}
+  .mob-filter{
+    padding:6px 14px;border-radius:20px;border:1px solid #e8ecf1;
+    background:#fff;font-size:.65rem;font-weight:600;color:#8892a4;
+    font-family:inherit;cursor:pointer;
+  }
+  .mob-filter.active{background:#2563eb;color:#fff;border-color:#2563eb}
+  .mob-rank-list{}
+  .mob-rank-row{
+    display:flex;align-items:center;gap:10px;
+    padding:12px 14px;background:#fff;
+    border-radius:12px;margin-bottom:6px;
+    border:1px solid #e8ecf1;
+  }
+  .mob-rank-pos{font-size:.75rem;font-weight:700;color:#8892a4;width:20px;text-align:center}
+  .mob-rank-avatar{width:32px;height:32px;border-radius:50%;background:#e8ecf1;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#8892a4}
+  .mob-rank-info{flex:1}
+  .mob-rank-name{font-size:.78rem;font-weight:600;color:#1a1f36}
+  .mob-rank-sub{font-size:.6rem;color:#8892a4}
+  .mob-rank-val{text-align:right}
+  .mob-rank-acordos{font-size:.85rem;font-weight:800;color:#1a1f36}
+  .mob-rank-valor{font-size:.6rem;color:#8892a4}
+  .mob-rank-turno{font-size:.45rem;font-weight:700;padding:2px 5px;border-radius:4px;margin-left:4px}
+  .mob-rank-turno.m{color:#16a34a;background:rgba(22,163,74,.08)}
+  .mob-rank-turno.t{color:#f59e0b;background:rgba(245,158,11,.08)}
+  .mob-rank-turno.n{color:#8b5cf6;background:rgba(139,92,246,.08)}
+  
+  /* ---- MAIS MENU (bottom sheet) ---- */
+  .mob-mais-menu{position:fixed;inset:0;z-index:50}
+  .mob-mais-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4)}
+  .mob-mais-sheet{
+    position:absolute;bottom:0;left:0;right:0;
+    background:#fff;border-radius:20px 20px 0 0;
+    padding:12px 16px 32px;
+  }
+  .mob-mais-handle{width:40px;height:4px;background:#d1d5db;border-radius:4px;margin:0 auto 16px}
+  .mob-mais-item{
+    display:flex;align-items:center;gap:10px;
+    width:100%;padding:14px 12px;border:none;background:none;
+    font-size:.85rem;font-weight:600;color:#1a1f36;
+    font-family:inherit;cursor:pointer;border-radius:10px;
+    text-align:left;
+  }
+  .mob-mais-item:hover{background:#f5f7fa}
+  .mob-mais-logout{color:#ef4444;margin-top:8px;border-top:1px solid #e8ecf1;padding-top:14px;border-radius:0}
+  
+  /* Date header - hide on mobile */
+  .date-header{display:none!important}
+  
+  /* Hide desktop stat cards */
+  .stat-cards{display:none!important}
+  .dash-grid{display:none!important}
+  .dash-footer{display:none!important}
+  
+  /* Login screen mobile */
+  .login-screen{background:#f5f7fa!important;padding:20px!important}
+  .login-box{background:#fff!important;border:1px solid #e8ecf1!important;border-radius:16px!important}
+  .login-box input{background:#f5f7fa!important;border:1px solid #e8ecf1!important;color:#1a1f36!important}
+  .login-btn{background:#2563eb!important;border-radius:10px!important}
+  .login-logo{color:#d4a937!important}
+}
+
+/* Hide mobile elements on desktop */
+@media(min-width:641px){
+  .mob-tabbar,.mob-header,.mob-inicio,.mob-acordos,.mob-mais-menu{display:none!important}
+}
+
 </style>
 
 </head>
@@ -2362,7 +2574,7 @@ function renderR(data){
   });
   h+='</div></div>';
   h+='<div class="dash-footer"><div class="brand-ft">ÉDIMO</div>Soluções em Cobranças</div>';
-  document.getElementById('pageRanking').innerHTML=h;toolbar.style.display='flex';updateFaltaAlert();
+  document.getElementById('pageRanking').innerHTML=h;toolbar.style.display='flex';updateFaltaAlert();if(isMobile&&currentMobTab==='inicio')renderMobInicio();else if(isMobile&&currentMobTab==='acordos')renderMobAcordos();
 }
 
 function mU(op,u){
@@ -3173,6 +3385,214 @@ function fm(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,max
 function fs(v){return'R$ '+Math.round(v).toLocaleString('pt-BR')}
 function copyLink(){const json=JSON.stringify(cRD),comp=LZString.compressToEncodedURIComponent(json),url=window.location.origin+window.location.pathname+'#d='+comp;navigator.clipboard.writeText(url).then(()=>sT('Link copiado!')).catch(()=>{const t=document.createElement('textarea');t.value=url;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);sT('Link copiado!')})}
 function sT(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+
+
+// ============================================================
+// MOBILE PWA LOGIC
+// ============================================================
+var isMobile=window.innerWidth<=640;
+var currentMobTab='inicio';
+
+function detectMobile(){
+  isMobile=window.innerWidth<=640;
+  var tb=document.getElementById('mobTabbar');
+  if(tb)tb.style.display=isMobile?'flex':'none';
+}
+window.addEventListener('resize',detectMobile);
+
+function mobNav(tab){
+  currentMobTab=tab;
+  // Reset all tabs
+  document.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active')});
+  var tabMap={inicio:'mobTabInicio',acordos:'mobTabAcordos',comparativo:'mobTabComp',treinamento:'mobTabTreino',mais:'mobTabMais',comissao:'mobTabMais',beneficios:'mobTabMais',faltas:'mobTabMais'};
+  var tid=tabMap[tab];
+  if(tid)document.getElementById(tid).classList.add('active');
+  
+  if(tab==='mais'){
+    document.getElementById('mobMaisMenu').style.display='block';
+    return;
+  }
+  
+  if(tab==='inicio')renderMobInicio();
+  else if(tab==='acordos')renderMobAcordos();
+  else if(tab==='comparativo'){showPage('comparativo');}
+  else if(tab==='treinamento'){showPage('treinamentos');}
+  else if(tab==='comissao')renderMobComissao();
+  else if(tab==='beneficios')renderMobBeneficios();
+  else if(tab==='faltas')renderMobFaltas();
+}
+
+function closeMaisMenu(){
+  document.getElementById('mobMaisMenu').style.display='none';
+}
+
+function renderMobInicio(){
+  if(!isMobile||!cRD)return;
+  var d=cRD;
+  var ops=d.ops||[];
+  var t3=ops.slice(0,3);
+  var ptOk=0,ptLate=0,ptMiss=0;
+  if(pontoData)pontoData.forEach(function(p){var s=p.status.toUpperCase();if(s.includes('PRESENTE'))ptOk++;else if(s.includes('ATRASADO'))ptLate++;else ptMiss++;});
+  
+  var h='<div class="mob-header"><div><div class="mob-header-title">Acordos do Dia</div><div class="mob-header-date">📅 '+(d.d||'Hoje')+'</div></div></div>';
+  h+='<div class="mob-inicio">';
+  
+  // Hero
+  h+='<div class="mob-hero"><div class="mob-hero-icon">🏆</div><div class="mob-hero-label">Valor Total</div><div class="mob-hero-val">'+fs(d.tv)+'</div><div class="mob-hero-sub">'+d.ta+' acordos</div></div>';
+  
+  // Stats 2x2
+  h+='<div class="mob-stats">';
+  h+='<div class="mob-stat"><div class="mob-stat-icon">📋</div><div class="mob-stat-label">Acordos</div><div class="mob-stat-val">'+d.ta+'</div></div>';
+  h+='<div class="mob-stat"><div class="mob-stat-icon">👥</div><div class="mob-stat-label">Operadores</div><div class="mob-stat-val">'+ops.length+'</div></div>';
+  if(pontoData){
+    h+='<div class="mob-stat"><div class="mob-stat-icon">📍</div><div class="mob-stat-label">Ponto</div><div class="mob-stat-val ponto"><span class="p-ok">'+ptOk+'</span> · <span class="p-late">'+ptLate+'</span> · <span class="p-miss">'+ptMiss+'</span></div></div>';
+  }
+  h+='</div>';
+  
+  // Top 3
+  if(t3.length>=3){
+    h+='<div class="mob-section"><div class="mob-section-title">🏆 Top 3 do Dia</div><div class="mob-section-link" onclick="mobNav('acordos')">Ver todos ›</div></div>';
+    var medals=['🥇','🥈','🥉'];
+    var posLabels=['👑 1°','2°','3°'];
+    t3.forEach(function(o,i){
+      h+='<div class="mob-pod"><div class="mob-pod-medal">'+medals[i]+'</div><div class="mob-pod-info"><div class="mob-pod-name">'+o.n+'</div><div class="mob-pod-stats">'+o.a+' acordos · '+fs(o.v)+'</div></div><div class="mob-pod-pos">'+posLabels[i]+'</div></div>';
+    });
+  }
+  
+  // Progress (for logged-in operator)
+  // We'll add this when comp data is available
+  
+  h+='</div>';
+  
+  // Render into pageRanking
+  document.getElementById('pageRanking').innerHTML=h;
+  document.getElementById('pageRanking').classList.add('mob-active');
+  document.getElementById('pageComp').classList.remove('mob-active');
+  var pt=document.getElementById('pageTreinamentos');
+  if(pt)pt.classList.remove('mob-active');
+}
+
+function renderMobAcordos(){
+  if(!isMobile||!cRD)return;
+  var d=cRD;
+  var allOps=mergeOpsWithPonto(d.ops||[]);
+  
+  var h='<div class="mob-header"><div><div class="mob-header-title">Acordos</div><div class="mob-header-date">📅 '+(d.d||'Hoje')+'</div></div></div>';
+  h+='<div class="mob-acordos">';
+  h+='<input class="mob-search" type="text" placeholder="🔍 Buscar operador..." oninput="filterMobRank(this.value)">';
+  
+  // Rank list
+  h+='<div class="mob-rank-list" id="mobRankList">';
+  allOps.forEach(function(o,i){
+    var pt=matchPonto(o.n);
+    var st=pontoStatus(pt,o.n);
+    var badge=pontoBadge(pt,o.n);
+    var turnoTag=getTurnoTag(o.n);
+    var turnoClass='';
+    if(turnoTag.includes('turno-m'))turnoClass='m';
+    else if(turnoTag.includes('turno-t'))turnoClass='t';
+    else if(turnoTag.includes('turno-n'))turnoClass='n';
+    var turnoLetter=turnoClass==='m'?'M':turnoClass==='t'?'T':turnoClass==='n'?'N':'';
+    
+    var rowCls='mob-rank-row'+(st==='miss'?' mob-rank-miss':'');
+    var initial=o.n.charAt(0).toUpperCase();
+    
+    h+='<div class="'+rowCls+'" data-name="'+o.n.toLowerCase()+'">';
+    h+='<div class="mob-rank-pos">'+(i+1)+'</div>';
+    h+='<div class="mob-rank-avatar">'+initial+'</div>';
+    h+='<div class="mob-rank-info"><div class="mob-rank-name">'+o.n;
+    if(turnoLetter)h+=' <span class="mob-rank-turno '+turnoClass+'">'+turnoLetter+'</span>';
+    h+='</div>';
+    h+='<div class="mob-rank-sub">'+(st==='ok'?'✓ Presente':st==='late'?'⏰ Atrasado':st==='miss'?'✗ Faltou':st==='pending'?'⏳ Aguardando':'')+'</div>';
+    h+='</div>';
+    h+='<div class="mob-rank-val"><div class="mob-rank-acordos">'+o.a+'</div><div class="mob-rank-valor">'+fm(o.v)+'</div></div>';
+    h+='</div>';
+  });
+  h+='</div></div>';
+  
+  document.getElementById('pageRanking').innerHTML=h;
+  document.getElementById('pageRanking').classList.add('mob-active');
+  document.getElementById('pageComp').classList.remove('mob-active');
+  var pt=document.getElementById('pageTreinamentos');
+  if(pt)pt.classList.remove('mob-active');
+}
+
+function filterMobRank(q){
+  q=q.toLowerCase();
+  document.querySelectorAll('.mob-rank-row').forEach(function(r){
+    r.style.display=r.getAttribute('data-name').includes(q)?'flex':'none';
+  });
+}
+
+function renderMobFaltas(){
+  if(!isMobile)return;
+  var h='<div class="mob-header"><div><div class="mob-header-title">🔔 Faltas do Dia</div></div></div>';
+  h+='<div style="padding:12px">';
+  if(pontoData){
+    var faltas=pontoData.filter(function(p){
+      var s=p.status.toUpperCase();
+      if(s.includes('PRESENTE')||s.includes('ATRASADO'))return false;
+      return shiftStarted(p.nome);
+    });
+    if(faltas.length===0)h+='<div style="text-align:center;padding:40px;color:#8892a4">Nenhuma falta registrada hoje 🎉</div>';
+    else{
+      h+='<div style="font-size:.7rem;color:#8892a4;margin-bottom:12px">'+faltas.length+' ausência(s)</div>';
+      faltas.forEach(function(p){
+        var nm=p.nome.split(/\s+/).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()}).join(' ');
+        h+='<div class="mob-rank-row"><div class="mob-rank-avatar" style="background:#fecaca;color:#ef4444">✗</div><div class="mob-rank-info"><div class="mob-rank-name">'+nm+'</div></div></div>';
+      });
+    }
+  }else h+='<div style="text-align:center;padding:40px;color:#8892a4">Dados de ponto indisponíveis</div>';
+  h+='</div>';
+  
+  document.getElementById('pageRanking').innerHTML=h;
+  document.getElementById('pageRanking').classList.add('mob-active');
+  document.getElementById('pageComp').classList.remove('mob-active');
+}
+
+// Override startApp to also render mobile
+var _origStartApp=typeof startApp==='function'?startApp:null;
+
+// Hook into renderR to also render mobile
+var _origRenderR=typeof renderR==='function'?renderR:null;
+
 </script>
+
+<!-- MOBILE BOTTOM TAB BAR -->
+<div class="mob-tabbar" id="mobTabbar">
+  <button class="mob-tab active" onclick="mobNav('inicio')" id="mobTabInicio">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    <span>Início</span>
+  </button>
+  <button class="mob-tab" onclick="mobNav('acordos')" id="mobTabAcordos">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    <span>Acordos</span>
+  </button>
+  <button class="mob-tab" onclick="mobNav('comparativo')" id="mobTabComp">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+    <span>Comparativo</span>
+  </button>
+  <button class="mob-tab" onclick="mobNav('treinamento')" id="mobTabTreino">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+    <span>Treinamento</span>
+  </button>
+  <button class="mob-tab" onclick="mobNav('mais')" id="mobTabMais">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+    <span>Mais</span>
+  </button>
+</div>
+
+<!-- MOBILE "MAIS" MENU -->
+<div class="mob-mais-menu" id="mobMaisMenu" style="display:none">
+  <div class="mob-mais-overlay" onclick="closeMaisMenu()"></div>
+  <div class="mob-mais-sheet">
+    <div class="mob-mais-handle"></div>
+    <button class="mob-mais-item" onclick="mobNav('comissao');closeMaisMenu()">💰 Comissão</button>
+    <button class="mob-mais-item" onclick="mobNav('beneficios');closeMaisMenu()">🎯 Benefícios e Regras</button>
+    <button class="mob-mais-item" onclick="mobNav('faltas');closeMaisMenu()">🔔 Faltas do Dia</button>
+    <button class="mob-mais-item mob-mais-logout" onclick="doLogout()">🚪 Sair</button>
+  </div>
+</div>
 </body>
 </html>
