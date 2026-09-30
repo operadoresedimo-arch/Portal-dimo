@@ -2223,6 +2223,7 @@ body::before,body::after{display:none!important}
 <div class="toast" id="toast"></div>
 
 <script>
+console.log('[EDIMO] Script loading...');
 const SH='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?gid=92433521&single=true&output=csv';
 const RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XSTNkcp2pbSTKTsVsygCKucMChmcI4hTZkC_pNEsuFNeQ/pub?output=csv';
 const CP_M1='https://docs.google.com/spreadsheets/d/e/2PACX-1vRd-WnBwsOyBqVeunc1jH3sTzou9KGZllzJYA1QpKC_wk21Y4Cw9A2KprRbowWDRw/pub?output=csv';
@@ -2477,6 +2478,7 @@ function loginToShift(login){
     if(login.toLowerCase().includes('livia'))return'14:00';
   }
 
+console.log('[EDIMO] doLogin defined');
 async function doLogin(){const u=document.getElementById('loginUser').value.trim().toLowerCase(),p=document.getElementById('loginPass').value;if(!u||!p)return;document.getElementById('loginError').style.display='none';document.getElementById('loginLoading').style.display='block';try{const r=await fetch(SH),c=await r.text(),rows=c.split('\n').map(r=>{const cells=[];let cell='',inQ=false;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){cells.push(cell.trim());cell=''}else cell+=ch;}cells.push(cell.trim());return cells;});let f=null;for(let i=1;i<rows.length;i++){if(rows[i].length>=4){allEntradas[rows[i][0].toLowerCase().trim()]=loginToShift(rows[i][1]?rows[i][1].trim():'');
         allLogins[rows[i][0].toLowerCase().trim()]=rows[i][1]?rows[i][1].trim():'';
         allAdmissao[rows[i][0].toLowerCase().trim()]=rows[i][2]?rows[i][2].trim():'';const n=rows[i][0].toLowerCase().trim(),s=rows[i][3].trim(),pf=rows[i][4]?rows[i][4].toLowerCase().trim():'colaborador';if(n===u&&s===p){f={nome:rows[i][0].trim(),perfil:pf,entrada:rows[i][2].trim(),login:rows[i][1]?rows[i][1].trim():''};break}}}document.getElementById('loginLoading').style.display='none';if(f){cU=f;sessionStorage.setItem('user',JSON.stringify(f));document.getElementById('loginScreen').style.display='none';setupUI();startApp()}else{document.getElementById('loginError').style.display='block'}}catch(e){document.getElementById('loginLoading').style.display='none';document.getElementById('loginError').textContent='Erro de conexão';document.getElementById('loginError').style.display='block'}}
