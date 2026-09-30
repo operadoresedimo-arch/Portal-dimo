@@ -2099,6 +2099,34 @@ body::before,body::after{display:none!important}
   .mob-tabbar,.mob-header,.mob-inicio,.mob-acordos,.mob-mais-menu{display:none!important}
 }
 
+
+/* ============================================================
+   MOBILE FINAL OVERRIDES - MUST BE LAST
+   ============================================================ */
+@media(max-width:640px){
+  /* FORCE hide desktop nav on mobile, regardless of sidebar */
+  .nav, .app-with-sidebar .nav{display:none!important}
+  .sidebar, .app-with-sidebar .sidebar{display:none!important}
+  .toolbar, .app-with-sidebar .toolbar{display:none!important}
+  
+  /* Main reset */
+  .main, .app-with-sidebar .main{
+    margin-left:0!important;
+    max-width:100%!important;
+    padding:0 0 80px 0!important;
+  }
+  
+  /* Pages: hide by default, show with mob-active */
+  .page{display:none!important}
+  .page.mob-active{display:block!important}
+  
+  /* Show bottom tab bar */
+  .mob-tabbar{display:flex!important}
+}
+@media(min-width:641px){
+  .mob-tabbar,.mob-header,.mob-mais-menu{display:none!important}
+}
+
 </style>
 
 </head>
@@ -3414,8 +3442,17 @@ function mobNav(tab){
   
   if(tab==='inicio')renderMobInicio();
   else if(tab==='acordos')renderMobAcordos();
-  else if(tab==='comparativo'){showPage('comparativo');}
-  else if(tab==='treinamento'){showPage('treinamentos');}
+  else if(tab==='comparativo'){
+    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('mob-active')});
+    showPage('comparativo');
+    document.getElementById('pageComp').classList.add('mob-active');
+  }
+  else if(tab==='treinamento'){
+    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('mob-active')});
+    showPage('treinamentos');
+    var pt=document.getElementById('pageTreinamentos');
+    if(pt)pt.classList.add('mob-active');
+  }
   else if(tab==='comissao')renderMobComissao();
   else if(tab==='beneficios')renderMobBeneficios();
   else if(tab==='faltas')renderMobFaltas();
