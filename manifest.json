@@ -1,0 +1,14 @@
+{
+  "name": "Édimo Portal",
+  "short_name": "Édimo",
+  "description": "Portal de desempenho",
+  "start_url": "./mobile.html",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#0f2440",
+  "orientation": "portrait",
+  "icons": [
+    {"src": "logo192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "logo512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
