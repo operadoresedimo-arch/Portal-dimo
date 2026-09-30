@@ -198,7 +198,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f5;color:#1a1f36;m
 <div class="login" id="loginScreen">
 <div class="login-box">
 <div class="login-logo">🏛️ Édimo · Soluções em Cobranças</div>
-<input type="text" id="loginUser" placeholder="Nome" autocomplete="off">
+<input type="text" id="loginUser" placeholder="Nome ou Login" autocomplete="off">
 <input type="password" id="loginPass" placeholder="Senha">
 <button class="login-btn" onclick="doLogin()">Entrar</button>
 <div class="login-err" id="loginErr">Usuário ou senha incorretos</div>
@@ -321,8 +321,10 @@ function isOperator(name){
   for(var key in allLogins){
     var b=normN(key).split(/\s+/).filter(function(x){return x});if(!b.length)continue;
     var lastA=a[a.length-1],lastB=b[b.length-1];var score=0;
-    if(lastA===lastB)score+=10;if(a[0]===b[0])score+=3;else if(simil(a[0],b[0]))score+=2;
-    if(score>=5){var p=allLogins[key].charAt(0);return p==='0'||p==='1'||p==='2'}
+    if(lastA===lastB)score+=10;
+    if(a[0]===b[0])score+=3;else if(simil(a[0],b[0]))score+=2;
+    // Require both first name AND surname match (score >= 12)
+    if(score>=12){var p=allLogins[key].charAt(0);return p==='0'||p==='1'||p==='2'}
   }
   return false;
 }
@@ -342,8 +344,8 @@ function doLogin(){
         allEntradas[rows[i][0].toLowerCase().trim()]=loginToShift(rows[i][1]?rows[i][1].trim():'');
         allLogins[rows[i][0].toLowerCase().trim()]=rows[i][1]?rows[i][1].trim():'';
         allAdmissao[rows[i][0].toLowerCase().trim()]=rows[i][2]?rows[i][2].trim():'';
-        var n=rows[i][0].toLowerCase().trim(),s=rows[i][3].trim(),pf=rows[i][4]?rows[i][4].toLowerCase().trim():'colaborador';
-        if(n===u&&s===p){found={nome:rows[i][0].trim(),perfil:pf,entrada:rows[i][2].trim(),login:rows[i][1]?rows[i][1].trim():''}}
+        var n=rows[i][0].toLowerCase().trim(),lg=rows[i][1]?rows[i][1].toLowerCase().trim():'',s=rows[i][3].trim(),pf=rows[i][4]?rows[i][4].toLowerCase().trim():'colaborador';
+        if((n===u||lg===u)&&s===p){found={nome:rows[i][0].trim(),perfil:pf,entrada:rows[i][2].trim(),login:rows[i][1]?rows[i][1].trim():''}}
       }
     }
     document.getElementById('loginLoad').style.display='none';
@@ -494,14 +496,117 @@ function renderAcordos(){
 
 function filterRank(q){q=q.toLowerCase();document.querySelectorAll('.rw').forEach(function(r){r.style.display=r.getAttribute('data-nm').includes(q)?'flex':'none'})}
 
-// === RENDER: COMPARATIVO (placeholder) ===
+// === RENDER: COMPARATIVO ===
+var compLoaded=false;
+var compMonths=[];
+
+function loadCompData(){
+  if(compLoaded)return Promise.resolve();
+  return Promise.all([
+    fetch(CP_M1+'&t='+Date.now()).then(function(r){return r.text()}),
+    fetch(CP_M2+'&t='+Date.now()).then(function(r){return r.text()}),
+    fetch(CP_NOW+'&t='+Date.now()).then(function(r){return r.text()})
+  ]).then(function(results){
+    compMonths=results.map(function(csv){return parseCompCSV(csv)});
+    compLoaded=true;
+  }).catch(function(){});
+}
+
+function parseCompCSV(csv){
+  var lines=csv.split('\n');
+  var period='',hI=-1;
+  for(var i=0;i<lines.length;i++){
+    var m=lines[i].match(/(\w+\/\d{4})/);if(m&&!period)period=m[1];
+    if(lines[i].includes(',Operador,')||lines[i].includes('Operador')){hI=i;break}
+  }
+  if(hI===-1)return{period:period,ops:[]};
+  var ops=[];
+  for(var i=hI+1;i<lines.length;i++){
+    var cells=[],cell='',inQ=false,line=lines[i];if(!line.trim())continue;
+    for(var j=0;j<line.length;j++){var c=line[j];if(c==='"')inQ=!inQ;else if(c===','&&!inQ){cells.push(cell);cell=''}else cell+=c}cells.push(cell);
+    var name='';for(var k=0;k<cells.length;k++){if(cells[k].trim()){name=cells[k].trim();break}}
+    if(!name||name==='Totais')continue;
+    var prefix=name.charAt(0);if(prefix!=='0'&&prefix!=='1'&&prefix!=='2')continue;
+    var nums=[];for(var k=0;k<cells.length;k++){var v=cells[k].trim().replace(/"/g,'');if(v&&v.match(/[\d]/)){var n=parseBR(v);if(!isNaN(n))nums.push(n)}}
+    if(nums.length<2)continue;
+    ops.push({n:cn(name),a:Math.round(nums[nums.length-2]),v:Math.round(nums[nums.length-1]*100)/100});
+  }
+  return{period:period,ops:ops};
+}
+
+function mU(op,u){
+  if(!u)return false;
+  var a=op.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  var b=u.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  var ps=b.split(' ').filter(function(p){return p.length>2});
+  if(ps.length>0&&ps.every(function(p){return a.includes(p)}))return true;
+  if(cU&&cU.login){
+    var lg=cU.login.replace(/^\d+\.?/,'').replace(/\./g,' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    var lps=lg.split(' ').filter(function(p){return p.length>2});
+    if(lps.length>0&&lps.every(function(p){return a.includes(p)}))return true;
+  }
+  return false;
+}
+
 function renderComp(){
-  var h='<div class="hdr"><div class="hdr-l"><div class="hdr-title">Comparativo</div></div></div><div style="padding:0 14px 16px">';
-  h+='<div class="sec"><div class="sec-t">\uD83D\uDCC8 Seu resultado atual</div></div>';
-  h+='<div class="comp-cards"><div class="cc"><div class="cc-lbl">Acordos</div><div class="cc-val">--</div></div><div class="cc"><div class="cc-lbl">Valor</div><div class="cc-val">--</div></div><div class="cc"><div class="cc-lbl">M\u00E9dia/acordo</div><div class="cc-val">--</div></div></div>';
-  h+='<div style="background:#fff;border-radius:14px;padding:24px;border:1px solid #e5e7eb;text-align:center;color:#9ca3af;font-size:.72rem;margin:12px 0">Dados do comparativo em carregamento...</div>';
-  h+='</div>';
-  document.getElementById('pgComp').innerHTML=h;
+  var el=document.getElementById('pgComp');
+  el.innerHTML='<div class="hdr"><div class="hdr-l"><div class="hdr-title">Comparativo</div></div></div><div style="padding:16px;text-align:center;color:#9ca3af">Carregando...</div>';
+  
+  loadCompData().then(function(){
+    if(!compMonths||compMonths.length<3){el.innerHTML+='<div style="padding:20px;text-align:center;color:#9ca3af;font-size:.75rem">Sem dados</div>';return}
+    var uN=cU?cU.nome.toLowerCase():'';
+    var isAdmin=cU&&cU.perfil==='admin';
+    
+    // Find user data in each month
+    var myData=compMonths.map(function(m){
+      if(!m||!m.ops)return null;
+      var found=null;m.ops.forEach(function(op){if(mU(op.n,uN))found=op});
+      return found;
+    });
+    
+    var cur=myData[2],prev=myData[1],old=myData[0];
+    var curA=cur?cur.a:0,curV=cur?cur.v:0;
+    var prevA=prev?prev.a:0,prevV=prev?prev.v:0;
+    var avgPerAcordo=curA>0?Math.round(curV/curA*100)/100:0;
+    
+    // Variation
+    var varV=prevV>0?Math.round((curV-prevV)/prevV*100):0;
+    var varA=prevA>0?Math.round((curA-prevA)/prevA*100):0;
+    var varAvg=prevA>0&&curA>0?Math.round(((curV/curA)-(prevV/prevA))/(prevV/prevA)*100):0;
+    
+    var h='<div class="hdr"><div class="hdr-l"><div class="hdr-title">Comparativo</div></div></div><div style="padding:0 14px 16px">';
+    h+='<div class="sec"><div class="sec-t">\uD83D\uDCC8 Seu resultado atual</div></div>';
+    h+='<div class="comp-cards">';
+    h+='<div class="cc"><div class="cc-lbl">Acordos</div><div class="cc-val">'+curA+'</div><div class="cc-pct'+(varA<0?' neg':'')+'">\u25B2 '+(varA>=0?'+':'')+varA+'%</div></div>';
+    h+='<div class="cc"><div class="cc-lbl">Valor</div><div class="cc-val" style="font-size:.85rem">'+fs(curV)+'</div><div class="cc-pct'+(varV<0?' neg':'')+'">\u25B2 '+(varV>=0?'+':'')+varV+'%</div></div>';
+    h+='<div class="cc"><div class="cc-lbl">M\u00E9dia/acordo</div><div class="cc-val" style="font-size:.85rem">'+fm(avgPerAcordo)+'</div><div class="cc-pct'+(varAvg<0?' neg':'')+'">\u25B2 '+(varAvg>=0?'+':'')+varAvg+'%</div></div>';
+    h+='</div>';
+    
+    // Chart bars
+    h+='<div class="chart-box"><div class="chart-title">\uD83D\uDCC8 Compara\u00E7\u00E3o com meses anteriores</div>';
+    h+='<div class="chart-bars">';
+    var maxV=Math.max(old?old.v:0,prev?prev.v:0,curV,1);
+    compMonths.forEach(function(m,i){
+      var d=myData[i],v=d?d.v:0,a=d?d.a:0;
+      var pct=Math.round(v/maxV*100);
+      var isCur=i===2;
+      h+='<div class="chart-col"><div class="chart-bar val" style="height:'+pct+'%;background:'+(isCur?'#2563eb':'#d1d5db')+'"></div>';
+      h+='<div class="chart-lbl" style="'+(isCur?'color:#2563eb;font-weight:700':'')+'">'+((m&&m.period)?m.period:'--')+'</div>';
+      h+='<div class="chart-v">'+fs(v)+'</div><div class="chart-a">'+a+' acordos</div></div>';
+    });
+    h+='</div></div>';
+    
+    // Variation
+    h+='<div class="var-box"><div class="var-title">\uD83D\uDCC8 Varia\u00E7\u00E3o do per\u00EDodo</div>';
+    h+='<div class="var-grid">';
+    h+='<div class="var-item"><div class="var-pct'+(varV<0?' neg':'')+'">'+((varV>=0?'+':'')+varV+'%')+'</div><div class="var-lbl">Valor<br>(vs. m\u00EAs anterior)</div></div>';
+    h+='<div class="var-item"><div class="var-pct'+(varA<0?' neg':'')+'">'+((varA>=0?'+':'')+varA+'%')+'</div><div class="var-lbl">Acordos<br>(vs. m\u00EAs anterior)</div></div>';
+    h+='<div class="var-item"><div class="var-pct'+(varAvg<0?' neg':'')+'">'+((varAvg>=0?'+':'')+varAvg+'%')+'</div><div class="var-lbl">M\u00E9dia/acordo<br>(vs. m\u00EAs anterior)</div></div>';
+    h+='</div></div>';
+    
+    h+='</div>';
+    el.innerHTML=h;
+  });
 }
 
 // === RENDER: COMISSAO ===
