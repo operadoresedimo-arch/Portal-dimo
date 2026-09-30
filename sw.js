@@ -1,4 +1,4 @@
-const CACHE_NAME = 'edimo-portal-v2';
+const CACHE_NAME = 'edimo-portal-v3';
 
 self.addEventListener('install', e => {
   self.skipWaiting();

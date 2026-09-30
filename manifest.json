@@ -4,8 +4,8 @@
   "description": "Portal de desempenho - Édimo Soluções em Cobranças",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0a1930",
-  "theme_color": "#0a1930",
+  "background_color": "#f3f5f7",
+  "theme_color": "#f3f5f7",
   "orientation": "portrait",
   "icons": [
     {

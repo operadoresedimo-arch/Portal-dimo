@@ -163,6 +163,172 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
   .comp-section{overflow-x:auto}
   
 }
+
+/* ============================================================
+   MOBILE V2 — LAYOUT SEPARADO / BRANCO + CINZA
+   ============================================================ */
+@media(max-width:640px){
+  body{background:#f3f5f7!important}
+  .mob-header{
+    min-height:64px!important;padding:10px 16px!important;
+    box-shadow:0 1px 0 rgba(17,24,39,.04);
+  }
+  .mob-header::before{
+    content:"☰";font-size:20px;color:#1f2937;margin-right:10px;line-height:1;
+  }
+  .mob-header > div:first-child{flex:1}
+  .mob-header-title{font-size:.98rem!important;letter-spacing:-.02em}
+  .mob-header-date{font-size:.62rem!important}
+  .mob-header-right::after{
+    content:"Hoje";display:inline-flex;align-items:center;justify-content:center;
+    min-height:30px;padding:0 10px;border:1px solid #e2e6eb;border-radius:9px;
+    color:#374151;background:#fff;font-size:.6rem;font-weight:700;
+  }
+
+  .mob-inicio,.mob-acordos{padding:0 14px 18px!important}
+  .mob-hero{
+    background:#fff!important;color:#18212f!important;border:1px solid #e2e6eb!important;
+    border-radius:16px!important;margin:14px 0 10px!important;padding:18px!important;
+    box-shadow:0 5px 18px rgba(24,33,47,.05)!important;
+  }
+  .mob-hero::after{display:none!important}
+  .mob-hero-label{color:#8b95a3!important;font-size:.57rem!important}
+  .mob-hero-val{color:#172033!important;font-size:1.8rem!important;letter-spacing:-.03em}
+  .mob-hero-sub{color:#7d8794!important}
+  .mob-hero-icon{color:#64748b!important;opacity:.8!important;font-size:1.6rem!important}
+
+  .mob-stats{grid-template-columns:1fr 1fr!important;gap:9px!important;margin-bottom:18px!important}
+  .mob-stat{
+    border:1px solid #e2e6eb!important;border-radius:14px!important;padding:15px!important;
+    box-shadow:0 3px 12px rgba(24,33,47,.035);
+  }
+  .mob-stat-icon{font-size:1rem!important}
+  .mob-stat-label{font-size:.52rem!important;color:#8a94a1!important}
+  .mob-stat-val{font-size:1.3rem!important;color:#172033!important}
+
+  .mob-section{margin:20px 2px 10px!important}
+  .mob-section-title{font-size:.86rem!important}
+  .mob-section-link{color:#526174!important}
+
+  .mob-pod{
+    border:1px solid #e2e6eb!important;border-radius:13px!important;
+    padding:13px!important;background:#fff!important;
+    box-shadow:0 2px 9px rgba(24,33,47,.025);
+  }
+  .mob-pod:first-child{
+    border-color:#d8dde3!important;background:#fff!important;
+  }
+  .mob-pod-pos{color:#667085!important}
+  .mob-pod:first-child .mob-pod-pos{color:#a47b21!important}
+
+  /* Separate sections / cards */
+  .mob-v2-card{
+    background:#fff;border:1px solid #e1e5ea;border-radius:15px;
+    padding:15px;margin:10px 0;box-shadow:0 3px 12px rgba(24,33,47,.035);
+  }
+  .mob-v2-title{
+    display:flex;align-items:center;justify-content:space-between;
+    font-size:.78rem;font-weight:800;color:#1d2939;margin-bottom:12px;
+  }
+  .mob-v2-kicker{
+    font-size:.53rem;font-weight:700;color:#98a2b3;
+    text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;
+  }
+  .mob-v2-value{font-size:1.45rem;font-weight:900;color:#172033;letter-spacing:-.02em}
+  .mob-v2-muted{font-size:.61rem;color:#7b8794}
+  .mob-v2-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .mob-v2-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .mob-v2-mini{
+    border:1px solid #e7eaee;border-radius:11px;padding:11px;background:#fafbfc;
+  }
+  .mob-v2-mini .v{font-size:.98rem;font-weight:800;color:#1d2939;margin-top:3px}
+  .mob-v2-mini .l{font-size:.52rem;color:#8b95a3}
+  .mob-v2-bar{height:9px;background:#e7eaee;border-radius:6px;overflow:hidden;margin:10px 0 6px}
+  .mob-v2-fill{height:100%;background:#596b80;border-radius:6px}
+  .mob-v2-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .mob-v2-delta.up{color:#16a34a}.mob-v2-delta.down{color:#dc2626}.mob-v2-delta.same{color:#667085}
+  .mob-v2-tag{font-size:.52rem;font-weight:800;padding:4px 7px;border-radius:999px;background:#f1f3f5;color:#596579}
+  .mob-v2-list{display:flex;flex-direction:column}
+  .mob-v2-listrow{
+    display:flex;align-items:center;gap:9px;padding:12px 0;border-top:1px solid #edf0f2;
+  }
+  .mob-v2-listrow:first-child{border-top:0}
+  .mob-v2-icon{
+    width:34px;height:34px;border-radius:10px;background:#f1f3f5;
+    display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;
+  }
+  .mob-v2-listinfo{flex:1;min-width:0}
+  .mob-v2-listname{font-size:.72rem;font-weight:700;color:#273244}
+  .mob-v2-listsub{font-size:.57rem;color:#8a94a1;margin-top:2px}
+  .mob-v2-arrow{color:#9aa3af;font-size:.8rem}
+  .mob-v2-alert{background:#f8f9fa;border:1px solid #e3e6ea;border-radius:11px;padding:11px;font-size:.62rem;color:#5b6572}
+
+  /* Mobile agreements */
+  .mob-acordos .mob-search{margin:12px 0 10px!important;background:#fff!important;border-color:#e0e4e8!important}
+  .mob-rank-row{
+    border-color:#e1e5ea!important;border-radius:12px!important;
+    box-shadow:0 2px 8px rgba(24,33,47,.025);
+  }
+
+  /* Hide desktop content when mobile V2 is active */
+  #pageComp.mob-active > .comp-hero,
+  #pageComp.mob-active > .comp-upload,
+  #pageComp.mob-active > .comp-filters,
+  #pageComp.mob-active > #compR{display:none!important}
+  #pageTreinamentos.mob-active > .trn-layout{display:none!important}
+  .mob-only-page{display:none!important}
+  .page.mob-active .mob-only-page{display:block!important}
+  #pageComp.mob-active #mobCompPage{display:block!important}
+  #pageTreinamentos.mob-active #mobTrainingPage{display:block!important}
+
+  /* Extra pages */
+  #pageMobExtra.mob-active{display:block!important}
+  #pageMobExtra{background:#f3f5f7;min-height:100vh}
+  .mob-extra{padding:0 14px 22px}
+  .mob-extra-head{display:flex;align-items:center;justify-content:space-between;margin:14px 2px 10px}
+  .mob-extra-title{font-size:.9rem;font-weight:800;color:#1d2939}
+  .mob-extra-sub{font-size:.59rem;color:#8993a0;margin-top:2px}
+
+  /* Training V2 */
+  .mob-training{padding:0 14px 20px}
+  .mob-training-hero{
+    background:#fff;border:1px solid #e0e4e8;border-radius:16px;padding:17px;
+    margin:14px 0;box-shadow:0 4px 14px rgba(24,33,47,.035);
+  }
+  .mob-training-hero h2{font-size:1rem;color:#1d2939;margin-bottom:5px}
+  .mob-training-hero p{font-size:.62rem;color:#7b8794;line-height:1.45}
+  .mob-training-progress{margin-top:13px}
+  .mob-training-progressline{display:flex;justify-content:space-between;font-size:.58rem;color:#667085}
+  .mob-training-progressbar{height:8px;background:#e7eaee;border-radius:6px;overflow:hidden;margin-top:6px}
+  .mob-training-progressfill{height:100%;background:#596b80;border-radius:6px}
+  .mob-course{
+    background:#fff;border:1px solid #e1e5ea;border-radius:14px;
+    margin:10px 0;overflow:hidden;box-shadow:0 3px 10px rgba(24,33,47,.025);
+  }
+  .mob-course-head{padding:14px;display:flex;align-items:center;gap:10px}
+  .mob-course-num{width:32px;height:32px;border-radius:10px;background:#eef1f4;color:#445266;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.7rem}
+  .mob-course-info{flex:1}
+  .mob-course-title{font-size:.73rem;font-weight:800;color:#273244}
+  .mob-course-sub{font-size:.56rem;color:#8b95a3;margin-top:2px}
+  .mob-course-arrow{color:#9aa3af}
+  .mob-course-lessons{border-top:1px solid #edf0f2;padding:2px 12px 6px}
+  .mob-lesson{display:flex;align-items:center;gap:9px;padding:10px 2px;border-bottom:1px solid #f0f2f4;cursor:pointer}
+  .mob-lesson:last-child{border-bottom:0}
+  .mob-lesson-thumb{width:29px;text-align:center;font-size:.95rem}
+  .mob-lesson-name{flex:1;font-size:.63rem;color:#344054}
+  .mob-lesson-check{font-size:.75rem;color:#7c8795}
+
+  /* Bottom nav more separated */
+  .mob-tabbar{
+    padding:7px 4px calc(7px + env(safe-area-inset-bottom,0px))!important;
+    box-shadow:0 -4px 18px rgba(17,24,39,.06)!important;
+  }
+  .mob-tab{min-width:58px;padding:5px 5px!important}
+  .mob-tab svg{width:20px!important;height:20px!important}
+  .mob-tab span{font-size:.52rem!important}
+  .mob-tab.active{font-weight:800}
+}
+
 </style>
 
 <style id="edimo-modern-overrides">
@@ -2099,34 +2265,6 @@ body::before,body::after{display:none!important}
   .mob-tabbar,.mob-header,.mob-inicio,.mob-acordos,.mob-mais-menu{display:none!important}
 }
 
-
-/* ============================================================
-   MOBILE FINAL OVERRIDES - MUST BE LAST
-   ============================================================ */
-@media(max-width:640px){
-  /* FORCE hide desktop nav on mobile, regardless of sidebar */
-  .nav, .app-with-sidebar .nav{display:none!important}
-  .sidebar, .app-with-sidebar .sidebar{display:none!important}
-  .toolbar, .app-with-sidebar .toolbar{display:none!important}
-  
-  /* Main reset */
-  .main, .app-with-sidebar .main{
-    margin-left:0!important;
-    max-width:100%!important;
-    padding:0 0 80px 0!important;
-  }
-  
-  /* Pages: hide by default, show with mob-active */
-  .page{display:none!important}
-  .page.mob-active{display:block!important}
-  
-  /* Show bottom tab bar */
-  .mob-tabbar{display:flex!important}
-}
-@media(min-width:641px){
-  .mob-tabbar,.mob-header,.mob-mais-menu{display:none!important}
-}
-
 </style>
 
 </head>
@@ -2214,6 +2352,7 @@ body::before,body::after{display:none!important}
 <div class="comp-month-tabs" id="compMonthTabs"></div>
 </div>
 <div id="compR"></div>
+<div id="mobCompPage" class="mob-only-page"></div>
 </div>
 </div>
 
@@ -2246,6 +2385,7 @@ body::before,body::after{display:none!important}
 </div>
 </div>
 </div>
+<div id="mobTrainingPage" class="mob-only-page"></div>
 
 <div class="toolbar" id="toolbar"><button class="btn-new admin-only" onclick="loadDrive()">↻ Atualizar</button><button class="btn-link admin-only" onclick="copyLink()">🔗 Link</button></div>
 <div class="toast" id="toast"></div>
@@ -3018,6 +3158,7 @@ function genComp(){
     }
     document.getElementById('compR').innerHTML=h;
   }
+  if(isMobile && currentMobTab==='comparativo')renderMobComparativo();
 }
 
 let compViewMode='all';
@@ -3413,6 +3554,208 @@ function fm(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,max
 function fs(v){return'R$ '+Math.round(v).toLocaleString('pt-BR')}
 function copyLink(){const json=JSON.stringify(cRD),comp=LZString.compressToEncodedURIComponent(json),url=window.location.origin+window.location.pathname+'#d='+comp;navigator.clipboard.writeText(url).then(()=>sT('Link copiado!')).catch(()=>{const t=document.createElement('textarea');t.value=url;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);sT('Link copiado!')})}
 function sT(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+/* ============================================================
+   MOBILE V2 — SEPARATED SCREENS
+   ============================================================ */
+function mobHidePages(){
+  ['pageRanking','pageComp','pageTreinamentos','pageMobExtra'].forEach(function(id){
+    var el=document.getElementById(id); if(el)el.classList.remove('mob-active');
+  });
+  var mm=document.getElementById('mobMaisMenu');if(mm)mm.style.display='none';
+}
+function mobSetPage(id){
+  mobHidePages();
+  var el=document.getElementById(id);if(el)el.classList.add('mob-active');
+}
+function mobileHeader(title,date){
+  return '<div class="mob-header"><div><div class="mob-header-title">'+title+'</div><div class="mob-header-date">📅 '+(date||'Hoje')+'</div></div><div class="mob-header-right"></div></div>';
+}
+function getMyMobileComp(){
+  var ms=cD.filter(function(d){return d!==null;});
+  if(!ms.length)return null;
+  var now=ms[ms.length-1], prev=ms.length>1?ms[ms.length-2]:null, old=ms.length>2?ms[0]:null;
+  var uN=cU?cU.nome.toLowerCase():'';
+  var allN=new Map();
+  ms.forEach(function(m,mi){(m.ops||[]).forEach(function(o){
+    if(!allN.has(o.n))allN.set(o.n,{name:o.n,cfg:o.cfg,t:o.t,m:new Array(ms.length).fill(null)});
+    var r=allN.get(o.n);r.m[mi]={a:o.a,v:o.v};if(o.cfg)r.cfg=o.cfg;
+  });});
+  var rows=[...allN.values()];
+  var mine=rows.find(function(o){return mU(o.name,uN);});
+  if(!mine)return null;
+  var ci=ms.length-1, cur=mine.m[ci], pd=prev?mine.m[ci-1]:null, od=old?mine.m[0]:null;
+  var meta=getMeta(mine.cfg);
+  return {ms:ms,now:now,prev:prev,old:old,mine:mine,cur:cur||{a:0,v:0},prevD:pd,oldD:od,meta:meta};
+}
+function renderMobInicio(){
+  if(!isMobile||!cRD)return;
+  var d=cRD, ops=mergeOpsWithPonto(d.ops||[]), t3=ops.slice(0,3);
+  var h=mobileHeader('Início',d.d||'Hoje');
+  h+='<div class="mob-inicio">';
+  h+='<div class="mob-hero"><div class="mob-hero-icon">◫</div><div class="mob-hero-label">VALOR TOTAL DO DIA</div><div class="mob-hero-val">'+fs(d.tv)+'</div><div class="mob-hero-sub">'+d.ta+' acordos realizados</div></div>';
+  h+='<div class="mob-stats">';
+  h+='<div class="mob-stat"><div class="mob-stat-icon">▣</div><div class="mob-stat-label">Total de acordos</div><div class="mob-stat-val">'+d.ta+'</div></div>';
+  h+='<div class="mob-stat"><div class="mob-stat-icon">◉</div><div class="mob-stat-label">Operadores</div><div class="mob-stat-val">'+ops.length+'</div></div>';
+  h+='</div>';
+  if(t3.length){
+    h+='<div class="mob-section"><div class="mob-section-title">Top 3 do dia</div><div class="mob-section-link" onclick="mobNav(\'acordos\')">Ver lista ›</div></div>';
+    var medals=['🥇','🥈','🥉'];
+    t3.forEach(function(o,i){
+      h+='<div class="mob-pod"><div class="mob-pod-medal">'+medals[i]+'</div><div class="mob-pod-info"><div class="mob-pod-name">'+o.n+'</div><div class="mob-pod-stats">'+o.a+' acordos · '+fs(o.v)+'</div></div><div class="mob-pod-pos">'+(i+1)+'º</div></div>';
+    });
+  }
+  h+='</div>';
+  document.getElementById('pageRanking').innerHTML=h;
+  mobSetPage('pageRanking');
+  currentMobTab='inicio';
+  document.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('mobTabInicio').classList.add('active');
+}
+function renderMobAcordos(){
+  if(!isMobile||!cRD)return;
+  var allOps=mergeOpsWithPonto(cRD.ops||[]);
+  var h=mobileHeader('Acordos',cRD.d||'Hoje');
+  h+='<div class="mob-acordos">';
+  h+='<input class="mob-search" type="text" placeholder="🔍  Buscar operador..." oninput="filterMobRank(this.value)">';
+  h+='<div class="mob-v2-card" style="padding:10px 12px;margin-bottom:10px"><div class="mob-v2-row"><div><div class="mob-v2-kicker">Resumo</div><div class="mob-v2-value" style="font-size:1.1rem">'+cRD.ta+' acordos</div></div><div style="text-align:right"><div class="mob-v2-kicker">Valor</div><div style="font-size:.82rem;font-weight:800;color:#344054">'+fs(cRD.tv)+'</div></div></div></div>';
+  h+='<div class="mob-rank-list" id="mobRankList">';
+  allOps.forEach(function(o,i){
+    var pt=matchPonto(o.n),st=pontoStatus(pt,o.n),initial=o.n.charAt(0).toUpperCase();
+    h+='<div class="mob-rank-row'+(st==='miss'?' mob-rank-miss':'')+'" data-name="'+o.n.toLowerCase()+'">';
+    h+='<div class="mob-rank-pos">'+(i+1)+'</div><div class="mob-rank-avatar">'+initial+'</div>';
+    h+='<div class="mob-rank-info"><div class="mob-rank-name">'+o.n+'</div><div class="mob-rank-sub">'+(st==='ok'?'✓ Presente':st==='late'?'⏰ Atrasado':st==='miss'?'✕ Faltou':'')+getTurnoTag(o.n)+'</div></div>';
+    h+='<div class="mob-rank-val"><div class="mob-rank-acordos">'+o.a+'</div><div class="mob-rank-valor">'+fm(o.v)+'</div></div></div>';
+  });
+  h+='</div></div>';
+  document.getElementById('pageRanking').innerHTML=h;
+  mobSetPage('pageRanking');
+  currentMobTab='acordos';
+  document.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('mobTabAcordos').classList.add('active');
+}
+function renderMobComparativo(){
+  var host=document.getElementById('mobCompPage');if(!host)return;
+  var p=getMyMobileComp();
+  var h=mobileHeader('Comparativo',p&&p.now?p.now.period:'Hoje');
+  h+='<div class="mob-extra">';
+  if(!p){
+    h+='<div class="mob-v2-card"><div class="mob-v2-title">Seu resultado</div><div class="mob-v2-alert">Seus dados individuais ainda não apareceram nos relatórios.</div></div></div>';
+    host.innerHTML=h;mobSetPage('pageComp');return;
+  }
+  var cur=p.cur,prev=p.prevD,old=p.oldD,meta=p.meta;
+  h+='<div class="mob-v2-card"><div class="mob-v2-title">Seu resultado atual <span class="mob-v2-tag">ATUAL</span></div>';
+  h+='<div class="mob-v2-grid3"><div class="mob-v2-mini"><div class="l">Acordos</div><div class="v">'+cur.a+'</div></div><div class="mob-v2-mini"><div class="l">Valor</div><div class="v">'+fm(cur.v)+'</div></div><div class="mob-v2-mini"><div class="l">Média/acordo</div><div class="v">'+fm(cur.a?cur.v/cur.a:0)+'</div></div></div></div>';
+  h+='<div class="mob-v2-card"><div class="mob-v2-title">Comparação com meses anteriores</div>';
+  if(old){h+='<div class="mob-v2-row" style="margin-bottom:9px"><span class="mob-v2-muted">2 meses atrás</span><b>'+old.a+' acordos · '+fm(old.v)+'</b></div>';}
+  if(prev){h+='<div class="mob-v2-row" style="margin-bottom:9px"><span class="mob-v2-muted">Mês passado</span><b>'+prev.a+' acordos · '+fm(prev.v)+'</b></div>';}
+  h+='<div class="mob-v2-row" style="border-top:1px solid #edf0f2;padding-top:10px"><span class="mob-v2-muted">Mês atual</span><b>'+cur.a+' acordos · '+fm(cur.v)+'</b></div>';
+  if(prev){
+    var da=cur.a-prev.a,dv=cur.v-prev.v,pct=prev.v?Math.round(dv/prev.v*100):0;
+    h+='<div class="mob-v2-grid3" style="margin-top:12px"><div class="mob-v2-mini"><div class="l">Acordos</div><div class="v mob-v2-delta '+(da>=0?'up':'down')+'">'+(da>=0?'+':'')+da+'</div></div><div class="mob-v2-mini"><div class="l">Valor</div><div class="v mob-v2-delta '+(dv>=0?'up':'down')+'">'+(dv>=0?'+':'')+fm(dv)+'</div></div><div class="mob-v2-mini"><div class="l">Variação</div><div class="v mob-v2-delta '+(pct>=0?'up':'down')+'">'+(pct>=0?'+':'')+pct+'%</div></div></div>';
+  }
+  h+='</div>';
+  if(meta&&meta.max>0){
+    var pctMeta=Math.min(Math.round(cur.v/meta.max*100),100),rem=Math.max(0,meta.max-cur.v);
+    h+='<div class="mob-v2-card"><div class="mob-v2-title">Comissão e meta</div>';
+    h+='<div class="mob-v2-grid2"><div><div class="mob-v2-kicker">Valor atual</div><div class="mob-v2-value">'+fm(cur.v)+'</div></div><div style="text-align:right"><div class="mob-v2-kicker">Meta</div><div class="mob-v2-value">'+fm(meta.max)+'</div></div></div>';
+    h+='<div class="mob-v2-bar"><div class="mob-v2-fill" style="width:'+pctMeta+'%"></div></div>';
+    h+='<div class="mob-v2-row"><span class="mob-v2-muted">'+pctMeta+'% atingido</span><b style="font-size:.68rem">'+(rem>0?'Falta '+fm(rem):'Meta atingida ✓')+'</b></div></div>';
+  }
+  h+='<div class="mob-v2-card"><div class="mob-v2-title">O que muda ao bater a meta</div>';
+  h+='<div class="mob-v2-list">';
+  h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">R$</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">Comissão</div><div class="mob-v2-listsub">5% da receita, conforme sua faixa</div></div><div class="mob-v2-arrow">›</div></div>';
+  h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">◷</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">Flexibilidade</div><div class="mob-v2-listsub">Benefício liberado conforme a meta</div></div><div class="mob-v2-arrow">›</div></div>';
+  h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">★</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">Folgas</div><div class="mob-v2-listsub">Conforme cumprimento das metas</div></div><div class="mob-v2-arrow">›</div></div>';
+  h+='</div></div></div>';
+  host.innerHTML=h;
+  mobSetPage('pageComp');
+}
+function renderMobComissao(){
+  var host=document.getElementById('pageMobExtra');if(!host)return;
+  var p=getMyMobileComp(),h=mobileHeader('Comissão',p&&p.now?p.now.period:'Hoje');
+  h+='<div class="mob-extra">';
+  if(!p||!p.meta||!p.meta.max){
+    h+='<div class="mob-v2-card"><div class="mob-v2-title">Sua comissão</div><div class="mob-v2-alert">A meta da sua faixa ainda não está disponível.</div></div>';
+  }else{
+    var cur=p.cur,prev=p.prevD,m=p.meta,pct=Math.min(Math.round(cur.v/m.max*100),100),rem=Math.max(0,m.max-cur.v);
+    var comissao=Math.round(cur.v*.05*100)/100;
+    var prevCom=prev?Math.round(prev.v*.05*100)/100:0;
+    h+='<div class="mob-v2-card"><div class="mob-v2-title">Sua comissão <span class="mob-v2-tag">'+pct+'% da meta</span></div>';
+    h+='<div class="mob-v2-value">'+fm(comissao)+'</div><div class="mob-v2-muted">estimativa de 5% da receita atual</div>';
+    h+='<div class="mob-v2-bar"><div class="mob-v2-fill" style="width:'+pct+'%"></div></div>';
+    h+='<div class="mob-v2-row"><span class="mob-v2-muted">Atual '+fm(cur.v)+'</span><b>'+(rem?'Falta '+fm(rem):'Meta atingida ✓')+'</b></div></div>';
+    h+='<div class="mob-v2-card"><div class="mob-v2-title">Sua meta</div><div class="mob-v2-grid3"><div class="mob-v2-mini"><div class="l">Atual</div><div class="v">'+fm(cur.v)+'</div></div><div class="mob-v2-mini"><div class="l">Meta</div><div class="v">'+fm(m.max)+'</div></div><div class="mob-v2-mini"><div class="l">Falta</div><div class="v">'+fm(rem)+'</div></div></div></div>';
+    if(prev){
+      var diff=cur.v-prev.v,pc=prev.v?Math.round(diff/prev.v*100):0;
+      h+='<div class="mob-v2-card"><div class="mob-v2-title">Comparação com o mês passado</div><div class="mob-v2-row"><div><div class="mob-v2-kicker">Mês passado</div><div class="mob-v2-value" style="font-size:1.1rem">'+fm(prev.v)+'</div></div><div style="text-align:right"><div class="mob-v2-kicker">Variação</div><div class="mob-v2-value '+(pc>=0?'mob-v2-delta up':'mob-v2-delta down')+'" style="font-size:1.1rem">'+(pc>=0?'+':'')+pc+'%</div></div></div><div class="mob-v2-muted" style="margin-top:8px">Comissão estimada anterior: '+fm(prevCom)+'</div></div>';
+    }
+  }
+  h+='</div>';host.innerHTML=h;mobSetPage('pageMobExtra');
+}
+function renderMobBeneficios(){
+  var host=document.getElementById('pageMobExtra');if(!host)return;
+  var p=getMyMobileComp(),h=mobileHeader('Benefícios',p&&p.now?p.now.period:'Hoje');
+  h+='<div class="mob-extra">';
+  var hit=p&&p.meta&&p.meta.max>0&&p.cur.v>=p.meta.max;
+  h+='<div class="mob-v2-card"><div class="mob-v2-title">Benefícios da meta <span class="mob-v2-tag">'+(hit?'LIBERADOS':'BLOQUEADOS')+'</span></div><div class="mob-v2-muted">Acompanhe o que é liberado conforme o atingimento da sua meta.</div></div>';
+  h+='<div class="mob-v2-card"><div class="mob-v2-title">Ao bater sua meta</div><div class="mob-v2-list">';
+  [['💰','Comissão','5% da receita conforme a faixa'],['◷','Flexibilidade','Horário flexível conforme as regras'],['🏖','Folgas','Dias de folga conforme as metas'],['🏆','Premiação por tempo','Valores progressivos conforme o tempo de empresa']].forEach(function(x){
+    h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">'+x[0]+'</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">'+x[1]+'</div><div class="mob-v2-listsub">'+x[2]+'</div></div><div class="mob-v2-arrow">'+(hit?'✓':'🔒')+'</div></div>';
+  });
+  h+='</div></div>';
+  h+='<div class="mob-v2-card"><div class="mob-v2-title">Premiação por tempo</div><div class="mob-v2-grid2">';
+  [['R$ 200','75 dias a 1 ano'],['R$ 300','+1 ano'],['R$ 400','+2 anos'],['R$ 600','+3 anos']].forEach(function(x){h+='<div class="mob-v2-mini"><div class="l">'+x[1]+'</div><div class="v">'+x[0]+'</div></div>';});
+  h+='</div></div>';
+  h+='<div class="mob-v2-card"><div class="mob-v2-title">Regras importantes</div><div class="mob-v2-list">';
+  ['Atraso no ponto acima de 10 minutos','Deixar de bater o ponto em qualquer dia','Falta sem atestado','Advertência verbal, escrita ou suspensão','Não trabalhar o mês integralmente'].forEach(function(x){h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">!</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">'+x+'</div></div></div>';});
+  h+='</div></div></div>';
+  host.innerHTML=h;mobSetPage('pageMobExtra');
+}
+function renderMobTreinamento(){
+  var host=document.getElementById('mobTrainingPage');if(!host)return;
+  var total=0,done=0;trnData.forEach(function(m){m.lessons.forEach(function(l){total++;if(trnCompleted.includes(l.id))done++;});});
+  var pct=total?Math.round(done/total*100):0;
+  var h=mobileHeader('Treinamento','Hoje');
+  h+='<div class="mob-training"><div class="mob-training-hero"><h2>Seu desenvolvimento também gera resultados</h2><p>Conteúdos rápidos para melhorar seu desempenho e ajudar você a bater suas metas.</p><div class="mob-training-progress"><div class="mob-training-progressline"><span>Seu progresso</span><b>'+pct+'%</b></div><div class="mob-training-progressbar"><div class="mob-training-progressfill" style="width:'+pct+'%"></div></div></div></div>';
+  trnData.forEach(function(mod,mi){
+    var md=mod.lessons.filter(function(l){return trnCompleted.includes(l.id)}).length;
+    h+='<div class="mob-course"><div class="mob-course-head"><div class="mob-course-num">'+(mi+1)+'</div><div class="mob-course-info"><div class="mob-course-title">'+mod.title+'</div><div class="mob-course-sub">'+md+'/'+mod.lessons.length+' módulos concluídos</div></div><div class="mob-course-arrow">›</div></div><div class="mob-course-lessons">';
+    mod.lessons.forEach(function(l){
+      h+='<div class="mob-lesson" onclick="playLesson(\''+l.id+'\');renderMobTreinamento()"><div class="mob-lesson-thumb">'+l.thumb+'</div><div class="mob-lesson-name">'+l.name+'</div><div class="mob-lesson-check">'+(trnCompleted.includes(l.id)?'✓':'○')+'</div></div>';
+    });
+    h+='</div></div>';
+  });
+  h+='</div>';host.innerHTML=h;mobSetPage('pageTreinamentos');
+}
+function renderMobFaltas(){
+  var host=document.getElementById('pageMobExtra');if(!host)return;
+  var h=mobileHeader('Faltas do Dia','Hoje')+'<div class="mob-extra"><div class="mob-v2-card"><div class="mob-v2-title">Status do ponto</div><div class="mob-v2-list">';
+  if(pontoData){
+    var found=0;pontoData.forEach(function(p){
+      var s=p.status.toUpperCase();if(s.includes('PRESENTE')||s.includes('ATRASADO'))return;
+      found++;h+='<div class="mob-v2-listrow"><div class="mob-v2-icon">!</div><div class="mob-v2-listinfo"><div class="mob-v2-listname">'+p.nome+'</div><div class="mob-v2-listsub">'+(s||'Sem registro')+'</div></div></div>';
+    });
+    if(!found)h+='<div class="mob-v2-alert">Nenhuma falta registrada.</div>';
+  }else h+='<div class="mob-v2-alert">Dados de ponto indisponíveis.</div>';
+  h+='</div></div></div>';host.innerHTML=h;mobSetPage('pageMobExtra');
+}
+function mobNav(tab){
+  currentMobTab=tab;
+  document.querySelectorAll('.mob-tab').forEach(function(t){t.classList.remove('active')});
+  var map={inicio:'mobTabInicio',acordos:'mobTabAcordos',comparativo:'mobTabComp',treinamento:'mobTabTreino',mais:'mobTabMais',comissao:'mobTabMais',beneficios:'mobTabMais',faltas:'mobTabMais'};
+  var tid=map[tab];if(tid&&document.getElementById(tid))document.getElementById(tid).classList.add('active');
+  if(tab==='mais'){var mm=document.getElementById('mobMaisMenu');if(mm)mm.style.display='block';return;}
+  if(tab==='inicio')renderMobInicio();
+  else if(tab==='acordos')renderMobAcordos();
+  else if(tab==='comparativo')renderMobComparativo();
+  else if(tab==='treinamento')renderMobTreinamento();
+  else if(tab==='comissao')renderMobComissao();
+  else if(tab==='beneficios')renderMobBeneficios();
+  else if(tab==='faltas')renderMobFaltas();
+}
+function closeMaisMenu(){var mm=document.getElementById('mobMaisMenu');if(mm)mm.style.display='none';}
+
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 
 
@@ -3442,17 +3785,8 @@ function mobNav(tab){
   
   if(tab==='inicio')renderMobInicio();
   else if(tab==='acordos')renderMobAcordos();
-  else if(tab==='comparativo'){
-    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('mob-active')});
-    showPage('comparativo');
-    document.getElementById('pageComp').classList.add('mob-active');
-  }
-  else if(tab==='treinamento'){
-    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('mob-active')});
-    showPage('treinamentos');
-    var pt=document.getElementById('pageTreinamentos');
-    if(pt)pt.classList.add('mob-active');
-  }
+  else if(tab==='comparativo'){showPage('comparativo');}
+  else if(tab==='treinamento'){showPage('treinamentos');}
   else if(tab==='comissao')renderMobComissao();
   else if(tab==='beneficios')renderMobBeneficios();
   else if(tab==='faltas')renderMobFaltas();
@@ -3595,6 +3929,8 @@ var _origRenderR=typeof renderR==='function'?renderR:null;
 </script>
 
 <!-- MOBILE BOTTOM TAB BAR -->
+<div class="page" id="pageMobExtra"></div>
+
 <div class="mob-tabbar" id="mobTabbar">
   <button class="mob-tab active" onclick="mobNav('inicio')" id="mobTabInicio">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
@@ -3610,7 +3946,7 @@ var _origRenderR=typeof renderR==='function'?renderR:null;
   </button>
   <button class="mob-tab" onclick="mobNav('treinamento')" id="mobTabTreino">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-    <span>Treinamento</span>
+    <span>Treino</span>
   </button>
   <button class="mob-tab" onclick="mobNav('mais')" id="mobTabMais">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
