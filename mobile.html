@@ -93,7 +93,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f5;color:#1a1f36;m
 <div class="login" id="loginScreen">
 <div class="login-box">
 <div class="login-logo">🏛️ Édimo · Soluções em Cobranças</div>
-<div style="font-size:.45rem;color:#ccc;margin-top:-20px;margin-bottom:12px">v7</div>
+<div style="font-size:.45rem;color:#ccc;margin-top:-20px;margin-bottom:12px">v8</div>
 <input type="text" id="loginUser" placeholder="Login" autocomplete="off">
 <input type="password" id="loginPass" placeholder="Senha">
 <button class="login-btn" onclick="doLogin()">Entrar</button>
@@ -207,7 +207,7 @@ function loadRanking(){
   return fetch(RK+'&t='+Date.now()).then(function(r){return r.text()}).then(function(csv){
     var lines=csv.split('\n'),dt='',hI=-1;
     for(var i=0;i<lines.length;i++){var m=lines[i].match(/(\d{2}\/\d{2}\/\d{4})\s*at/);if(m){dt=m[1];break}}
-    for(var i=0;i<lines.length;i++){if(lines[i].includes(',Operador,')){hI=i;break}}
+    for(var i=0;i<lines.length;i++){if(lines[i].includes('Operador')){hI=i;break}}
     if(hI===-1)return;
     var ops=[],ta=0,tv=0;
     for(var i=hI+1;i<lines.length;i++){
@@ -224,7 +224,7 @@ function loadRanking(){
     }
     ops.sort(function(a,b){return b.a-a.a||b.v-a.v});
     rankData={d:dt,ta:ta,tv:Math.round(tv*100)/100,ops:ops};
-  }).catch(function(e){console.log('Ranking error:',e)});
+  }).catch(function(e){console.log('Ranking error:',e);rankData={d:'Hoje',ta:0,tv:0,ops:[]}});
 }
 
 function loadPonto(){
