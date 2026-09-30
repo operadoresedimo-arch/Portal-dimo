@@ -87,13 +87,25 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f5;color:#1a1f36;m
 .menu-item{display:flex;align-items:center;gap:12px;width:100%;padding:14px 12px;border:none;background:none;font-size:.82rem;font-weight:600;color:#1a1f36;font-family:inherit;cursor:pointer;border-radius:10px;text-align:left}
 .menu-item:active{background:#f3f4f6}
 .menu-item.out{color:#ef4444;margin-top:8px;border-top:1px solid #e5e7eb;padding-top:14px;border-radius:0}
+
+.top3-card{display:flex;align-items:center;gap:14px;padding:16px;background:#fff;border-radius:16px;margin-bottom:10px;border:1px solid #e5e7eb}
+.top3-left{position:relative;flex-shrink:0}
+.top3-medal{position:absolute;top:-6px;left:-6px;font-size:1.1rem;z-index:2}
+.top3-av{width:48px;height:48px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;color:#fff;border:2px solid #d4a937}
+.top3-card:nth-child(2) .top3-av{background:#9ca3af}
+.top3-card:nth-child(3) .top3-av{background:#b8860b}
+.top3-card:first-child .top3-av{background:#d4a937}
+.top3-info{flex:1;min-width:0}
+.top3-nm{font-size:.88rem;font-weight:700;color:#1a1f36}
+.top3-st{font-size:.65rem;color:#9ca3af;margin-top:3px}
+.top3-pos{font-size:1.3rem;font-weight:900;flex-shrink:0}
 </style>
 </head>
 <body>
 <div class="login" id="loginScreen">
 <div class="login-box">
 <div class="login-logo">🏛️ Édimo · Soluções em Cobranças</div>
-<div style="font-size:.45rem;color:#ccc;margin-top:-20px;margin-bottom:12px">v11</div>
+
 <input type="text" id="loginUser" placeholder="Login" autocomplete="off">
 <input type="password" id="loginPass" placeholder="Senha">
 <button class="login-btn" onclick="doLogin()">Entrar</button>
@@ -208,6 +220,16 @@ function loadRanking(){
     var lines=csv.split('\n'),dt='',hI=-1;
     for(var i=0;i<lines.length;i++){var m=lines[i].match(/(\d{2}\/\d{2}\/\d{4})\s*at/);if(m){dt=m[1];break}}
     for(var i=0;i<lines.length;i++){if(lines[i].includes(',Operador,')){hI=i;break}}
+    if(hI===-1){
+      // Try alternate: just "Operador" at start or after empty cells
+      for(var i=0;i<lines.length;i++){
+        var fc=csvSplit(lines[i]);
+        for(var j=0;j<fc.length;j++){
+          if(fc[j].trim()==='Operador'){hI=i;break}
+        }
+        if(hI>=0)break;
+      }
+    }
     if(hI===-1)return;
     var ops=[],ta=0,tv=0;
     for(var i=hI+1;i<lines.length;i++){
@@ -325,19 +347,30 @@ function closeMenu(){document.getElementById('menuBg').classList.remove('on')}
 // === RENDER PAGES ===
 function renderInicio(){
   if(!rankData)return;var d=rankData,ops=d.ops,t3=ops.slice(0,3);
-  var ptOk=0,ptLate=0,ptMiss=0;
-  if(pontoData)pontoData.forEach(function(p){var s=p.status.toUpperCase();if(s.includes('PRESENTE'))ptOk++;else if(s.includes('ATRASADO'))ptLate++;else ptMiss++});
-  var h='<div class="hdr"><div><div class="hdr-title">Acordos do Dia</div><div class="hdr-date">\uD83D\uDCC5 '+(d.d||'Hoje')+'</div></div></div>';
+  var userName=cU?cU.nome.split(' ')[0]:'';
+  var h='<div class="hdr"><div><div class="hdr-title">Acordos do Dia</div><div class="hdr-date">\uD83D\uDCC5 '+(d.d||'Hoje')+(userName?' \u00B7 '+userName:'')+'</div></div></div>';
   h+='<div style="padding:0 14px 16px">';
-  h+='<div class="hero"><div class="hero-icon">\uD83C\uDFC6</div><div class="hero-lbl">Valor Total</div><div class="hero-val">'+fs(d.tv)+'</div><div class="hero-sub">'+d.ta+' acordos</div></div>';
-  h+='<div class="stats"><div class="st"><div class="st-icon">\uD83D\uDCCB</div><div class="st-lbl">Acordos</div><div class="st-val">'+d.ta+'</div></div>';
-  h+='<div class="st"><div class="st-icon">\uD83D\uDC65</div><div class="st-lbl">Operadores</div><div class="st-val">'+ops.length+'</div></div>';
-  if(pontoData)h+='<div class="st"><div class="st-icon">\uD83D\uDCCD</div><div class="st-lbl">Ponto</div><div class="st-val" style="font-size:.85rem"><span style="color:#16a34a">'+ptOk+'</span> \u00B7 <span style="color:#f59e0b">'+ptLate+'</span> \u00B7 <span style="color:#ef4444">'+ptMiss+'</span></div></div>';
-  h+='</div>';
+  // Hero
+  h+='<div class="hero"><div class="hero-icon">\uD83C\uDFC6</div><div class="hero-lbl">Valor Total</div><div class="hero-val">'+fs(d.tv)+'</div><div class="hero-sub">'+d.ta+' acordos \u00B7 '+ops.length+' operadores</div></div>';
+  // Top 3
   if(t3.length>=3){
-    h+='<div class="sec"><div class="sec-t">\uD83C\uDFC6 Top 3</div><div class="sec-link" onclick="go(\'acordos\')">Ver todos \u203A</div></div>';
-    var md=['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'],po=['\uD83D\uDC51 1\u00BA','2\u00BA','3\u00BA'];
-    t3.forEach(function(o,i){h+='<div class="pod"><div class="pod-medal">'+md[i]+'</div><div class="pod-info"><div class="pod-nm">'+o.n+'</div><div class="pod-st">'+o.a+' acordos \u00B7 '+fs(o.v)+'</div></div><div class="pod-pos">'+po[i]+'</div></div>'});
+    h+='<div class="sec"><div class="sec-t">\uD83C\uDFC6 Top 3 do Dia</div><div class="sec-link" onclick="go(\'acordos\')">Ver todos \u203A</div></div>';
+    var md=['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'];
+    var posLbl=['\uD83D\uDC51','2\u00BA','3\u00BA'];
+    var bgColors=['linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,215,0,.02))','linear-gradient(135deg,rgba(192,192,192,.06),#fff)','linear-gradient(135deg,rgba(205,127,50,.06),#fff)'];
+    var borderColors=['rgba(212,169,55,.3)','#e5e7eb','rgba(205,127,50,.2)'];
+    t3.forEach(function(o,i){
+      var initial=o.n.charAt(0);
+      var avColors=['#d4a937','#6b7280','#cd7f32'];
+      h+='<div class="top3-card" style="background:'+bgColors[i]+';border-color:'+borderColors[i]+'">';
+      h+='<div class="top3-left">';
+      h+='<div class="top3-medal">'+md[i]+'</div>';
+      h+='<div class="top3-av" style="border-color:'+avColors[i]+'">'+initial+'</div>';
+      h+='</div>';
+      h+='<div class="top3-info"><div class="top3-nm">'+o.n+'</div><div class="top3-st">'+o.a+' acordos \u00B7 '+fs(o.v)+'</div></div>';
+      h+='<div class="top3-pos" style="color:'+avColors[i]+'">'+posLbl[i]+'</div>';
+      h+='</div>';
+    });
   }
   h+='</div>';
   document.getElementById('pgInicio').innerHTML=h;
