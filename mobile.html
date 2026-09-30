@@ -93,7 +93,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f5;color:#1a1f36;m
 <div class="login" id="loginScreen">
 <div class="login-box">
 <div class="login-logo">🏛️ Édimo · Soluções em Cobranças</div>
-<div style="font-size:.45rem;color:#ccc;margin-top:-20px;margin-bottom:12px">v10</div>
+<div style="font-size:.45rem;color:#ccc;margin-top:-20px;margin-bottom:12px">v11</div>
 <input type="text" id="loginUser" placeholder="Login" autocomplete="off">
 <input type="password" id="loginPass" placeholder="Senha">
 <button class="login-btn" onclick="doLogin()">Entrar</button>
@@ -204,28 +204,32 @@ function getFullName(login){return loginMap[login.toLowerCase()]||cn(login)}
 function loadData(){Promise.all([loadRanking(),loadPonto(),loadComp()]).then(function(){go('inicio')})}
 
 function loadRanking(){
-  console.warn('[RK] Starting...');document.title='RK START';
-  return fetch(RK).then(function(r){return r.text()}).then(function(csv){
-    var lines=csv.split('\n'),dt='',hI=-1;console.warn('[RK] First 3 lines:',lines.slice(0,3));console.warn('[RK] Total lines:',lines.length);
+  return fetch(RK+'&t='+Date.now()).then(function(r){return r.text()}).then(function(csv){
+    var lines=csv.split('\n'),dt='',hI=-1;
     for(var i=0;i<lines.length;i++){var m=lines[i].match(/(\d{2}\/\d{2}\/\d{4})\s*at/);if(m){dt=m[1];break}}
-    for(var i=0;i<lines.length;i++){if(lines[i].includes('Operador')){hI=i;break}}
-    console.warn('[RK] hI='+hI);document.title='RK hI='+hI+' L='+lines.length;if(hI===-1){console.warn('[RK] No header found!');document.title='RK NO HEADER';return;}
+    for(var i=0;i<lines.length;i++){if(lines[i].includes(',Operador,')){hI=i;break}}
+    if(hI===-1)return;
     var ops=[],ta=0,tv=0;
     for(var i=hI+1;i<lines.length;i++){
-      var cells=csvSplit(lines[i]);if(!cells[0])continue;
-      var raw='';for(var k=0;k<cells.length;k++){if(cells[k].trim()){raw=cells[k].trim();break}}
-      if(!raw||raw.toLowerCase().includes('suporte'))continue;
-      var nums=[];for(var k=0;k<cells.length;k++){var v=cells[k].trim().replace(/"/g,'');if(v&&v.match(/[\d]/)){var n=parseBR(v);if(!isNaN(n))nums.push(n)}}
-      if(nums.length<2)continue;
-      var totalQtd=Math.round(nums[nums.length-2]),totalVal=nums[nums.length-1];
-      if(raw==='Totais'){ta=totalQtd;tv=totalVal;continue}
+      var line=lines[i];if(!line.trim())continue;
+      var cells=csvSplit(line);
+      var name='';for(var k=0;k<cells.length;k++){if(cells[k].trim()){name=cells[k].trim();break}}
+      if(!name)continue;
+      if(name.toLowerCase().includes('suporte'))continue;
+      var allNums=[];
+      for(var k=0;k<cells.length;k++){var v=cells[k].trim().replace(/"/g,'');if(v&&v.match(/[\d]/)){var n=parseBR(v);if(!isNaN(n))allNums.push(n)}}
+      if(allNums.length<2)continue;
+      var totalVal=allNums[allNums.length-1];
+      var totalQtd=Math.round(allNums[allNums.length-2]);
+      if(name==='Totais'){ta=totalQtd;tv=totalVal;continue}
       if(totalQtd===0&&totalVal===0)continue;
-      var prefix=raw.charAt(0);if(prefix!=='0'&&prefix!=='1'&&prefix!=='2')continue;
-      ops.push({raw:raw,n:cn(raw),a:totalQtd,v:Math.round(totalVal*100)/100,turno:getTurno(raw)});
+      var prefix=name.charAt(0);
+      if(prefix!=='0'&&prefix!=='1'&&prefix!=='2')continue;
+      ops.push({raw:name,n:cn(name),a:totalQtd,v:Math.round(totalVal*100)/100,turno:getTurno(name)});
     }
-    ops.sort(function(a,b){return b.a-a.a||b.v-a.v});console.warn('[RK] ops='+ops.length);document.title='RK ops='+ops.length+' ta='+ta;
+    ops.sort(function(a,b){return b.a-a.a||b.v-a.v});
     rankData={d:dt,ta:ta,tv:Math.round(tv*100)/100,ops:ops};
-  }).catch(function(e){console.log('Ranking error:',e);rankData={d:'Hoje',ta:0,tv:0,ops:[]}});
+  }).catch(function(e){console.log('Ranking error:',e)});
 }
 
 function loadPonto(){
