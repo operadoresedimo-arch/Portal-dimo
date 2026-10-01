@@ -230,6 +230,64 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 .cm-li b{font-weight:600;color:#1f2937}.cm-li b.ok{color:#16a34a}
 .cm-info{display:flex;align-items:flex-start;gap:12px;background:#eef3fa;border-radius:12px;padding:12px 14px;margin:8px 0 10px;font-size:.7rem;color:#1e3a5f;line-height:1.4}
 .cm-i{width:20px;height:20px;border-radius:50%;background:#0f3557;color:#fff;font-weight:700;font-size:.7rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:Georgia,serif}
+
+/* v31 preencher tela */
+.pg.on{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding:0 0 calc(64px + env(safe-area-inset-bottom))}
+.pg .hdr{margin:0;padding-left:16px;padding-right:16px}
+.fill{flex:1;display:flex;flex-direction:column;padding:8px 14px 14px!important}
+.fill .vtag{margin-top:auto;padding-top:6px}
+/* inicio */
+#pgInicio .hdr{border-bottom:0;background:#f7f9fc}
+.fill-ini .hero{padding:30px 20px;margin:4px 0 14px;border-radius:20px}
+.fill-ini .hero-trophy{width:64px;height:64px;font-size:2rem}
+.fill-ini .hero-lbl{font-size:.9rem}
+.fill-ini .hero-val{font-size:2.5rem}
+.fill-ini .duo-cards{gap:12px;margin-bottom:4px}
+.fill-ini .duo{padding:22px 16px;border-radius:18px}
+.fill-ini .duo-icon{width:52px;height:52px;font-size:1.4rem}
+.fill-ini .duo-lbl{font-size:.85rem}
+.fill-ini .duo-val{font-size:2rem}
+.fill-ini .sec{margin:18px 2px 12px}.fill-ini .sec-t{font-size:1rem}.fill-ini .sec-link{font-size:.75rem}
+.t3-wrap{flex:1;display:flex;flex-direction:column;gap:12px}
+.t3-wrap .top3-card{flex:1;margin:0;padding:18px 20px;min-height:92px}
+.t3-wrap .top3-left,.t3-wrap .top3-av{width:62px;height:62px}
+.t3-wrap .top3-av{font-size:1.4rem}
+.t3-wrap .top3-medal{left:-8px;bottom:-6px;font-size:1.5rem}
+.t3-wrap .top3-nm{font-size:1.05rem}.t3-wrap .top3-st{font-size:.8rem;margin-top:5px}
+.t3-wrap .top3-pos{font-size:1.8rem}
+/* comparativo */
+.fill .cp-sec{font-size:.95rem;margin:6px 2px 12px}
+.fill .kp-grid{gap:12px}
+.fill .kp{padding:20px 16px}
+.fill .kp-lbl{font-size:.85rem}.fill .kp-val{font-size:1.45rem;margin:8px 0 12px}.fill .kp-pct{font-size:.85rem}
+.fill .cp-card{padding:18px 16px}
+.fill .cp-card-t{font-size:.9rem}
+.cp-chart{flex:1;display:flex;flex-direction:column}
+.cp-chart .cp-bars{flex:1;height:auto;min-height:150px}
+.cp-chart .cp-col{height:100%}
+.cp-chart .cp-bar{width:62%}
+.fill .cp-leg{font-size:.75rem}
+.fill .cp-mes{font-size:.78rem}.fill .cp-v{font-size:.95rem}.fill .cp-a{font-size:.75rem}
+.fill .vr-grid{margin-top:16px}.fill .vr-pct{font-size:1.4rem}.fill .vr-lbl{font-size:.82rem}.fill .vr-sub{font-size:.68rem}
+/* comissao */
+.fill .cm-hero{padding:24px 18px 18px}
+.fill .cm-ic{width:56px;height:56px;font-size:1.6rem}
+.fill .cm-lbl{font-size:.9rem}.fill .cm-val{font-size:1.9rem}
+.fill .cm-prog{height:18px}.fill .cm-fill span{line-height:18px;font-size:.66rem}
+.fill .cm-foot{font-size:.75rem}
+.fill .cm-box{padding:18px 4px}.fill .cm-bv{font-size:.88rem}.fill .cm-pv{font-size:1.2rem}.fill .cm-bl{font-size:.72rem}
+.cm-detcard{flex:1;display:flex;flex-direction:column}
+.cm-detcard .cm-det{flex:1;display:flex;flex-direction:column;justify-content:space-around}
+.fill .cm-li{font-size:.85rem;padding:16px 2px}
+.fill .cm-info{font-size:.8rem;padding:16px}
+
+/* v31 acordos maior */
+#pgAcordos .tbl-card .tbl-row{padding:13px 10px}
+#pgAcordos .tbl-card .tbl-nm{font-size:.86rem}
+#pgAcordos .tbl-card .tbl-av{width:36px;height:36px;font-size:.8rem}
+#pgAcordos .tbl-card .tbl-ac{font-size:.9rem}
+#pgAcordos .tbl-card .tbl-vl{font-size:.82rem}
+#pgAcordos .tbl-card .tbl-h-rk,#pgAcordos .tbl-card .tbl-h-nm,#pgAcordos .tbl-card .tbl-h-ac,#pgAcordos .tbl-card .tbl-h-vl{font-size:.7rem}
 </style>
 </head>
 <body>
@@ -490,8 +548,8 @@ function closeMenu(){document.getElementById('menuBg').classList.remove('on')}
 function renderInicio(){
   if(!rankData)return;var d=rankData,ops=d.ops,t3=ops.slice(0,3);
   var userName=cU?cU.nome.split(' ')[0]:'';
-  var h='<div class="hdr"><div><div class="hdr-title">Acordos do Dia</div><div class="hdr-date">\uD83D\uDCC5 '+(d.d||'Hoje')+(userName?' \u00B7 '+userName:'')+'</div></div></div>';
-  h+='<div style="padding:0 14px 16px">';
+  var h=hdrPadrao('Acordos do Dia',(d.d||'Hoje')+(userName?' \u00B7 '+userName:''));
+  h+='<div class="fill fill-ini">';
   // Hero with trophy on left
   h+='<div class="hero"><div class="hero-trophy">\uD83C\uDFC6</div><div class="hero-body"><div class="hero-lbl">Valor Total</div><div class="hero-val">'+fs(d.tv)+'</div></div></div>';
   // Acordos + Operadores
@@ -502,6 +560,7 @@ function renderInicio(){
   // Top 3
   if(t3.length>=3){
     h+='<div class="sec"><div class="sec-t">\uD83C\uDFC6 Top 3 do Dia</div><div class="sec-link" onclick="go(\'acordos\')">Ver todos \u203A</div></div>';
+    h+='<div class="t3-wrap">';
     var md=['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'];
     var posLbl=['\uD83D\uDC51','2\u00BA','3\u00BA'];
     var avBg=['#d4a937','#c0c0c0','#cd7f32'];
@@ -515,6 +574,7 @@ function renderInicio(){
       h+='<div class="top3-pos" style="color:'+avBg[i]+'">'+posLbl[i]+'</div>';
       h+='</div>';
     });
+    h+='</div>';
   }
   h+='</div>';
   document.getElementById('pgInicio').innerHTML=h;
@@ -545,7 +605,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div><div class="vtag">v27</div></div>';
+  h+='</div><div class="vtag">v31</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -578,17 +638,17 @@ function renderComp(){
   var varA=prevA>0?Math.round((curA-prevA)/prevA*100):0;
   function pc(v){return '<div class="kp-pct'+(v<0?' neg':'')+'"><span class="kp-ic">'+(v<0?'\u25BC':'\u271A')+'</span> '+(v>=0?'+':'')+v+'%</div>'}
   var h=hdrPadrao('Comparativo',rankData?rankData.d:'');
-  h+='<div class="cp-wrap">';
+  h+='<div class="cp-wrap fill">';
   h+='<div class="cp-sec"><span class="cp-ic">\uD83D\uDCCA</span> Seu resultado atual</div>';
   h+='<div class="kp-grid"><div class="kp"><div class="kp-lbl">Acordos</div><div class="kp-val">'+curA+'</div>'+pc(varA)+'</div>';
   h+='<div class="kp"><div class="kp-lbl">Valor</div><div class="kp-val">'+fm(curV)+'</div>'+pc(varV)+'</div></div>';
   var maxV=Math.max(old?old.v:0,prev?prev.v:0,curV,1);
-  h+='<div class="cp-card"><div class="cp-card-h"><div class="cp-card-t"><span class="cp-ic">\uD83D\uDCCA</span> Compara\u00E7\u00E3o com meses anteriores</div></div>';
+  h+='<div class="cp-card cp-chart"><div class="cp-card-h"><div class="cp-card-t"><span class="cp-ic">\uD83D\uDCCA</span> Compara\u00E7\u00E3o com meses anteriores</div></div>';
   h+='<div class="cp-leg"><span><i style="background:#3b82f6"></i>Valor</span><span><i style="background:#9ca3af"></i>Acordos</span></div>';
   h+='<div class="cp-bars">';
   [old,prev,cur].forEach(function(d,i){
-    var v=d?d.v:0,px=Math.max(Math.round(v/maxV*90),8),isCur=i===2;
-    h+='<div class="cp-col"><div class="cp-bar'+(isCur?' cur':'')+'" style="height:'+px+'px"></div></div>';
+    var v=d?d.v:0,px=Math.max(Math.round(v/maxV*92),6),isCur=i===2;
+    h+='<div class="cp-col"><div class="cp-bar'+(isCur?' cur':'')+'" style="height:'+px+'%"></div></div>';
   });
   h+='</div><div class="cp-info">';
   [old,prev,cur].forEach(function(d,i){
@@ -600,7 +660,7 @@ function renderComp(){
   h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
   h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
   h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
-  h+='</div></div><div class="vtag">v28</div></div>';
+  h+='</div></div><div class="vtag">v31</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -619,7 +679,7 @@ function renderComissao(){
   var pCom=curRec>0?Math.round(curCom/curRec*1000)/10:0;
   var ok=falta<=0;
   var h=hdrPadrao('Comiss\u00E3o',rankData?rankData.d:'');
-  h+='<div class="cp-wrap">';
+  h+='<div class="cp-wrap fill">';
   h+='<div class="cm-hero"><div class="cm-top"><div class="cm-ic">\uD83D\uDCB0</div><div><div class="cm-lbl">Sua comiss\u00E3o</div><div class="cm-val">'+fm(curV)+'</div></div></div>';
   h+='<div class="cm-prog"><div class="cm-fill" style="width:'+Math.max(pct,8)+'%"><span>'+pctR+'%</span></div></div>';
   h+='<div class="cm-foot"><span>'+(novato?'Sem meta (novato)':'Meta: '+fm(meta))+'</span><span>'+(novato?'':(ok?'Meta atingida!':'Falta: '+fm(falta)))+'</span></div>';
@@ -628,13 +688,13 @@ function renderComissao(){
   h+='<div class="cm-box"><div class="cm-bv">'+fm(prevV)+'</div><div class="cm-bl">M\u00EAs anterior</div></div>';
   h+='<div class="cm-box cm-cur"><div class="cm-bv" style="font-weight:600">'+fm(curV)+'</div><div class="cm-bl">Atual</div></div>';
   h+='<div class="cm-box"><div class="cm-bv cm-pv'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="cm-bl">Varia\u00E7\u00E3o</div></div></div></div>';
-  h+='<div class="cp-card" style="padding-bottom:6px"><div class="cp-card-t"><span class="cp-ic">\uD83D\uDCBC</span> Detalhes da comiss\u00E3o</div><div class="cm-det">';
-  h+='<div class="cm-li"><span><i>\uD83D\uDCB5</i> Comiss\u00E3o'+(pCom?' ('+String(pCom).replace('.',',')+'%)':'')+'</span><b>'+fm(curCom)+'</b></div>';
+  h+='<div class="cp-card cm-detcard"><div class="cp-card-t"><span class="cp-ic">\uD83D\uDCBC</span> Detalhes da comiss\u00E3o</div><div class="cm-det">';
+  h+='<div class="cm-li"><span><i>\uD83D\uDCB5</i> Comiss\u00E3o'+(pCom?' ('+String(pCom).replace('.',',')+'%)':'')+'</span></div>';
   h+='<div class="cm-li"><span><i>\uD83D\uDD52</i> Flexibilidade (hor\u00E1rio)</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
   h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
-  h+='<div class="vtag">v30</div></div>';
+  h+='<div class="vtag">v31</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
