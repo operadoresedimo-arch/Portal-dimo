@@ -138,6 +138,43 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 .tbl-h-ch{width:20px}
 .tbl-turno{margin-left:6px}
 .ver-todos{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px;border-top:1px solid #eef0f3;font-size:.76rem;font-weight:600;color:#2d3748;background:#fff;width:100%;border-left:0;border-right:0;border-bottom:0;font-family:inherit}
+
+/* v26 acordos igual mockup */
+#pgAcordos .hdr{border-bottom:0;background:#f7f9fc;padding-bottom:6px}
+#pgAcordos .hdr-title{font-size:1.15rem;font-weight:800;color:#1a1f36}
+#pgAcordos .hdr-date{font-size:.72rem;color:#4b5563;margin-top:3px}
+.ham{width:22px;gap:5px}.ham i{height:2.5px;background:#1e293b}
+.hoje{padding:8px 12px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);font-size:.78rem}
+.hoje:after{content:"\2304";margin-left:2px;font-size:.7rem;position:relative;top:-3px}
+#pgAcordos .srch{background:#eef2f7;border:1px solid #e3e8ef;border-radius:14px;padding:11px 14px;margin:8px 0 10px;font-size:.8rem}
+.filters{background:#eef2f7;border:1px solid #e3e8ef;border-radius:16px;padding:3px}
+.flt{padding:10px 4px;border-radius:14px;font-size:.8rem;font-weight:500;color:#374151;position:relative}
+.flt+.flt:not(.on):before{content:"";position:absolute;left:0;top:25%;height:50%;width:1px;background:#d6dce5}
+.flt.on{background:linear-gradient(180deg,#1e4e7e,#0f3557);color:#fff;font-weight:700;box-shadow:0 3px 8px rgba(15,53,87,.35)}
+.flt.on+.flt:before{display:none}
+.tbl-card{border:1px solid #e3e8ef;border-radius:16px;box-shadow:0 2px 8px rgba(15,23,42,.05)}
+.tbl-card .tbl-hdr{background:#f3f6fa;padding:12px 10px}
+.tbl-card .tbl-h-rk,.tbl-card .tbl-h-nm,.tbl-card .tbl-h-ac,.tbl-card .tbl-h-vl{font-size:.62rem;font-weight:600;color:#374151;letter-spacing:.02em}
+.tbl-card .tbl-h-rk{width:20px}
+.tbl-card .tbl-h-nm{padding-left:0;margin-left:0}
+.tbl-card .tbl-h-ac{width:62px}
+.tbl-card .tbl-h-vl{width:96px;text-align:left;padding-left:8px}
+.tbl-card .tbl-h-t{width:30px}
+.tbl-card .tbl-row{padding:9px 10px;border-bottom:1px solid #eef1f5}
+.tbl-card .tbl-row:nth-child(odd){background:#fbfcfe}
+.tbl-card .tbl-rk{width:20px;text-align:left;font-size:.74rem;font-weight:500;color:#1f2937}
+.tbl-card .tbl-av{width:30px;height:30px;margin:0 10px 0 4px;font-size:.72rem;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.tbl-card .tbl-nm{font-size:.78rem;font-weight:500;color:#1f2937}
+.tbl-card .tbl-ac{width:62px;font-size:.8rem;font-weight:700;color:#1f2937}
+.tbl-card .tbl-vl{width:96px;text-align:left;padding-left:8px;font-size:.76rem;color:#1f2937;white-space:nowrap}
+.tbl-card .tbl-turno{width:24px;height:24px;line-height:18px;margin-left:6px;font-size:.7rem;font-weight:700;border-radius:6px}
+.tbl-card .tbl-turno.t-m{color:#15803d;background:#dcfce7;border:1px solid #bbf7d0}
+.tbl-card .tbl-turno.t-t{color:#b45309;background:#fef3c7;border:1px solid #fde68a}
+.tbl-card .tbl-turno.t-n{color:#7e22ce;background:#f3e8ff;border:1px solid #e9d5ff}
+.tbl-ch{width:18px;color:#374151;font-size:1.05rem}
+.tbl-h-ch{width:18px}
+.ver-todos{margin:10px;width:calc(100% - 20px);border:0;border-radius:12px;background:#eef2f7;font-size:.72rem;color:#1f2937;padding:11px}
+.vtag{text-align:center;font-size:.55rem;color:#c0c5cf;margin-top:8px}
 </style>
 </head>
 <body>
@@ -283,12 +320,23 @@ function loadRanking(){
       var totalVal=allNums[allNums.length-1];
       var totalQtd=Math.round(allNums[allNums.length-2]);
       if(name==='Totais'){ta=totalQtd;tv=totalVal;continue}
-      if(totalQtd===0&&totalVal===0)continue;
       var prefix=name.charAt(0);
       if(prefix!=='0'&&prefix!=='1'&&prefix!=='2')continue;
       ops.push({raw:name,n:cn(name),a:totalQtd,v:Math.round(totalVal*100)/100,turno:getTurno(name)});
     }
-    ops.sort(function(a,b){return b.a-a.a||b.v-a.v});
+    // incluir quem nao fez acordo (logins 0/1/2 da planilha de login)
+    var EXC=['solange ana batista'];
+    var tem={};ops.forEach(function(o){tem[o.raw.toLowerCase().replace(/^\d+\./,'')]=1});
+    Object.keys(loginMap).forEach(function(lg){
+      var pf=lg.charAt(0);if(pf!=='0'&&pf!=='1'&&pf!=='2')return;
+      if(!/^\d+\./.test(lg))return;
+      var full=(loginMap[lg]||'').toLowerCase().trim();
+      if(EXC.indexOf(full)>=0)return;
+      var k=lg.replace(/^\d+\./,'');if(tem[k])return;tem[k]=1;
+      ops.push({raw:lg,n:cn(lg),a:0,v:0,turno:getTurno(lg)});
+    });
+    ops=ops.filter(function(o){var f=(loginMap[o.raw.toLowerCase()]||'').toLowerCase().trim();return EXC.indexOf(f)<0&&o.n.toLowerCase()!=='solange batista'});
+    ops.sort(function(a,b){return b.a-a.a||b.v-a.v||a.n.localeCompare(b.n)});
     rankData={d:dt,ta:ta,tv:Math.round(tv*100)/100,ops:ops};
   }).catch(function(e){console.log('Ranking error:',e)});
 }
@@ -394,7 +442,7 @@ function renderInicio(){
   // Acordos + Operadores
   h+='<div class="duo-cards">';
   h+='<div class="duo"><div class="duo-icon" style="background:rgba(37,99,235,.1);color:#2563eb">\uD83D\uDCCB</div><div class="duo-data"><div class="duo-lbl">Acordos</div><div class="duo-val">'+d.ta+'</div></div></div>';
-  h+='<div class="duo"><div class="duo-icon" style="background:rgba(234,88,12,.1);color:#ea580c">\uD83D\uDC65</div><div class="duo-data"><div class="duo-lbl">Operadores</div><div class="duo-val">'+ops.length+'</div></div></div>';
+  h+='<div class="duo"><div class="duo-icon" style="background:rgba(234,88,12,.1);color:#ea580c">\uD83D\uDC65</div><div class="duo-data"><div class="duo-lbl">Operadores</div><div class="duo-val">'+ops.filter(function(o){return o.a>0}).length+'</div></div></div>';
   h+='</div>';
   // Top 3
   if(t3.length>=3){
@@ -442,7 +490,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div></div>';
+  h+='</div><div class="vtag">v27</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
