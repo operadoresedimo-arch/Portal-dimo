@@ -288,6 +288,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 #pgAcordos .tbl-card .tbl-ac{font-size:.9rem}
 #pgAcordos .tbl-card .tbl-vl{font-size:.82rem}
 #pgAcordos .tbl-card .tbl-h-rk,#pgAcordos .tbl-card .tbl-h-nm,#pgAcordos .tbl-card .tbl-h-ac,#pgAcordos .tbl-card .tbl-h-vl{font-size:.7rem}
+
+/* v32 fix barras grafico */
+.cp-chart .cp-bars{align-items:stretch}
+.cp-chart .cp-bars .cp-col{position:relative;height:auto;align-self:stretch}
+.cp-chart .cp-bars .cp-bar{position:absolute;bottom:0;left:19%;width:62%}
 </style>
 </head>
 <body>
@@ -605,7 +610,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div><div class="vtag">v31</div></div>';
+  h+='</div><div class="vtag">v32</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -660,7 +665,7 @@ function renderComp(){
   h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
   h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
   h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
-  h+='</div></div><div class="vtag">v31</div></div>';
+  h+='</div></div><div class="vtag">v32</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -694,7 +699,7 @@ function renderComissao(){
   h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
   h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
-  h+='<div class="vtag">v31</div></div>';
+  h+='<div class="vtag">v32</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
