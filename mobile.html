@@ -344,6 +344,22 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 .tr-ph{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e5e7eb;font-size:.85rem}
 .tr-ds{font-size:.8rem;color:#4b5563;margin:12px 2px}
 .tr-btn{width:100%;border:0;border-radius:12px;padding:14px;background:linear-gradient(180deg,#1e4e7e,#0f3557);color:#fff;font-family:inherit;font-size:.85rem;font-weight:700}
+
+/* v34 beneficios */
+.bn-rw{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bn-r{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:22px 4px;text-align:center;box-shadow:0 1px 4px rgba(15,23,42,.04)}
+.bn-r.hl{background:#fffbeb;border:2px solid #f5c34b}
+.bn-rv{font-size:.95rem;font-weight:700;color:#1a1f36}
+.bn-rl{font-size:.7rem;color:#4b5563;margin-top:8px}
+.bn-it{flex:1;display:flex;align-items:center;gap:14px;padding:16px 14px;border-bottom:1px solid #eef1f5;min-height:80px}
+.bn-it:last-child{border-bottom:0}
+.bn-ic{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+.bn-b{flex:1;min-width:0}
+.bn-t{font-size:.9rem;font-weight:700;color:#1a1f36}
+.bn-s{font-size:.76rem;color:#1f2937;margin-top:3px}
+.bn-s2{font-size:.7rem;color:#6b7280;margin-top:2px}
+.bn-lk{font-size:1.2rem;flex-shrink:0;filter:grayscale(.2)}
+.bn-lk.ok{filter:none}
 </style>
 </head>
 <body>
@@ -661,7 +677,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div><div class="vtag">v33</div></div>';
+  h+='</div><div class="vtag">v34</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -716,7 +732,7 @@ function renderComp(){
   h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
   h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
   h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
-  h+='</div></div><div class="vtag">v33</div></div>';
+  h+='</div></div><div class="vtag">v34</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -750,23 +766,36 @@ function renderComissao(){
   h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
   h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
-  h+='<div class="vtag">v33</div></div>';
+  h+='<div class="vtag">v34</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
 
 function renderBeneficios(){
   var el=document.getElementById('pgComp');
-  var h='<div class="hdr"><div><div class="hdr-title">Benef\u00EDcios</div></div></div><div style="padding:0 14px 16px">';
-  h+='<div class="card" style="background:linear-gradient(135deg,#e8edf3,#dfe5ed);border:none;display:flex;gap:14px;align-items:center"><div style="font-size:2rem">\uD83C\uDF81</div><div><div style="font-size:.85rem;font-weight:700">Bater a meta tem suas recompensas!</div><div style="font-size:.6rem;color:#6b7280;margin-top:2px">Alcance seus objetivos e desbloqueie benef\u00EDcios.</div></div></div>';
-  h+='<div class="sec"><div class="sec-t">\u23F0 Recompensas por tempo</div></div>';
-  h+='<div class="rew-grid"><div class="rew"><div class="rew-val">R$ 200</div><div class="rew-lbl">2 a 6 dias</div></div><div class="rew"><div class="rew-val">R$ 300</div><div class="rew-lbl">+7 dias</div></div><div class="rew"><div class="rew-val">R$ 400</div><div class="rew-lbl">+12 dias</div></div><div class="rew hl"><div class="rew-val">R$ 600</div><div class="rew-lbl">+3 meses</div></div></div>';
-  h+='<div class="sec"><div class="sec-t">\uD83C\uDFAF Benef\u00EDcios da meta</div></div>';
-  h+='<div class="ben-item"><div class="ben-icon">\uD83D\uDCB0</div><div style="flex:1"><div class="ben-nm">Comiss\u00E3o</div><div class="ben-desc">5% da Receita</div></div><div>\uD83D\uDD12</div></div>';
-  h+='<div class="ben-item"><div class="ben-icon">\u23F0</div><div style="flex:1"><div class="ben-nm">Flexibilidade</div><div class="ben-desc">Hor\u00E1rio Flex\u00EDvel</div></div><div>\uD83D\uDD12</div></div>';
-  h+='<div class="ben-item"><div class="ben-icon">\uD83C\uDFD6</div><div style="flex:1"><div class="ben-nm">Folgas</div><div class="ben-desc">Conforme cumprimento das metas</div></div><div>\uD83D\uDD12</div></div>';
+  var cur=findMyComp(compMonths[2]),curV=cur?cur.v:0;
+  var cfg=(cur&&cur.cfg?cur.cfg:'').toLowerCase(),novato=cfg.indexOf('novato')>=0||(cU&&cU.login&&cU.login.charAt(0)==='0');
+  var m1=0,m2=0,mm=cfg.match(/(\d+)\s*a\s*(\d+)/),mo=cfg.match(/(\d+)\s*ou\s*mais/);
+  if(mm){m1=+mm[1]*1000;m2=+mm[2]*1000}else if(mo){m1=m2=+mo[1]*1000}else if(!novato){m1=10000;m2=14000}
+  var meta=new Date().getDate()<=20?m1:m2,ok=!novato&&meta>0&&curV>=meta;
+  function lk(){return '<div class="bn-lk'+(ok?' ok':'')+'">'+(ok?'\uD83D\uDD13':'\uD83D\uDD12')+'</div>'}
+  var h=hdrPadrao('Benef\u00EDcios',rankData?rankData.d:'');
+  h+='<div class="fill">';
+  h+='<div class="tr-hero"><div class="tr-hic">\uD83C\uDF81</div><div><div class="tr-ht">Bater a meta tem suas recompensas!</div><div class="tr-hs">Veja todos os benef\u00EDcios que voc\u00EA pode conquistar ao alcan\u00E7ar seus objetivos.</div></div></div>';
+  h+='<div class="tr-sec"><div class="tr-st"><span class="tr-sic">\uD83D\uDD52</span> Recompensas por tempo</div></div>';
+  h+='<div class="bn-rw">';
+  [['R$ 200','2 a 6 dias'],['R$ 300','+7 dias'],['R$ 400','+12 dias'],['R$ 600','+3 meses']].forEach(function(r,i){
+    h+='<div class="bn-r'+(i===3?' hl':'')+'"><div class="bn-rv">'+r[0]+'</div><div class="bn-rl">'+r[1]+'</div></div>';
+  });
   h+='</div>';
+  h+='<div class="tr-sec"><div class="tr-st"><span class="tr-sic">\uD83C\uDF81</span> Benef\u00EDcios da meta</div></div>';
+  h+='<div class="tr-list">';
+  h+='<div class="bn-it"><div class="bn-ic" style="background:#1f2937">\uD83D\uDCB0</div><div class="bn-b"><div class="bn-t">Comiss\u00E3o</div><div class="bn-s">5% da Receita</div></div>'+lk()+'</div>';
+  h+='<div class="bn-it"><div class="bn-ic" style="background:#eef2f7">\uD83D\uDD52</div><div class="bn-b"><div class="bn-t">Flexibilidade</div><div class="bn-s">Hor\u00E1rio Flex\u00EDvel</div><div class="bn-s2">8h \u00E0s 12h + 2h para almo\u00E7o</div></div>'+lk()+'</div>';
+  h+='<div class="bn-it"><div class="bn-ic" style="background:#fde7c7">\uD83C\uDFDD\uFE0F</div><div class="bn-b"><div class="bn-t">Folgas</div><div class="bn-s">Dias de Folga</div><div class="bn-s2">Conforme cumprimento das metas</div></div>'+lk()+'</div>';
+  h+='</div><div class="vtag">v34</div></div>';
   el.innerHTML=h;
+  window.scrollTo(0,0);
 }
 
 function renderFaltas(){
@@ -831,7 +860,7 @@ function renderTreino(){
     }
     h+='</div>';
   });
-  h+='</div><div class="vtag">v33</div></div>';
+  h+='</div><div class="vtag">v34</div></div>';
   document.getElementById('pgTreino').innerHTML=h;
 }
 function trnToggle(i){trnOpen=trnOpen===i?-1:i;renderTreino()}
