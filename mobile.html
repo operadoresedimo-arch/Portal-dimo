@@ -123,6 +123,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 .tbl-turno.t-m{color:#16a34a;background:rgba(22,163,74,.1)}
 .tbl-turno.t-t{color:#f59e0b;background:rgba(245,158,11,.1)}
 .tbl-turno.t-n{color:#8b5cf6;background:rgba(139,92,246,.1)}
+.ac-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ac-left{display:flex;align-items:center;gap:12px}
+.ham{width:22px;display:flex;flex-direction:column;gap:4px}.ham i{display:block;height:2px;background:#1a1f36;border-radius:2px}
+.hoje{display:flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;font-size:.72rem;font-weight:600;color:#1a1f36}
+.filters{display:flex;background:#eef0f3;border-radius:12px;padding:4px;margin:4px 0 12px}
+.flt{flex:1;border:0;background:transparent;padding:9px 4px;border-radius:9px;font-family:inherit;font-size:.74rem;font-weight:600;color:#6b7280;cursor:pointer}
+.flt.on{background:#2d3748;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.tbl-card{background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
+.tbl-card .tbl-hdr{margin-top:0;padding:12px 12px;border-bottom:1px solid #eef0f3}
+.tbl-card .tbl-row{padding:11px 12px}
+.tbl-card .tbl-row:last-child{border-bottom:0}
+.tbl-ch{width:16px;text-align:right;color:#c0c5cf;font-size:.9rem;margin-left:4px}
+.tbl-h-ch{width:20px}
+.tbl-turno{margin-left:6px}
+.ver-todos{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px;border-top:1px solid #eef0f3;font-size:.76rem;font-weight:600;color:#2d3748;background:#fff;width:100%;border-left:0;border-right:0;border-bottom:0;font-family:inherit}
 </style>
 </head>
 <body>
@@ -405,26 +420,29 @@ function renderInicio(){
 
 function renderAcordos(){
   if(!rankData)return;var d=rankData,ops=d.ops.slice();
-  var h='<div class="hdr"><div><div class="hdr-title">Acordos</div><div class="hdr-date">\uD83D\uDCC5 '+(d.d||'Hoje')+'</div></div></div>';
+  var AVC=['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#ec4899','#64748b'];
+  var h='<div class="hdr ac-top"><div class="ac-left"><div class="ham"><i></i><i></i><i></i></div><div><div class="hdr-title">Acordos</div><div class="hdr-date">'+(d.d||'Hoje')+'</div></div></div><div class="hoje">\uD83D\uDCC5 Hoje</div></div>';
   h+='<div style="padding:0 14px 16px">';
   h+='<input class="srch" type="text" placeholder="\uD83D\uDD0D Buscar operador..." oninput="filterRank(this.value)">';
   h+='<div class="filters"><button class="flt on" onclick="filterAccordos(\'todos\',this)">Todos</button><button class="flt" onclick="filterAccordos(\'com\',this)">Com acordo</button><button class="flt" onclick="filterAccordos(\'sem\',this)">Sem acordo</button></div>';
-  // Table header
-  h+='<div class="tbl-hdr"><div class="tbl-h-rk">#</div><div class="tbl-h-nm">OPERADOR</div><div class="tbl-h-ac">ACORDOS</div><div class="tbl-h-vl">VALOR</div><div class="tbl-h-t"></div></div>';
-  // Rows
+  h+='<div class="tbl-card">';
+  h+='<div class="tbl-hdr"><div class="tbl-h-rk">#</div><div class="tbl-h-nm">OPERADOR</div><div class="tbl-h-ac">ACORDOS</div><div class="tbl-h-vl">VALOR</div><div class="tbl-h-t"></div><div class="tbl-h-ch"></div></div>';
   ops.forEach(function(o,i){
     var tl=o.turno==='m'?'M':o.turno==='t'?'T':o.turno==='n'?'N':'';
     var tc=o.turno||'';
+    var cor=AVC[(o.n.charCodeAt(0)+o.n.length)%AVC.length];
     h+='<div class="tbl-row" data-nm="'+o.n.toLowerCase()+'" data-a="'+o.a+'">';
     h+='<div class="tbl-rk">'+(i+1)+'</div>';
-    h+='<div class="tbl-av">'+o.n.charAt(0)+'</div>';
+    h+='<div class="tbl-av" style="background:'+cor+'">'+o.n.charAt(0).toUpperCase()+'</div>';
     h+='<div class="tbl-nm">'+o.n+'</div>';
     h+='<div class="tbl-ac">'+o.a+'</div>';
     h+='<div class="tbl-vl">'+fm(o.v)+'</div>';
     h+=(tl?'<div class="tbl-turno t-'+tc+'">'+tl+'</div>':'<div class="tbl-turno"></div>');
+    h+='<div class="tbl-ch">\u203A</div>';
     h+='</div>';
   });
-  h+='</div>';
+  h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
+  h+='</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
