@@ -175,6 +175,37 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 .tbl-h-ch{width:18px}
 .ver-todos{margin:10px;width:calc(100% - 20px);border:0;border-radius:12px;background:#eef2f7;font-size:.72rem;color:#1f2937;padding:11px}
 .vtag{text-align:center;font-size:.55rem;color:#c0c5cf;margin-top:8px}
+
+/* v28 comparativo */
+#pgComp .hdr{border-bottom:0;background:#f7f9fc;padding-bottom:6px}
+.hdr-date{color:#4b5563}
+.cp-wrap{padding:6px 14px 20px}
+.cp-sec{display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;color:#1f2937;margin:8px 2px 12px}
+.cp-ic{font-size:.95rem}
+.kp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.kp{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(15,23,42,.04)}
+.kp-lbl{font-size:.75rem;font-weight:600;color:#1f2937}
+.kp-val{font-size:1.15rem;font-weight:800;color:#1a1f36;margin:6px 0 10px}
+.kp-pct{font-size:.75rem;font-weight:600;color:#16a34a}.kp-pct.neg{color:#ef4444}
+.kp-ic{font-size:.7rem}
+.cp-card{background:#fff;border:1px solid #e3e8ef;border-radius:16px;padding:16px 14px;margin-bottom:14px;box-shadow:0 1px 4px rgba(15,23,42,.04)}
+.cp-card-t{display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:600;color:#1f2937}
+.cp-leg{display:flex;justify-content:flex-end;gap:14px;font-size:.66rem;color:#4b5563;margin:14px 0 10px}
+.cp-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.cp-bars{display:flex;align-items:flex-end;height:100px;border-bottom:1px solid #e5e7eb;padding:0 4px}
+.cp-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center}
+.cp-bar{width:64%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#d1d5db 0,#d1d5db 14%,#8e949c 15%,#8a9099 100%)}
+.cp-bar.cur{background:linear-gradient(180deg,#60a5fa 0,#60a5fa 14%,#3b82f6 15%,#2563eb 100%)}
+.cp-info{display:flex;padding-top:10px}
+.cp-mes{font-size:.66rem;color:#4b5563}.cp-mes.cur{color:#2563eb;font-weight:700}
+.cp-v{font-size:.8rem;font-weight:700;color:#1a1f36;margin-top:6px}
+.cp-a{font-size:.66rem;color:#374151;margin-top:4px}
+.cp-var{background:#f3f6fa}
+.vr-grid{display:grid;grid-template-columns:1fr 1fr;margin-top:14px}
+.vr-grid>div{text-align:center}.vr-grid>div+div{border-left:1px solid #d6dce5}
+.vr-pct{font-size:1.05rem;font-weight:700;color:#16a34a}.vr-pct.neg{color:#ef4444}
+.vr-lbl{font-size:.72rem;color:#1f2937;margin-top:6px}
+.vr-sub{font-size:.6rem;color:#6b7280;margin-top:3px}
 </style>
 </head>
 <body>
@@ -506,40 +537,48 @@ function filterAccordos(tipo,btn){
   });
 }
 
+function mesNome(per){
+  var M=['Janeiro','Fevereiro','Mar\u00E7o','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  var m=(per||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(m)return M[parseInt(m[2],10)-1]+'/'+m[3];
+  return (per||'--').split(' ')[0];
+}
+function hdrPadrao(titulo,data){
+  return '<div class="hdr ac-top"><div class="ac-left"><div class="ham"><i></i><i></i><i></i></div><div><div class="hdr-title">'+titulo+'</div><div class="hdr-date">\uD83D\uDCC5 '+(data||'Hoje')+'</div></div></div><div class="hoje">\uD83D\uDCC5 Hoje</div></div>';
+}
 function renderComp(){
   var el=document.getElementById('pgComp');
   var cur=findMyComp(compMonths[2]),prev=findMyComp(compMonths[1]),old=findMyComp(compMonths[0]);
   var curA=cur?cur.a:0,curV=cur?cur.v:0,prevA=prev?prev.a:0,prevV=prev?prev.v:0;
   var varV=prevV>0?Math.round((curV-prevV)/prevV*100):0;
   var varA=prevA>0?Math.round((curA-prevA)/prevA*100):0;
-  var avgCur=curA>0?Math.round(curV/curA*100)/100:0,avgPrev=prevA>0?Math.round(prevV/prevA*100)/100:0;
-  var varAvg=avgPrev>0?Math.round((avgCur-avgPrev)/avgPrev*100):0;
-  var h='<div class="hdr"><div><div class="hdr-title">Comparativo</div></div></div><div style="padding:0 14px 16px">';
-  h+='<div class="sec"><div class="sec-t">\uD83D\uDCC8 Seu resultado atual</div></div>';
-  h+='<div class="cc-grid"><div class="cc"><div class="cc-lbl">Acordos</div><div class="cc-val">'+curA+'</div><div class="cc-pct'+(varA<0?' neg':'')+'">\u25B2 '+(varA>=0?'+':'')+varA+'%</div></div>';
-  h+='<div class="cc"><div class="cc-lbl">Valor</div><div class="cc-val" style="font-size:.85rem">'+fs(curV)+'</div><div class="cc-pct'+(varV<0?' neg':'')+'">\u25B2 '+(varV>=0?'+':'')+varV+'%</div></div>';
-  h+='<div class="cc"><div class="cc-lbl">M\u00E9dia/acordo</div><div class="cc-val" style="font-size:.85rem">'+fm(avgCur)+'</div><div class="cc-pct'+(varAvg<0?' neg':'')+'">\u25B2 '+(varAvg>=0?'+':'')+varAvg+'%</div></div></div>';
-  // Chart
+  function pc(v){return '<div class="kp-pct'+(v<0?' neg':'')+'"><span class="kp-ic">'+(v<0?'\u25BC':'\u271A')+'</span> '+(v>=0?'+':'')+v+'%</div>'}
+  var h=hdrPadrao('Comparativo',rankData?rankData.d:'');
+  h+='<div class="cp-wrap">';
+  h+='<div class="cp-sec"><span class="cp-ic">\uD83D\uDCCA</span> Seu resultado atual</div>';
+  h+='<div class="kp-grid"><div class="kp"><div class="kp-lbl">Acordos</div><div class="kp-val">'+curA+'</div>'+pc(varA)+'</div>';
+  h+='<div class="kp"><div class="kp-lbl">Valor</div><div class="kp-val">'+fm(curV)+'</div>'+pc(varV)+'</div></div>';
   var maxV=Math.max(old?old.v:0,prev?prev.v:0,curV,1);
-  h+='<div class="card"><div class="card-t">\uD83D\uDCC8 Compara\u00E7\u00E3o mensal</div><div class="chart-bars">';
+  h+='<div class="cp-card"><div class="cp-card-h"><div class="cp-card-t"><span class="cp-ic">\uD83D\uDCCA</span> Compara\u00E7\u00E3o com meses anteriores</div></div>';
+  h+='<div class="cp-leg"><span><i style="background:#3b82f6"></i>Valor</span><span><i style="background:#9ca3af"></i>Acordos</span></div>';
+  h+='<div class="cp-bars">';
   [old,prev,cur].forEach(function(d,i){
-    var v=d?d.v:0,a=d?d.a:0,pct=Math.round(v/maxV*100),isCur=i===2;
-    var period=compMonths[i]?compMonths[i].period:'--';
-    h+='<div class="chart-col"><div class="chart-bar" style="height:'+Math.max(pct,4)+'%;background:'+(isCur?'#2563eb':'#d1d5db')+'"></div>';
-    h+='<div class="chart-lbl" style="'+(isCur?'color:#2563eb;font-weight:700':'')+'">'+period.split(' ')[0]+'</div>';
-    h+='<div class="chart-v">'+fs(v)+'</div><div class="chart-a">'+a+' acordos</div></div>';
+    var v=d?d.v:0,px=Math.max(Math.round(v/maxV*90),8),isCur=i===2;
+    h+='<div class="cp-col"><div class="cp-bar'+(isCur?' cur':'')+'" style="height:'+px+'px"></div></div>';
+  });
+  h+='</div><div class="cp-info">';
+  [old,prev,cur].forEach(function(d,i){
+    var v=d?d.v:0,a=d?d.a:0,isCur=i===2;
+    var per=compMonths[i]?compMonths[i].period:'';
+    h+='<div class="cp-col"><div class="cp-mes'+(isCur?' cur':'')+'">'+mesNome(per)+'</div><div class="cp-v">'+fm(v)+'</div><div class="cp-a">'+a+' acordos</div></div>';
   });
   h+='</div></div>';
-  // Variation
-  h+='<div class="card"><div class="card-t">\uD83D\uDCC8 Varia\u00E7\u00E3o</div><div class="var-grid">';
-  h+='<div><div class="var-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="var-lbl">Valor</div></div>';
-  h+='<div><div class="var-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="var-lbl">Acordos</div></div>';
-  h+='<div><div class="var-pct'+(varAvg<0?' neg':'')+'">'+(varAvg>=0?'+':'')+varAvg+'%</div><div class="var-lbl">M\u00E9dia</div></div>';
-  h+='</div></div>';
-  if(varV<0)h+='<div class="msg">\u26A1 Bora recuperar! Foco no pr\u00F3ximo acordo.</div>';
-  else if(curV>0)h+='<div class="msg">\uD83D\uDD25 Mandando bem! Continue assim!</div>';
-  h+='</div>';
+  h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
+  h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
+  h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
+  h+='</div></div><div class="vtag">v28</div></div>';
   el.innerHTML=h;
+  window.scrollTo(0,0);
 }
 
 function renderComissao(){
