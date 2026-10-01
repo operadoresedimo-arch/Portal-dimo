@@ -206,6 +206,30 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 .vr-pct{font-size:1.05rem;font-weight:700;color:#16a34a}.vr-pct.neg{color:#ef4444}
 .vr-lbl{font-size:.72rem;color:#1f2937;margin-top:6px}
 .vr-sub{font-size:.6rem;color:#6b7280;margin-top:3px}
+
+/* v29 comissao */
+.cm-etapa{font-size:.6rem;opacity:.65;margin-top:6px}
+.cm-hero{background:linear-gradient(135deg,#3a4557,#1f2937);border-radius:16px;padding:18px 16px 14px;color:#fff;margin:6px 0 14px;box-shadow:0 4px 14px rgba(15,23,42,.18)}
+.cm-top{display:flex;align-items:center;gap:14px}
+.cm-ic{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.cm-lbl{font-size:.8rem;opacity:.9}
+.cm-val{font-size:1.5rem;font-weight:800;margin-top:2px}
+.cm-prog{height:14px;background:rgba(255,255,255,.18);border-radius:8px;overflow:hidden;margin:16px 0 8px}
+.cm-fill{height:100%;background:linear-gradient(90deg,#16a34a,#4ade80);border-radius:8px;position:relative}
+.cm-fill span{position:absolute;right:6px;top:0;line-height:14px;font-size:.58rem;font-weight:700;color:#fff}
+.cm-foot{display:flex;justify-content:space-between;font-size:.66rem;font-weight:500}
+.cm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.cm-box{background:#f7f9fc;border:1px solid #e3e8ef;border-radius:10px;padding:12px 4px;text-align:center}
+.cm-bv{font-size:.76rem;font-weight:700;color:#1a1f36;white-space:nowrap}
+.cm-pv{font-size:1rem;color:#16a34a}.cm-pv.neg{color:#ef4444}
+.cm-bl{font-size:.64rem;color:#4b5563;margin-top:6px}
+.cm-det{margin-top:10px}
+.cm-li{display:flex;justify-content:space-between;align-items:center;padding:10px 2px;border-bottom:1px solid #eef1f5;font-size:.72rem;color:#374151}
+.cm-li:last-child{border-bottom:0}
+.cm-li i{font-style:normal;margin-right:8px}
+.cm-li b{font-weight:600;color:#1f2937}.cm-li b.ok{color:#16a34a}
+.cm-info{display:flex;align-items:flex-start;gap:12px;background:#eef3fa;border-radius:12px;padding:12px 14px;margin:8px 0 10px;font-size:.7rem;color:#1e3a5f;line-height:1.4}
+.cm-i{width:20px;height:20px;border-radius:50%;background:#0f3557;color:#fff;font-weight:700;font-size:.7rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:Georgia,serif}
 </style>
 </head>
 <body>
@@ -584,21 +608,35 @@ function renderComp(){
 function renderComissao(){
   var el=document.getElementById('pgComp');
   var cur=findMyComp(compMonths[2]),prev=findMyComp(compMonths[1]);
-  var curV=cur?cur.v:0,prevV=prev?prev.v:0,curCom=cur?cur.com:0;
-  var meta=20000,pct=meta>0?Math.min(Math.round(curV/meta*100),100):0,falta=Math.max(meta-curV,0);
+  var curV=cur?cur.v:0,prevV=prev?prev.v:0,curCom=cur?cur.com:0,curRec=cur?cur.rec:0;
+  var cfg=(cur&&cur.cfg?cur.cfg:'').toLowerCase(),novato=cfg.indexOf('novato')>=0||(cU&&cU.login&&cU.login.charAt(0)==='0');
+  var m1=0,m2=0,mm=cfg.match(/(\d+)\s*a\s*(\d+)/),mo=cfg.match(/(\d+)\s*ou\s*mais/);
+  if(mm){m1=+mm[1]*1000;m2=+mm[2]*1000}else if(mo){m1=m2=+mo[1]*1000}else if(!novato){m1=10000;m2=14000}
+  var dia=new Date().getDate(),ate20=dia<=20,meta=novato?0:(ate20?m1:m2);
+  var etapa=novato?'Novato: comiss\u00E3o sobre qualquer acordo':(ate20?'Meta at\u00E9 dia 20':'Meta at\u00E9 o fim do m\u00EAs');
+  var pctR=meta>0?Math.round(curV/meta*100):100,pct=Math.min(pctR,100),falta=Math.max(meta-curV,0);
   var varV=prevV>0?Math.round((curV-prevV)/prevV*100):0;
-  var h='<div class="hdr"><div><div class="hdr-title">Comiss\u00E3o</div></div></div><div style="padding:0 14px 16px">';
-  h+='<div class="hero"><div class="hero-lbl">\uD83D\uDCB0 Sua comiss\u00E3o</div><div class="hero-val">'+fm(curV)+'</div>';
-  h+='<div style="height:10px;background:rgba(255,255,255,.15);border-radius:6px;overflow:hidden;margin:10px 0 6px"><div style="height:100%;background:#16a34a;border-radius:6px;width:'+pct+'%"></div></div>';
-  h+='<div style="display:flex;justify-content:space-between;font-size:.55rem;opacity:.5"><span>Meta: '+fm(meta)+'</span><span>Falta: '+fm(falta)+'</span></div></div>';
-  h+='<div class="card"><div class="card-t">Comparativo com m\u00EAs anterior</div><div class="cc-grid">';
-  h+='<div class="cc"><div class="cc-val" style="font-size:.85rem">'+fs(prevV)+'</div><div class="cc-lbl">M\u00EAs anterior</div></div>';
-  h+='<div class="cc"><div class="cc-val" style="font-size:.85rem">'+fs(curV)+'</div><div class="cc-lbl">Atual</div></div>';
-  h+='<div class="cc"><div class="cc-pct'+(varV<0?' neg':'')+'" style="font-size:1rem">'+(varV>=0?'+':'')+varV+'%</div><div class="cc-lbl">Varia\u00E7\u00E3o</div></div></div></div>';
-  if(falta>0)h+='<div class="msg">\uD83D\uDCA1 Faltam '+fm(falta)+' para desbloquear tudo!</div>';
-  else h+='<div class="msg" style="background:rgba(22,163,74,.05);color:#16a34a;border-color:rgba(22,163,74,.12)">\u2705 Meta atingida! Parab\u00E9ns!</div>';
+  var pCom=curRec>0?Math.round(curCom/curRec*1000)/10:0;
+  var ok=falta<=0;
+  var h=hdrPadrao('Comiss\u00E3o',rankData?rankData.d:'');
+  h+='<div class="cp-wrap">';
+  h+='<div class="cm-hero"><div class="cm-top"><div class="cm-ic">\uD83D\uDCB0</div><div><div class="cm-lbl">Sua comiss\u00E3o</div><div class="cm-val">'+fm(curV)+'</div></div></div>';
+  h+='<div class="cm-prog"><div class="cm-fill" style="width:'+Math.max(pct,8)+'%"><span>'+pctR+'%</span></div></div>';
+  h+='<div class="cm-foot"><span>'+(novato?'Sem meta (novato)':'Meta: '+fm(meta))+'</span><span>'+(novato?'':(ok?'Meta atingida!':'Falta: '+fm(falta)))+'</span></div>';
+  h+='<div class="cm-etapa">'+etapa+(!novato&&m1!==m2?' \u00B7 dia 20: '+fs(m1)+' \u00B7 fim do m\u00EAs: '+fs(m2):'')+'</div></div>';
+  h+='<div class="cp-card"><div class="cp-card-t"><span class="cp-ic">\uD83D\uDCC8</span> Comparativo com o m\u00EAs anterior</div><div class="cm-grid">';
+  h+='<div class="cm-box"><div class="cm-bv">'+fm(prevV)+'</div><div class="cm-bl">M\u00EAs anterior</div></div>';
+  h+='<div class="cm-box cm-cur"><div class="cm-bv" style="font-weight:600">'+fm(curV)+'</div><div class="cm-bl">Atual</div></div>';
+  h+='<div class="cm-box"><div class="cm-bv cm-pv'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="cm-bl">Varia\u00E7\u00E3o</div></div></div></div>';
+  h+='<div class="cp-card" style="padding-bottom:6px"><div class="cp-card-t"><span class="cp-ic">\uD83D\uDCBC</span> Detalhes da comiss\u00E3o</div><div class="cm-det">';
+  h+='<div class="cm-li"><span><i>\uD83D\uDCB5</i> Comiss\u00E3o'+(pCom?' ('+String(pCom).replace('.',',')+'%)':'')+'</span><b>'+fm(curCom)+'</b></div>';
+  h+='<div class="cm-li"><span><i>\uD83D\uDD52</i> Flexibilidade (hor\u00E1rio)</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
+  h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
+  h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
+  h+='<div class="vtag">v30</div></div>';
   el.innerHTML=h;
+  window.scrollTo(0,0);
 }
 
 function renderBeneficios(){
