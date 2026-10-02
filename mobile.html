@@ -377,6 +377,26 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 .pw-box input:focus{border-color:#1e4e7e}
 .pw-btn{margin-top:4px}
 .pw-cancel{width:100%;margin-top:8px;padding:12px;border:0;background:none;color:#6b7280;font-family:inherit;font-size:.8rem;font-weight:600}
+
+/* v38 drawer */
+.menu-bg{transition:background .25s}
+.drw{position:fixed;top:0;left:0;bottom:0;width:82%;max-width:320px;background:#fff;z-index:61;transform:translateX(-100%);transition:transform .28s ease;display:flex;flex-direction:column;padding:max(18px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom));box-shadow:4px 0 24px rgba(15,23,42,.18);overflow-y:auto}
+.menu-bg.on .drw{transform:translateX(0)}
+.drw-h{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#4a5568,#1f2937);border-radius:16px;padding:16px 14px;color:#fff;margin-bottom:10px}
+.drw-av{width:46px;height:46px;border-radius:50%;background:#d4a937;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;flex-shrink:0}
+.drw-u{flex:1;min-width:0}
+.drw-nm{font-size:.92rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drw-lg{font-size:.68rem;opacity:.75;margin-top:2px}
+.drw-x{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:.8rem;cursor:pointer}
+.drw-sec{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin:14px 10px 6px}
+.drw-it{display:flex;align-items:center;gap:14px;width:100%;padding:13px 12px;border:0;background:none;border-radius:12px;font-family:inherit;font-size:.88rem;font-weight:600;color:#1a1f36;text-align:left;cursor:pointer}
+.drw-it span{width:34px;height:34px;border-radius:10px;background:#eef2f7;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.drw-it.on{background:#eef2f7;color:#0f3557}
+.drw-it.on span{background:#0f3557}
+.drw-it.out{color:#ef4444}
+.drw-it.out span{background:#fee2e2}
+.drw-ft{margin-top:auto;text-align:center;font-size:.6rem;color:#c0c5cf;padding-top:14px}
+.ham{cursor:pointer;padding:6px 2px}
 </style>
 </head>
 <body>
@@ -415,17 +435,23 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 <button class="bar-btn" data-t="acordos" onclick="go('acordos')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><span>Acordos</span></button>
 <button class="bar-btn" data-t="comp" onclick="go('comp')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>Comparativo</span></button>
 <button class="bar-btn" data-t="treino" onclick="go('treino')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg><span>Treinamento</span></button>
-<button class="bar-btn" data-t="mais" onclick="openMenu()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg><span>Mais</span></button>
 </div>
 </div>
 <div class="menu-bg" id="menuBg" onclick="closeMenu()">
-<div class="menu-sheet" onclick="event.stopPropagation()">
-<div class="menu-h"></div>
-<button class="menu-item" onclick="closeMenu();go('comissao')">💰 Comissão</button>
-<button class="menu-item" onclick="closeMenu();go('beneficios')">🎯 Benefícios</button>
-<button class="menu-item" onclick="closeMenu();go('faltas')">🔔 Faltas do Dia</button>
-<button class="menu-item" onclick="closeMenu();abrirSenha(false)">🔑 Alterar senha</button>
-<button class="menu-item out" onclick="doLogout()">🚪 Sair</button>
+<div class="drw" onclick="event.stopPropagation()">
+<div class="drw-h"><div class="drw-av" id="drwAv">?</div><div class="drw-u"><div class="drw-nm" id="drwNm"></div><div class="drw-lg" id="drwLg"></div></div><div class="drw-x" onclick="closeMenu()">✕</div></div>
+<div class="drw-sec">Menu</div>
+<button class="drw-it" data-t="inicio" onclick="closeMenu();go('inicio')"><span>🏠</span>Início</button>
+<button class="drw-it" data-t="acordos" onclick="closeMenu();go('acordos')"><span>📋</span>Acordos</button>
+<button class="drw-it" data-t="comp" onclick="closeMenu();go('comp')"><span>📊</span>Comparativo</button>
+<button class="drw-it" data-t="comissao" onclick="closeMenu();go('comissao')"><span>💰</span>Comissão</button>
+<button class="drw-it" data-t="beneficios" onclick="closeMenu();go('beneficios')"><span>🎁</span>Benefícios</button>
+<button class="drw-it" data-t="treino" onclick="closeMenu();go('treino')"><span>🎓</span>Treinamento</button>
+<button class="drw-it" data-t="faltas" onclick="closeMenu();go('faltas')"><span>🔔</span>Faltas do Dia</button>
+<div class="drw-sec">Conta</div>
+<button class="drw-it" onclick="closeMenu();abrirSenha(false)"><span>🔑</span>Alterar senha</button>
+<button class="drw-it out" onclick="doLogout()"><span>🚪</span>Sair</button>
+<div class="drw-ft">Édimo · Portal do Operador</div>
 </div>
 </div>
 <script>
@@ -698,7 +724,9 @@ function findMyComp(month){
 }
 
 // === NAVIGATION ===
+var curTab='inicio';
 function go(tab){
+  curTab=tab;
   document.querySelectorAll('.bar-btn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===tab)});
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});
   if(tab==='inicio'){document.getElementById('pgInicio').classList.add('on');renderInicio();window.scrollTo(0,0)}
@@ -706,7 +734,11 @@ function go(tab){
   else if(tab==='comp'||tab==='comissao'||tab==='beneficios'||tab==='faltas'){document.getElementById('pgComp').classList.add('on');if(tab==='comp')renderComp();else if(tab==='comissao')renderComissao();else if(tab==='beneficios')renderBeneficios();else renderFaltas()}
   else if(tab==='treino'){document.getElementById('pgTreino').classList.add('on');renderTreino()}
 }
-function openMenu(){document.getElementById('menuBg').classList.add('on')}
+function openMenu(){
+  if(cU){var n=cU.nome||'';document.getElementById('drwAv').textContent=n.charAt(0).toUpperCase();document.getElementById('drwNm').textContent=n.split(' ').slice(0,2).join(' ');document.getElementById('drwLg').textContent=(cU.login||'')+(cU.perfil==='admin'?' \u00B7 Admin':'')}
+  document.querySelectorAll('.drw-it[data-t]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===curTab)});
+  document.getElementById('menuBg').classList.add('on');
+}
 function closeMenu(){document.getElementById('menuBg').classList.remove('on')}
 
 // === RENDER PAGES ===
@@ -749,7 +781,7 @@ function renderInicio(){
 function renderAcordos(){
   if(!rankData)return;var d=rankData,ops=d.ops.slice();
   var AVC=['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#ec4899','#64748b'];
-  var h='<div class="hdr ac-top"><div class="ac-left"><div class="ham"><i></i><i></i><i></i></div><div><div class="hdr-title">Acordos</div><div class="hdr-date">'+(d.d||'Hoje')+'</div></div></div><div class="hoje">\uD83D\uDCC5 Hoje</div></div>';
+  var h='<div class="hdr ac-top"><div class="ac-left"><div class="ham" onclick="openMenu()"><i></i><i></i><i></i></div><div><div class="hdr-title">Acordos</div><div class="hdr-date">'+(d.d||'Hoje')+'</div></div></div><div class="hoje">\uD83D\uDCC5 Hoje</div></div>';
   h+='<div style="padding:0 14px 16px">';
   h+='<input class="srch" type="text" placeholder="\uD83D\uDD0D Buscar operador..." oninput="filterRank(this.value)">';
   h+='<div class="filters"><button class="flt on" onclick="filterAccordos(\'todos\',this)">Todos</button><button class="flt" onclick="filterAccordos(\'com\',this)">Com acordo</button><button class="flt" onclick="filterAccordos(\'sem\',this)">Sem acordo</button></div>';
@@ -770,7 +802,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div><div class="vtag">v37</div></div>';
+  h+='</div><div class="vtag">v38</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -793,7 +825,7 @@ function mesNome(per){
   return (per||'--').split(' ')[0];
 }
 function hdrPadrao(titulo,data){
-  return '<div class="hdr ac-top"><div class="ac-left"><div class="ham"><i></i><i></i><i></i></div><div><div class="hdr-title">'+titulo+'</div><div class="hdr-date">\uD83D\uDCC5 '+(data||'Hoje')+'</div></div></div><div class="hoje">\uD83D\uDCC5 Hoje</div></div>';
+  return '<div class="hdr ac-top"><div class="ac-left"><div class="ham" onclick="openMenu()"><i></i><i></i><i></i></div><div><div class="hdr-title">'+titulo+'</div><div class="hdr-date">\uD83D\uDCC5 '+(data||'Hoje')+'</div></div></div><div class="hoje">\uD83D\uDCC5 Hoje</div></div>';
 }
 function renderComp(){
   var el=document.getElementById('pgComp');
@@ -825,7 +857,7 @@ function renderComp(){
   h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
   h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
   h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
-  h+='</div></div><div class="vtag">v37</div></div>';
+  h+='</div></div><div class="vtag">v38</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -859,7 +891,7 @@ function renderComissao(){
   h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
   h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
-  h+='<div class="vtag">v37</div></div>';
+  h+='<div class="vtag">v38</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -893,14 +925,14 @@ function renderBeneficios(){
   h+='<div class="bn-it"><div class="bn-ic" style="background:#1f2937">\uD83D\uDCB0</div><div class="bn-b"><div class="bn-t">Comiss\u00E3o</div><div class="bn-s">5% da Receita</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#eef2f7">\uD83D\uDD52</div><div class="bn-b"><div class="bn-t">Flexibilidade</div><div class="bn-s">Hor\u00E1rio Flex\u00EDvel</div><div class="bn-s2">8h \u00E0s 12h + 2h para almo\u00E7o</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#fde7c7">\uD83C\uDFDD\uFE0F</div><div class="bn-b"><div class="bn-t">Folgas</div><div class="bn-s">Dias de Folga</div><div class="bn-s2">Conforme cumprimento das metas</div></div>'+lk()+'</div>';
-  h+='</div><div class="vtag">v37</div></div>';
+  h+='</div><div class="vtag">v38</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
 
 function renderFaltas(){
   var el=document.getElementById('pgComp');
-  var h='<div class="hdr"><div><div class="hdr-title">\uD83D\uDD14 Faltas do Dia</div></div></div><div style="padding:0 14px 16px">';
+  var h=hdrPadrao('Faltas do Dia',rankData?rankData.d:'')+'<div style="padding:0 14px 16px">';
   if(pontoData){
     var faltas=pontoData.filter(function(p){return p.status.toUpperCase().includes('FALTOU')});
     if(faltas.length===0)h+='<div style="text-align:center;padding:40px;color:#9ca3af">\uD83C\uDF89 Nenhuma falta hoje!</div>';
@@ -960,7 +992,7 @@ function renderTreino(){
     }
     h+='</div>';
   });
-  h+='</div><div class="vtag">v37</div></div>';
+  h+='</div><div class="vtag">v38</div></div>';
   document.getElementById('pgTreino').innerHTML=h;
 }
 function trnToggle(i){trnOpen=trnOpen===i?-1:i;renderTreino()}
