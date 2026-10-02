@@ -445,6 +445,11 @@ body.is-adm .op-only{display:none!important}
 
 /* v44 secretaria */
 .tbl-turno.t-s,.ad-nm .tbl-turno.t-s{width:auto!important;padding:0 7px;color:#0f3557;background:#e0e7ff;border:1px solid #c7d2fe}
+
+/* v50 novato */
+.nv-exp{display:flex;align-items:center;gap:12px;background:#fffbeb;border:1px solid #f5c34b;border-radius:14px;padding:14px;margin:0 0 14px;font-size:.78rem;color:#78350f;line-height:1.4}
+.nv-exp b{color:#92400e}
+.nv-ic{width:38px;height:38px;border-radius:50%;background:#fde68a;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -523,7 +528,8 @@ var cU=null,rankData=null,pontoData=null,compMonths=[null,null,null];
 // loginMap: {cobmaisLogin: fullName} e.g. {"1.gislaine.batista":"Gislaine Miranda Batista"}
 // nameMap: {fullNameLower: cobmaisLogin}
 var loginMap={},nameMap={},entMap={},entNome={},perfMap={};
-var SEC_RE=/andriel+[iy]/i; // secretarias que fazem acordo (sem meta)
+var SEC_RE=/andriel+[iy]/i;
+function ehSec(raw){return /^5/.test(String(raw||'').trim())||SEC_RE.test(raw||'')} // secretarias que fazem acordo (sem meta)
 
 function fm(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function fs(v){return'R$ '+Math.round(v).toLocaleString('pt-BR')}
@@ -698,7 +704,7 @@ function loadRanking(){
       var totalQtd=Math.round(allNums[allNums.length-2]);
       if(name==='Totais'){ta=totalQtd;tv=totalVal;continue}
       var prefix=name.charAt(0);
-      if(prefix!=='0'&&prefix!=='1'&&prefix!=='2'){if(SEC_RE.test(name))sec.push({raw:name,n:cn(name),a:totalQtd,v:Math.round(totalVal*100)/100,turno:'',sec:true});continue}
+      if(prefix!=='0'&&prefix!=='1'&&prefix!=='2'){if(ehSec(name))sec.push({raw:name,n:cn(name),a:totalQtd,v:Math.round(totalVal*100)/100,turno:'',sec:true});continue}
       ops.push({raw:name,n:cn(name),a:totalQtd,v:Math.round(totalVal*100)/100,turno:getTurno(name)});
     }
     // incluir quem nao fez acordo (logins 0/1/2 da planilha de login)
@@ -783,7 +789,7 @@ function parseCompCSV(text){
     var rec=cols.rec!==undefined?parseBR(cells[cols.rec]):0;
     var com=cols.com!==undefined?parseBR(cells[cols.com]):0;
     if(qtd===0&&val===0)continue;
-    var prefix=nm.charAt(0);if(prefix!=='0'&&prefix!=='1'&&prefix!=='2'){if(SEC_RE.test(nm))sec.push({raw:nm,n:cn(nm),cfg:cfg,a:qtd,v:Math.round(val*100)/100,rec:Math.round(rec*100)/100,com:Math.round(com*100)/100,sec:true});continue}
+    var prefix=nm.charAt(0);if(prefix!=='0'&&prefix!=='1'&&prefix!=='2'){if(ehSec(nm))sec.push({raw:nm,n:cn(nm),cfg:cfg,a:qtd,v:Math.round(val*100)/100,rec:Math.round(rec*100)/100,com:Math.round(com*100)/100,sec:true});continue}
     ops.push({raw:nm,n:cn(nm),cfg:cfg,a:qtd,v:Math.round(val*100)/100,rec:Math.round(rec*100)/100,com:Math.round(com*100)/100});
   }
   return{period:period,ops:ops,sec:sec};
@@ -882,7 +888,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div><div class="vtag">v49</div></div>';
+  h+='</div><div class="vtag">v51</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -937,7 +943,7 @@ function renderComp(){
   h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
   h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
   h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
-  h+='</div></div><div class="vtag">v49</div></div>';
+  h+='</div></div><div class="vtag">v51</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -961,6 +967,8 @@ function renderComissao(){
   h+='<div class="cm-hero"><div class="cm-top"><div class="cm-ic">\uD83D\uDCB0</div><div><div class="cm-lbl">Valor recuperado</div><div class="cm-val">'+fm(curV)+'</div></div></div>';
   if(novato){
     h+='<div class="cm-etapa" style="font-size:.72rem;opacity:.85;margin-top:12px">Novato: voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo.</div></div>';
+    var dc=diasCasa((cU&&cU.entrada)||entMap[meuLg.toLowerCase()]||''),rest=dc>=0?Math.max(75-dc,0):-1;
+    h+='<div class="nv-exp"><div class="nv-ic">\u23F3</div><div>'+(rest>0?'<b>Faltam '+rest+(rest===1?' dia':' dias')+'</b> pro fim da sua experi\u00EAncia.':(rest===0?'<b>Sua experi\u00EAncia est\u00E1 terminando!</b>':'<b>Per\u00EDodo de experi\u00EAncia</b>'))+' Depois disso, bata a meta pra continuar ganhando comiss\u00E3o!</div></div>';
   }else{
     h+='<div class="cm-prog"><div class="cm-fill" style="width:'+Math.max(pct,8)+'%"><span>'+pctR+'%</span></div></div>';
     h+='<div class="cm-foot"><span>Meta: '+fm(meta)+'</span><span>'+(ok?'Meta atingida!':'Falta: '+fm(falta))+'</span></div>';
@@ -971,12 +979,12 @@ function renderComissao(){
   h+='<div class="cm-box cm-cur"><div class="cm-bv" style="font-weight:600">'+fm(curV)+'</div><div class="cm-bl">Atual</div></div>';
   h+='<div class="cm-box"><div class="cm-bv cm-pv'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="cm-bl">Varia\u00E7\u00E3o</div></div></div></div>';
   h+='<div class="cp-card cm-detcard"><div class="cp-card-t"><span class="cp-ic">\uD83D\uDCBC</span> Detalhes da comiss\u00E3o</div><div class="cm-det">';
-  h+='<div class="cm-li"><span><i>\uD83D\uDCB5</i> Comiss\u00E3o'+(pCom?' ('+String(pCom).replace('.',',')+'%)':'')+'</span></div>';
+  h+='<div class="cm-li"><span><i>\uD83D\uDCB5</i> Comiss\u00E3o</span></div>';
   h+='<div class="cm-li"><span><i>\uD83D\uDD52</i> Flexibilidade (hor\u00E1rio)</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
   h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
-  h+='<div class="vtag">v49</div></div>';
+  h+='<div class="vtag">v51</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1010,7 +1018,7 @@ function renderBeneficios(){
   h+='<div class="bn-it"><div class="bn-ic" style="background:#1f2937">\uD83D\uDCB0</div><div class="bn-b"><div class="bn-t">Comiss\u00E3o</div><div class="bn-s">5% da Receita</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#eef2f7">\uD83D\uDD52</div><div class="bn-b"><div class="bn-t">Flexibilidade</div><div class="bn-s">Hor\u00E1rio Flex\u00EDvel</div><div class="bn-s2">8h \u00E0s 12h + 2h para almo\u00E7o</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#fde7c7">\uD83C\uDFDD\uFE0F</div><div class="bn-b"><div class="bn-t">Folgas</div><div class="bn-s">Dias de Folga</div><div class="bn-s2">Conforme cumprimento das metas</div></div>'+lk()+'</div>';
-  h+='</div><div class="vtag">v49</div></div>';
+  h+='</div><div class="vtag">v51</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1077,8 +1085,11 @@ function ativoOp(raw){
   return Object.keys(loginMap).some(function(l){return /^[012]\./.test(l)&&perfMap[l]!=='admin'&&kLog(l)===k});
 }
 function ativoSec(raw){
-  var fn=cn(raw).toLowerCase().split(' ')[0];
-  return Object.keys(loginMap).some(function(l){return (loginMap[l]||'').toLowerCase().split(' ')[0]===fn});
+  var fn=normN(cn(String(raw).replace(/^5\.?/,''))).split(' ')[0];
+  return Object.keys(loginMap).some(function(l){
+    var nm=normN(loginMap[l]||'').split(' ')[0];
+    return nm===fn&&perfMap[l]!=='admin'&&(/^5/.test(l)||SEC_RE.test(loginMap[l]||''));
+  });
 }
 var eqList=[];
 function montarEquipe(){
@@ -1100,7 +1111,7 @@ function montarEquipe(){
     L.push({k:k,raw:raw,n:cn(raw),full:full,sec:!!sec,turno:sec?'s':getTurno(raw),dias:d,ms:ms,hoje:hoje[k]||null,
       medA:fech.length?mA/fech.length:0,medV:fech.length?mV/fech.length:0,ticket:tA?tV/tA:0,cfg:ms[2]?ms[2].cfg:''});
   }
-  Object.keys(loginMap).forEach(add);
+  Object.keys(loginMap).forEach(function(l){add(l)});
   [2,1,0].forEach(function(i){if(compMonths[i])compMonths[i].ops.forEach(function(o){add(o.raw)})});
   [2,1,0].forEach(function(i){if(compMonths[i])(compMonths[i].sec||[]).forEach(function(o){add(o.raw,true)})});
   (rankData&&rankData.sec||[]).forEach(function(o){add(o.raw,true)});
@@ -1118,7 +1129,7 @@ function renderEquipe(){
   h+='<div class="ad-k" style="--c:#8b5cf6"><div class="ad-kv">'+nm[2]+'</div><div class="ad-kl">Novatos</div></div></div>';
   h+='<input class="srch" type="text" placeholder="\uD83D\uDD0D Buscar operador..." oninput="filtCG(this.value)">';
   h+=segm('eqo',[['valor','Maior valor'],['media','M\u00E9dia'],['tempo','Tempo de casa'],['nome','A-Z']],'ordEquipe');
-  h+='<div class="tr-list ad-list" id="eqBox"></div><div class="vtag">v49</div></div>';
+  h+='<div class="tr-list ad-list" id="eqBox"></div><div class="vtag">v51</div></div>';
   el.innerHTML=h;ordEquipe('valor');window.scrollTo(0,0);
 }
 function ordEquipe(t,btn){
@@ -1188,7 +1199,7 @@ function renderMetas(){
     h+='</div><div class="ad-r"><div class="ad-ra" style="color:'+cor+'">'+(x.m.nov?'\u2014':x.pc+'%')+'</div><div class="ad-rv">'+fm(o.v)+'</div></div></div>';
   });
   if(!L.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v49</div></div>';
+  h+='</div><div class="vtag">v51</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtMetas(t,btn){segOn(btn);document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=(t==='todos'||r.getAttribute('data-g')===t)?'flex':'none'})}
@@ -1218,7 +1229,7 @@ function renderTurnos(){
   h+='<div class="fill">';
   h+=blocoTurnos('\uD83E\uDD1D Novos acordos de hoje',grpTurno(rankData?rankData.ops:[]),true);
   var _d=new Date();h+=blocoTurnos('\uD83D\uDCB0 Valor recuperado \u00B7 dia 1 at\u00E9 '+('0'+_d.getDate()).slice(-2)+'/'+('0'+(_d.getMonth()+1)).slice(-2),grpTurno(compMonths[2]?compMonths[2].ops.filter(function(o){return ativoOp(o.raw)}):[]),false);
-  h+='<div class="vtag">v49</div></div>';
+  h+='<div class="vtag">v51</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 
@@ -1244,7 +1255,7 @@ function renderCompGeral(){
     h+='<div class="ad-r"><div class="ad-ra" style="font-size:.82rem">'+fs(o.v)+'</div><div class="ad-rv" style="font-weight:700;color:'+(v===null?'#9ca3af':v<0?'#ef4444':'#16a34a')+'">'+(v===null?'novo':(v>=0?'+':'')+v+'%')+'</div></div></div>';
   });
   if(!cur.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v49</div></div>';
+  h+='</div><div class="vtag">v51</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtCG(q){q=q.toLowerCase();document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=r.getAttribute('data-nm').indexOf(q)>=0?'flex':'none'})}
@@ -1269,7 +1280,7 @@ function renderSenhas(){
       h+=x.ok?'<button class="ad-rst" onclick="resetSenha(\''+x.k+'\',\''+x.n.replace(/'/g,'')+'\')">Resetar</button>':'<span class="ad-pl none">Padr\u00E3o</span>';
       h+='</div>';
     });
-    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v49</div></div>';
+    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v51</div></div>';
     el.innerHTML=h;
   }).catch(function(){el.innerHTML=hdrPadrao('Senhas','')+'<div class="fill"><div class="ad-empty">Erro de conex\u00E3o</div></div>'});
 }
@@ -1332,7 +1343,7 @@ function renderTreino(){
     }
     h+='</div>';
   });
-  h+='</div><div class="vtag">v49</div></div>';
+  h+='</div><div class="vtag">v51</div></div>';
   document.getElementById('pgTreino').innerHTML=h;
 }
 function trnToggle(i){trnOpen=trnOpen===i?-1:i;renderTreino()}
