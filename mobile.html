@@ -363,6 +363,20 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 .bn-s2{font-size:.7rem;color:#6b7280;margin-top:2px}
 .bn-lk{font-size:1.2rem;flex-shrink:0;filter:grayscale(.2)}
 .bn-lk.ok{filter:none}
+
+/* v37 senha */
+.lg-keep{display:flex;align-items:center;gap:8px;font-size:.78rem;color:#374151;margin:4px 2px 14px;cursor:pointer;text-align:left}
+.lg-keep input{width:18px!important;height:18px;margin:0!important;padding:0!important;accent-color:#1e4e7e}
+.login-btn{background:linear-gradient(180deg,#1e4e7e,#0f3557)}
+.pw-bg{position:fixed;inset:0;background:#eef2f7;z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.pw-box{width:100%;max-width:360px;background:#fff;border-radius:18px;padding:32px 24px;text-align:center;box-shadow:0 4px 18px rgba(15,23,42,.08)}
+.pw-ic{width:64px;height:64px;border-radius:50%;background:#eef2f7;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 14px}
+.pw-t{font-size:1.15rem;font-weight:800;color:#1a1f36}
+.pw-s{font-size:.75rem;color:#6b7280;margin:6px 0 18px;line-height:1.4}
+.pw-box input{width:100%;padding:13px 14px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;font-family:inherit;font-size:.85rem;margin-bottom:10px;outline:none}
+.pw-box input:focus{border-color:#1e4e7e}
+.pw-btn{margin-top:4px}
+.pw-cancel{width:100%;margin-top:8px;padding:12px;border:0;background:none;color:#6b7280;font-family:inherit;font-size:.8rem;font-weight:600}
 </style>
 </head>
 <body>
@@ -372,9 +386,23 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 
 <input type="text" id="loginUser" placeholder="Login" autocomplete="off">
 <input type="password" id="loginPass" placeholder="Senha">
+<label class="lg-keep"><input type="checkbox" id="loginKeep" checked> Manter conectado</label>
 <button class="login-btn" onclick="doLogin()">Entrar</button>
 <div class="login-err" id="loginErr">Usuário ou senha incorretos</div>
 <div class="login-load" id="loginLoad">Verificando...</div>
+</div>
+</div>
+<div class="pw-bg" id="pwBg">
+<div class="pw-box">
+<div class="pw-ic">🔑</div>
+<div class="pw-t" id="pwTitle">Crie sua senha</div>
+<div class="pw-s" id="pwSub">Por segurança, troque a senha padrão antes de continuar.</div>
+<input type="password" id="pwAtual" placeholder="Senha atual">
+<input type="password" id="pwNova" placeholder="Nova senha (mínimo 6 caracteres)">
+<input type="password" id="pwConf" placeholder="Confirmar nova senha">
+<button class="login-btn pw-btn" id="pwBtn" onclick="salvarSenha()">Salvar e entrar</button>
+<button class="pw-cancel" id="pwCancel" onclick="fecharSenha()">Cancelar</button>
+<div class="login-err" id="pwErr"></div>
 </div>
 </div>
 <div class="app" id="app">
@@ -396,6 +424,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,
 <button class="menu-item" onclick="closeMenu();go('comissao')">💰 Comissão</button>
 <button class="menu-item" onclick="closeMenu();go('beneficios')">🎯 Benefícios</button>
 <button class="menu-item" onclick="closeMenu();go('faltas')">🔔 Faltas do Dia</button>
+<button class="menu-item" onclick="closeMenu();abrirSenha(false)">🔑 Alterar senha</button>
 <button class="menu-item out" onclick="doLogout()">🚪 Sair</button>
 </div>
 </div>
@@ -419,33 +448,94 @@ function csvSplit(line){var cells=[],cell='',inQ=false;for(var i=0;i<line.length
 function normN(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z\s]/g,'').trim()}
 
 // === LOGIN ===
+// >>> COLE AQUI a URL do Apps Script (a mesma que esta no sync-login.js, termina com /exec) <<<
+var SCRIPT_URL='COLE_AQUI';
+var temScript=/^https:\/\/script\.google\.com\/.+\/exec$/.test(SCRIPT_URL);
+var pwCtx=null; // {key, atual, forcar}
 document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
+function sha(t){
+  var b=new TextEncoder().encode(t);
+  return crypto.subtle.digest('SHA-256',b).then(function(h){return Array.prototype.map.call(new Uint8Array(h),function(x){return('0'+x.toString(16)).slice(-2)}).join('')});
+}
+function chaveDe(f){return String(f.login||f.nome||'').trim().toLowerCase()}
+function hashSenha(key,senha){return sha('edimo|'+key+'|'+senha)}
+function store(){return localStorage.getItem('mu')?localStorage:sessionStorage}
+function salvarSessao(keep){
+  var st=keep?localStorage:sessionStorage;
+  localStorage.removeItem('mu');sessionStorage.removeItem('mu');
+  st.setItem('mu',JSON.stringify(cU));st.setItem('lm',JSON.stringify(loginMap));st.setItem('nm',JSON.stringify(nameMap));
+}
+function lgErr(t){var e=document.getElementById('loginErr');e.textContent=t;e.style.display='block'}
 function doLogin(){
   var u=document.getElementById('loginUser').value.trim().toLowerCase(),p=document.getElementById('loginPass').value;
   if(!u||!p)return;
   document.getElementById('loginErr').style.display='none';
   document.getElementById('loginLoad').style.display='block';
-  fetch(SH).then(function(r){return r.text()}).then(function(c){
+  var pSen=temScript?fetch(SCRIPT_URL+'?type=senhas&t='+Date.now()).then(function(r){return r.json()}).catch(function(){return null}):Promise.resolve(null);
+  Promise.all([fetch(SH+'&t='+Date.now()).then(function(r){return r.text()}),pSen]).then(function(res){
+    var c=res[0],senhas=res[1];
     var rows=c.split('\n').map(function(l){return csvSplit(l)});
-    var found=null;
+    var cand=null;
     for(var i=1;i<rows.length;i++){
       if(rows[i].length<4)continue;
       var nome=rows[i][0].trim(),login=rows[i][1]?rows[i][1].trim():'',senha=rows[i][3]?rows[i][3].trim():'',perfil=rows[i][4]?rows[i][4].trim():'Operador';
       if(login)loginMap[login.toLowerCase()]=nome;
       if(nome)nameMap[nome.toLowerCase()]=login.toLowerCase();
-      if((nome.toLowerCase()===u||login.toLowerCase()===u)&&senha===p){
-        found={nome:nome,login:login,perfil:perfil.toLowerCase(),entrada:rows[i][2]?rows[i][2].trim():''}
+      if(!cand&&(nome.toLowerCase()===u||(login&&login.toLowerCase()===u))){
+        cand={nome:nome,login:login,perfil:perfil.toLowerCase(),entrada:rows[i][2]?rows[i][2].trim():'',padrao:senha};
       }
     }
-    document.getElementById('loginLoad').style.display='none';
-    if(found){cU=found;sessionStorage.setItem('mu',JSON.stringify(found));sessionStorage.setItem('lm',JSON.stringify(loginMap));sessionStorage.setItem('nm',JSON.stringify(nameMap));showApp()}
-    else{document.getElementById('loginErr').style.display='block'}
-  }).catch(function(){document.getElementById('loginLoad').style.display='none';document.getElementById('loginErr').textContent='Erro de conexão';document.getElementById('loginErr').style.display='block'});
+    if(!cand){document.getElementById('loginLoad').style.display='none';lgErr('Usu\u00E1rio ou senha incorretos');return}
+    if(temScript&&!senhas){document.getElementById('loginLoad').style.display='none';lgErr('Erro de conex\u00E3o, tente de novo');return}
+    var key=chaveDe(cand),salva=senhas?senhas[key]:'';
+    var check=salva?hashSenha(key,p).then(function(h){return h===salva}):Promise.resolve(cand.padrao===p);
+    check.then(function(ok){
+      document.getElementById('loginLoad').style.display='none';
+      if(!ok){lgErr('Usu\u00E1rio ou senha incorretos');return}
+      var padrao=cand.padrao;delete cand.padrao;cU=cand;
+      var keep=document.getElementById('loginKeep').checked;
+      if(temScript&&!salva){pwCtx={key:key,atual:p,keep:keep,forcar:true};abrirSenha(true);return}
+      salvarSessao(keep);showApp();
+    });
+  }).catch(function(){document.getElementById('loginLoad').style.display='none';lgErr('Erro de conex\u00E3o')});
 }
-function doLogout(){sessionStorage.clear();location.reload()}
+function abrirSenha(forcar){
+  if(!temScript){alert('Troca de senha ainda n\u00E3o configurada.');return}
+  if(!forcar)pwCtx={key:chaveDe(cU),atual:'',forcar:false};
+  document.getElementById('pwTitle').textContent=forcar?'Crie sua senha':'Alterar senha';
+  document.getElementById('pwSub').textContent=forcar?'Por seguran\u00E7a, troque a senha padr\u00E3o antes de continuar.':'Digite sua senha atual e a nova senha.';
+  document.getElementById('pwAtual').style.display=forcar?'none':'block';
+  document.getElementById('pwCancel').style.display=forcar?'none':'block';
+  document.getElementById('pwBtn').textContent=forcar?'Salvar e entrar':'Salvar';
+  ['pwAtual','pwNova','pwConf'].forEach(function(i){document.getElementById(i).value=''});
+  document.getElementById('pwErr').style.display='none';
+  document.getElementById('pwBg').style.display='flex';
+}
+function fecharSenha(){document.getElementById('pwBg').style.display='none'}
+function pwErr(t){var e=document.getElementById('pwErr');e.textContent=t;e.style.display='block'}
+function salvarSenha(){
+  var atual=pwCtx.forcar?pwCtx.atual:document.getElementById('pwAtual').value;
+  var n=document.getElementById('pwNova').value,c=document.getElementById('pwConf').value;
+  if(!pwCtx.forcar&&!atual)return pwErr('Digite sua senha atual');
+  if(n.length<6)return pwErr('A senha precisa ter pelo menos 6 caracteres');
+  if(n.toLowerCase()==='edimo123')return pwErr('Escolha uma senha diferente da padr\u00E3o');
+  if(n===atual)return pwErr('A nova senha precisa ser diferente da atual');
+  if(n!==c)return pwErr('As senhas n\u00E3o conferem');
+  var btn=document.getElementById('pwBtn');btn.disabled=true;btn.textContent='Salvando...';
+  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'senha',login:pwCtx.key,atual:atual,nova:n})})
+  .then(function(r){return r.json()}).then(function(r){
+    btn.disabled=false;
+    if(r.status==='ok'){
+      fecharSenha();
+      if(pwCtx.forcar){salvarSessao(pwCtx.keep);showApp()}
+      else alert('Senha alterada!');
+    }else{btn.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';pwErr(r.msg||'N\u00E3o foi poss\u00EDvel salvar')}
+  }).catch(function(){btn.disabled=false;btn.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';pwErr('Erro de conex\u00E3o, tente de novo')});
+}
+function doLogout(){localStorage.removeItem('mu');localStorage.removeItem('lm');localStorage.removeItem('nm');sessionStorage.clear();location.reload()}
 window.addEventListener('load',function(){
-  var s=sessionStorage.getItem('mu');
-  if(s){try{cU=JSON.parse(s);loginMap=JSON.parse(sessionStorage.getItem('lm')||'{}');nameMap=JSON.parse(sessionStorage.getItem('nm')||'{}');showApp()}catch(e){}}
+  var st=store(),s=st.getItem('mu');
+  if(s){try{cU=JSON.parse(s);loginMap=JSON.parse(st.getItem('lm')||'{}');nameMap=JSON.parse(st.getItem('nm')||'{}');showApp()}catch(e){}}
 });
 function showApp(){document.getElementById('loginScreen').style.display='none';document.getElementById('app').style.display='block';window.scrollTo(0,0);loadData()}
 
@@ -680,7 +770,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div><div class="vtag">v36</div></div>';
+  h+='</div><div class="vtag">v37</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -735,7 +825,7 @@ function renderComp(){
   h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
   h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
   h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
-  h+='</div></div><div class="vtag">v36</div></div>';
+  h+='</div></div><div class="vtag">v37</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -769,7 +859,7 @@ function renderComissao(){
   h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
   h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
-  h+='<div class="vtag">v36</div></div>';
+  h+='<div class="vtag">v37</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -803,7 +893,7 @@ function renderBeneficios(){
   h+='<div class="bn-it"><div class="bn-ic" style="background:#1f2937">\uD83D\uDCB0</div><div class="bn-b"><div class="bn-t">Comiss\u00E3o</div><div class="bn-s">5% da Receita</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#eef2f7">\uD83D\uDD52</div><div class="bn-b"><div class="bn-t">Flexibilidade</div><div class="bn-s">Hor\u00E1rio Flex\u00EDvel</div><div class="bn-s2">8h \u00E0s 12h + 2h para almo\u00E7o</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#fde7c7">\uD83C\uDFDD\uFE0F</div><div class="bn-b"><div class="bn-t">Folgas</div><div class="bn-s">Dias de Folga</div><div class="bn-s2">Conforme cumprimento das metas</div></div>'+lk()+'</div>';
-  h+='</div><div class="vtag">v36</div></div>';
+  h+='</div><div class="vtag">v37</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -870,7 +960,7 @@ function renderTreino(){
     }
     h+='</div>';
   });
-  h+='</div><div class="vtag">v36</div></div>';
+  h+='</div><div class="vtag">v37</div></div>';
   document.getElementById('pgTreino').innerHTML=h;
 }
 function trnToggle(i){trnOpen=trnOpen===i?-1:i;renderTreino()}
