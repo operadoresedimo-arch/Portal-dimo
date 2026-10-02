@@ -427,6 +427,21 @@ body.is-adm .op-only{display:none!important}
 .ad-empty{text-align:center;padding:40px 10px;color:#9ca3af;font-size:.8rem}
 .ad-rst{border:0;border-radius:10px;background:#fee2e2;color:#b91c1c;font-family:inherit;font-size:.72rem;font-weight:700;padding:8px 12px;cursor:pointer}
 #pgComp .srch{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:11px 14px;margin:0 0 12px}
+
+/* v42 equipe */
+.eq-mini{display:flex;align-items:flex-end;gap:3px;height:36px;padding:0 4px;flex-shrink:0}
+.eq-mini i{display:block;width:8px;border-radius:3px 3px 0 0}
+.ad-row{cursor:pointer}
+.eq-sh{max-height:92vh;overflow-y:auto}
+.eq-tc{display:flex;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#4a5568,#1f2937);color:#fff;border-radius:16px;padding:16px}
+.eq-tl{font-size:.66rem;opacity:.75}
+.eq-tv{font-size:1.05rem;font-weight:800;margin-top:3px}
+.eq-ts{font-size:.68rem;opacity:.9;margin-top:4px}
+.eq-bars{display:flex;margin-top:14px}
+.eq-col{flex:1;text-align:center}
+.eq-bw{height:120px;display:flex;align-items:flex-end;justify-content:center;border-bottom:1px solid #e5e7eb;margin:6px 0 8px}
+.eq-bv{font-size:.74rem;font-weight:700;color:#1a1f36}
+.eq-vv{margin-left:auto;font-size:.7rem;font-weight:700;color:#16a34a}.eq-vv.neg{color:#ef4444}
 </style>
 </head>
 <body>
@@ -474,7 +489,7 @@ body.is-adm .op-only{display:none!important}
 <div class="drw" onclick="event.stopPropagation()">
 <div class="drw-h"><div class="drw-av" id="drwAv">?</div><div class="drw-u"><div class="drw-nm" id="drwNm"></div><div class="drw-lg" id="drwLg"></div></div><div class="drw-x" onclick="closeMenu()">✕</div></div>
 <div class="drw-sec adm-only">Administração</div>
-<button class="drw-it adm-only" data-t="equipe" onclick="closeMenu();go('equipe')"><span>👥</span>Equipe hoje</button>
+<button class="drw-it adm-only" data-t="equipe" onclick="closeMenu();go('equipe')"><span>👥</span>Equipe</button>
 <button class="drw-it adm-only" data-t="metas" onclick="closeMenu();go('metas')"><span>🎯</span>Metas da equipe</button>
 <button class="drw-it adm-only" data-t="turnos" onclick="closeMenu();go('turnos')"><span>🕒</span>Turnos</button>
 <button class="drw-it adm-only" data-t="compgeral" onclick="closeMenu();go('compgeral')"><span>📈</span>Comparativo geral</button>
@@ -504,7 +519,7 @@ var CP_NOW='https://docs.google.com/spreadsheets/d/e/2PACX-1vQt4Q6crwYKFDr0p6kbT
 var cU=null,rankData=null,pontoData=null,compMonths=[null,null,null];
 // loginMap: {cobmaisLogin: fullName} e.g. {"1.gislaine.batista":"Gislaine Miranda Batista"}
 // nameMap: {fullNameLower: cobmaisLogin}
-var loginMap={},nameMap={};
+var loginMap={},nameMap={},entMap={};
 
 function fm(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function fs(v){return'R$ '+Math.round(v).toLocaleString('pt-BR')}
@@ -529,7 +544,7 @@ function store(){return localStorage.getItem('mu')?localStorage:sessionStorage}
 function salvarSessao(keep){
   var st=keep?localStorage:sessionStorage;
   localStorage.removeItem('mu');sessionStorage.removeItem('mu');
-  st.setItem('mu',JSON.stringify(cU));st.setItem('lm',JSON.stringify(loginMap));st.setItem('nm',JSON.stringify(nameMap));
+  st.setItem('mu',JSON.stringify(cU));st.setItem('lm',JSON.stringify(loginMap));st.setItem('nm',JSON.stringify(nameMap));st.setItem('em',JSON.stringify(entMap));
 }
 function lgErr(t){var e=document.getElementById('loginErr');e.textContent=t;e.style.display='block'}
 function doLogin(){
@@ -546,6 +561,7 @@ function doLogin(){
       if(rows[i].length<4)continue;
       var nome=rows[i][0].trim(),login=rows[i][1]?rows[i][1].trim():'',senha=rows[i][3]?rows[i][3].trim():'',perfil=rows[i][4]?rows[i][4].trim():'Operador';
       if(login)loginMap[login.toLowerCase()]=nome;
+      if(login)entMap[login.toLowerCase()]=rows[i][2]?rows[i][2].trim():'';
       if(nome)nameMap[nome.toLowerCase()]=login.toLowerCase();
       if(!cand&&(nome.toLowerCase()===u||(login&&login.toLowerCase()===u))){
         cand={nome:nome,login:login,perfil:perfil.toLowerCase(),entrada:rows[i][2]?rows[i][2].trim():'',padrao:senha};
@@ -598,10 +614,10 @@ function salvarSenha(){
     }else{btn.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';pwErr(r.msg||'N\u00E3o foi poss\u00EDvel salvar')}
   }).catch(function(){btn.disabled=false;btn.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';pwErr('Erro de conex\u00E3o, tente de novo')});
 }
-function doLogout(){localStorage.removeItem('mu');localStorage.removeItem('lm');localStorage.removeItem('nm');sessionStorage.clear();location.reload()}
+function doLogout(){localStorage.removeItem('mu');localStorage.removeItem('lm');localStorage.removeItem('nm');localStorage.removeItem('em');sessionStorage.clear();location.reload()}
 window.addEventListener('load',function(){
   var st=store(),s=st.getItem('mu');
-  if(s){try{cU=JSON.parse(s);loginMap=JSON.parse(st.getItem('lm')||'{}');nameMap=JSON.parse(st.getItem('nm')||'{}');showApp()}catch(e){}}
+  if(s){try{cU=JSON.parse(s);loginMap=JSON.parse(st.getItem('lm')||'{}');nameMap=JSON.parse(st.getItem('nm')||'{}');entMap=JSON.parse(st.getItem('em')||'{}');showApp()}catch(e){}}
 });
 function showApp(){aplicarPerfil();document.getElementById('loginScreen').style.display='none';document.getElementById('app').style.display='block';window.scrollTo(0,0);loadData()}
 
@@ -844,7 +860,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div><div class="vtag">v41</div></div>';
+  h+='</div><div class="vtag">v42</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -899,7 +915,7 @@ function renderComp(){
   h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
   h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
   h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
-  h+='</div></div><div class="vtag">v41</div></div>';
+  h+='</div></div><div class="vtag">v42</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -933,7 +949,7 @@ function renderComissao(){
   h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
   h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
-  h+='<div class="vtag">v41</div></div>';
+  h+='<div class="vtag">v42</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -967,7 +983,7 @@ function renderBeneficios(){
   h+='<div class="bn-it"><div class="bn-ic" style="background:#1f2937">\uD83D\uDCB0</div><div class="bn-b"><div class="bn-t">Comiss\u00E3o</div><div class="bn-s">5% da Receita</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#eef2f7">\uD83D\uDD52</div><div class="bn-b"><div class="bn-t">Flexibilidade</div><div class="bn-s">Hor\u00E1rio Flex\u00EDvel</div><div class="bn-s2">8h \u00E0s 12h + 2h para almo\u00E7o</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#fde7c7">\uD83C\uDFDD\uFE0F</div><div class="bn-b"><div class="bn-t">Folgas</div><div class="bn-s">Dias de Folga</div><div class="bn-s2">Conforme cumprimento das metas</div></div>'+lk()+'</div>';
-  h+='</div><div class="vtag">v41</div></div>';
+  h+='</div><div class="vtag">v42</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1005,46 +1021,99 @@ function segm(id,opts,fn){
 }
 function segOn(btn){btn.parentNode.querySelectorAll('.flt').forEach(function(b){b.classList.remove('on')});btn.classList.add('on')}
 
-// ---- Equipe hoje ----
+// ---- Equipe ----
+function diasCasa(en){
+  en=en||'';var md=en.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/),dt=null;
+  if(md){var yy=+md[3];if(yy<100)yy+=2000;dt=new Date(yy,+md[2]-1,+md[1])}
+  else if(/^\d{4}-\d{2}-\d{2}/.test(en))dt=new Date(en.substring(0,10)+'T00:00:00');
+  else if(/^\d{5}$/.test(en.trim()))dt=new Date(Date.UTC(1899,11,30)+(+en)*864e5);
+  return(dt&&!isNaN(dt))?Math.floor((new Date()-dt)/864e5):-1;
+}
+function tempoTxt(d){
+  if(d<0)return'Sem data de admiss\u00E3o';
+  var a=Math.floor(d/365),m=Math.floor((d%365)/30);
+  if(a>0)return a+(a>1?' anos':' ano')+(m?' e '+m+(m>1?' meses':' m\u00EAs'):'');
+  if(m>0)return m+(m>1?' meses':' m\u00EAs');
+  return d+(d===1?' dia':' dias');
+}
+function nivelTxt(d){return d>=1095?'N\u00EDvel III':d>=730?'N\u00EDvel II':d>365?'N\u00EDvel I':d>=75?'N\u00EDvel 0':'Experi\u00EAncia'}
+function kLog(r){return String(r||'').toLowerCase().replace(/^\d+\./,'')}
+var EXC_EQ=['solange ana batista'];
+var eqList=[];
+function montarEquipe(){
+  var idx=[{},{},{}];
+  [0,1,2].forEach(function(i){var M=compMonths[i];if(M)M.ops.forEach(function(o){idx[i][kLog(o.raw)]=o})});
+  var hoje={};(rankData?rankData.ops:[]).forEach(function(o){hoje[kLog(o.raw)]=o});
+  var vis={},L=[];
+  function add(raw){
+    var k=kLog(raw);if(!k||vis[k])return;
+    var pf=String(raw).charAt(0);if('012'.indexOf(pf)<0)return;
+    var full=loginMap[String(raw).toLowerCase()]||cn(raw);
+    if(EXC_EQ.indexOf(full.toLowerCase().trim())>=0)return;
+    vis[k]=1;
+    var ms=[idx[0][k],idx[1][k],idx[2][k]],d=diasCasa(entMap[String(raw).toLowerCase()]||'');
+    var fech=[ms[0],ms[1]].filter(function(x){return x}),mA=0,mV=0;
+    fech.forEach(function(x){mA+=x.a;mV+=x.v});
+    var tA=0,tV=0;ms.forEach(function(x){if(x){tA+=x.a;tV+=x.v}});
+    L.push({k:k,raw:raw,n:cn(raw),full:full,turno:getTurno(raw),dias:d,ms:ms,hoje:hoje[k]||null,
+      medA:fech.length?mA/fech.length:0,medV:fech.length?mV/fech.length:0,ticket:tA?tV/tA:0,cfg:ms[2]?ms[2].cfg:''});
+  }
+  Object.keys(loginMap).forEach(add);
+  [2,1,0].forEach(function(i){if(compMonths[i])compMonths[i].ops.forEach(function(o){add(o.raw)})});
+  return L;
+}
 function renderEquipe(){
   var el=document.getElementById('pgComp');
-  var ops=rankData?rankData.ops:[];
-  var L=ops.map(function(o){
-    var full=loginMap[o.raw.toLowerCase()]||o.n,p=findPonto(full),st=p?pontoStatus(p):'none';
-    return{o:o,full:full,p:p,st:st};
-  });
-  var pres=L.filter(function(x){return x.st==='ok'}).length,atr=L.filter(function(x){return x.st==='late'}).length,
-      fal=L.filter(function(x){return x.st==='miss'}).length,sem=L.filter(function(x){return(x.st==='ok'||x.st==='late')&&x.o.a===0}).length;
-  var h=hdrPadrao('Equipe hoje',rankData?rankData.d:'');
+  eqList=montarEquipe();
+  var h=hdrPadrao('Equipe',compMonths[2]?mesNome(compMonths[2].period):'');
   h+='<div class="fill">';
-  h+='<div class="ad-kp4">';
-  h+='<div class="ad-k" style="--c:#16a34a"><div class="ad-kv">'+pres+'</div><div class="ad-kl">Presentes</div></div>';
-  h+='<div class="ad-k" style="--c:#f59e0b"><div class="ad-kv">'+atr+'</div><div class="ad-kl">Atrasados</div></div>';
-  h+='<div class="ad-k" style="--c:#ef4444"><div class="ad-kv">'+fal+'</div><div class="ad-kl">Faltaram</div></div>';
-  h+='<div class="ad-k" style="--c:#0f3557"><div class="ad-kv">'+sem+'</div><div class="ad-kl">No ponto sem acordo</div></div>';
-  h+='</div>';
-  h+=segm('eq',[['todos','Todos'],['sem','Sem acordo'],['atr','Atrasados'],['fal','Faltas']],'filtEquipe');
-  h+='<div class="tr-list ad-list">';
-  L.sort(function(a,b){var r={miss:0,late:1,ok:2,none:3};return(a.o.a===0)-(b.o.a===0)||b.o.a-a.o.a||b.o.v-a.o.v||r[a.st]-r[b.st]});
-  L.forEach(function(x){
-    var o=x.o,t=tlb(o.turno),pl;
-    if(x.st==='ok')pl='<span class="ad-pl ok">'+(x.p.entrada||'Presente')+'</span>';
-    else if(x.st==='late')pl='<span class="ad-pl late">Atraso '+(x.p.entrada||'')+'</span>';
-    else if(x.st==='miss')pl='<span class="ad-pl miss">Faltou</span>';
-    else pl='<span class="ad-pl none">Sem ponto</span>';
-    h+='<div class="ad-row" data-st="'+x.st+'" data-a="'+o.a+'"><div class="tbl-av" style="background:'+corAv(o.n)+'">'+o.n.charAt(0).toUpperCase()+'</div>';
-    h+='<div class="ad-b"><div class="ad-nm">'+o.n+(t?' <span class="tbl-turno t-'+o.turno+'">'+t+'</span>':'')+'</div><div class="ad-sb">'+pl+'</div></div>';
-    h+='<div class="ad-r"><div class="ad-ra">'+o.a+' <small>acordos</small></div><div class="ad-rv">'+fm(o.v)+'</div></div></div>';
-  });
-  if(!L.length)h+='<div class="ad-empty">Sem dados do ranking</div>';
-  h+='</div><div class="vtag">v41</div></div>';
-  el.innerHTML=h;window.scrollTo(0,0);
+  var nm=['m','t','n'].map(function(t){return eqList.filter(function(x){return x.turno===t}).length});
+  h+='<div class="ad-kp4" style="grid-template-columns:repeat(3,1fr)">';
+  h+='<div class="ad-k" style="--c:#16a34a"><div class="ad-kv">'+nm[0]+'</div><div class="ad-kl">Manh\u00E3</div></div>';
+  h+='<div class="ad-k" style="--c:#f59e0b"><div class="ad-kv">'+nm[1]+'</div><div class="ad-kl">Tarde</div></div>';
+  h+='<div class="ad-k" style="--c:#8b5cf6"><div class="ad-kv">'+nm[2]+'</div><div class="ad-kl">Novatos</div></div></div>';
+  h+='<input class="srch" type="text" placeholder="\uD83D\uDD0D Buscar operador..." oninput="filtCG(this.value)">';
+  h+=segm('eqo',[['valor','Maior valor'],['media','M\u00E9dia'],['tempo','Tempo de casa'],['nome','A-Z']],'ordEquipe');
+  h+='<div class="tr-list ad-list" id="eqBox"></div><div class="vtag">v42</div></div>';
+  el.innerHTML=h;ordEquipe('valor');window.scrollTo(0,0);
 }
-function filtEquipe(t,btn){segOn(btn);document.querySelectorAll('.ad-row').forEach(function(r){
-  var st=r.getAttribute('data-st'),a=+r.getAttribute('data-a'),ok=true;
-  if(t==='sem')ok=(st==='ok'||st==='late')&&a===0;else if(t==='atr')ok=st==='late';else if(t==='fal')ok=st==='miss';
-  r.style.display=ok?'flex':'none'})}
-
+function ordEquipe(t,btn){
+  if(btn)segOn(btn);
+  var L=eqList.slice();
+  if(t==='valor')L.sort(function(a,b){return(b.ms[2]?b.ms[2].v:0)-(a.ms[2]?a.ms[2].v:0)});
+  else if(t==='media')L.sort(function(a,b){return b.medV-a.medV});
+  else if(t==='tempo')L.sort(function(a,b){return b.dias-a.dias});
+  else L.sort(function(a,b){return a.n.localeCompare(b.n)});
+  var h='';
+  L.forEach(function(x){
+    var vs=x.ms.map(function(m){return m?m.v:0}),mx=Math.max(vs[0],vs[1],vs[2],1),t=tlb(x.turno);
+    h+='<div class="ad-row" data-nm="'+(x.n+' '+x.full).toLowerCase()+'" onclick="abrirOp(\''+x.k+'\')"><div class="tbl-av" style="background:'+corAv(x.n)+'">'+x.n.charAt(0).toUpperCase()+'</div>';
+    h+='<div class="ad-b"><div class="ad-nm">'+x.n+(t?' <span class="tbl-turno t-'+x.turno+'">'+t+'</span>':'')+'</div><div class="ad-sb">\uD83D\uDD52 '+tempoTxt(x.dias)+'</div><div class="ad-sb">M\u00E9dia/m\u00EAs: <b>'+fs(x.medV)+'</b> \u00B7 '+Math.round(x.medA)+' acordos</div></div>';
+    h+='<div class="eq-mini">';vs.forEach(function(v,i){h+='<i style="height:'+Math.max(Math.round(v/mx*34),3)+'px;background:'+(i===2?'#2563eb':'#9ca3af')+'"></i>'});
+    h+='</div><div class="tr-ch">\u203A</div></div>';
+  });
+  if(!L.length)h='<div class="ad-empty">Sem dados</div>';
+  document.getElementById('eqBox').innerHTML=h;
+}
+function abrirOp(k){
+  var x=null;eqList.forEach(function(o){if(o.k===k)x=o});if(!x)return;
+  var mx=Math.max(x.ms[0]?x.ms[0].v:0,x.ms[1]?x.ms[1].v:0,x.ms[2]?x.ms[2].v:0,1);
+  var cur=x.ms[2],prv=x.ms[1],vv=prv&&prv.v?Math.round(((cur?cur.v:0)-prv.v)/prv.v*100):null;
+  var p=findPonto(x.full),st=p?pontoStatus(p):'none';
+  var pl=st==='ok'?'<span class="ad-pl ok">Presente '+(p.entrada||'')+'</span>':st==='late'?'<span class="ad-pl late">Atraso '+(p.entrada||'')+'</span>':st==='miss'?'<span class="ad-pl miss">Faltou</span>':'<span class="ad-pl none">Sem ponto</span>';
+  var h='<div class="tr-sh eq-sh"><div class="tr-shh"><div style="display:flex;align-items:center;gap:12px"><div class="tbl-av" style="width:46px;height:46px;margin:0;font-size:1rem;background:'+corAv(x.n)+'">'+x.n.charAt(0).toUpperCase()+'</div><div><div class="tr-sht">'+x.full+'</div><div class="ad-sb">'+x.raw+(x.cfg?' \u00B7 '+x.cfg:'')+'</div></div></div><div class="tr-x" onclick="this.closest(\'.tr-ov\').remove()">\u2715</div></div>';
+  h+='<div class="eq-tc"><div><div class="eq-tl">Tempo de empresa</div><div class="eq-tv">'+tempoTxt(x.dias)+'</div><div class="eq-ts">'+(x.dias>=0?x.dias+' dias \u00B7 '+nivelTxt(x.dias):'')+'</div></div><div style="text-align:right"><div class="eq-tl">Hoje</div><div class="eq-tv">'+(x.hoje?x.hoje.a:0)+' acordos</div><div class="eq-ts">'+pl+'</div></div></div>';
+  h+='<div class="ad-kp4" style="grid-template-columns:repeat(3,1fr);margin-top:12px">';
+  h+='<div class="ad-k" style="--c:#0f3557"><div class="ad-kv" style="font-size:1.05rem">'+fs(x.medV)+'</div><div class="ad-kl">M\u00E9dia valor/m\u00EAs</div></div>';
+  h+='<div class="ad-k" style="--c:#0f3557"><div class="ad-kv" style="font-size:1.05rem">'+Math.round(x.medA)+'</div><div class="ad-kl">M\u00E9dia acordos/m\u00EAs</div></div>';
+  h+='<div class="ad-k" style="--c:#0f3557"><div class="ad-kv" style="font-size:1.05rem">'+fs(x.ticket)+'</div><div class="ad-kl">Ticket m\u00E9dio</div></div></div>';
+  h+='<div class="cp-card" style="margin:0"><div class="cp-card-t"><span class="cp-ic">\uD83D\uDCCA</span> \u00DAltimos 3 meses'+(vv!==null?'<span class="eq-vv'+(vv<0?' neg':'')+'">'+(vv>=0?'+':'')+vv+'% vs anterior</span>':'')+'</div>';
+  h+='<div class="eq-bars">';
+  [0,1,2].forEach(function(i){var m=x.ms[i],v=m?m.v:0;
+    h+='<div class="eq-col"><div class="eq-bv">'+fs(v)+'</div><div class="eq-bw"><div class="cp-bar'+(i===2?' cur':'')+'" style="height:'+Math.max(Math.round(v/mx*100),4)+'%;width:60%"></div></div><div class="cp-mes'+(i===2?' cur':'')+'">'+mesNome(compMonths[i]?compMonths[i].period:'')+'</div><div class="cp-a">'+(m?m.a:0)+' acordos</div></div>'});
+  h+='</div></div><div class="ad-sb" style="text-align:center;margin-top:10px">M\u00E9dias calculadas pelos 2 meses fechados. O m\u00EAs atual ainda est\u00E1 em andamento.</div></div>';
+  var ov=document.createElement('div');ov.className='tr-ov';ov.onclick=function(e){if(e.target===ov)ov.remove()};ov.innerHTML=h;document.body.appendChild(ov);
+}
 // ---- Metas da equipe ----
 function renderMetas(){
   var el=document.getElementById('pgComp');
@@ -1075,7 +1144,7 @@ function renderMetas(){
     h+='</div><div class="ad-r"><div class="ad-ra" style="color:'+cor+'">'+(x.m.nov?'\u2014':x.pc+'%')+'</div><div class="ad-rv">'+fm(o.v)+'</div></div></div>';
   });
   if(!L.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v41</div></div>';
+  h+='</div><div class="vtag">v42</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtMetas(t,btn){segOn(btn);document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=(t==='todos'||r.getAttribute('data-g')===t)?'flex':'none'})}
@@ -1105,7 +1174,7 @@ function renderTurnos(){
   h+='<div class="fill">';
   h+=blocoTurnos('\uD83E\uDD1D Novos acordos de hoje',grpTurno(rankData?rankData.ops:[]),true);
   var _d=new Date();h+=blocoTurnos('\uD83D\uDCB0 Valor recuperado \u00B7 dia 1 at\u00E9 '+('0'+_d.getDate()).slice(-2)+'/'+('0'+(_d.getMonth()+1)).slice(-2),grpTurno(compMonths[2]?compMonths[2].ops:[]),false);
-  h+='<div class="vtag">v41</div></div>';
+  h+='<div class="vtag">v42</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 
@@ -1131,7 +1200,7 @@ function renderCompGeral(){
     h+='<div class="ad-r"><div class="ad-ra" style="font-size:.82rem">'+fs(o.v)+'</div><div class="ad-rv" style="font-weight:700;color:'+(v===null?'#9ca3af':v<0?'#ef4444':'#16a34a')+'">'+(v===null?'novo':(v>=0?'+':'')+v+'%')+'</div></div></div>';
   });
   if(!cur.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v41</div></div>';
+  h+='</div><div class="vtag">v42</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtCG(q){q=q.toLowerCase();document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=r.getAttribute('data-nm').indexOf(q)>=0?'flex':'none'})}
@@ -1156,7 +1225,7 @@ function renderSenhas(){
       h+=x.ok?'<button class="ad-rst" onclick="resetSenha(\''+x.k+'\',\''+x.n.replace(/'/g,'')+'\')">Resetar</button>':'<span class="ad-pl none">Padr\u00E3o</span>';
       h+='</div>';
     });
-    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v41</div></div>';
+    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v42</div></div>';
     el.innerHTML=h;
   }).catch(function(){el.innerHTML=hdrPadrao('Senhas','')+'<div class="fill"><div class="ad-empty">Erro de conex\u00E3o</div></div>'});
 }
@@ -1219,7 +1288,7 @@ function renderTreino(){
     }
     h+='</div>';
   });
-  h+='</div><div class="vtag">v41</div></div>';
+  h+='</div><div class="vtag">v42</div></div>';
   document.getElementById('pgTreino').innerHTML=h;
 }
 function trnToggle(i){trnOpen=trnOpen===i?-1:i;renderTreino()}
