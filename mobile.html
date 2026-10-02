@@ -449,7 +449,7 @@ function normN(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036
 
 // === LOGIN ===
 // >>> COLE AQUI a URL do Apps Script (a mesma que esta no sync-login.js, termina com /exec) <<<
-var SCRIPT_URL='COLE_AQUI';
+var SCRIPT_URL='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec';
 var temScript=/^https:\/\/script\.google\.com\/.+\/exec$/.test(SCRIPT_URL);
 var pwCtx=null; // {key, atual, forcar}
 document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
