@@ -466,6 +466,10 @@ body.is-adm .op-only{display:none!important}
 .fc-v{font-size:.8rem;font-weight:600;color:#1a1f36;white-space:nowrap}
 .fc-t{background:#f3f6fa;border-bottom:0}
 .fc-t b{font-weight:800}
+
+/* v54 fotos */
+.drw-av{cursor:pointer;position:relative;background-size:cover;background-position:center}
+.drw-av:after{content:"\1F4F7";position:absolute;right:-4px;bottom:-4px;width:20px;height:20px;border-radius:50%;background:#fff;font-size:.6rem;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 </style>
 </head>
 <body>
@@ -511,7 +515,7 @@ body.is-adm .op-only{display:none!important}
 </div>
 <div class="menu-bg" id="menuBg" onclick="closeMenu()">
 <div class="drw" onclick="event.stopPropagation()">
-<div class="drw-h"><div class="drw-av" id="drwAv">?</div><div class="drw-u"><div class="drw-nm" id="drwNm"></div><div class="drw-lg" id="drwLg"></div></div><div class="drw-x" onclick="closeMenu()">✕</div></div>
+<div class="drw-h"><div class="drw-av" id="drwAv" onclick="escolherFoto()">?</div><input type="file" id="fotoIn" accept="image/*" style="display:none" onchange="fotoSel(this)"><div class="drw-u"><div class="drw-nm" id="drwNm"></div><div class="drw-lg" id="drwLg"></div></div><div class="drw-x" onclick="closeMenu()">✕</div></div>
 <div class="drw-sec adm-only">Administração</div>
 <button class="drw-it adm-only" data-t="equipe" onclick="closeMenu();go('equipe')"><span>👥</span>Equipe</button>
 <button class="drw-it adm-only" data-t="metas" onclick="closeMenu();go('metas')"><span>🎯</span>Metas da equipe</button>
@@ -529,6 +533,7 @@ body.is-adm .op-only{display:none!important}
 <button class="drw-it" data-t="treino" onclick="closeMenu();go('treino')"><span>🎓</span>Treinamento</button>
 <button class="drw-it" data-t="faltas" onclick="closeMenu();go('faltas')"><span>🔔</span>Faltas do Dia</button>
 <div class="drw-sec">Conta</div>
+<button class="drw-it" onclick="escolherFoto()"><span>📷</span>Alterar foto</button>
 <button class="drw-it" onclick="closeMenu();abrirSenha(false)"><span>🔑</span>Alterar senha</button>
 <button class="drw-it out" onclick="doLogout()"><span>🚪</span>Sair</button>
 <div class="drw-ft">Édimo · Portal do Operador</div>
@@ -691,7 +696,8 @@ function loadLogins(){
     });
   }).catch(function(){});
 }
-function loadData(){loadLogins().then(function(){return Promise.all([loadRanking(),loadPonto(),loadComp()])}).then(function(){go('inicio')})}
+function loadFotos(){if(!temScript)return Promise.resolve();return fetch(SCRIPT_URL+'?type=fotos&t='+Date.now()).then(function(r){return r.json()}).then(function(f){fotoMap=f||{}}).catch(function(){})}
+function loadData(){loadLogins().then(function(){return Promise.all([loadRanking(),loadPonto(),loadComp(),loadFotos()])}).then(function(){go('inicio')})}
 
 function loadRanking(){
   return fetch(RK+'&t='+Date.now()).then(function(r){return r.text()}).then(function(csv){
@@ -840,7 +846,7 @@ function go(tab){
     ({fechamento:renderFechamento,equipe:renderEquipe,metas:renderMetas,turnos:renderTurnos,compgeral:renderCompGeral,senhas:renderSenhas})[tab]()}
 }
 function openMenu(){
-  if(cU){var n=cU.nome||'';document.getElementById('drwAv').textContent=n.charAt(0).toUpperCase();document.getElementById('drwNm').textContent=n.split(' ').slice(0,2).join(' ');document.getElementById('drwLg').textContent=(cU.login||'')+(cU.perfil==='admin'?' \u00B7 Admin':'')}
+  if(cU){var n=cU.nome||'';var dv=document.getElementById('drwAv'),mf=fotoMap[chaveDe(cU)];dv.textContent=mf?'':n.charAt(0).toUpperCase();dv.style.cssText=mf?'background:url('+mf+') center/cover':'';document.getElementById('drwNm').textContent=n.split(' ').slice(0,2).join(' ');document.getElementById('drwLg').textContent=(cU.login||'')+(cU.perfil==='admin'?' \u00B7 Admin':'')}
   document.querySelectorAll('.drw-it[data-t]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===curTab)});
   document.getElementById('menuBg').classList.add('on');
 }
@@ -871,7 +877,7 @@ function renderInicio(){
     t3.forEach(function(o,i){
       var ini=o.n.charAt(0);
       h+='<div class="top3-card" style="background:'+cardBg[i]+';border-color:'+bdCol[i]+'">';
-      h+='<div class="top3-left"><div class="top3-medal">'+md[i]+'</div><div class="top3-av" style="background:'+avBg[i]+';border-color:'+avBg[i]+'">'+ini+'</div></div>';
+      h+='<div class="top3-left"><div class="top3-medal">'+md[i]+'</div><div class="top3-av" style="'+avS(o.raw,avBg[i])+'border-color:'+avBg[i]+'">'+ini+'</div></div>';
       h+='<div class="top3-info"><div class="top3-nm">'+o.n+'</div><div class="top3-st">'+o.a+' acordos \u00B7 '+fs(o.v)+'</div></div>';
       h+='<div class="top3-pos" style="color:'+avBg[i]+'">'+posLbl[i]+'</div>';
       h+='</div>';
@@ -898,7 +904,7 @@ function renderAcordos(){
     var cor=AVC[(o.n.charCodeAt(0)+o.n.length)%AVC.length];
     h+='<div class="tbl-row" data-nm="'+o.n.toLowerCase()+'" data-a="'+o.a+'">';
     h+='<div class="tbl-rk">'+(i+1)+'</div>';
-    h+='<div class="tbl-av" style="background:'+cor+'">'+o.n.charAt(0).toUpperCase()+'</div>';
+    h+='<div class="tbl-av" style="'+avS(o.raw,cor)+'">'+o.n.charAt(0).toUpperCase()+'</div>';
     h+='<div class="tbl-nm">'+o.n+'</div>';
     h+='<div class="tbl-ac">'+o.a+'</div>';
     h+='<div class="tbl-vl">'+fm(o.v)+'</div>';
@@ -907,7 +913,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div><div class="vtag">v53</div></div>';
+  h+='</div><div class="vtag">v54</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -962,7 +968,7 @@ function renderComp(){
   h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
   h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
   h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
-  h+='</div></div><div class="vtag">v53</div></div>';
+  h+='</div></div><div class="vtag">v54</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1003,7 +1009,7 @@ function renderComissao(){
   h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
   h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
-  h+='<div class="vtag">v53</div></div>';
+  h+='<div class="vtag">v54</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1037,7 +1043,7 @@ function renderBeneficios(){
   h+='<div class="bn-it"><div class="bn-ic" style="background:#1f2937">\uD83D\uDCB0</div><div class="bn-b"><div class="bn-t">Comiss\u00E3o</div><div class="bn-s">5% da Receita</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#eef2f7">\uD83D\uDD52</div><div class="bn-b"><div class="bn-t">Flexibilidade</div><div class="bn-s">Hor\u00E1rio Flex\u00EDvel</div><div class="bn-s2">8h \u00E0s 12h + 2h para almo\u00E7o</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#fde7c7">\uD83C\uDFDD\uFE0F</div><div class="bn-b"><div class="bn-t">Folgas</div><div class="bn-s">Dias de Folga</div><div class="bn-s2">Conforme cumprimento das metas</div></div>'+lk()+'</div>';
-  h+='</div><div class="vtag">v53</div></div>';
+  h+='</div><div class="vtag">v54</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1059,6 +1065,48 @@ function renderFaltas(){
   }else h+='<div style="text-align:center;padding:40px;color:#9ca3af">Dados indispon\u00EDveis</div>';
   h+='</div>';
   el.innerHTML=h;
+}
+
+
+// === FOTOS DE PERFIL ===
+var fotoMap={};
+function avS(raw,cor){var f=fotoMap[chaveDe({login:raw||''})];return f?'background:url('+f+') center/cover;color:transparent;':'background:'+cor+';'}
+function escolherFoto(){document.getElementById('fotoIn').click()}
+function fotoSel(inp){
+  var file=inp.files&&inp.files[0];inp.value='';if(!file)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    var img=new Image();
+    img.onload=function(){
+      var S=200,c=document.createElement('canvas');c.width=S;c.height=S;
+      var m=Math.min(img.width,img.height),sx=(img.width-m)/2,sy=(img.height-m)/2;
+      c.getContext('2d').drawImage(img,sx,sy,m,m,0,0,S,S);
+      var q=.8,url=c.toDataURL('image/jpeg',q);
+      while(url.length>40000&&q>.3){q-=.1;url=c.toDataURL('image/jpeg',q)}
+      enviarFoto(url);
+    };
+    img.onerror=function(){alert('N\u00E3o consegui abrir essa imagem')};
+    img.src=rd.result;
+  };
+  rd.readAsDataURL(file);
+}
+function enviarFoto(url){
+  var key=chaveDe(cU),dv=document.getElementById('drwAv');
+  dv.style.cssText='background:url('+url+') center/cover;opacity:.5';dv.textContent='';
+  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'foto',login:key,foto:url})})
+  .then(function(r){return r.json()}).then(function(r){
+    dv.style.opacity='1';
+    if(r.status==='ok'){fotoMap[key]=url;go(curTab)}else alert(r.msg||'N\u00E3o foi poss\u00EDvel salvar a foto');
+  }).catch(function(){dv.style.opacity='1';alert('Erro de conex\u00E3o, tente de novo')});
+}
+function removerFoto(k,n){
+  if(!confirm('Remover a foto de '+n+'?'))return;
+  if(!admPass){admPass=prompt('Confirme a SUA senha de admin:')||'';if(!admPass)return}
+  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'fotodel',admin:chaveDe(cU),senha:admPass,login:k})})
+  .then(function(r){return r.json()}).then(function(r){
+    if(r.status==='ok'){delete fotoMap[k];var o=document.querySelector('.tr-ov');if(o)o.remove();go(curTab)}
+    else{if(/admin/i.test(r.msg||''))admPass='';alert(r.msg||'N\u00E3o foi poss\u00EDvel remover')}
+  }).catch(function(){alert('Erro de conex\u00E3o')});
 }
 
 // === ADMIN ===
@@ -1149,7 +1197,7 @@ function renderEquipe(){
   h+='<div class="ad-k" style="--c:#8b5cf6"><div class="ad-kv">'+nm[2]+'</div><div class="ad-kl">Novatos</div></div></div>';
   h+='<input class="srch" type="text" placeholder="\uD83D\uDD0D Buscar operador..." oninput="filtCG(this.value)">';
   h+=segm('eqo',[['valor','Maior valor'],['media','M\u00E9dia'],['tempo','Tempo de casa'],['nome','A-Z']],'ordEquipe');
-  h+='<div class="tr-list ad-list" id="eqBox"></div><div class="vtag">v53</div></div>';
+  h+='<div class="tr-list ad-list" id="eqBox"></div><div class="vtag">v54</div></div>';
   el.innerHTML=h;ordEquipe('valor');window.scrollTo(0,0);
 }
 function ordEquipe(t,btn){
@@ -1162,7 +1210,7 @@ function ordEquipe(t,btn){
   var h='';
   L.forEach(function(x){
     var vs=x.ms.map(function(m){return m?m.v:0}),mx=Math.max(vs[0],vs[1],vs[2],1),t=tlb(x.turno);
-    h+='<div class="ad-row" data-nm="'+(x.n+' '+x.full).toLowerCase()+'" onclick="abrirOp(\''+x.k+'\')"><div class="tbl-av" style="background:'+corAv(x.n)+'">'+x.n.charAt(0).toUpperCase()+'</div>';
+    h+='<div class="ad-row" data-nm="'+(x.n+' '+x.full).toLowerCase()+'" onclick="abrirOp(\''+x.k+'\')"><div class="tbl-av" style="'+avS(x.raw,corAv(x.n))+'">'+x.n.charAt(0).toUpperCase()+'</div>';
     h+='<div class="ad-b"><div class="ad-nm">'+x.n+(t?' <span class="tbl-turno t-'+x.turno+'">'+t+'</span>':'')+'</div><div class="ad-sb">\uD83D\uDD52 '+tempoTxt(x.dias)+'</div><div class="ad-sb">M\u00E9dia/m\u00EAs: <b>'+fs(x.medV)+'</b> \u00B7 '+Math.round(x.medA)+' acordos</div></div>';
     h+='<div class="eq-mini">';vs.forEach(function(v,i){h+='<i style="height:'+Math.max(Math.round(v/mx*34),3)+'px;background:'+(i===2?'#2563eb':'#9ca3af')+'"></i>'});
     h+='</div><div class="tr-ch">\u203A</div></div>';
@@ -1176,7 +1224,7 @@ function abrirOp(k){
   var cur=x.ms[2],prv=x.ms[1],vv=prv&&prv.v?Math.round(((cur?cur.v:0)-prv.v)/prv.v*100):null;
   var p=findPonto(x.full),st=p?pontoStatus(p):'none';
   var pl=st==='ok'?'<span class="ad-pl ok">Presente '+(p.entrada||'')+'</span>':st==='late'?'<span class="ad-pl late">Atraso '+(p.entrada||'')+'</span>':st==='miss'?'<span class="ad-pl miss">Faltou</span>':'<span class="ad-pl none">Sem ponto</span>';
-  var h='<div class="tr-sh eq-sh"><div class="tr-shh"><div style="display:flex;align-items:center;gap:12px"><div class="tbl-av" style="width:46px;height:46px;margin:0;font-size:1rem;background:'+corAv(x.n)+'">'+x.n.charAt(0).toUpperCase()+'</div><div><div class="tr-sht">'+x.full+'</div><div class="ad-sb">'+x.raw+(x.sec?' \u00B7 Secretaria (sem meta)':(x.cfg?' \u00B7 '+x.cfg:''))+'</div></div></div><div class="tr-x" onclick="this.closest(\'.tr-ov\').remove()">\u2715</div></div>';
+  var h='<div class="tr-sh eq-sh"><div class="tr-shh"><div style="display:flex;align-items:center;gap:12px"><div class="tbl-av" style="width:46px;height:46px;margin:0;font-size:1rem;'+avS(x.raw,corAv(x.n))+'">'+x.n.charAt(0).toUpperCase()+'</div><div><div class="tr-sht">'+x.full+'</div><div class="ad-sb">'+x.raw+(x.sec?' \u00B7 Secretaria (sem meta)':(x.cfg?' \u00B7 '+x.cfg:''))+'</div></div></div><div class="tr-x" onclick="this.closest(\'.tr-ov\').remove()">\u2715</div></div>';
   h+='<div class="eq-tc"><div><div class="eq-tl">Tempo de empresa</div><div class="eq-tv">'+tempoTxt(x.dias)+'</div><div class="eq-ts">'+(x.dias>=0?x.dias+' dias \u00B7 '+nivelTxt(x.dias):'')+'</div></div><div style="text-align:right"><div class="eq-tl">Hoje</div><div class="eq-tv">'+(x.hoje?x.hoje.a:0)+' acordos</div><div class="eq-ts">'+pl+'</div></div></div>';
   h+='<div class="ad-kp4" style="grid-template-columns:repeat(3,1fr);margin-top:12px">';
   h+='<div class="ad-k" style="--c:#0f3557"><div class="ad-kv" style="font-size:1.05rem">'+fs(x.medV)+'</div><div class="ad-kl">M\u00E9dia valor/m\u00EAs</div></div>';
@@ -1186,7 +1234,7 @@ function abrirOp(k){
   h+='<div class="eq-bars">';
   [0,1,2].forEach(function(i){var m=x.ms[i],v=m?m.v:0;
     h+='<div class="eq-col"><div class="eq-bv">'+fs(v)+'</div><div class="eq-bw"><div class="cp-bar'+(i===2?' cur':'')+'" style="height:'+Math.max(Math.round(v/mx*100),4)+'%;width:60%"></div></div><div class="cp-mes'+(i===2?' cur':'')+'">'+mesNome(compMonths[i]?compMonths[i].period:'')+'</div><div class="cp-a">'+(m?m.a:0)+' acordos</div></div>'});
-  h+='</div></div><div class="ad-sb" style="text-align:center;margin-top:10px">M\u00E9dias calculadas pelos 2 meses fechados. O m\u00EAs atual ainda est\u00E1 em andamento.</div></div>';
+  h+='</div></div>'+(fotoMap[x.k]?'<button class="ad-rst" style="width:100%;margin-top:12px;padding:12px" onclick="removerFoto(\''+x.k+'\',\''+x.n.replace(/'/g,'')+'\')">Remover foto de perfil</button>':'')+'<div class="ad-sb" style="text-align:center;margin-top:10px">M\u00E9dias calculadas pelos 2 meses fechados. O m\u00EAs atual ainda est\u00E1 em andamento.</div></div>';
   var ov=document.createElement('div');ov.className='tr-ov';ov.onclick=function(e){if(e.target===ov)ov.remove()};ov.innerHTML=h;document.body.appendChild(ov);
 }
 // ---- Metas da equipe ----
@@ -1213,13 +1261,13 @@ function renderMetas(){
   L.forEach(function(x){
     var o=x.o,cor=x.g==='ok'?'#16a34a':x.g==='perto'?'#f59e0b':x.g==='longe'?'#ef4444':'#8b5cf6';
     var sub=x.m.nov?'Novato \u00B7 comiss\u00E3o sobre qualquer acordo':'Meta '+fs(x.m.meta)+(x.pc<100?' \u00B7 falta '+fs(Math.max(x.m.meta-o.v,0)):' \u00B7 batida \u2714');
-    h+='<div class="ad-row" data-g="'+x.g+'"><div class="tbl-av" style="background:'+corAv(o.n)+'">'+o.n.charAt(0).toUpperCase()+'</div>';
+    h+='<div class="ad-row" data-g="'+x.g+'"><div class="tbl-av" style="'+avS(o.raw,corAv(o.n))+'">'+o.n.charAt(0).toUpperCase()+'</div>';
     h+='<div class="ad-b"><div class="ad-nm">'+o.n+'</div><div class="ad-sb">'+sub+'</div>';
     if(!x.m.nov)h+='<div class="ad-bar"><div style="width:'+Math.min(Math.max(x.pc,3),100)+'%;background:'+cor+'"></div></div>';
     h+='</div><div class="ad-r"><div class="ad-ra" style="color:'+cor+'">'+(x.m.nov?'\u2014':x.pc+'%')+'</div><div class="ad-rv">'+fm(o.v)+'</div></div></div>';
   });
   if(!L.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v53</div></div>';
+  h+='</div><div class="vtag">v54</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtMetas(t,btn){segOn(btn);document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=(t==='todos'||r.getAttribute('data-g')===t)?'flex':'none'})}
@@ -1249,7 +1297,7 @@ function renderTurnos(){
   h+='<div class="fill">';
   h+=blocoTurnos('\uD83E\uDD1D Novos acordos de hoje',grpTurno(rankData?rankData.ops:[]),true);
   var _d=new Date();h+=blocoTurnos('\uD83D\uDCB0 Valor recuperado \u00B7 dia 1 at\u00E9 '+('0'+_d.getDate()).slice(-2)+'/'+('0'+(_d.getMonth()+1)).slice(-2),grpTurno(compMonths[2]?compMonths[2].ops.filter(function(o){return ativoOp(o.raw)}):[]),false);
-  h+='<div class="vtag">v53</div></div>';
+  h+='<div class="vtag">v54</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 
@@ -1270,12 +1318,12 @@ function renderCompGeral(){
   h+='<div class="tr-list ad-list">';
   cur.slice().sort(function(a,b){return b.v-a.v}).forEach(function(o,i){
     var p=pm[o.raw.toLowerCase().replace(/^\d+\./,'')],pv=p?p.v:0,v=pv?Math.round((o.v-pv)/pv*100):null;
-    h+='<div class="ad-row" data-nm="'+o.n.toLowerCase()+'"><div class="tbl-rk" style="width:22px">'+(i+1)+'</div><div class="tbl-av" style="background:'+corAv(o.n)+'">'+o.n.charAt(0).toUpperCase()+'</div>';
+    h+='<div class="ad-row" data-nm="'+o.n.toLowerCase()+'"><div class="tbl-rk" style="width:22px">'+(i+1)+'</div><div class="tbl-av" style="'+avS(o.raw,corAv(o.n))+'">'+o.n.charAt(0).toUpperCase()+'</div>';
     h+='<div class="ad-b"><div class="ad-nm">'+o.n+'</div><div class="ad-sb">'+o.a+' acordos \u00B7 anterior '+fs(pv)+'</div></div>';
     h+='<div class="ad-r"><div class="ad-ra" style="font-size:.82rem">'+fs(o.v)+'</div><div class="ad-rv" style="font-weight:700;color:'+(v===null?'#9ca3af':v<0?'#ef4444':'#16a34a')+'">'+(v===null?'novo':(v>=0?'+':'')+v+'%')+'</div></div></div>';
   });
   if(!cur.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v53</div></div>';
+  h+='</div><div class="vtag">v54</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtCG(q){q=q.toLowerCase();document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=r.getAttribute('data-nm').indexOf(q)>=0?'flex':'none'})}
@@ -1305,7 +1353,7 @@ function renderFechamento(){
   });
   if(!fchList.length)h+='<div class="ad-empty">Sem dados do m\u00EAs anterior</div>';
   else h+='<div class="fc-r fc-t"><span></span><span class="fc-n"><b>TOTAL</b></span><span class="fc-a">'+ta+'</span><span class="fc-v">'+fm(tv)+'</span></div>';
-  h+='</div><div class="vtag">v53</div></div>';
+  h+='</div><div class="vtag">v54</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function baixarFechamento(){
@@ -1337,12 +1385,12 @@ function renderSenhas(){
     h+='<input class="srch" type="text" placeholder="\uD83D\uDD0D Buscar..." oninput="filtCG(this.value)">';
     h+='<div class="tr-list ad-list">';
     L.forEach(function(x){
-      h+='<div class="ad-row" data-nm="'+(x.n+' '+x.k).toLowerCase()+'"><div class="tbl-av" style="background:'+corAv(x.n)+'">'+x.n.charAt(0).toUpperCase()+'</div>';
+      h+='<div class="ad-row" data-nm="'+(x.n+' '+x.k).toLowerCase()+'"><div class="tbl-av" style="'+avS(x.k,corAv(x.n))+'">'+x.n.charAt(0).toUpperCase()+'</div>';
       h+='<div class="ad-b"><div class="ad-nm">'+x.n+'</div><div class="ad-sb">'+x.lg+'</div></div>';
       h+=x.ok?'<button class="ad-rst" onclick="resetSenha(\''+x.k+'\',\''+x.n.replace(/'/g,'')+'\')">Resetar</button>':'<span class="ad-pl none">Padr\u00E3o</span>';
       h+='</div>';
     });
-    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v53</div></div>';
+    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v54</div></div>';
     el.innerHTML=h;
   }).catch(function(){el.innerHTML=hdrPadrao('Senhas','')+'<div class="fill"><div class="ad-empty">Erro de conex\u00E3o</div></div>'});
 }
@@ -1405,7 +1453,7 @@ function renderTreino(){
     }
     h+='</div>';
   });
-  h+='</div><div class="vtag">v53</div></div>';
+  h+='</div><div class="vtag">v54</div></div>';
   document.getElementById('pgTreino').innerHTML=h;
 }
 function trnToggle(i){trnOpen=trnOpen===i?-1:i;renderTreino()}
