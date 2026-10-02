@@ -479,12 +479,13 @@ body.is-adm .op-only{display:none!important}
 <button class="drw-it adm-only" data-t="turnos" onclick="closeMenu();go('turnos')"><span>🕒</span>Turnos</button>
 <button class="drw-it adm-only" data-t="compgeral" onclick="closeMenu();go('compgeral')"><span>📈</span>Comparativo geral</button>
 <button class="drw-it adm-only" data-t="senhas" onclick="closeMenu();go('senhas')"><span>🔐</span>Senhas</button>
-<div class="drw-sec"><span class="adm-only" style="display:inline">Telas do operador</span><span class="op-only" style="display:inline">Menu</span></div>
-<button class="drw-it" data-t="inicio" onclick="closeMenu();go('inicio')"><span>🏠</span>Início</button>
-<button class="drw-it" data-t="acordos" onclick="closeMenu();go('acordos')"><span>📋</span>Acordos</button>
-<button class="drw-it" data-t="comp" onclick="closeMenu();go('comp')"><span>📊</span>Comparativo</button>
-<button class="drw-it" data-t="comissao" onclick="closeMenu();go('comissao')"><span>💰</span>Comissão</button>
-<button class="drw-it" data-t="beneficios" onclick="closeMenu();go('beneficios')"><span>🎁</span>Benefícios</button>
+<div class="drw-sec op-only">Menu</div>
+<div class="drw-sec adm-only">Outros</div>
+<button class="drw-it op-only" data-t="inicio" onclick="closeMenu();go('inicio')"><span>🏠</span>Início</button>
+<button class="drw-it op-only" data-t="acordos" onclick="closeMenu();go('acordos')"><span>📋</span>Acordos</button>
+<button class="drw-it op-only" data-t="comp" onclick="closeMenu();go('comp')"><span>📊</span>Comparativo</button>
+<button class="drw-it op-only" data-t="comissao" onclick="closeMenu();go('comissao')"><span>💰</span>Comissão</button>
+<button class="drw-it op-only" data-t="beneficios" onclick="closeMenu();go('beneficios')"><span>🎁</span>Benefícios</button>
 <button class="drw-it" data-t="treino" onclick="closeMenu();go('treino')"><span>🎓</span>Treinamento</button>
 <button class="drw-it" data-t="faltas" onclick="closeMenu();go('faltas')"><span>🔔</span>Faltas do Dia</button>
 <div class="drw-sec">Conta</div>
@@ -843,7 +844,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div><div class="vtag">v39</div></div>';
+  h+='</div><div class="vtag">v41</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -898,7 +899,7 @@ function renderComp(){
   h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
   h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
   h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
-  h+='</div></div><div class="vtag">v39</div></div>';
+  h+='</div></div><div class="vtag">v41</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -932,7 +933,7 @@ function renderComissao(){
   h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
   h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
-  h+='<div class="vtag">v39</div></div>';
+  h+='<div class="vtag">v41</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -966,7 +967,7 @@ function renderBeneficios(){
   h+='<div class="bn-it"><div class="bn-ic" style="background:#1f2937">\uD83D\uDCB0</div><div class="bn-b"><div class="bn-t">Comiss\u00E3o</div><div class="bn-s">5% da Receita</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#eef2f7">\uD83D\uDD52</div><div class="bn-b"><div class="bn-t">Flexibilidade</div><div class="bn-s">Hor\u00E1rio Flex\u00EDvel</div><div class="bn-s2">8h \u00E0s 12h + 2h para almo\u00E7o</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#fde7c7">\uD83C\uDFDD\uFE0F</div><div class="bn-b"><div class="bn-t">Folgas</div><div class="bn-s">Dias de Folga</div><div class="bn-s2">Conforme cumprimento das metas</div></div>'+lk()+'</div>';
-  h+='</div><div class="vtag">v39</div></div>';
+  h+='</div><div class="vtag">v41</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1036,7 +1037,7 @@ function renderEquipe(){
     h+='<div class="ad-r"><div class="ad-ra">'+o.a+' <small>acordos</small></div><div class="ad-rv">'+fm(o.v)+'</div></div></div>';
   });
   if(!L.length)h+='<div class="ad-empty">Sem dados do ranking</div>';
-  h+='</div><div class="vtag">v39</div></div>';
+  h+='</div><div class="vtag">v41</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtEquipe(t,btn){segOn(btn);document.querySelectorAll('.ad-row').forEach(function(r){
@@ -1074,7 +1075,7 @@ function renderMetas(){
     h+='</div><div class="ad-r"><div class="ad-ra" style="color:'+cor+'">'+(x.m.nov?'\u2014':x.pc+'%')+'</div><div class="ad-rv">'+fm(o.v)+'</div></div></div>';
   });
   if(!L.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v39</div></div>';
+  h+='</div><div class="vtag">v41</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtMetas(t,btn){segOn(btn);document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=(t==='todos'||r.getAttribute('data-g')===t)?'flex':'none'})}
@@ -1092,7 +1093,7 @@ function blocoTurnos(titulo,g,hoje){
   ['m','t','n'].forEach(function(k){var x=g[k],md=x.n?x.v/x.n:0;
     h+='<div class="ad-tn"><div class="ad-tnh"><div class="bn-ic" style="background:'+nm[k][1]+'22;width:44px;height:44px;font-size:1.2rem">'+nm[k][2]+'</div>';
     h+='<div class="ad-b"><div class="ad-nm">'+nm[k][0]+'</div><div class="ad-sb">'+x.n+' operadores'+(hoje?' \u00B7 '+x.c+' com acordo':'')+'</div></div>';
-    h+='<div class="ad-r"><div class="ad-ra">'+fs(x.v)+'</div><div class="ad-rv">'+x.a+' acordos</div></div></div>';
+    h+='<div class="ad-r"><div class="ad-ra">'+fs(x.v)+'</div><div class="ad-rv">'+x.a+(hoje?' acordos':' pagamentos')+'</div></div></div>';
     h+='<div class="ad-bar" style="margin:10px 0 6px"><div style="width:'+Math.max(Math.round(x.v/mx*100),3)+'%;background:'+nm[k][1]+'"></div></div>';
     h+='<div class="ad-sb">M\u00E9dia por operador: <b>'+fs(md)+'</b></div></div>';
   });
@@ -1102,9 +1103,9 @@ function renderTurnos(){
   var el=document.getElementById('pgComp');
   var h=hdrPadrao('Turnos',rankData?rankData.d:'');
   h+='<div class="fill">';
-  h+=blocoTurnos('\u2600\uFE0F Hoje',grpTurno(rankData?rankData.ops:[]),true);
-  h+=blocoTurnos('\uD83D\uDCC5 M\u00EAs atual'+(compMonths[2]?' \u00B7 '+mesNome(compMonths[2].period):''),grpTurno(compMonths[2]?compMonths[2].ops:[]),false);
-  h+='<div class="vtag">v39</div></div>';
+  h+=blocoTurnos('\uD83E\uDD1D Novos acordos de hoje',grpTurno(rankData?rankData.ops:[]),true);
+  var _d=new Date();h+=blocoTurnos('\uD83D\uDCB0 Valor recuperado \u00B7 dia 1 at\u00E9 '+('0'+_d.getDate()).slice(-2)+'/'+('0'+(_d.getMonth()+1)).slice(-2),grpTurno(compMonths[2]?compMonths[2].ops:[]),false);
+  h+='<div class="vtag">v41</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 
@@ -1118,7 +1119,7 @@ function renderCompGeral(){
   function pc(v){return '<div class="kp-pct'+(v<0?' neg':'')+'">'+(v<0?'\u25BC':'\u25B2')+' '+(v>=0?'+':'')+v+'%</div>'}
   var h=hdrPadrao('Comparativo geral',compMonths[2]?mesNome(compMonths[2].period):'');
   h+='<div class="fill">';
-  h+='<div class="cp-sec"><span class="cp-ic">\uD83D\uDCCA</span> Equipe no m\u00EAs (vs. m\u00EAs anterior)</div>';
+  h+='<div class="cp-sec"><span class="cp-ic">\uD83D\uDCCA</span> Valor recuperado no m\u00EAs (vs. m\u00EAs anterior)</div>';
   h+='<div class="kp-grid"><div class="kp"><div class="kp-lbl">Acordos</div><div class="kp-val">'+ac+'</div>'+pc(va)+'</div>';
   h+='<div class="kp"><div class="kp-lbl">Valor</div><div class="kp-val">'+fs(tc)+'</div>'+pc(vv)+'</div></div>';
   h+='<input class="srch" type="text" placeholder="\uD83D\uDD0D Buscar operador..." oninput="filtCG(this.value)">';
@@ -1130,7 +1131,7 @@ function renderCompGeral(){
     h+='<div class="ad-r"><div class="ad-ra" style="font-size:.82rem">'+fs(o.v)+'</div><div class="ad-rv" style="font-weight:700;color:'+(v===null?'#9ca3af':v<0?'#ef4444':'#16a34a')+'">'+(v===null?'novo':(v>=0?'+':'')+v+'%')+'</div></div></div>';
   });
   if(!cur.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v39</div></div>';
+  h+='</div><div class="vtag">v41</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtCG(q){q=q.toLowerCase();document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=r.getAttribute('data-nm').indexOf(q)>=0?'flex':'none'})}
@@ -1155,7 +1156,7 @@ function renderSenhas(){
       h+=x.ok?'<button class="ad-rst" onclick="resetSenha(\''+x.k+'\',\''+x.n.replace(/'/g,'')+'\')">Resetar</button>':'<span class="ad-pl none">Padr\u00E3o</span>';
       h+='</div>';
     });
-    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v39</div></div>';
+    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v41</div></div>';
     el.innerHTML=h;
   }).catch(function(){el.innerHTML=hdrPadrao('Senhas','')+'<div class="fill"><div class="ad-empty">Erro de conex\u00E3o</div></div>'});
 }
@@ -1218,7 +1219,7 @@ function renderTreino(){
     }
     h+='</div>';
   });
-  h+='</div><div class="vtag">v39</div></div>';
+  h+='</div><div class="vtag">v41</div></div>';
   document.getElementById('pgTreino').innerHTML=h;
 }
 function trnToggle(i){trnOpen=trnOpen===i?-1:i;renderTreino()}
