@@ -541,6 +541,16 @@ body.is-adm .op-only{display:none!important}
 .pw-wrap input{padding-right:46px!important}
 .pw-eye{position:absolute;right:6px;top:0;height:calc(100% - 10px);width:38px;border:0;background:none;color:#6b7280;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .pw-eye:active{color:#0f3557}
+
+/* v58 comparativo dias uteis */
+.cg-info{font-size:.7rem;color:#374151;background:#eef3fa;border-radius:12px;padding:10px 12px;margin:0 0 12px;line-height:1.4}
+.kp-ant{font-size:.66rem;color:#6b7280;margin-top:4px}
+
+/* v59 carregamento */
+@keyframes skp{0%{background-position:-300px 0}100%{background-position:300px 0}}
+.sk{border-radius:16px;margin-bottom:12px;background:linear-gradient(90deg,#e5e9f0 0,#f3f5f9 50%,#e5e9f0 100%);background-size:600px 100%;animation:skp 1.2s infinite linear}
+.sk-top{height:190px}.sk-comp{height:96px}.sk-post{height:120px}
+.ld-txt{text-align:center;font-size:.75rem;color:#9ca3af;margin-top:6px}
 </style>
 </head>
 <body>
@@ -720,7 +730,7 @@ function salvarSenha(){
     }else{btn.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';pwErr(r.msg||'N\u00E3o foi poss\u00EDvel salvar')}
   }).catch(function(){btn.disabled=false;btn.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';pwErr('Erro de conex\u00E3o, tente de novo')});
 }
-function doLogout(){document.querySelectorAll('.pw-wrap input').forEach(function(i){i.type='password'});localStorage.removeItem('mu');localStorage.removeItem('lm');localStorage.removeItem('nm');localStorage.removeItem('em');sessionStorage.clear();location.reload()}
+function doLogout(){localStorage.removeItem('cacheDados');document.querySelectorAll('.pw-wrap input').forEach(function(i){i.type='password'});localStorage.removeItem('mu');localStorage.removeItem('lm');localStorage.removeItem('nm');localStorage.removeItem('em');sessionStorage.clear();location.reload()}
 window.addEventListener('load',function(){
   var lm=localStorage.getItem('lgMsg');if(lm){localStorage.removeItem('lgMsg');lgErr(lm)}
   var st=store(),s=st.getItem('mu');
@@ -788,7 +798,36 @@ function derrubar(){
   localStorage.setItem('lgMsg','Seu acesso mudou. Entre novamente com seu login atual e a senha padr\u00E3o.');
   doLogout();
 }
-function loadData(){loadLogins().then(function(){if(!acessoValido()){derrubar();throw 'off'}return Promise.all([loadRanking(),loadPonto(),loadComp(),loadFotos()])}).then(function(){go('inicio')})}
+// ---- cache local: abre na hora com os dados da ultima vez e atualiza por tras ----
+function salvarCache(){
+  try{localStorage.setItem('cacheDados',JSON.stringify({t:Date.now(),rk:rankData,cm:compMonths,pt:pontoData,lm:loginMap,nm:nameMap,em:entMap,en:entNome,pf:perfMap,ft:fotoMap,fd:feedData,fv:feedVer,ll:loginsLidos}))}
+  catch(e){try{localStorage.setItem('cacheDados',JSON.stringify({t:Date.now(),rk:rankData,cm:compMonths,pt:pontoData,lm:loginMap,nm:nameMap,em:entMap,en:entNome,pf:perfMap,fd:feedData,fv:feedVer,ll:loginsLidos}))}catch(e2){}}
+}
+function lerCache(){
+  try{var c=JSON.parse(localStorage.getItem('cacheDados')||'null');if(!c)return false;
+    rankData=c.rk;compMonths=c.cm||[null,null,null];pontoData=c.pt;loginMap=c.lm||{};nameMap=c.nm||{};entMap=c.em||{};entNome=c.en||{};perfMap=c.pf||{};fotoMap=c.ft||{};feedData=c.fd||null;feedVer=c.fv==null?-1:c.fv;loginsLidos=c.ll||0;
+    return !!rankData}catch(e){return false}
+}
+function telaCarregando(){
+  var el=document.getElementById('pgInicio');if(!el||el.innerHTML.trim())return;
+  el.innerHTML=hdrPadrao('In\u00EDcio','Carregando...')+'<div class="fill"><div class="sk sk-top"></div><div class="sk sk-comp"></div><div class="sk sk-post"></div><div class="sk sk-post"></div><div class="ld-txt">Carregando os dados do dia...</div></div>';
+}
+var primeiraCarga=true;
+function rerender(){
+  if(curTab==='inicio'){var b=document.getElementById('fdTopBox');if(b&&document.getElementById('fdList')){b.innerHTML=topoFeed(rankData);desenharFeed()}else renderInicio()}
+  else go(curTab);
+}
+function loadData(){
+  var temCache=lerCache();
+  if(temCache){if(!acessoValido()){derrubar();return}go(curTab||'inicio')}else telaCarregando();
+  // tudo em paralelo; ranking depende so da lista de logins
+  var pLog=loadLogins().then(function(){if(!acessoValido()){derrubar();throw 'off'}});
+  var pRk=pLog.then(loadRanking).then(function(){if(!temCache&&primeiraCarga){primeiraCarga=false;go('inicio')}else if(curTab==='inicio')rerender()});
+  var pResto=Promise.all([loadPonto(),loadComp(),loadHist()]);
+  var pFoto=loadFotos();
+  Promise.all([pRk,pResto]).then(function(){if(curTab!=='inicio')go(curTab);salvarCache()}).catch(function(){});
+  Promise.all([pRk,pFoto]).then(function(){rerender();salvarCache()}).catch(function(){});
+}
 
 function loadRanking(){
   return fetch(RK+'&t='+Date.now()).then(function(r){return r.text()}).then(function(csv){
@@ -1004,7 +1043,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div><div class="vtag">v57</div></div>';
+  h+='</div><div class="vtag">v59</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1059,7 +1098,7 @@ function renderComp(){
   h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
   h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
   h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
-  h+='</div></div><div class="vtag">v57</div></div>';
+  h+='</div></div><div class="vtag">v59</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1100,7 +1139,7 @@ function renderComissao(){
   h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
   h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
-  h+='<div class="vtag">v57</div></div>';
+  h+='<div class="vtag">v59</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1134,7 +1173,7 @@ function renderBeneficios(){
   h+='<div class="bn-it"><div class="bn-ic" style="background:#1f2937">\uD83D\uDCB0</div><div class="bn-b"><div class="bn-t">Comiss\u00E3o</div><div class="bn-s">5% da Receita</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#eef2f7">\uD83D\uDD52</div><div class="bn-b"><div class="bn-t">Flexibilidade</div><div class="bn-s">Hor\u00E1rio Flex\u00EDvel</div><div class="bn-s2">8h \u00E0s 12h + 2h para almo\u00E7o</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#fde7c7">\uD83C\uDFDD\uFE0F</div><div class="bn-b"><div class="bn-t">Folgas</div><div class="bn-s">Dias de Folga</div><div class="bn-s2">Conforme cumprimento das metas</div></div>'+lk()+'</div>';
-  h+='</div><div class="vtag">v57</div></div>';
+  h+='</div><div class="vtag">v59</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1240,7 +1279,7 @@ function renderInicio(){
   var h=hdrPadrao('In\u00EDcio',(d.d||'Hoje')+(nm?' \u00B7 '+nm:''));
   h+='<div class="fill fd-wrap"><div id="fdPull" class="fd-pull">\u2193 Puxe para atualizar</div><div id="fdTopBox">'+topoFeed(d)+'</div>';
   h+=composer();
-  h+='<div class="fd-sec">\uD83D\uDCF0 Publica\u00E7\u00F5es</div><div id="fdList"><div class="ad-empty">Carregando publica\u00E7\u00F5es...</div></div><div class="vtag">v57</div></div>';
+  h+='<div class="fd-sec">\uD83D\uDCF0 Publica\u00E7\u00F5es</div><div id="fdList"><div class="ad-empty">Carregando publica\u00E7\u00F5es...</div></div><div class="vtag">v59</div></div>';
   el.innerHTML=h;
   if(feedData)desenharFeed();
   carregarFeed(true);iniciarPoll();
@@ -1250,7 +1289,7 @@ function carregarFeed(force){
   var p=force?Promise.resolve({ver:-2}):fetch(SCRIPT_URL+'?type=feedver&t='+Date.now()).then(function(r){return r.json()});
   p.then(function(v){
     if(!force&&v.ver===feedVer){feedBusy=false;return}
-    return fetch(SCRIPT_URL+'?type=feed&t='+Date.now()).then(function(r){return r.json()}).then(function(d){feedData=d;feedVer=d.ver;feedBusy=false;desenharFeed()});
+    return fetch(SCRIPT_URL+'?type=feed&t='+Date.now()).then(function(r){return r.json()}).then(function(d){feedData=d;feedVer=d.ver;feedBusy=false;desenharFeed();salvarCache()});
   }).catch(function(){feedBusy=false;var l=document.getElementById('fdList');if(l&&!feedData)l.innerHTML='<div class="ad-empty">N\u00E3o foi poss\u00EDvel carregar o feed</div>'});
 }
 function atualizarTopo(){return loadRanking().then(function(){var b=document.getElementById('fdTopBox');if(b)b.innerHTML=topoFeed(rankData)})}
@@ -1459,7 +1498,7 @@ function renderEquipe(){
   h+='<div class="ad-k" style="--c:#8b5cf6"><div class="ad-kv">'+nm[2]+'</div><div class="ad-kl">Novatos</div></div></div>';
   h+='<input class="srch" type="text" placeholder="\uD83D\uDD0D Buscar operador..." oninput="filtCG(this.value)">';
   h+=segm('eqo',[['valor','Maior valor'],['media','M\u00E9dia'],['tempo','Tempo de casa'],['nome','A-Z']],'ordEquipe');
-  h+='<div class="tr-list ad-list" id="eqBox"></div><div class="vtag">v57</div></div>';
+  h+='<div class="tr-list ad-list" id="eqBox"></div><div class="vtag">v59</div></div>';
   el.innerHTML=h;ordEquipe('valor');window.scrollTo(0,0);
 }
 function ordEquipe(t,btn){
@@ -1529,7 +1568,7 @@ function renderMetas(){
     h+='</div><div class="ad-r"><div class="ad-ra" style="color:'+cor+'">'+(x.m.nov?'\u2014':x.pc+'%')+'</div><div class="ad-rv">'+fm(o.v)+'</div></div></div>';
   });
   if(!L.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v57</div></div>';
+  h+='</div><div class="vtag">v59</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtMetas(t,btn){segOn(btn);document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=(t==='todos'||r.getAttribute('data-g')===t)?'flex':'none'})}
@@ -1559,33 +1598,52 @@ function renderTurnos(){
   h+='<div class="fill">';
   h+=blocoTurnos('\uD83E\uDD1D Novos acordos de hoje',grpTurno(rankData?rankData.ops:[]),true);
   var _d=new Date();h+=blocoTurnos('\uD83D\uDCB0 Valor recuperado \u00B7 dia 1 at\u00E9 '+('0'+_d.getDate()).slice(-2)+'/'+('0'+(_d.getMonth()+1)).slice(-2),grpTurno(compMonths[2]?compMonths[2].ops.filter(function(o){return ativoOp(o.raw)}):[]),false);
-  h+='<div class="vtag">v57</div></div>';
+  h+='<div class="vtag">v59</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 
 // ---- Comparativo geral ----
+// dias uteis: seg-sex = 1, sabado = 0,5, domingo = 0 (feriados nao contam)
+function pesoDia(d){var w=d.getDay();return w===0?0:w===6?0.5:1}
+function uteisAte(ano,mes,dia){var t=0;for(var i=1;i<=dia;i++)t+=pesoDia(new Date(ano,mes,i));return t}
+function diasNoMes(ano,mes){return new Date(ano,mes+1,0).getDate()}
+// dia do mes anterior com a mesma quantidade de dias uteis
+function diaEquivalente(ano,mes,alvo){var n=diasNoMes(ano,mes),t=0;for(var i=1;i<=n;i++){t+=pesoDia(new Date(ano,mes,i));if(t>=alvo)return i}return n}
+var histData=null;
+function loadHist(){if(!temScript||!isAdm())return Promise.resolve();return fetch(SCRIPT_URL+'?type=hist&t='+Date.now()).then(function(r){return r.json()}).then(function(h){histData=h&&h.dias?h.dias:null}).catch(function(){})}
 function renderCompGeral(){
   var el=document.getElementById('pgComp');
   var cur=compMonths[2]?compMonths[2].ops.filter(function(o){return ativoOp(o.raw)}):[],prv=compMonths[1]?compMonths[1].ops:[];
-  var pm={};prv.forEach(function(o){pm[o.raw.toLowerCase().replace(/^\d+\./,'')]=o});
-  var tc=0,tp=0,ac=0,ap=0;cur.forEach(function(o){tc+=o.v;ac+=o.a});prv.forEach(function(o){tp+=o.v;ap+=o.a});
+  var hoje=new Date(),Y=hoje.getFullYear(),M=hoje.getMonth(),D=hoje.getDate();
+  var pY=M===0?Y-1:Y,pM=M===0?11:M-1;
+  var uHoje=uteisAte(Y,M,D),uPrevTot=uteisAte(pY,pM,diasNoMes(pY,pM)),dEq=diaEquivalente(pY,pM,uHoje);
+  var fator=uPrevTot?Math.min(uHoje/uPrevTot,1):1;
+  // foto do mes anterior no dia equivalente (se existir) ou estimativa proporcional
+  var snap=null,snapDia=null;
+  if(histData){for(var d=dEq;d>=1&&!snap;d--){var k=pY+'-'+('0'+(pM+1)).slice(-2)+'-'+('0'+d).slice(-2);if(histData[k]){snap=histData[k];snapDia=d}}}
+  var pm={};prv.forEach(function(o){var k=o.raw.toLowerCase().replace(/^\d+\./,'');pm[k]=snap?(snap[k]?{a:snap[k][0],v:snap[k][1]}:{a:0,v:0}):{a:o.a*fator,v:o.v*fator}});
+  if(snap)Object.keys(snap).forEach(function(k){if(!pm[k])pm[k]={a:snap[k][0],v:snap[k][1]}});
+  var tc=0,tp=0,ac=0,ap=0;cur.forEach(function(o){tc+=o.v;ac+=o.a});Object.keys(pm).forEach(function(k){tp+=pm[k].v;ap+=pm[k].a});
   var vv=tp?Math.round((tc-tp)/tp*100):0,va=ap?Math.round((ac-ap)/ap*100):0;
-  function pc(v){return '<div class="kp-pct'+(v<0?' neg':'')+'">'+(v<0?'\u25BC':'\u25B2')+' '+(v>=0?'+':'')+v+'%</div>'}
+  function pc(v,ant){return '<div class="kp-pct'+(v<0?' neg':'')+'">'+(v<0?'\u25BC':'\u25B2')+' '+(v>=0?'+':'')+v+'%</div><div class="kp-ant">'+ant+'</div>'}
+  var uTxt=String(uHoje).replace('.',',');
+  var mesP=mesNome(compMonths[1]?compMonths[1].period:'').split('/')[0];
   var h=hdrPadrao('Comparativo geral',compMonths[2]?mesNome(compMonths[2].period):'');
   h+='<div class="fill">';
-  h+='<div class="cp-sec"><span class="cp-ic">\uD83D\uDCCA</span> Valor recuperado no m\u00EAs (vs. m\u00EAs anterior)</div>';
-  h+='<div class="kp-grid"><div class="kp"><div class="kp-lbl">Acordos</div><div class="kp-val">'+ac+'</div>'+pc(va)+'</div>';
-  h+='<div class="kp"><div class="kp-lbl">Valor</div><div class="kp-val">'+fs(tc)+'</div>'+pc(vv)+'</div></div>';
+  h+='<div class="cp-sec"><span class="cp-ic">\uD83D\uDCCA</span> '+uTxt+' dias \u00FAteis vs. mesmo per\u00EDodo de '+mesP+'</div>';
+  h+='<div class="cg-info">'+(snap?'\u2705 Comparando com o acumulado real at\u00E9 '+('0'+snapDia).slice(-2)+'/'+('0'+(pM+1)).slice(-2):'\u2248 M\u00EAs anterior <b>estimado</b>: total de '+mesP+' \u00D7 '+uTxt+'/'+String(uPrevTot).replace('.',',')+' dias \u00FAteis. A partir do pr\u00F3ximo m\u00EAs a compara\u00E7\u00E3o fica exata.')+'</div>';
+  h+='<div class="kp-grid"><div class="kp"><div class="kp-lbl">Acordos</div><div class="kp-val">'+ac+'</div>'+pc(va,(snap?'':'\u2248 ')+Math.round(ap)+' em '+mesP)+'</div>';
+  h+='<div class="kp"><div class="kp-lbl">Valor recuperado</div><div class="kp-val">'+fs(tc)+'</div>'+pc(vv,(snap?'':'\u2248 ')+fs(tp)+' em '+mesP)+'</div></div>';
   h+='<input class="srch" type="text" placeholder="\uD83D\uDD0D Buscar operador..." oninput="filtCG(this.value)">';
   h+='<div class="tr-list ad-list">';
   cur.slice().sort(function(a,b){return b.v-a.v}).forEach(function(o,i){
     var p=pm[o.raw.toLowerCase().replace(/^\d+\./,'')],pv=p?p.v:0,v=pv?Math.round((o.v-pv)/pv*100):null;
     h+='<div class="ad-row" data-nm="'+o.n.toLowerCase()+'"><div class="tbl-rk" style="width:22px">'+(i+1)+'</div><div class="tbl-av" style="'+avS(o.raw,corAv(o.n))+'">'+o.n.charAt(0).toUpperCase()+'</div>';
-    h+='<div class="ad-b"><div class="ad-nm">'+o.n+'</div><div class="ad-sb">'+o.a+' acordos \u00B7 anterior '+fs(pv)+'</div></div>';
+    h+='<div class="ad-b"><div class="ad-nm">'+o.n+'</div><div class="ad-sb">'+o.a+' acordos \u00B7 '+mesP+' '+(snap?'':'\u2248 ')+fs(pv)+'</div></div>';
     h+='<div class="ad-r"><div class="ad-ra" style="font-size:.82rem">'+fs(o.v)+'</div><div class="ad-rv" style="font-weight:700;color:'+(v===null?'#9ca3af':v<0?'#ef4444':'#16a34a')+'">'+(v===null?'novo':(v>=0?'+':'')+v+'%')+'</div></div></div>';
   });
   if(!cur.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v57</div></div>';
+  h+='</div><div class="vtag">v59</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtCG(q){q=q.toLowerCase();document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=r.getAttribute('data-nm').indexOf(q)>=0?'flex':'none'})}
@@ -1615,7 +1673,7 @@ function renderFechamento(){
   });
   if(!fchList.length)h+='<div class="ad-empty">Sem dados do m\u00EAs anterior</div>';
   else h+='<div class="fc-r fc-t"><span></span><span class="fc-n"><b>TOTAL</b></span><span class="fc-a">'+ta+'</span><span class="fc-v">'+fm(tv)+'</span></div>';
-  h+='</div><div class="vtag">v57</div></div>';
+  h+='</div><div class="vtag">v59</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function baixarFechamento(){
@@ -1652,7 +1710,7 @@ function renderSenhas(){
       h+=x.ok?'<button class="ad-rst" onclick="resetSenha(\''+x.k+'\',\''+x.n.replace(/'/g,'')+'\')">Resetar</button>':'<span class="ad-pl none">Padr\u00E3o</span>';
       h+='</div>';
     });
-    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v57</div></div>';
+    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v59</div></div>';
     el.innerHTML=h;
   }).catch(function(){el.innerHTML=hdrPadrao('Senhas','')+'<div class="fill"><div class="ad-empty">Erro de conex\u00E3o</div></div>'});
 }
@@ -1715,7 +1773,7 @@ function renderTreino(){
     }
     h+='</div>';
   });
-  h+='</div><div class="vtag">v57</div></div>';
+  h+='</div><div class="vtag">v59</div></div>';
   document.getElementById('pgTreino').innerHTML=h;
 }
 function trnToggle(i){trnOpen=trnOpen===i?-1:i;renderTreino()}
