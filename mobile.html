@@ -535,6 +535,12 @@ body.is-adm .op-only{display:none!important}
 .fd-cnew{display:flex;gap:8px}
 .fd-ci{flex:1;min-width:0;border:1px solid #e3e8ef;background:#f7f9fc;border-radius:20px;padding:8px 14px;font-family:inherit;font-size:16px;outline:none}
 .fd-cnew button{width:40px;height:40px;border-radius:50%;border:0;background:#0f3557;color:#fff;font-size:.95rem;flex-shrink:0}
+
+/* v57 olho senha */
+.pw-wrap{position:relative;width:100%}
+.pw-wrap input{padding-right:46px!important}
+.pw-eye{position:absolute;right:6px;top:0;height:calc(100% - 10px);width:38px;border:0;background:none;color:#6b7280;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.pw-eye:active{color:#0f3557}
 </style>
 </head>
 <body>
@@ -714,8 +720,9 @@ function salvarSenha(){
     }else{btn.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';pwErr(r.msg||'N\u00E3o foi poss\u00EDvel salvar')}
   }).catch(function(){btn.disabled=false;btn.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';pwErr('Erro de conex\u00E3o, tente de novo')});
 }
-function doLogout(){localStorage.removeItem('mu');localStorage.removeItem('lm');localStorage.removeItem('nm');localStorage.removeItem('em');sessionStorage.clear();location.reload()}
+function doLogout(){document.querySelectorAll('.pw-wrap input').forEach(function(i){i.type='password'});localStorage.removeItem('mu');localStorage.removeItem('lm');localStorage.removeItem('nm');localStorage.removeItem('em');sessionStorage.clear();location.reload()}
 window.addEventListener('load',function(){
+  var lm=localStorage.getItem('lgMsg');if(lm){localStorage.removeItem('lgMsg');lgErr(lm)}
   var st=store(),s=st.getItem('mu');
   if(s){try{cU=JSON.parse(s);loginMap=JSON.parse(st.getItem('lm')||'{}');nameMap=JSON.parse(st.getItem('nm')||'{}');entMap=JSON.parse(st.getItem('em')||'{}');showApp()}catch(e){}}
 });
@@ -749,12 +756,15 @@ function pontoStatus(p){if(!p)return'';var s=p.status.toUpperCase();if(s.include
 function getFullName(login){return loginMap[login.toLowerCase()]||cn(login)}
 
 // === DATA LOADING ===
+var loginsLidos=0;
 function loadLogins(){
   return fetch(SH+'&t='+Date.now()).then(function(r){return r.text()}).then(function(c){
+    loginsLidos=0;
     c.split('\n').slice(1).forEach(function(l){
       var r=csvSplit(l);if(r.length<3)return;
       var nome=(r[0]||'').trim(),login=(r[1]||'').trim().toLowerCase(),ent=(r[2]||'').trim();
       if(login)perfMap[login]=(r[4]||'').trim().toLowerCase();
+      if(login||nome)loginsLidos++;
       if(login){loginMap[login]=nome;entMap[login]=ent}
       if(nome)entNome[nome.toLowerCase()]=ent;
       if(nome)nameMap[nome.toLowerCase()]=login;
@@ -762,7 +772,23 @@ function loadLogins(){
   }).catch(function(){});
 }
 function loadFotos(){if(!temScript)return Promise.resolve();return fetch(SCRIPT_URL+'?type=fotos&t='+Date.now()).then(function(r){return r.json()}).then(function(f){fotoMap=f||{}}).catch(function(){})}
-function loadData(){loadLogins().then(function(){return Promise.all([loadRanking(),loadPonto(),loadComp(),loadFotos()])}).then(function(){go('inicio')})}
+// Confere se o login salvo no celular ainda existe na aba Login (mudou no Cobmais ou saiu da empresa -> desloga)
+function acessoValido(){
+  if(!cU||loginsLidos<10)return true; // sem internet ou planilha incompleta: nao derruba
+  var lg=String(cU.login||'').trim().toLowerCase(),nm=String(cU.nome||'').trim().toLowerCase();
+  if(lg)return loginMap.hasOwnProperty(lg)&&(loginMap[lg]||'').trim().toLowerCase()===nm;
+  return nameMap.hasOwnProperty(nm);
+}
+var ultCheck=Date.now();
+document.addEventListener('visibilitychange',function(){
+  if(document.hidden||!cU||Date.now()-ultCheck<30*60000)return;ultCheck=Date.now();
+  loadLogins().then(function(){if(!acessoValido())derrubar()});
+});
+function derrubar(){
+  localStorage.setItem('lgMsg','Seu acesso mudou. Entre novamente com seu login atual e a senha padr\u00E3o.');
+  doLogout();
+}
+function loadData(){loadLogins().then(function(){if(!acessoValido()){derrubar();throw 'off'}return Promise.all([loadRanking(),loadPonto(),loadComp(),loadFotos()])}).then(function(){go('inicio')})}
 
 function loadRanking(){
   return fetch(RK+'&t='+Date.now()).then(function(r){return r.text()}).then(function(csv){
@@ -978,7 +1004,7 @@ function renderAcordos(){
     h+='</div>';
   });
   h+='<button class="ver-todos" onclick="filterAccordos(\'todos\',document.querySelector(\'.flt\'));window.scrollTo(0,0)">Ver todos os operadores \u203A</button>';
-  h+='</div><div class="vtag">v55</div></div>';
+  h+='</div><div class="vtag">v57</div></div>';
   document.getElementById('pgAcordos').innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1033,7 +1059,7 @@ function renderComp(){
   h+='<div class="cp-card cp-var"><div class="cp-card-t" style="font-weight:500"><span class="cp-ic">\uD83D\uDCC5</span> Varia\u00E7\u00E3o do per\u00EDodo</div><div class="vr-grid">';
   h+='<div><div class="vr-pct'+(varV<0?' neg':'')+'">'+(varV>=0?'+':'')+varV+'%</div><div class="vr-lbl">Valor</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
   h+='<div><div class="vr-pct'+(varA<0?' neg':'')+'">'+(varA>=0?'+':'')+varA+'%</div><div class="vr-lbl">Acordos</div><div class="vr-sub">(vs. m\u00EAs anterior)</div></div>';
-  h+='</div></div><div class="vtag">v55</div></div>';
+  h+='</div></div><div class="vtag">v57</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1074,7 +1100,7 @@ function renderComissao(){
   h+='<div class="cm-li"><span><i>\uD83C\uDFD6\uFE0F</i> Folgas</span><b'+(ok?' class="ok"':'')+'>'+(ok?'Dispon\u00EDvel':'N\u00E3o dispon\u00EDvel')+'</b></div>';
   h+='</div>';
   h+='<div class="cm-info"><div class="cm-i">i</div><div>'+(novato?'Como novato, voc\u00EA ganha comiss\u00E3o em cima de qualquer acordo. Bora pra cima!':ok?'Parab\u00E9ns! Voc\u00EA atingiu a meta e desbloqueou os benef\u00EDcios.':'Voc\u00EA ainda n\u00E3o atingiu a meta. Continue se dedicando, voc\u00EA consegue!')+'</div></div></div>';
-  h+='<div class="vtag">v55</div></div>';
+  h+='<div class="vtag">v57</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1108,7 +1134,7 @@ function renderBeneficios(){
   h+='<div class="bn-it"><div class="bn-ic" style="background:#1f2937">\uD83D\uDCB0</div><div class="bn-b"><div class="bn-t">Comiss\u00E3o</div><div class="bn-s">5% da Receita</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#eef2f7">\uD83D\uDD52</div><div class="bn-b"><div class="bn-t">Flexibilidade</div><div class="bn-s">Hor\u00E1rio Flex\u00EDvel</div><div class="bn-s2">8h \u00E0s 12h + 2h para almo\u00E7o</div></div>'+lk()+'</div>';
   h+='<div class="bn-it"><div class="bn-ic" style="background:#fde7c7">\uD83C\uDFDD\uFE0F</div><div class="bn-b"><div class="bn-t">Folgas</div><div class="bn-s">Dias de Folga</div><div class="bn-s2">Conforme cumprimento das metas</div></div>'+lk()+'</div>';
-  h+='</div><div class="vtag">v55</div></div>';
+  h+='</div><div class="vtag">v57</div></div>';
   el.innerHTML=h;
   window.scrollTo(0,0);
 }
@@ -1214,7 +1240,7 @@ function renderInicio(){
   var h=hdrPadrao('In\u00EDcio',(d.d||'Hoje')+(nm?' \u00B7 '+nm:''));
   h+='<div class="fill fd-wrap"><div id="fdPull" class="fd-pull">\u2193 Puxe para atualizar</div><div id="fdTopBox">'+topoFeed(d)+'</div>';
   h+=composer();
-  h+='<div class="fd-sec">\uD83D\uDCF0 Publica\u00E7\u00F5es</div><div id="fdList"><div class="ad-empty">Carregando publica\u00E7\u00F5es...</div></div><div class="vtag">v55</div></div>';
+  h+='<div class="fd-sec">\uD83D\uDCF0 Publica\u00E7\u00F5es</div><div id="fdList"><div class="ad-empty">Carregando publica\u00E7\u00F5es...</div></div><div class="vtag">v57</div></div>';
   el.innerHTML=h;
   if(feedData)desenharFeed();
   carregarFeed(true);iniciarPoll();
@@ -1433,7 +1459,7 @@ function renderEquipe(){
   h+='<div class="ad-k" style="--c:#8b5cf6"><div class="ad-kv">'+nm[2]+'</div><div class="ad-kl">Novatos</div></div></div>';
   h+='<input class="srch" type="text" placeholder="\uD83D\uDD0D Buscar operador..." oninput="filtCG(this.value)">';
   h+=segm('eqo',[['valor','Maior valor'],['media','M\u00E9dia'],['tempo','Tempo de casa'],['nome','A-Z']],'ordEquipe');
-  h+='<div class="tr-list ad-list" id="eqBox"></div><div class="vtag">v55</div></div>';
+  h+='<div class="tr-list ad-list" id="eqBox"></div><div class="vtag">v57</div></div>';
   el.innerHTML=h;ordEquipe('valor');window.scrollTo(0,0);
 }
 function ordEquipe(t,btn){
@@ -1503,7 +1529,7 @@ function renderMetas(){
     h+='</div><div class="ad-r"><div class="ad-ra" style="color:'+cor+'">'+(x.m.nov?'\u2014':x.pc+'%')+'</div><div class="ad-rv">'+fm(o.v)+'</div></div></div>';
   });
   if(!L.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v55</div></div>';
+  h+='</div><div class="vtag">v57</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtMetas(t,btn){segOn(btn);document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=(t==='todos'||r.getAttribute('data-g')===t)?'flex':'none'})}
@@ -1533,7 +1559,7 @@ function renderTurnos(){
   h+='<div class="fill">';
   h+=blocoTurnos('\uD83E\uDD1D Novos acordos de hoje',grpTurno(rankData?rankData.ops:[]),true);
   var _d=new Date();h+=blocoTurnos('\uD83D\uDCB0 Valor recuperado \u00B7 dia 1 at\u00E9 '+('0'+_d.getDate()).slice(-2)+'/'+('0'+(_d.getMonth()+1)).slice(-2),grpTurno(compMonths[2]?compMonths[2].ops.filter(function(o){return ativoOp(o.raw)}):[]),false);
-  h+='<div class="vtag">v55</div></div>';
+  h+='<div class="vtag">v57</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 
@@ -1559,7 +1585,7 @@ function renderCompGeral(){
     h+='<div class="ad-r"><div class="ad-ra" style="font-size:.82rem">'+fs(o.v)+'</div><div class="ad-rv" style="font-weight:700;color:'+(v===null?'#9ca3af':v<0?'#ef4444':'#16a34a')+'">'+(v===null?'novo':(v>=0?'+':'')+v+'%')+'</div></div></div>';
   });
   if(!cur.length)h+='<div class="ad-empty">Sem dados do m\u00EAs atual</div>';
-  h+='</div><div class="vtag">v55</div></div>';
+  h+='</div><div class="vtag">v57</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function filtCG(q){q=q.toLowerCase();document.querySelectorAll('.ad-row').forEach(function(r){r.style.display=r.getAttribute('data-nm').indexOf(q)>=0?'flex':'none'})}
@@ -1589,7 +1615,7 @@ function renderFechamento(){
   });
   if(!fchList.length)h+='<div class="ad-empty">Sem dados do m\u00EAs anterior</div>';
   else h+='<div class="fc-r fc-t"><span></span><span class="fc-n"><b>TOTAL</b></span><span class="fc-a">'+ta+'</span><span class="fc-v">'+fm(tv)+'</span></div>';
-  h+='</div><div class="vtag">v55</div></div>';
+  h+='</div><div class="vtag">v57</div></div>';
   el.innerHTML=h;window.scrollTo(0,0);
 }
 function baixarFechamento(){
@@ -1626,7 +1652,7 @@ function renderSenhas(){
       h+=x.ok?'<button class="ad-rst" onclick="resetSenha(\''+x.k+'\',\''+x.n.replace(/'/g,'')+'\')">Resetar</button>':'<span class="ad-pl none">Padr\u00E3o</span>';
       h+='</div>';
     });
-    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v55</div></div>';
+    h+='</div><div class="ad-sb" style="text-align:center;margin-top:10px">Resetar volta a senha pra Edimo123 e a pessoa cria outra no pr\u00F3ximo login.</div><div class="vtag">v57</div></div>';
     el.innerHTML=h;
   }).catch(function(){el.innerHTML=hdrPadrao('Senhas','')+'<div class="fill"><div class="ad-empty">Erro de conex\u00E3o</div></div>'});
 }
@@ -1689,7 +1715,7 @@ function renderTreino(){
     }
     h+='</div>';
   });
-  h+='</div><div class="vtag">v55</div></div>';
+  h+='</div><div class="vtag">v57</div></div>';
   document.getElementById('pgTreino').innerHTML=h;
 }
 function trnToggle(i){trnOpen=trnOpen===i?-1:i;renderTreino()}
@@ -1707,6 +1733,19 @@ function trnPlay(id){
 }
 function trnMark(id){var d=trnDone();if(d.indexOf(id)<0){d.push(id);localStorage.setItem('trnCompleted',JSON.stringify(d))}renderTreino()}
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}
+
+// === OLHO NA SENHA ===
+(function(){
+  var olho='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var fech='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M14.12 14.12a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>';
+  document.querySelectorAll('input[type="password"]').forEach(function(inp){
+    var w=document.createElement('div');w.className='pw-wrap';
+    inp.parentNode.insertBefore(w,inp);w.appendChild(inp);
+    var b=document.createElement('button');b.type='button';b.className='pw-eye';b.innerHTML=olho;b.setAttribute('aria-label','Mostrar senha');
+    b.addEventListener('click',function(e){e.preventDefault();var v=inp.type==='password';inp.type=v?'text':'password';b.innerHTML=v?fech:olho;b.setAttribute('aria-label',v?'Esconder senha':'Mostrar senha')});
+    w.appendChild(b);
+  });
+})();
 </script>
 </body>
 </html>
