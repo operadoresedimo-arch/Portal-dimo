@@ -1889,6 +1889,45 @@ body::before,body::after{display:none!important}
 }
 </style>
 
+<style id="avd-styles">
+/* ===== AVALIAÇÃO DE DISCAGEM ===== */
+#pageAvaliacao{--ok:#22e477;--bad:#f87171;--mid:#f5b91f}
+.avd-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.avd-head h2{font-size:1.6rem;font-weight:900;letter-spacing:-.02em}.avd-head h2 span{color:var(--gold)}
+.avd-head p{color:var(--text2);font-size:.75rem;margin-top:4px}
+.avd-fil{display:flex;gap:8px;flex-wrap:wrap}
+.avd-fil select,.avd-fil button,.avd-in{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-family:inherit;font-size:.75rem;cursor:pointer}
+.avd-btn-gold{background:linear-gradient(135deg,#f5b91f,#d4a937)!important;color:#111!important;border:none!important;font-weight:700}
+.avd-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:18px}
+.avd-kpi{background:linear-gradient(145deg,rgba(12,31,57,.96),rgba(7,22,42,.96));border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.avd-kpi small{display:block;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.avd-kpi b{display:block;font-size:1.7rem;font-weight:900;color:var(--gold);margin-top:4px}.avd-kpi em{font-style:normal;font-size:.68rem;color:var(--text2)}
+.avd-tab{width:100%;border-collapse:collapse;background:linear-gradient(145deg,rgba(10,28,52,.97),rgba(6,19,37,.97));border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.avd-tab th{font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:12px 14px;text-align:left;background:#0d2341;border-bottom:1px solid var(--border)}
+.avd-tab td{padding:11px 14px;font-size:.76rem;border-bottom:1px solid rgba(26,58,91,.5)}
+.avd-tab tbody tr{cursor:pointer;transition:background .15s}.avd-tab tbody tr:hover{background:rgba(23,133,255,.08)}
+.avd-n{display:inline-block;min-width:42px;text-align:center;padding:3px 8px;border-radius:20px;font-weight:800;font-size:.75rem}
+.avd-ok{background:rgba(34,228,119,.14);color:var(--ok)}.avd-mid{background:rgba(245,185,31,.14);color:var(--mid)}.avd-bad{background:rgba(248,113,113,.14);color:var(--bad)}
+.avd-up{color:var(--ok);font-weight:700}.avd-down{color:var(--bad);font-weight:700}.avd-mut{color:var(--text2)}
+.avd-tag{font-size:.55rem;font-weight:800;padding:2px 6px;border-radius:6px;margin-left:6px;vertical-align:middle;background:rgba(169,108,255,.12);color:#a96cff;border:1px solid rgba(169,108,255,.25)}
+.avd-box{background:linear-gradient(145deg,rgba(10,28,52,.97),rgba(6,19,37,.97));border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+.avd-box h3{font-size:.8rem;font-weight:800;color:var(--gold);margin-bottom:14px;letter-spacing:.02em}
+.avd-g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:850px){.avd-g2{grid-template-columns:1fr}}
+.avd-crit{margin-bottom:11px}.avd-crit .l{display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:5px}
+.avd-bar{position:relative;height:10px;background:#102b4d;border-radius:8px;overflow:hidden}.avd-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:8px}
+.avd-bar .e{background:#2c4f7c}.avd-bar .o{background:linear-gradient(90deg,#d4a937,#f5b91f);top:2px;bottom:2px}
+.avd-leg{font-size:.65rem;color:var(--text2);margin-bottom:12px}.avd-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 5px 0 12px;vertical-align:middle}
+.avd-lst{padding-left:18px;font-size:.74rem}.avd-lst li{margin-bottom:7px}.avd-lst li span{color:var(--text3);font-size:.65rem}
+.avd-lig{border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.avd-lig-h{display:flex;gap:12px;align-items:center;padding:11px 14px;cursor:pointer;flex-wrap:wrap;font-size:.74rem}.avd-lig-h:hover{background:rgba(23,133,255,.06)}
+.avd-lig-b{display:none;padding:16px;border-top:1px solid var(--border);background:rgba(4,11,24,.5);font-size:.74rem;line-height:1.55}
+.avd-lig-b iframe{width:100%;height:64px;border:0;border-radius:10px;background:#000;margin-bottom:12px}
+.avd-lig-b p{margin-bottom:8px}.avd-ev{color:var(--text2);margin:5px 0}.avd-ev b{color:var(--text)}
+.avd-lig-b details summary{cursor:pointer;color:var(--gold);margin:10px 0 6px}.avd-lig-b pre{white-space:pre-wrap;font-family:inherit;color:var(--text2);font-size:.72rem}
+.avd-fb{color:var(--ok);font-size:.68rem;font-weight:600}.avd-pend{color:var(--mid);font-size:.68rem;font-weight:600}
+.avd-login{max-width:360px;margin:60px auto;text-align:center}.avd-login .avd-in{width:100%;margin:14px 0 10px;cursor:text}
+.avd-demo{display:inline-block;font-size:.6rem;font-weight:800;padding:3px 8px;border-radius:6px;background:rgba(245,185,31,.14);color:var(--gold);border:1px solid rgba(245,185,31,.3);margin-left:8px;vertical-align:middle}
+</style>
 </head>
 <body>
 <div class="bg-layer"></div>
@@ -1907,6 +1946,7 @@ body::before,body::after{display:none!important}
 <button class="nav-tab active" onclick="showPage('ranking')" id="tabR">📊 Acordos do Dia</button>
 <button class="nav-tab" onclick="showPage('comparativo')" id="tabC">📈 Comparativo</button>
 <button class="nav-tab" onclick="showPage('treinamentos')" id="tabT">🎓 Treinamentos</button>
+<button class="nav-tab" onclick="showPage('avaliacao')" id="tabA" style="display:none">🎧 Avaliação</button>
 <div class="nav-right"><span class="nav-user" id="navUser">👤 </span><button class="nav-logout" onclick="doLogout()">🚪 Sair</button></div>
 </div></div>
 
@@ -1931,6 +1971,7 @@ body::before,body::after{display:none!important}
 <button class="sb-item" onclick="showPage('ranking')" id="sbR">🏆 Acordos do Dia</button>
 <button class="sb-item active" onclick="showPage('comparativo')" id="sbC">📊 Comparativo</button>
 <button class="sb-item" onclick="showPage('treinamentos')" id="sbT">🎓 Treinamentos</button>
+<button class="sb-item" onclick="showPage('avaliacao')" id="sbA" style="display:none">🎧 Avaliação de Discagem</button>
 <button class="sb-item" onclick="doLogout()">🚪 Sair</button>
 </nav>
 <div class="sb-bell-wrap" id="sbAlert" style="display:none">
@@ -1977,6 +2018,7 @@ body::before,body::after{display:none!important}
 </div>
 </div>
 
+<div class="page" id="pageAvaliacao"><div class="loading-msg">Carregando...</div></div>
 <div class="page" id="pageTreinamentos">
 <div class="trn-layout">
 <!-- VIDEO PLAYER -->
@@ -2304,6 +2346,9 @@ function showPage(p){
   var tabT=document.getElementById('tabT');if(tabT)tabT.classList.toggle('active',p==='treinamentos');
   document.getElementById('pageRanking').classList.toggle('active',p==='ranking');
   document.getElementById('pageComp').classList.toggle('active',p==='comparativo');
+  var tabA=document.getElementById('tabA');if(tabA)tabA.classList.toggle('active',p==='avaliacao');
+  var pageA=document.getElementById('pageAvaliacao');if(pageA){pageA.classList.toggle('active',p==='avaliacao');if(p==='avaliacao'&&window.avd)avd.carregar();}
+  var sbA=document.getElementById('sbA');if(sbA)sbA.classList.toggle('active',p==='avaliacao');
   var pageT=document.getElementById('pageTreinamentos');if(pageT){pageT.classList.toggle('active',p==='treinamentos');if(p==='treinamentos')renderModules();}
   toolbar.style.display=(p==='ranking'&&cRD)?'flex':'none';
   const sb=document.getElementById('sidebar');
@@ -3173,6 +3218,109 @@ function fm(v){return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,max
 function fs(v){return'R$ '+Math.round(v).toLocaleString('pt-BR')}
 function copyLink(){const json=JSON.stringify(cRD),comp=LZString.compressToEncodedURIComponent(json),url=window.location.origin+window.location.pathname+'#d='+comp;navigator.clipboard.writeText(url).then(()=>sT('Link copiado!')).catch(()=>{const t=document.createElement('textarea');t.value=url;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);sT('Link copiado!')})}
 function sT(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+</script>
+<script id="avd-script">
+/* ===== AVALIAÇÃO DE DISCAGEM ===== */
+(function(){
+const API='COLE_AQUI_A_URL_DO_APPS_SCRIPT'; // termina em /exec
+const DEMO=[{"id": "108084594", "data": "12/09/2026", "hora": "11:29:41", "operador": "KETLIN SCHMITT DOS SANTOS", "grupo": "veterano", "duracao": "00:03:42", "tabulacao": "Acordo", "nota": 78, "resultado": "acordo", "criterios": [{"id": "abertura", "nome": "Abertura e identificação", "max": 10, "pontos": 8, "evidencia": "Confirmou \"é a Fernanda?\" antes de falar da dívida"}, {"id": "motivo", "nome": "Explicou o motivo", "max": 10, "pontos": 7, "evidencia": "Explicou credor e protesto, mas de forma corrida"}, {"id": "avista", "nome": "Ofereceu à vista primeiro", "max": 15, "pontos": 5, "evidencia": "Não deixou claro o valor à vista sem juros"}, {"id": "objecao", "nome": "Contornou a objeção", "max": 20, "pontos": 18, "evidencia": "\"Eu não vou conseguir retornar pra senhora\" segurou a conversa"}, {"id": "escada", "nome": "Negociou antes de desistir", "max": 15, "pontos": 14, "evidencia": "Baixou pra R$ 250 de entrada + 2x"}, {"id": "valores", "nome": "Valores claros e corretos", "max": 10, "pontos": 6, "evidencia": "Valores um pouco confusos (488 / 519)"}, {"id": "saida", "nome": "Saiu com resultado", "max": 10, "pontos": 10, "evidencia": "Fechou acordo"}, {"id": "fechamento", "nome": "Fechamento formal", "max": 10, "pontos": 10, "evidencia": "Confirmou CPF, nascimento, avisou que vale como acordo e boleto no WhatsApp"}], "acertos": ["Não aceitou o \"te ligo depois\"", "Baixou a entrada antes de desistir", "Fechamento formal completo"], "erros": ["Não apresentou o à vista com clareza", "Falou valores de forma confusa"], "feedback": "Ótima recuperação da objeção. Só apresenta o à vista com o valor bem claro antes do parcelamento.", "resumo": "Devedora desempregada, acordo com entrada de R$ 250 + 2x.", "transcricao": "(transcrição disponível na versão real)", "audio_url": "", "feedback_dado": ""}, {"id": "111229002", "data": "30/09/2026", "hora": "11:30:17", "operador": "KETLIN SCHMITT DOS SANTOS", "grupo": "veterano", "duracao": "00:02:42", "tabulacao": "Contato Com o Cliente (Devedor)", "nota": 68, "resultado": "sem acordo", "criterios": [{"id": "abertura", "nome": "Abertura e identificação", "max": 10, "pontos": 9, "evidencia": "Apresentação completa"}, {"id": "motivo", "nome": "Explicou o motivo", "max": 10, "pontos": 7, "evidencia": "Explicou protesto"}, {"id": "avista", "nome": "Ofereceu à vista primeiro", "max": 15, "pontos": 15, "evidencia": "Começou pelo à vista de R$ 3.482"}, {"id": "objecao", "nome": "Contornou a objeção", "max": 20, "pontos": 12, "evidencia": "Insistiu, mas aceitou o \"vou ver\""}, {"id": "escada", "nome": "Negociou antes de desistir", "max": 15, "pontos": 12, "evidencia": "Ofereceu desconto e entrada de R$ 900"}, {"id": "valores", "nome": "Valores claros e corretos", "max": 10, "pontos": 6, "evidencia": "Muitos números seguidos"}, {"id": "saida", "nome": "Saiu com resultado", "max": 10, "pontos": 3, "evidencia": "Terminou sem data de retorno"}, {"id": "fechamento", "nome": "Fechamento formal", "max": 10, "pontos": 4, "evidencia": "Não recapitulou"}], "acertos": ["Ofereceu o à vista primeiro", "Tentou desconto antes de desistir"], "erros": ["Saiu sem data de retorno", "Entrada mínima alta travou o acordo"], "feedback": "Boa escada. Quando o devedor disser \"vou ver\", marca o dia e a hora do retorno antes de desligar.", "resumo": "Dívida de R$ 5,4 mil, devedor travou na entrada.", "transcricao": "(transcrição disponível na versão real)", "audio_url": "", "feedback_dado": ""}, {"id": "111286601", "data": "30/09/2026", "hora": "13:23:51", "operador": "JANAINA LIMA CARVALHO", "grupo": "veterano", "duracao": "00:03:18", "tabulacao": "Contato Com o Cliente (Devedor)", "nota": 47, "resultado": "sem acordo", "criterios": [{"id": "abertura", "nome": "Abertura e identificação", "max": 10, "pontos": 10, "evidencia": "Apresentação e confirmação perfeitas"}, {"id": "motivo", "nome": "Explicou o motivo", "max": 10, "pontos": 9, "evidencia": "Explicou bem o contrato"}, {"id": "avista", "nome": "Ofereceu à vista primeiro", "max": 15, "pontos": 8, "evidencia": "Perguntou à vista ou parcelado ao mesmo tempo"}, {"id": "objecao", "nome": "Contornou a objeção", "max": 20, "pontos": 5, "evidencia": "\"Ah, sim, tá bom\" e aceitou o não"}, {"id": "escada", "nome": "Negociou antes de desistir", "max": 15, "pontos": 3, "evidencia": "Não ofereceu valor menor"}, {"id": "valores", "nome": "Valores claros e corretos", "max": 10, "pontos": 8, "evidencia": "Valores corretos"}, {"id": "saida", "nome": "Saiu com resultado", "max": 10, "pontos": 0, "evidencia": "Sem data de retorno"}, {"id": "fechamento", "nome": "Fechamento formal", "max": 10, "pontos": 4, "evidencia": "Encerrou sem recapitular"}], "acertos": ["Abertura profissional", "Explicação clara da dívida"], "erros": ["Aceitou o \"não tenho\" sem investigar", "Não ofereceu entrada menor", "Saiu sem data de retorno"], "feedback": "Tua abertura é das melhores. Quando ouvir \"não estou trabalhando\", pergunta quando entra algum dinheiro e oferece uma entrada pequena.", "resumo": "Devedora vive de pensão; ligação encerrada sem proposta alternativa.", "transcricao": "(transcrição disponível na versão real)", "audio_url": "", "feedback_dado": ""}, {"id": "106837176", "data": "04/09/2026", "hora": "14:33:18", "operador": "NICOLLY RIBEIRO RAIMUNDO", "grupo": "veterano", "duracao": "00:03:24", "tabulacao": "Acordo", "nota": 79, "resultado": "acordo", "criterios": [{"id": "abertura", "nome": "Abertura e identificação", "max": 10, "pontos": 9, "evidencia": "Apresentação ok"}, {"id": "motivo", "nome": "Explicou o motivo", "max": 10, "pontos": 9, "evidencia": "Explicou a quebra e o protesto dia 10"}, {"id": "avista", "nome": "Ofereceu à vista primeiro", "max": 15, "pontos": 8, "evidencia": "Manteve o valor do acordo antigo"}, {"id": "objecao", "nome": "Contornou a objeção", "max": 20, "pontos": 18, "evidencia": "Criou urgência com prazo"}, {"id": "escada", "nome": "Negociou antes de desistir", "max": 15, "pontos": 10, "evidencia": "Manteve condição anterior"}, {"id": "valores", "nome": "Valores claros e corretos", "max": 10, "pontos": 5, "evidencia": "Falou 2x de 168 e depois 2x de 198"}, {"id": "saida", "nome": "Saiu com resultado", "max": 10, "pontos": 10, "evidencia": "Fechou acordo"}, {"id": "fechamento", "nome": "Fechamento formal", "max": 10, "pontos": 10, "evidencia": "Avisou gravação, boleto no WhatsApp"}], "acertos": ["Criou urgência com data", "Fechamento formal completo"], "erros": ["Valores inconsistentes durante a ligação"], "feedback": "Excelente condução. Atenção aos valores: repita a parcela uma vez só e confira antes de falar.", "resumo": "Retomada de acordo quebrado, fechado com prazo até dia 10.", "transcricao": "(transcrição disponível na versão real)", "audio_url": "", "feedback_dado": ""}, {"id": "111283287", "data": "30/09/2026", "hora": "13:18:08", "operador": "PALOMA ALVES DE CARVALHO", "grupo": "novato", "duracao": "00:03:30", "tabulacao": "Contato Com o Cliente (Devedor)", "nota": 47, "resultado": "sem acordo", "criterios": [{"id": "abertura", "nome": "Abertura e identificação", "max": 10, "pontos": 8, "evidencia": "Apresentação ok"}, {"id": "motivo", "nome": "Explicou o motivo", "max": 10, "pontos": 4, "evidencia": "Abriu falando em execução no fórum"}, {"id": "avista", "nome": "Ofereceu à vista primeiro", "max": 15, "pontos": 12, "evidencia": "Ofereceu à vista"}, {"id": "objecao", "nome": "Contornou a objeção", "max": 20, "pontos": 6, "evidencia": "Aceitou o \"quem sabe pra frente\""}, {"id": "escada", "nome": "Negociou antes de desistir", "max": 15, "pontos": 9, "evidencia": "Baixou a entrada uma vez"}, {"id": "valores", "nome": "Valores claros e corretos", "max": 10, "pontos": 2, "evidencia": "\"Em 10 vezes fica R$ 10.440\" e vários \"espera aí\""}, {"id": "saida", "nome": "Saiu com resultado", "max": 10, "pontos": 2, "evidencia": "Sem data de retorno"}, {"id": "fechamento", "nome": "Fechamento formal", "max": 10, "pontos": 4, "evidencia": "Não recapitulou"}], "acertos": ["Ofereceu o à vista", "Tentou baixar a entrada"], "erros": ["Abertura agressiva", "Errou valor da parcela", "Calculou ao vivo", "Saiu sem data de retorno"], "feedback": "Use a calculadora antes de falar valores e abra sem ameaça. Se a entrada travar, marque o dia exato do retorno.", "resumo": "Devedor topava as parcelas e travou na entrada de R$ 1.150.", "transcricao": "(transcrição disponível na versão real)", "audio_url": "", "feedback_dado": ""}];
+let DADOS=null,CHAVE=localStorage.getItem('avd_chave')||'',DEMO_MODE=false,OP=null;
+const $=id=>document.getElementById(id);
+const J=v=>{if(Array.isArray(v))return v;try{return JSON.parse(v||'[]')}catch(e){return[]}};
+const dt=s=>{const p=String(s).split('/');return new Date(+p[2],p[1]-1,+p[0])};
+const cl=n=>n>=75?'avd-ok':n>=55?'avd-mid':'avd-bad';
+const med=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:0;
+const nc=n=>String(n).toLowerCase().split(' ').slice(0,2).map(p=>p.charAt(0).toUpperCase()+p.slice(1)).join(' ');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const temRes=l=>{const r=String(l.resultado||'').toLowerCase();return r.indexOf('acordo')===0||r.indexOf('retorno')>=0};
+const root=()=>$('pageAvaliacao');
+
+function cabec(extra){return '<div class="avd-head"><div><h2>🎧 Avaliação de <span>Discagem</span>'+(DEMO_MODE?'<span class="avd-demo">DEMONSTRAÇÃO</span>':'')+'</h2><p>Ligações ouvidas e avaliadas pela IA · régua de 100 pontos</p></div>'+(extra||'')+'</div>'}
+function filtrosHTML(){return '<div class="avd-fil"><select id="avdPer" onchange="avd.render()"><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="0">Tudo</option></select><select id="avdGrp" onchange="avd.render()"><option value="">Todos</option><option value="novato">Novatos</option><option value="veterano">Veteranos</option></select><button onclick="avd.carregar(true)">↻ Atualizar</button></div>'}
+
+function telaSenha(msg){root().innerHTML=cabec()+'<div class="avd-box avd-login"><h3>Área do supervisor</h3><p class="avd-mut" style="font-size:.75rem">Digite a senha da avaliação</p><input class="avd-in" type="password" id="avdSenha" placeholder="Senha" onkeydown="if(event.key===\'Enter\')avd.entrar()"><button class="avd-btn-gold avd-in" style="cursor:pointer" onclick="avd.entrar()">Entrar</button><p class="avd-down" style="font-size:.7rem;margin-top:8px">'+(msg||'')+'</p></div>'}
+
+async function carregar(forcar){
+  if(typeof isA==='function'&&!isA()){root().innerHTML='<div class="loading-msg">Área restrita ao administrador.</div>';return}
+  if(DADOS&&!forcar){render();return}
+  if(API.indexOf('COLE')===0){DEMO_MODE=true;DADOS=DEMO.map(l=>Object.assign({},l));render(true);return}
+  if(!CHAVE){telaSenha();return}
+  root().innerHTML='<div class="loading-msg">Carregando avaliações...</div>';
+  try{
+    const j=await fetch(API+'?chave='+encodeURIComponent(CHAVE)+'&t='+Date.now()).then(r=>r.json());
+    if(!j.ok){localStorage.removeItem('avd_chave');CHAVE='';telaSenha('Senha incorreta');return}
+    localStorage.setItem('avd_chave',CHAVE);
+    DADOS=j.linhas.map(l=>Object.assign({},l,{nota:+l.nota||0,criterios:J(l.criterios),acertos:J(l.acertos),erros:J(l.erros)}));
+    render(true);
+  }catch(e){root().innerHTML=cabec()+'<div class="loading-msg">Não consegui conectar na planilha: '+esc(e.message)+'</div>'}
+}
+function entrar(){CHAVE=$('avdSenha').value.trim();if(CHAVE)carregar(true)}
+
+function filt(){
+  const per=$('avdPer'),grp=$('avdGrp');const dias=per?+per.value:30,g=grp?grp.value:'';
+  const lim=new Date();lim.setHours(0,0,0,0);lim.setDate(lim.getDate()-dias);
+  return DADOS.filter(l=>(!dias||dt(l.data)>=lim)&&(!g||l.grupo===g));
+}
+function cm(ls){const m={};ls.forEach(l=>l.criterios.forEach(c=>{if(!m[c.id])m[c.id]={nome:c.nome,p:0,max:0};m[c.id].p+=+c.pontos;m[c.id].max+=+c.max}));Object.keys(m).forEach(k=>m[k].pct=m[k].max?m[k].p/m[k].max*100:0);return m}
+
+function render(primeira){
+  const per=$('avdPer')?$('avdPer').value:(DEMO_MODE?'0':'30'),grp=$('avdGrp')?$('avdGrp').value:'';
+  root().innerHTML=cabec(filtrosHTML())+'<div id="avdBody"></div>';
+  $('avdPer').value=per;$('avdGrp').value=grp;
+  OP=null;const ls=filt(),eq=med(ls.map(l=>l.nota)),c=cm(ls);
+  const fr=Object.values(c).sort((a,b)=>a.pct-b.pct)[0];
+  const ops={};ls.forEach(l=>(ops[l.operador]=ops[l.operador]||[]).push(l));
+  const lin=Object.keys(ops).map(op=>{const a=ops[op],n=med(a.map(l=>l.nota)),f=Object.values(cm(a)).sort((x,y)=>x.pct-y.pct)[0];return{op,a,n,g:a[0].grupo,res:a.filter(temRes).length/a.length*100,f,pend:a.filter(l=>!l.feedback_dado).length}}).sort((x,y)=>y.n-x.n);
+  let h='<div class="avd-kpis">'+
+   '<div class="avd-kpi"><small>Ligações avaliadas</small><b>'+ls.length+'</b><em>'+lin.length+' operadores</em></div>'+
+   '<div class="avd-kpi"><small>Nota média da equipe</small><b>'+eq.toFixed(0)+'</b><em>de 100 pontos</em></div>'+
+   '<div class="avd-kpi"><small>Saíram com acordo ou retorno</small><b>'+(ls.length?(ls.filter(temRes).length/ls.length*100).toFixed(0):0)+'%</b></div>'+
+   '<div class="avd-kpi"><small>Ponto mais fraco da equipe</small><b style="font-size:1rem;line-height:1.3">'+(fr?esc(fr.nome):'-')+'</b><em>'+(fr?fr.pct.toFixed(0)+'% de aproveitamento':'')+'</em></div></div>';
+  h+='<table class="avd-tab"><thead><tr><th>#</th><th>Operador</th><th>Ouvidas</th><th>Nota média</th><th>x Equipe</th><th>Com resultado</th><th>Ponto mais fraco</th><th>Feedback</th></tr></thead><tbody>';
+  h+=lin.map((o,i)=>'<tr onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><td class="avd-mut">'+(i+1)+'º</td><td><b>'+esc(nc(o.op))+'</b>'+(o.g==='novato'?'<span class="avd-tag">NOVATO</span>':'')+'</td><td>'+o.a.length+'</td><td><span class="avd-n '+cl(o.n)+'">'+o.n.toFixed(0)+'</span></td><td class="'+(o.n>=eq?'avd-up':'avd-down')+'">'+(o.n>=eq?'▲ ':'▼ ')+Math.abs(o.n-eq).toFixed(0)+'</td><td>'+o.res.toFixed(0)+'%</td><td>'+(o.f?esc(o.f.nome)+' <span class="avd-mut">('+o.f.pct.toFixed(0)+'%)</span>':'-')+'</td><td>'+(o.pend?'<span class="avd-pend">'+o.pend+' pendente'+(o.pend>1?'s':'')+'</span>':'<span class="avd-fb">em dia</span>')+'</td></tr>').join('');
+  h+='</tbody></table>'+(lin.length?'':'<div class="loading-msg">Nenhuma ligação avaliada nesse período.</div>');
+  $('avdBody').innerHTML=h;
+}
+
+function top(ls,campo){const m={};ls.forEach(l=>(l[campo]||[]).forEach(f=>{const k=String(f).trim();if(k)m[k]=(m[k]||0)+1}));return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,7)}
+
+function detalhe(opEnc){
+  const op=decodeURIComponent(opEnc);OP=op;
+  const todos=filt(),a=todos.filter(l=>l.operador===op).sort((x,y)=>dt(y.data)-dt(x.data)||String(y.hora).localeCompare(String(x.hora)));
+  const eq=med(todos.map(l=>l.nota)),n=med(a.map(l=>l.nota));
+  const rk={};todos.forEach(l=>(rk[l.operador]=rk[l.operador]||[]).push(l.nota));
+  const rank=Object.keys(rk).map(o=>[o,med(rk[o])]).sort((x,y)=>y[1]-x[1]),pos=rank.findIndex(r=>r[0]===op)+1;
+  const co=cm(a),ce=cm(todos),ac=top(a,'acertos'),er=top(a,'erros'),nm=esc(nc(op));
+  let h='<button class="avd-in" style="margin-bottom:14px" onclick="avd.render()">← Voltar pro ranking</button>';
+  h+='<h2 style="font-size:1.3rem;font-weight:900">'+nm+(a[0]&&a[0].grupo==='novato'?'<span class="avd-tag">NOVATO</span>':'')+'</h2><p class="avd-mut" style="font-size:.72rem;margin:4px 0 14px">'+esc(op)+'</p>';
+  h+='<div class="avd-kpis"><div class="avd-kpi"><small>Nota média</small><b>'+n.toFixed(0)+'</b><em class="'+(n>=eq?'avd-up':'avd-down')+'">'+(n>=eq?'▲ ':'▼ ')+Math.abs(n-eq).toFixed(0)+' vs equipe ('+eq.toFixed(0)+')</em></div>'+
+   '<div class="avd-kpi"><small>Posição no ranking</small><b>'+pos+'º</b><em>de '+rank.length+' operadores</em></div>'+
+   '<div class="avd-kpi"><small>Ligações ouvidas</small><b>'+a.length+'</b><em>'+a.filter(temRes).length+' com acordo ou retorno</em></div>'+
+   '<div class="avd-kpi"><small>Feedback pendente</small><b>'+a.filter(l=>!l.feedback_dado).length+'</b></div></div>';
+  h+='<div class="avd-box"><h3>Critério a critério: '+nm+' x equipe</h3><div class="avd-leg"><i style="background:#f5b91f"></i>'+nm+'<i style="background:#2c4f7c"></i>Média da equipe</div>'+
+   Object.keys(ce).map(id=>{const c=ce[id],o=co[id]?co[id].pct:0;return '<div class="avd-crit"><div class="l"><span>'+esc(c.nome)+'</span><span><b class="'+(o>=c.pct?'avd-up':'avd-down')+'">'+o.toFixed(0)+'%</b> <span class="avd-mut">/ equipe '+c.pct.toFixed(0)+'%</span></span></div><div class="avd-bar"><i class="e" style="width:'+c.pct+'%"></i><i class="o" style="width:'+o+'%"></i></div></div>'}).join('')+'</div>';
+  h+='<div class="avd-g2"><div class="avd-box"><h3>✅ O que mais acerta</h3><ul class="avd-lst">'+(ac.map(x=>'<li>'+esc(x[0])+' <span>('+x[1]+'x)</span></li>').join('')||'<li class="avd-mut">Sem dados</li>')+'</ul></div>'+
+   '<div class="avd-box"><h3>⚠️ Onde mais erra</h3><ul class="avd-lst">'+(er.map(x=>'<li>'+esc(x[0])+' <span>('+x[1]+'x)</span></li>').join('')||'<li class="avd-mut">Sem dados</li>')+'</ul></div></div>';
+  h+='<div class="avd-box"><h3>Ligações ouvidas</h3>'+a.map((l,i)=>'<div class="avd-lig"><div class="avd-lig-h" onclick="avd.abre('+i+')"><span class="avd-n '+cl(l.nota)+'">'+l.nota+'</span><b>'+esc(l.data)+' '+esc(String(l.hora).slice(0,5))+'</b><span class="avd-mut">'+esc(l.duracao)+' · '+esc(l.tabulacao)+'</span><span class="avd-tag" style="background:rgba(37,99,235,.12);color:#68c2ff;border-color:rgba(37,99,235,.3)">'+esc(l.resultado||'-')+'</span><span style="margin-left:auto">'+(l.feedback_dado?'<span class="avd-fb">✔ feedback dado</span>':'<span class="avd-pend">feedback pendente</span>')+'</span></div>'+
+   '<div class="avd-lig-b" id="avdLb'+i+'">'+(l.audio_url?'<iframe data-src="'+esc(l.audio_url)+'" allow="autoplay"></iframe>':'')+'<p><b>Resumo:</b> '+esc(l.resumo)+'</p><p><b>O que falar no feedback:</b> '+esc(l.feedback)+'</p>'+
+   l.criterios.map(c=>'<div class="avd-ev"><b>'+esc(c.nome)+': '+c.pontos+'/'+c.max+'</b> · '+esc(c.evidencia)+'</div>').join('')+
+   '<details><summary>Ver transcrição</summary><pre>'+esc(l.transcricao)+'</pre></details><button class="avd-in '+(l.feedback_dado?'':'avd-btn-gold')+'" style="margin-top:8px" onclick="avd.feedback(\''+esc(l.id)+'\','+(l.feedback_dado?0:1)+',this)">'+(l.feedback_dado?'Desmarcar feedback':'✔ Marcar feedback dado')+'</button></div></div>').join('')+'</div>';
+  $('avdBody').innerHTML=h;window.scrollTo(0,0);
+}
+function abre(i){const b=$('avdLb'+i),f=b.querySelector('iframe');b.style.display=b.style.display==='block'?'none':'block';if(f&&!f.src)f.src=f.dataset.src}
+async function feedback(id,v,btn){
+  const l=DADOS.find(x=>String(x.id)===String(id));
+  if(DEMO_MODE){l.feedback_dado=v?'demo':'';return detalhe(encodeURIComponent(OP))}
+  btn.disabled=true;btn.textContent='Salvando...';
+  const r=await fetch(API+'?chave='+encodeURIComponent(CHAVE)+'&acao=feedback&id='+encodeURIComponent(id)+'&valor='+v).then(r=>r.json()).catch(()=>({}));
+  if(r.ok){l.feedback_dado=v?new Date().toLocaleString('pt-BR'):'';detalhe(encodeURIComponent(OP))}else{btn.disabled=false;btn.textContent='Erro, tente de novo'}
+}
+window.avd={carregar,entrar,render,detalhe,abre,feedback};
+// mostra a aba só pra admin
+function avdNav(){const ok=typeof isA==='function'&&isA();['tabA'].forEach(id=>{const e=$(id);if(e)e.style.display=ok?'':'none'});const s=$('sbA');if(s)s.style.display=ok?'flex':'none'}
+if(typeof setupUI==='function'){const _su=setupUI;window.setupUI=setupUI=function(){_su.apply(this,arguments);avdNav()}}
+window.addEventListener('load',()=>setTimeout(avdNav,50));
+})();
 </script>
 </body>
 </html>
