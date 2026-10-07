@@ -2035,8 +2035,12 @@ body{background:var(--p-bg)!important;color:var(--p-tx)!important}
 /* v7: tela cheia + logo + item ativo */
 body .sidebar .sb-nav .sb-item.active{background:var(--p-sf)!important;color:var(--p-nv)!important;font-weight:700!important;border-left:3px solid var(--p-nv)!important;box-shadow:none!important}
 body .sidebar .sb-nav .sb-item.active .ic{color:var(--p-nv)!important}
-body .sidebar .sb-logo{margin:-14px -10px 14px!important;padding:0!important;height:96px;overflow:hidden;border-bottom:1px solid var(--p-bd)!important;display:block!important;background:#2a2c2f}
-body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:100%!important;object-fit:cover;display:block;transform:none!important}
+body .sidebar .sb-logo{margin:-14px -10px 14px!important;padding:0!important;height:auto!important;overflow:hidden;border-bottom:1px solid var(--p-bd)!important;display:block!important;background:transparent}
+body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:auto!important;object-fit:contain;display:block;transform:none!important}
+.cell-meta-txt{white-space:nowrap!important;font-size:.55rem!important;color:#6b7280!important}
+.cell-meta-bar{max-width:100%!important;background:#eef2f7!important}
+.comp-table{width:100%!important}
+.comp-table th,.comp-table td{padding:7px 8px!important}
 #pageAvaliacao{max-width:none!important;width:100%}
 .app-with-sidebar .main{max-width:none!important;width:auto!important}
 .main>.page{width:100%}
@@ -2664,7 +2668,7 @@ function miniMetaBar(val,cfg){
   const m=getMeta(cfg);if(!m||m.max===0)return'';
   const pct=Math.min(Math.round((val/m.max)*100),100),exceeded=val>=m.max;
   const barColor=pctColor(pct);
-  return '<div class="cell-meta"><div class="cell-meta-bar"><div class="cell-meta-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div><div class="cell-meta-txt">'+pct+'%'+(exceeded?' ⭐':'')+' · '+fm(val)+' / '+fm(m.max)+'</div></div>';
+  return '<div class="cell-meta"><div class="cell-meta-bar"><div class="cell-meta-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div><div class="cell-meta-txt" title="'+fm(val)+' de '+fm(m.max)+'">'+pct+'% da meta'+(exceeded?' ⭐':'')+'</div></div>';
 }
 function shortPeriod(p){if(!p)return'';const parts=p.split(' a ');if(parts.length===2){const d1=parts[0].substring(3),d2=parts[1].substring(3);return d1===d2?d1:d1+' a '+d2;}return p;}
 
