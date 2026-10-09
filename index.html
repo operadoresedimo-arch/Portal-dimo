@@ -2091,6 +2091,7 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 <button class="sb-item" onclick="showPage('ranking')" id="sbR">🏆 Acordos do Dia</button>
 <button class="sb-item active" onclick="showPage('comparativo')" id="sbC">📊 Comparativo</button>
 <button class="sb-item" onclick="showPage('treinamentos')" id="sbT">🎓 Treinamentos</button>
+<button class="sb-item" onclick="showPage('qualidade')" id="sbQ">⭐ Qualidade das Ligações</button>
 <button class="sb-item" onclick="showPage('avaliacao')" id="sbA" style="display:none">🎧 Avaliação de Discagem</button>
 <button class="sb-item" onclick="doLogout()">🚪 Sair</button>
 </nav>
@@ -2107,6 +2108,7 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 
 <div class="main">
 <div class="page" id="pageRanking"><div class="loading-msg" id="rankLoading">Carregando ranking...</div></div>
+<div class="page" id="pageQualidade"></div>
 <div class="page" id="pageAvaliacao"><div class="loading-msg">Carregando...</div></div>
 <div class="page" id="pageComp">
 <div class="comp-hero" id="compHero">
@@ -3435,6 +3437,90 @@ window.avd={carregar,entrar,render,detalhe,abre,feedback};
 function avdNav(){const ok=typeof isA==='function'&&isA();const t=$('tabA');if(t)t.style.display=ok?'':'none';const s=$('sbA');if(s)s.style.display=ok?'flex':'none'}
 if(typeof setupUI==='function'){const _su=setupUI;window.setupUI=setupUI=function(){_su.apply(this,arguments);avdNav()}}
 window.addEventListener('load',()=>setTimeout(avdNav,50));
+})();
+</script>
+<style id="edimo-qualidade">
+#pageQualidade{font-family:'Inter',system-ui,sans-serif;color:#1a1f36}
+.q-wrap{max-width:none;width:100%}
+.q-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.q-head h2{font-size:1.25rem;font-weight:800;margin:0;color:#0f3557}
+.q-head p{margin:4px 0 0;color:#6b7280;font-size:.82rem}
+.q-tabs{display:flex;background:#eef2f7;border-radius:10px;padding:3px}
+.q-tabs button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-weight:600;font-size:.78rem;color:#6b7280;cursor:pointer;font-family:inherit}
+.q-tabs button.on{background:#fff;color:#0f3557;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.q-me{background:linear-gradient(135deg,#0f3557,#1e4e7e);color:#fff;border-radius:16px;padding:22px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:16px}
+.q-me-n{font-size:3rem;font-weight:800;line-height:1}
+.q-me-n small{font-size:1rem;opacity:.7;font-weight:600}
+.q-me-info{flex:1;min-width:220px}
+.q-me-t{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;opacity:.75;font-weight:600}
+.q-me-s{font-size:1.05rem;font-weight:700;margin:4px 0 10px}
+.q-me-bar{height:10px;background:rgba(255,255,255,.18);border-radius:99px;overflow:hidden}
+.q-me-bar i{display:block;height:100%;border-radius:99px}
+.q-me-sub{font-size:.78rem;opacity:.8;margin-top:8px}
+.q-card{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:6px 18px}
+.q-row{display:grid;grid-template-columns:34px minmax(140px,220px) 1fr 70px;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid #f0f2f6}
+.q-row:last-child{border-bottom:0}
+.q-row.me{background:#f6f9ff;margin:0 -18px;padding:11px 18px;border-left:3px solid #0f3557}
+.q-pos{font-weight:700;color:#9ca3af;font-size:.85rem;text-align:center}
+.q-nome{font-weight:600;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-bar{height:9px;background:#eef2f7;border-radius:99px;overflow:hidden}
+.q-bar i{display:block;height:100%;border-radius:99px;transition:width .6s}
+.q-nota{font-weight:800;font-size:1rem;text-align:right}
+.q-leg{display:flex;gap:16px;flex-wrap:wrap;font-size:.75rem;color:#6b7280;margin:12px 2px 0}
+.q-leg span:before{content:'';display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.q-vazio{padding:40px;text-align:center;color:#6b7280}
+</style>
+<script id="edimo-qualidade-js">
+/* Qualidade das Ligações: visão do operador (nome + barra + nota, sem detalhes) */
+(function(){
+const API_Q='https://script.google.com/macros/s/AKfycbyUX25htVlM8Fs0voi7QK3QzAlF15jYgtzehFG-oUlbP4w0S4efX_Pc7UlrAa0p1_IU/exec';
+let DQ=null,TQ=0,PER='mes';
+const nz=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
+const cor=n=>n>=75?'#16a34a':n>=55?'#d4a937':'#dc2626';
+const status=n=>n>=75?'Mandando bem!':n>=55?'No caminho certo':'Bora melhorar';
+const curto=n=>{const p=String(n).trim().split(/\s+/).map(w=>w.charAt(0)+w.slice(1).toLowerCase());return p.length>1?p[0]+' '+p[p.length-1]:p[0]};
+function dt(s){const m=String(s).match(/(\d{2})\/(\d{2})\/(\d{4})/);return m?new Date(+m[3],+m[2]-1,+m[1]):null}
+function souEu(nomeFw){
+  if(!window.cU)return false;
+  const a=nz(nomeFw).split(' '),b=nz(cU.nome).split(' ');
+  if(!a[0]||a[0]!==b[0])return false;
+  if(b.length===1)return true;
+  return b.slice(1).some(w=>w.length>2&&a.includes(w));
+}
+function filtra(){
+  const h=new Date();h.setHours(0,0,0,0);let ini;
+  if(PER==='hoje')ini=h;else if(PER==='semana'){ini=new Date(h);ini.setDate(h.getDate()-((h.getDay()+6)%7))}else ini=new Date(h.getFullYear(),h.getMonth(),1);
+  const g={};(DQ||[]).forEach(r=>{const d=dt(r.d);if(!d||d<ini)return;const k=String(r.o).trim().toUpperCase();(g[k]=g[k]||{o:r.o,s:0,q:0});g[k].s+=Number(r.n)||0;g[k].q++});
+  return Object.values(g).map(x=>({o:x.o,n:Math.round(x.s/x.q),q:x.q})).sort((a,b)=>b.n-a.n);
+}
+function render(){
+  const el=document.getElementById('pageQualidade');if(!el)return;
+  const L=filtra(),eu=L.findIndex(x=>souEu(x.o)),me=eu>=0?L[eu]:null;
+  const tab=(k,t)=>'<button class="'+(PER===k?'on':'')+'" onclick="qualPer(\''+k+'\')">'+t+'</button>';
+  let h='<div class="q-wrap"><div class="q-head"><div><h2>Qualidade das Ligações</h2><p>Nota de 0 a 100 das suas ligações ouvidas pela monitoria. Quanto mais cheia a barra, melhor.</p></div><div class="q-tabs">'+tab('hoje','Hoje')+tab('semana','Semana')+tab('mes','Mês')+'</div></div>';
+  if(me){h+='<div class="q-me"><div class="q-me-n">'+me.n+'<small>/100</small></div><div class="q-me-info"><div class="q-me-t">Sua nota</div><div class="q-me-s">'+status(me.n)+'</div><div class="q-me-bar"><i style="width:'+me.n+'%;background:'+cor(me.n)+'"></i></div><div class="q-me-sub">'+(eu+1)+'º de '+L.length+' &middot; '+me.q+' ligaç'+(me.q>1?'ões':'ão')+' ouvida'+(me.q>1?'s':'')+'</div></div></div>'}
+  else if(window.cU&&!isAdm()){h+='<div class="q-me"><div class="q-me-info"><div class="q-me-t">Sua nota</div><div class="q-me-s">Ainda não ouvimos ligações suas nesse período</div><div class="q-me-sub">Assim que a monitoria ouvir, sua nota aparece aqui.</div></div></div>'}
+  if(!L.length)h+='<div class="q-card"><div class="q-vazio">Nenhuma ligação avaliada nesse período ainda.</div></div>';
+  else{h+='<div class="q-card">'+L.map((x,i)=>'<div class="q-row'+(i===eu?' me':'')+'"><div class="q-pos">'+(i+1)+'º</div><div class="q-nome">'+curto(x.o)+'</div><div class="q-bar"><i style="width:'+x.n+'%;background:'+cor(x.n)+'"></i></div><div class="q-nota" style="color:'+cor(x.n)+'">'+x.n+'</div></div>').join('')+'</div>';
+    h+='<div class="q-leg"><span style="--c:#16a34a">75+ mandando bem</span><span style="--c:#d4a937">55 a 74 no caminho</span><span style="--c:#dc2626">abaixo de 55 bora melhorar</span></div>'}
+  el.innerHTML=h+'</div>';
+}
+function isAdm(){try{return isA()}catch(e){return false}}
+window.qualPer=function(p){PER=p;render()};
+window.qualCarregar=function(){
+  const el=document.getElementById('pageQualidade');
+  if(DQ&&Date.now()-TQ<5*60000)return render();
+  if(el&&!DQ)el.innerHTML='<div class="loading-msg">Carregando...</div>';
+  fetch(API_Q+'?acao=placar').then(r=>r.json()).then(j=>{if(!j.ok)throw new Error(j.erro);DQ=j.placar||[];TQ=Date.now();render()})
+  .catch(()=>{if(el)el.innerHTML='<div class="q-card"><div class="q-vazio">Não consegui carregar as notas agora. Tente de novo em alguns minutos.</div></div>'});
+};
+const sp=window.showPage;
+window.showPage=function(p){
+  sp(p);
+  const pg=document.getElementById('pageQualidade'),sb=document.getElementById('sbQ');
+  if(pg)pg.classList.toggle('active',p==='qualidade');if(sb)sb.classList.toggle('active',p==='qualidade');
+  if(p==='qualidade')qualCarregar();
+};
 })();
 </script>
 <script id="edimo-icons">
