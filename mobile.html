@@ -552,6 +552,13 @@ body.is-adm .op-only{display:none!important}
 .sk-top{height:190px}.sk-comp{height:96px}.sk-post{height:120px}
 .ld-txt{text-align:center;font-size:.75rem;color:#9ca3af;margin-top:6px}
 </style>
+<style id="edimo-mini-turnos">
+.fd-tn{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.fd-tnc{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-top:3px solid var(--c);border-radius:12px;padding:9px 6px 8px;text-align:center;min-width:0}
+.fd-tnn{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c)}
+.fd-tnv{font-size:.9rem;font-weight:800;color:#fff;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fd-tna{font-size:.66rem;color:rgba(255,255,255,.65);margin-top:1px}
+</style>
 <style id="edimo-qualidade">
 .qm{padding:14px 16px 90px;font-family:inherit}
 .qm-tabs{display:flex;background:#eef2f7;border-radius:12px;padding:3px;margin-bottom:14px}
@@ -1287,6 +1294,14 @@ function tempoAtras(iso){
   if(isNaN(m))return'';if(m<1)return'agora';if(m<60)return m+' min';var h=Math.floor(m/60);if(h<24)return h+'h';var dd=Math.floor(h/24);if(dd<7)return dd+(dd>1?' dias':' dia');
   return('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);
 }
+function miniTurnos(ops){
+  var g=grpTurno(ops),nm={m:['Manh\u00E3','#22c55e'],t:['Tarde','#f59e0b'],n:['Novatos','#a78bfa']};
+  var h='<div class="fd-tn">';
+  ['m','t','n'].forEach(function(k){var x=g[k];
+    h+='<div class="fd-tnc" style="--c:'+nm[k][1]+'"><div class="fd-tnn">'+nm[k][0]+'</div><div class="fd-tnv">'+fs(x.v)+'</div><div class="fd-tna">'+x.a+' acordo'+(x.a===1?'':'s')+'</div></div>';
+  });
+  return h+'</div>';
+}
 function topoFeed(d){
   d=d||{ops:[],tv:0,ta:0};
   var h='<div class="fd-top"><div class="fd-top-h"><span>\uD83C\uDFC6 Top 3 de hoje</span><span class="fd-top-s">'+fs(d.tv||0)+' \u00B7 '+(d.ta||0)+' acordos</span></div><div class="fd-pod">';
@@ -1299,6 +1314,7 @@ function topoFeed(d){
   h+='</div>';
   if(!isAdm()&&cU){var pos=-1;d.ops.forEach(function(o,i){if(pos<0&&isMe(o.raw))pos=i});
     if(pos>=0){var me=d.ops[pos];h+='<div class="fd-me">Voc\u00EA est\u00E1 em <b>'+(pos+1)+'\u00BA</b> \u00B7 '+me.a+' acordos \u00B7 '+fs(me.v)+'</div>'}}
+  h+=miniTurnos(d.ops||[]);
   h+='<div class="fd-ver" onclick="go(\'acordos\')">Ver ranking completo \u203A</div></div>';
   return h;
 }

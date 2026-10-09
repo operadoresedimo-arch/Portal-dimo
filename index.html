@@ -1937,7 +1937,8 @@ body::before,body::after{display:none!important}
 .avd-lst{list-style:none;padding:0;margin:0}.avd-lst li{display:flex;gap:10px;align-items:flex-start;font-size:.78rem;padding:8px 0;border-top:1px solid #eef1f5}.avd-lst li:first-child{border-top:0}
 .avd-lst li b{margin-left:auto;font-size:.66rem;color:var(--mu);flex-shrink:0}
 .avd-lig-b{display:none;padding:14px 16px 16px;background:#f8fafc;border-top:1px solid #eef1f5;font-size:.78rem;line-height:1.55}
-.avd-lig-b iframe{width:100%;height:64px;border:0;border-radius:12px;background:#000;margin-bottom:12px}
+.avd-lig-b iframe{display:block;width:100%;height:120px;border:0;border-radius:12px;background:#1f1f1f;margin-bottom:6px}
+.avd-drv{display:inline-block;font-size:.74rem;color:#1e4e7e;font-weight:600;margin-bottom:12px;text-decoration:none}.avd-drv:hover{text-decoration:underline}
 .avd-lig-b p{margin-bottom:8px}.avd-ev{color:#374151;margin:6px 0;padding:8px 10px;background:#fff;border:1px solid var(--bd);border-radius:10px}.avd-ev b{color:var(--nv)}
 .avd-lig-b details summary{cursor:pointer;color:var(--nv2);font-weight:600;margin:10px 0 6px}.avd-lig-b pre{white-space:pre-wrap;font-family:inherit;color:#374151;font-size:.74rem;background:#fff;border:1px solid var(--bd);border-radius:10px;padding:10px}
 .avd-login{max-width:360px;margin:40px auto;background:#fff;border-radius:16px;padding:34px 26px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06)}
@@ -3444,7 +3445,7 @@ function detalhe(opEnc){
   const lst=(arr,ic)=>arr.length?'<ul class="avd-lst">'+arr.map(x=>'<li><span>'+ic+'</span><span>'+esc(x[0])+'</span><b>'+x[1]+'x</b></li>').join('')+'</ul>':'<div class="avd-empty" style="padding:14px">Sem dados ainda</div>';
   h+='<div class="avd-g2"><div class="avd-card"><div class="avd-ct">O que mais acerta</div><div class="avd-pad">'+lst(ac,'✅')+'</div></div><div class="avd-card"><div class="avd-ct">Onde mais erra</div><div class="avd-pad">'+lst(er,'⚠️')+'</div></div></div>';
   h+='<div class="avd-card"><div class="avd-ct">Ligações ouvidas</div>'+a.map((l,i)=>'<div class="avd-row" onclick="avd.abre('+i+')"><span class="avd-n '+cl(l.nota)+'">'+l.nota+'</span><div class="avd-b"><div class="avd-nm">'+esc(l.data)+' · '+esc(String(l.hora).slice(0,5))+' <span class="avd-pl rs">'+esc(l.resultado||'-')+'</span></div><div class="avd-sb">'+esc(l.duracao)+' · '+esc(l.tabulacao)+'</div></div><div class="avd-r">'+(l.feedback_dado?'<span class="avd-pl fb">✔ feedback dado</span>':'<span class="avd-pl pd">pendente</span>')+'</div></div>'+
-   '<div class="avd-lig-b" id="avdLb'+i+'">'+(l.audio_url?'<iframe data-src="'+esc(l.audio_url)+'" allow="autoplay"></iframe>':'')+'<p><b>Resumo:</b> '+esc(l.resumo)+'</p><p><b>O que falar no feedback:</b> '+esc(l.feedback)+'</p>'+
+   '<div class="avd-lig-b" id="avdLb'+i+'">'+(l.audio_url?'<iframe data-src="'+esc(l.audio_url)+'" allow="autoplay"></iframe><a class="avd-drv" href="'+esc(String(l.audio_url).replace('/preview','/view'))+'" target="_blank">Abrir \u00E1udio no Drive \u203A</a>':'')+'<p><b>Resumo:</b> '+esc(l.resumo)+'</p><p><b>O que falar no feedback:</b> '+esc(l.feedback)+'</p>'+
    l.criterios.map(c=>'<div class="avd-ev"><b>'+esc(c.nome)+' · '+c.pontos+'/'+c.max+'</b><br>'+esc(c.evidencia)+'</div>').join('')+
    '<details><summary>Ver transcrição</summary><pre>'+esc(l.transcricao)+'</pre></details><button class="avd-btn'+(l.feedback_dado?' sec':'')+'" style="margin-top:10px" onclick="event.stopPropagation();avd.feedback(\''+esc(l.id)+'\','+(l.feedback_dado?0:1)+',this)">'+(l.feedback_dado?'Desmarcar feedback':'✔ Marcar feedback dado')+'</button></div>').join('')+(a.length?'':'<div class="avd-empty">Sem ligações</div>')+'</div>';
   $('avdBody').innerHTML=h;window.scrollTo(0,0);
