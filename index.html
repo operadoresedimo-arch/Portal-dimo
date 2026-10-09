@@ -2047,6 +2047,18 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 @media(min-width:1600px){.app-with-sidebar .main{padding-left:28px!important;padding-right:28px!important}}
 @media(min-width:1900px){html{font-size:17px}}
 </style>
+<style id="edimo-senha">
+.pw-bg{position:fixed;inset:0;background:#eef2f7;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+.pw-box{width:100%;max-width:380px;background:#fff;border-radius:18px;padding:34px 28px;text-align:center;box-shadow:0 4px 18px rgba(15,23,42,.08);font-family:'Inter',system-ui,sans-serif}
+.pw-ic{width:64px;height:64px;border-radius:50%;background:#eef2f7;color:#0f3557;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.pw-t{font-size:1.15rem;font-weight:800;color:#1a1f36}
+.pw-s{font-size:.78rem;color:#6b7280;margin:6px 0 18px;line-height:1.4}
+.pw-box input{width:100%;box-sizing:border-box;padding:13px 14px;border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;font-family:inherit;font-size:.88rem;margin-bottom:10px;outline:none}
+.pw-box input:focus{border-color:#1e4e7e}
+.pw-box .login-btn{width:100%;margin-top:4px}
+.pw-cancel{width:100%;margin-top:8px;padding:12px;border:0;background:none;color:#6b7280;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
+.pw-err{display:none;color:#dc2626;font-size:.78rem;margin-top:10px}
+</style>
 </head>
 <body>
 <div class="bg-layer"></div>
@@ -2061,6 +2073,17 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 <div class="login-loading" id="loginLoading">Verificando...</div>
 </div></div>
 
+<div class="pw-bg" id="pwBg"><div class="pw-box">
+<div class="pw-ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+<div class="pw-t" id="pwTitle">Crie sua senha</div>
+<div class="pw-s" id="pwSub">Por segurança, troque a senha padrão antes de continuar.</div>
+<input type="password" id="pwAtual" placeholder="Senha atual">
+<input type="password" id="pwNova" placeholder="Nova senha (mínimo 6 caracteres)">
+<input type="password" id="pwConf" placeholder="Confirmar nova senha">
+<button class="login-btn" id="pwBtn" onclick="salvarSenha()">Salvar e entrar</button>
+<button class="pw-cancel" id="pwCancel" onclick="fecharSenha()">Cancelar</button>
+<div class="pw-err" id="pwErr"></div>
+</div></div>
 <div class="nav" id="nav"><div class="nav-inner">
 <div class="nav-brand">⚖️ ÉDIMO</div>
 <button class="nav-tab active" onclick="showPage('ranking')" id="tabR">📊 Acordos do Dia</button>
@@ -2093,6 +2116,7 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 <button class="sb-item" onclick="showPage('treinamentos')" id="sbT">🎓 Treinamentos</button>
 <button class="sb-item" onclick="showPage('qualidade')" id="sbQ">⭐ Qualidade das Ligações</button>
 <button class="sb-item" onclick="showPage('avaliacao')" id="sbA" style="display:none">🎧 Avaliação de Discagem</button>
+<button class="sb-item" onclick="abrirSenha(false)">🔐 Alterar senha</button>
 <button class="sb-item" onclick="doLogout()">🚪 Sair</button>
 </nav>
 <div class="sb-bell-wrap" id="sbAlert" style="display:none">
@@ -3470,6 +3494,70 @@ window.addEventListener('load',()=>setTimeout(avdNav,50));
 .q-leg span:before{content:'';display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
 .q-vazio{padding:40px;text-align:center;color:#6b7280}
 </style>
+<script id="edimo-senha-js">
+/* Login igual ao mobile: senha padrão no 1º acesso -> cria senha própria (aba Senhas, hash SHA-256) */
+(function(){
+var SCRIPT_URL='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec';
+var pwCtx=null,pend=null;
+function sha(t){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)).then(function(h){return Array.prototype.map.call(new Uint8Array(h),function(x){return('0'+x.toString(16)).slice(-2)}).join('')})}
+function chaveDe(f){return String(f.login||f.nome||'').trim().toLowerCase().replace(/^\d+\./,'')}
+function hashSenha(k,s){return sha('edimo|'+k+'|'+s)}
+function $(i){return document.getElementById(i)}
+function erro(t){$('loginLoading').style.display='none';var e=$('loginError');e.textContent=t;e.style.display='block'}
+function csv(r){var cells=[],cell='',q=false;for(var i=0;i<r.length;i++){var ch=r[i];if(ch==='"')q=!q;else if(ch===','&&!q){cells.push(cell.trim());cell=''}else cell+=ch}cells.push(cell.trim());return cells}
+function entrar(f,keep){cU=f;(keep?localStorage:sessionStorage).setItem('user',JSON.stringify(f));$('loginScreen').style.display='none';setupUI();startApp()}
+window.doLogin=function(){
+  var u=$('loginUser').value.trim().toLowerCase(),p=$('loginPass').value;if(!u||!p)return;
+  $('loginError').style.display='none';$('loginLoading').style.display='block';
+  var pSen=fetch(SCRIPT_URL+'?type=senhas&t='+Date.now()).then(function(r){return r.json()}).catch(function(){return null});
+  Promise.all([fetch(SH+'&t='+Date.now()).then(function(r){return r.text()}),pSen]).then(function(res){
+    var rows=res[0].split('\n').map(csv),senhas=res[1],cand=null,padrao='';
+    for(var i=1;i<rows.length;i++){var r=rows[i];if(r.length<4)continue;
+      var nm=r[0].toLowerCase().trim(),lg=r[1]?r[1].trim():'';
+      try{allEntradas[nm]=loginToShift(lg);allLogins[nm]=lg;allAdmissao[nm]=r[2]?r[2].trim():''}catch(e){}
+      if(!cand&&(nm===u||(lg&&lg.toLowerCase()===u))){cand={nome:r[0].trim(),perfil:r[4]?r[4].toLowerCase().trim():'colaborador',entrada:(r[2]||'').trim(),login:lg};padrao=(r[3]||'').trim()}
+    }
+    if(!cand)return erro('Usu\u00E1rio ou senha incorretos');
+    if(!senhas)return erro('Erro de conex\u00E3o, tente de novo');
+    var key=chaveDe(cand),salva=senhas[key];
+    (salva?hashSenha(key,p).then(function(h){return h===salva}):Promise.resolve(padrao===p)).then(function(ok){
+      $('loginLoading').style.display='none';
+      if(!ok)return erro('Usu\u00E1rio ou senha incorretos');
+      var keep=($('loginKeep')||{}).checked;
+      if(!salva){pend={f:cand,keep:keep};pwCtx={key:key,atual:p,forcar:true};abrirSenha(true);return}
+      entrar(cand,keep);
+    });
+  }).catch(function(){erro('Erro de conex\u00E3o')});
+};
+window.abrirSenha=function(forcar){
+  if(!forcar){if(typeof cU==='undefined'||!cU)return;pwCtx={key:chaveDe(cU),atual:'',forcar:false}}
+  $('pwTitle').textContent=forcar?'Crie sua senha':'Alterar senha';
+  $('pwSub').textContent=forcar?'Por seguran\u00E7a, troque a senha padr\u00E3o antes de continuar.':'Digite sua senha atual e a nova senha.';
+  $('pwAtual').style.display=forcar?'none':'block';$('pwCancel').style.display=forcar?'none':'block';
+  $('pwBtn').textContent=forcar?'Salvar e entrar':'Salvar';
+  ['pwAtual','pwNova','pwConf'].forEach(function(i){$(i).value=''});$('pwErr').style.display='none';
+  $('pwBg').style.display='flex';setTimeout(function(){$(forcar?'pwNova':'pwAtual').focus()},50);
+};
+window.fecharSenha=function(){$('pwBg').style.display='none'};
+function pwErr(t){var e=$('pwErr');e.textContent=t;e.style.display='block'}
+window.salvarSenha=function(){
+  var atual=pwCtx.forcar?pwCtx.atual:$('pwAtual').value,n=$('pwNova').value,c=$('pwConf').value;
+  if(!pwCtx.forcar&&!atual)return pwErr('Digite sua senha atual');
+  if(n.length<6)return pwErr('A senha precisa ter pelo menos 6 caracteres');
+  if(n.toLowerCase()==='edimo123')return pwErr('Escolha uma senha diferente da padr\u00E3o');
+  if(n===atual)return pwErr('A nova senha precisa ser diferente da atual');
+  if(n!==c)return pwErr('As senhas n\u00E3o conferem');
+  var b=$('pwBtn');b.disabled=true;b.textContent='Salvando...';
+  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'senha',login:pwCtx.key,atual:atual,nova:n})})
+  .then(function(r){return r.json()}).then(function(r){
+    b.disabled=false;b.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';
+    if(r.status==='ok'){fecharSenha();if(pwCtx.forcar&&pend){entrar(pend.f,pend.keep);pend=null}else alert('Senha alterada!')}
+    else pwErr(r.msg||'N\u00E3o foi poss\u00EDvel salvar');
+  }).catch(function(){b.disabled=false;b.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';pwErr('Erro de conex\u00E3o, tente de novo')});
+};
+['pwNova','pwConf','pwAtual'].forEach(function(i){var el=$(i);if(el)el.addEventListener('keydown',function(e){if(e.key==='Enter')salvarSenha()})});
+})();
+</script>
 <script id="edimo-qualidade-js">
 /* Qualidade das Ligações: visão do operador (nome + barra + nota, sem detalhes) */
 (function(){
@@ -3481,7 +3569,7 @@ const status=n=>n>=75?'Mandando bem!':n>=55?'No caminho certo':'Bora melhorar';
 const curto=n=>{const p=String(n).trim().split(/\s+/).map(w=>w.charAt(0)+w.slice(1).toLowerCase());return p.length>1?p[0]+' '+p[p.length-1]:p[0]};
 function dt(s){const m=String(s).match(/(\d{2})\/(\d{2})\/(\d{4})/);return m?new Date(+m[3],+m[2]-1,+m[1]):null}
 function souEu(nomeFw){
-  if(!window.cU)return false;
+  if(typeof cU==='undefined'||!cU)return false;
   const a=nz(nomeFw).split(' '),b=nz(cU.nome).split(' ');
   if(!a[0]||a[0]!==b[0])return false;
   if(b.length===1)return true;
@@ -3499,7 +3587,7 @@ function render(){
   const tab=(k,t)=>'<button class="'+(PER===k?'on':'')+'" onclick="qualPer(\''+k+'\')">'+t+'</button>';
   let h='<div class="q-wrap"><div class="q-head"><div><h2>Qualidade das Ligações</h2><p>Nota de 0 a 100 das suas ligações ouvidas pela monitoria. Quanto mais cheia a barra, melhor.</p></div><div class="q-tabs">'+tab('hoje','Hoje')+tab('semana','Semana')+tab('mes','Mês')+'</div></div>';
   if(me){h+='<div class="q-me"><div class="q-me-n">'+me.n+'<small>/100</small></div><div class="q-me-info"><div class="q-me-t">Sua nota</div><div class="q-me-s">'+status(me.n)+'</div><div class="q-me-bar"><i style="width:'+me.n+'%;background:'+cor(me.n)+'"></i></div><div class="q-me-sub">'+(eu+1)+'º de '+L.length+' &middot; '+me.q+' ligaç'+(me.q>1?'ões':'ão')+' ouvida'+(me.q>1?'s':'')+'</div></div></div>'}
-  else if(window.cU&&!isAdm()){h+='<div class="q-me"><div class="q-me-info"><div class="q-me-t">Sua nota</div><div class="q-me-s">Ainda não ouvimos ligações suas nesse período</div><div class="q-me-sub">Assim que a monitoria ouvir, sua nota aparece aqui.</div></div></div>'}
+  else if(typeof cU!=='undefined'&&cU&&!isAdm()){h+='<div class="q-me"><div class="q-me-info"><div class="q-me-t">Sua nota</div><div class="q-me-s">Ainda não ouvimos ligações suas nesse período</div><div class="q-me-sub">Assim que a monitoria ouvir, sua nota aparece aqui.</div></div></div>'}
   if(!L.length)h+='<div class="q-card"><div class="q-vazio">Nenhuma ligação avaliada nesse período ainda.</div></div>';
   else{h+='<div class="q-card">'+L.map((x,i)=>'<div class="q-row'+(i===eu?' me':'')+'"><div class="q-pos">'+(i+1)+'º</div><div class="q-nome">'+curto(x.o)+'</div><div class="q-bar"><i style="width:'+x.n+'%;background:'+cor(x.n)+'"></i></div><div class="q-nota" style="color:'+cor(x.n)+'">'+x.n+'</div></div>').join('')+'</div>';
     h+='<div class="q-leg"><span style="--c:#16a34a">75+ mandando bem</span><span style="--c:#d4a937">55 a 74 no caminho</span><span style="--c:#dc2626">abaixo de 55 bora melhorar</span></div>'}
