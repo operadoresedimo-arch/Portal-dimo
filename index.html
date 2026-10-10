@@ -1899,6 +1899,7 @@ body::before,body::after{display:none!important}
 .avd-fil{display:flex;gap:8px;flex-wrap:wrap}
 .avd-fil select,.avd-fil button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:9px 12px;font-family:inherit;font-size:.76rem;font-weight:600;cursor:pointer}
 .avd-fil select option{color:#1a1f36}
+.avd-fil input[type=date]{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:7px 10px;font-family:inherit;font-size:.76rem;font-weight:600;color-scheme:dark}
 .avd-in{background:#f9fafb;color:var(--tx);border:1px solid #e5e7eb;border-radius:10px;padding:11px 14px;font-family:inherit;font-size:.8rem;cursor:pointer}
 .avd-btn{width:auto;padding:11px 16px;border:0;border-radius:10px;background:linear-gradient(180deg,#1e4e7e,#0f3557);color:#fff;font-family:inherit;font-size:.8rem;font-weight:700;cursor:pointer}
 .avd-btn.sec{background:var(--sf);color:var(--nv)}
@@ -3405,7 +3406,7 @@ const root=()=>$('pageAvaliacao');
 const vs=(n,eq)=>'<span class="'+(n>=eq?'avd-up':'avd-down')+'">'+(n>=eq?'▲ ':'▼ ')+Math.abs(n-eq).toFixed(0)+'</span> <span class="avd-mut">vs equipe</span>';
 
 function cabec(extra){return '<div class="avd-head"><div><h2>🎧 Avaliação de <span>Discagem</span>'+(DEMO_MODE?'<span class="avd-demo">DEMONSTRAÇÃO</span>':'')+'</h2><p>Ligações ouvidas e avaliadas pela IA · régua de 100 pontos</p></div>'+(extra||'')+'</div>'}
-function filtrosHTML(){return '<div class="avd-fil"><select id="avdPer" onchange="avd.render()"><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="0">Tudo</option></select><select id="avdGrp" onchange="avd.render()"><option value="">Todos</option><option value="novato">Novatos</option><option value="veterano">Veteranos</option></select><button onclick="avd.carregar(true)">↻ Atualizar</button></div>'}
+function filtrosHTML(){return '<div class="avd-fil"><select id="avdPer" onchange="avd.render()"><option value="0">Tudo</option><option value="hoje">Hoje</option><option value="ontem">Ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="dia">Escolher dia...</option></select><input type="date" id="avdDia" onchange="avd.render()" style="display:none"><select id="avdGrp" onchange="avd.render()"><option value="">Todos</option><option value="novato">Novatos</option><option value="veterano">Veteranos</option></select><button onclick="avd.carregar(true)">↻ Atualizar</button></div>'}
 function telaSenha(msg){root().innerHTML=cabec()+'<div class="avd-login"><div class="avd-ic">🔐</div><h3>Área do supervisor</h3><p>Digite a senha da avaliação de discagem</p><input class="avd-in" type="password" id="avdSenha" placeholder="Senha" onkeydown="if(event.key===\'Enter\')avd.entrar()"><button class="avd-btn" onclick="avd.entrar()">Entrar</button><p style="color:#ef4444;margin-top:10px">'+(msg||'')+'</p></div>'}
 
 async function carregar(forcar){
@@ -3427,10 +3428,18 @@ async function carregar(forcar){
   }catch(e){root().innerHTML=cabec()+'<div class="avd-empty">Não consegui conectar na planilha: '+esc(e.message)+'</div>'}
 }
 function entrar(){CHAVE=$('avdSenha').value.trim();if(CHAVE)carregar(true)}
+function noPer(dstr){
+  const per=$('avdPer'),v=per?per.value:'0',d=dt(String(dstr).replace(/^'/,''));if(isNaN(d))return v==='0';
+  const h=new Date();h.setHours(0,0,0,0);
+  if(v==='0')return true;
+  if(v==='hoje')return +d===+h;
+  if(v==='ontem'){const o=new Date(h);o.setDate(h.getDate()-1);return +d===+o}
+  if(v==='dia'){const x=$('avdDia');if(!x||!x.value)return true;const p=x.value.split('-');return +d===+new Date(+p[0],p[1]-1,+p[2])}
+  const lim=new Date(h);lim.setDate(h.getDate()-(+v));return d>=lim;
+}
 function filt(){
-  const per=$('avdPer'),grp=$('avdGrp');const dias=per?+per.value:30,g=grp?grp.value:'';
-  const lim=new Date();lim.setHours(0,0,0,0);lim.setDate(lim.getDate()-dias);
-  return DADOS.filter(l=>(!dias||dt(l.data)>=lim)&&(!g||l.grupo===g));
+  const grp=$('avdGrp'),g=grp?grp.value:'';
+  return DADOS.filter(l=>noPer(l.data)&&(!g||l.grupo===g));
 }
 const CNOME={abertura:'Abertura e identificação',motivo:'Explicou o motivo',avista:'Ofereceu à vista primeiro',objecao:'Contornou a objeção',escada:'Insistiu na negociação',valores:'Valores claros e corretos',saida:'Saiu com resultado',fechamento:'Fechamento formal'};
 const CFRACO={abertura:'Abertura fraca',motivo:'Não explica o motivo',avista:'Não oferece à vista primeiro',objecao:'Trava na objeção',escada:'Desiste sem negociar',valores:'Valores confusos',saida:'Encerra sem resultado',fechamento:'Fechamento incompleto'};
@@ -3444,9 +3453,9 @@ const pc=(x,t)=>t?(x/t*100):0;
 const mini=(p,c)=>'<span class="avd-mini"><i style="width:'+Math.max(2,Math.min(100,p)).toFixed(0)+'%;background:'+c+'"></i></span>';
 
 function render(){
-  const per=$('avdPer')?$('avdPer').value:(DEMO_MODE?'0':'30'),grp=$('avdGrp')?$('avdGrp').value:'';
+  const per=$('avdPer')?$('avdPer').value:'0',grp=$('avdGrp')?$('avdGrp').value:'',dia=$('avdDia')?$('avdDia').value:'';
   root().innerHTML=cabec(filtrosHTML())+'<div id="avdBody"></div>';
-  $('avdPer').value=per;$('avdGrp').value=grp;
+  $('avdPer').value=per;$('avdGrp').value=grp;if($('avdDia')){$('avdDia').value=dia||new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);$('avdDia').style.display=per==='dia'?'':'none'}
   OP=null;const ls=filt(),eq=med(ls.map(l=>l.nota)),c=cm(ls);
   const fr=Object.values(c).sort((a,b)=>a.pct-b.pct)[0];
   const ops={};ls.forEach(l=>(ops[l.operador]=ops[l.operador]||[]).push(l));
@@ -3493,7 +3502,7 @@ async function feedback(id,v,btn){
   if(r.ok){l.feedback_dado=v?new Date().toLocaleString('pt-BR'):'';detalhe(encodeURIComponent(OP))}else{btn.disabled=false;btn.textContent='Erro, tente de novo'}
 }
 const fmtN=n=>Math.round(n||0).toLocaleString('pt-BR');
-function funilFilt(){const per=$('avdPer');const dias=per?+per.value:30;const lim=new Date();lim.setHours(0,0,0,0);lim.setDate(lim.getDate()-dias);return (FUNIL||[]).filter(x=>!dias||dt(String(x.data).replace(/^'/,''))>=lim)}
+function funilFilt(){return (FUNIL||[]).filter(x=>noPer(x.data))}
 function funilTot(rs){const t={dis:0,atd:0,op:0,cpc:0,aco:0,ele:0,muda:0,nc:0,seg:0};rs.forEach(r=>Object.keys(t).forEach(k=>t[k]+=+r[k]||0));return t}
 function funilAgr(rs){const g={};rs.forEach(r=>{const k=String(r.nome);(g[k]=g[k]||[]).push(r)});return Object.keys(g).map(k=>Object.assign({nome:k},funilTot(g[k])))}
 function visaoFunil(){
