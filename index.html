@@ -3452,7 +3452,7 @@ function render(){
   const ops={};ls.forEach(l=>(ops[l.operador]=ops[l.operador]||[]).push(l));
   const lin=Object.keys(ops).map(op=>{const a=ops[op],n=med(a.map(l=>l.nota)),f=Object.values(cm(a)).sort((x,y)=>x.pct-y.pct)[0];return{op,a,n,g:a[0].grupo,res:a.filter(temRes).length/a.length*100,f,pend:a.filter(l=>!l.feedback_dado).length}}).sort((x,y)=>y.n-x.n);
   let h='<div class="avd-kpis">'+
-    kpi('#1e4e7e',ls.length,'Ligações avaliadas',lin.length+' operadores','','rank')+
+    kpi('#1e4e7e',ls.length,'Ligações avaliadas',lin.length+' operadores','rank')+
     kpi('#d4a937',eq.toFixed(0),'Nota média da equipe','de 100 pontos','nota')+
     kpi('#16a34a',(ls.length?(ls.filter(temRes).length/ls.length*100).toFixed(0):0)+'%','Saíram com acordo ou retorno','','res')+
     kpi('#dc2626','<span style="font-size:1rem">'+(fr?esc(fr.fraco||fr.nome):'-')+'</span>','Principal erro da equipe',fr?fr.pct.toFixed(0)+'% de aproveitamento':'','erro')+
