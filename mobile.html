@@ -593,6 +593,7 @@ body.is-adm .op-only{display:none!important}
 .qm-fb-t{font-size:.66rem;color:#6b7280;font-weight:600;margin-bottom:4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .qm-tag{font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:99px;background:#eef2f7;color:#374151}.qm-tag.ok{background:#dcfce7;color:#15803d}
 .qm-mais{border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:8px;padding:8px 12px;font-family:inherit;font-weight:600;font-size:.74rem;margin-top:10px;width:100%}
+.qm-au{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px}.qm-au button{border:1px solid #cfd8e3;background:#f3f6fa;color:#0f3557;border-radius:8px;padding:6px 12px;font-family:inherit;font-weight:700;font-size:.74rem;cursor:pointer}.qm-au a{font-size:.7rem;color:#2563eb;text-decoration:none;font-weight:600}.qm-au iframe{width:100%;height:120px;border:0;border-radius:8px;background:#f3f6fa}
 </style>
 </head>
 <body>
@@ -1886,19 +1887,21 @@ function filtra(){
   L.forEach(function(x){x.L.sort(function(a,b){return(dt(b.d)-dt(a.d))||String(b.h||'').localeCompare(String(a.h||''))})});
   return L.sort(function(a,b){return b.q-a.q||curto(a.o).localeCompare(curto(b.o))});
 }
+function semNome(t){t=String(t||'').trim();var m=t.match(/^(ol[aá],?\s+)?([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+)(\s+[A-ZÁÉÍÓÚ][a-záéíóúâêôãõç]+)?\s*[,!]\s*/);var K=['excelente','parabens','otimo','otima','boa','bom','muito','atencao','cuidado','olha','entao','aqui','hoje','sim','nao','legal','show','perfeito','importante','resumindo','infelizmente','apesar','embora','mandou','voce'];if(!m)return t;var w=m[2].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(K.indexOf(w)>=0)return t;var r=t.slice(m[0].length);return r.charAt(0).toUpperCase()+r.slice(1)}
 function fbs(L,max){
-  var v=L.filter(function(r){return String(r.f||'').trim()});
-  if(!v.length)return '<div class="qm-fb"><div class="qm-fb-t">Sem feedback escrito ainda</div>Assim que a monitoria ouvir, o feedback aparece aqui.</div>';
-  return v.slice(0,max||v.length).map(function(r){var ok=/^acordo/i.test(r.r||'');return '<div class="qm-fb" style="--c:'+(ok?'#16a34a':'#d4a937')+'"><div class="qm-fb-t">'+esc(r.d)+(r.h?' \u00E0s '+esc(r.h):'')+(r.r?'<span class="qm-tag'+(ok?' ok':'')+'">'+(ok?'acordo':'sem acordo')+'</span>':'')+'</div>'+esc(r.f)+'</div>'}).join('');
+  if(!L.length)return '<div class="qm-fb"><div class="qm-fb-t">Nada ainda</div>Assim que a monitoria ouvir, aparece aqui.</div>';
+  return L.slice(0,max||L.length).map(function(r){var ok=/^acordo/i.test(r.r||''),f=String(r.f||'').trim(),a=String(r.a||'');return '<div class="qm-fb" style="--c:'+(ok?'#16a34a':'#d4a937')+'"><div class="qm-fb-t">'+esc(r.d)+(r.h?' \u00E0s '+esc(r.h):'')+(r.r?'<span class="qm-tag'+(ok?' ok':'')+'">'+(ok?'acordo':'sem acordo')+'</span>':'')+'</div>'+(f?esc(semNome(f)):'<i style="color:#6b7280">Sem feedback escrito</i>')+(a?'<div class="qm-au"><button onclick="event.stopPropagation();qualOuvir(this)" data-src="'+esc(a)+'">\u25B6 Ouvir a liga\u00E7\u00E3o</button><a href="'+esc(a.replace('/preview','/view'))+'" target="_blank" onclick="event.stopPropagation()">abrir no Drive \u203A</a></div>':'')+'</div>'}).join('');
 }
+window.qualOuvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(fr){fr.remove();b.textContent='\u25B6 Ouvir a liga\u00E7\u00E3o';return}fr=document.createElement('iframe');fr.src=b.getAttribute('data-src');fr.allow='autoplay';w.appendChild(fr);b.textContent='\u25A0 Fechar \u00E1udio'};
+
 function hdr(){return typeof hdrPadrao==='function'?hdrPadrao('Qualidade das Liga\u00E7\u00F5es',(typeof rankData!=='undefined'&&rankData&&rankData.d)||''):''}
 function render(){
   var el=document.getElementById('pgQual');if(!el)return;
   var L=filtra(),A=adm(),eu=-1,mx=1;L.forEach(function(x,i){if(eu<0&&souEu(x.o))eu=i;if(x.q>mx)mx=x.q});var me=eu>=0?L[eu]:null;
   function tab(k,t){return '<button class="'+(PER===k?'on':'')+'" onclick="qualPer(\''+k+'\')">'+t+'</button>'}
   var h=hdr()+'<div class="qm"><div class="qm-tabs">'+tab('hoje','Hoje')+tab('semana','Semana')+tab('mes','M\u00EAs')+'</div>';
-  if(me){var nf=me.L.filter(function(r){return String(r.f||'').trim()}).length;
-    h+='<div class="qm-me"><div class="qm-me-top"><div class="qm-n">'+me.q+'</div><div><div class="qm-t">Suas liga\u00E7\u00F5es avaliadas</div><div class="qm-s">'+(me.ac?me.ac+' com acordo \u00B7 ':'')+'veja o feedback</div></div></div><div class="qm-fbs">'+fbs(me.L,TUDO?0:3)+'</div>'+(nf>3?'<button class="qm-mais" onclick="qualTudo()">'+(TUDO?'Mostrar menos':'Ver todos os '+nf+' feedbacks')+'</button>':'')+'</div>'}
+  if(me){var nf=me.L.length;
+    h+='<div class="qm-me"><div class="qm-me-top"><div class="qm-n">'+me.q+'</div><div><div class="qm-t">Suas liga\u00E7\u00F5es avaliadas</div><div class="qm-s">'+(me.ac?me.ac+' com acordo \u00B7 ':'')+'veja o feedback</div></div></div><div class="qm-fbs">'+fbs(me.L,TUDO?0:3)+'</div>'+(nf>3?'<button class="qm-mais" onclick="qualTudo()">'+(TUDO?'Mostrar menos':'Ver todas as '+nf+' liga\u00E7\u00F5es')+'</button>':'')+'</div>'}
   else if(!A)h+='<div class="qm-me"><div class="qm-t">Suas liga\u00E7\u00F5es avaliadas</div><div class="qm-s">Ainda n\u00E3o ouvimos liga\u00E7\u00F5es suas nesse per\u00EDodo</div><div class="qm-sub">Assim que a monitoria ouvir, o feedback aparece aqui.</div></div>';
   if(!L.length)h+='<div class="qm-card"><div class="qm-vazio">Nenhuma liga\u00E7\u00E3o avaliada nesse per\u00EDodo ainda.</div></div>';
   else{h+='<div class="qm-card">'+L.map(function(x,i){var ab=A&&ABERTO===x.k;return '<div class="qm-row q2'+(i===eu?' me':'')+(A?' clk':'')+'"'+(A?' onclick="qualAbre(\''+esc(x.k).replace(/'/g,"\\'")+'\')"':'')+'><div class="qm-pos">'+(i+1)+'\u00BA</div><div class="qm-nome">'+curto(x.o)+'</div><div class="qm-nota">'+x.q+'<small>'+(x.q>1?'liga\u00E7\u00F5es':'liga\u00E7\u00E3o')+'</small></div><div class="qm-b"><i style="width:'+Math.round(100*x.q/mx)+'%;background:#1e4e7e"></i></div>'+(ab?'<div class="qm-det"><div class="qm-fbs">'+fbs(x.L)+'</div></div>':'')+'</div>'}).join('')+'</div>';
