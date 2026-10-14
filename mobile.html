@@ -1918,9 +1918,14 @@ function carregar(){
   fetch(API_Q+'?acao=placar&t='+Date.now()).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.erro);DQ=j.placar||[];TQ=Date.now();render()})
   .catch(function(){if(el)el.innerHTML=hdr()+'<div class="qm"><div class="qm-card"><div class="qm-vazio">N\u00E3o consegui carregar agora. Tente de novo em alguns minutos.</div></div></div>'});
 }
+// BLOQUEIO: enquanto LIBERADO=false, so admin ve a Qualidade das Ligacoes. Pra liberar pros operadores, troque pra true.
+var LIBERADO=false;
+function bloqueado(){return !LIBERADO&&!adm()}
+setInterval(function(){document.querySelectorAll('[data-t="qual"]').forEach(function(b){b.style.display=bloqueado()?'none':''})},800);
 var orig=window.go;
 window.go=function(t){
   if(t!=='qual')return orig(t);
+  if(bloqueado())return;
   try{curTab=t}catch(e){}
   document.querySelectorAll('.bar-btn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===t)});
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});

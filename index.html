@@ -3727,8 +3727,13 @@ window.qualCarregar=function(){
   fetch(API_Q+'?acao=placar&t='+Date.now()).then(r=>r.json()).then(j=>{if(!j.ok)throw new Error(j.erro);DQ=j.placar||[];TQ=Date.now();render()})
   .catch(()=>{if(el)el.innerHTML='<div class="q-card"><div class="q-vazio">N\u00E3o consegui carregar agora. Tente de novo em alguns minutos.</div></div>'});
 };
+// BLOQUEIO: enquanto LIBERADO=false, so admin ve a Qualidade das Ligacoes. Pra liberar pros operadores, troque pra true.
+const LIBERADO=false;
+const bloqueado=()=>!LIBERADO&&!isAdm();
+setInterval(()=>{const b=document.getElementById('sbQ');if(b)b.style.display=bloqueado()?'none':''},800);
 const sp=window.showPage;
 window.showPage=function(p){
+  if(p==='qualidade'&&bloqueado())return;
   sp(p);
   const pg=document.getElementById('pageQualidade'),sb=document.getElementById('sbQ');
   if(pg)pg.classList.toggle('active',p==='qualidade');if(sb)sb.classList.toggle('active',p==='qualidade');
