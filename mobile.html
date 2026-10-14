@@ -583,6 +583,16 @@ body.is-adm .op-only{display:none!important}
 .qm-leg{display:flex;flex-direction:column;gap:6px;font-size:.74rem;color:#6b7280;margin:12px 4px 0}
 .qm-leg span:before{content:'';display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
 .qm-vazio{padding:34px 10px;text-align:center;color:#6b7280;font-size:.86rem}
+
+.qm-row.q2{grid-template-columns:28px 1fr 70px}
+.qm-row.q2 .qm-nota{color:#0f3557;font-size:.95rem}.qm-row.q2 .qm-nota small{display:block;font-size:.6rem;font-weight:500;color:#6b7280}
+.qm-row.clk{cursor:pointer}
+.qm-det{grid-column:1/-1}
+.qm-fbs{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.qm-fb{background:#fff;color:#1a1f36;border-radius:12px;padding:11px 12px;border-left:4px solid var(--c,#0f3557);font-size:.8rem;line-height:1.45;border-top:1px solid #eef1f5;border-right:1px solid #eef1f5;border-bottom:1px solid #eef1f5}
+.qm-fb-t{font-size:.66rem;color:#6b7280;font-weight:600;margin-bottom:4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.qm-tag{font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:99px;background:#eef2f7;color:#374151}.qm-tag.ok{background:#dcfce7;color:#15803d}
+.qm-mais{border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:8px;padding:8px 12px;font-family:inherit;font-weight:600;font-size:.74rem;margin-top:10px;width:100%}
 </style>
 </head>
 <body>
@@ -1858,43 +1868,52 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch
 })();
 </script>
 <script id="edimo-qualidade-js">
-/* Qualidade das Ligações (mobile): nome + barra + nota, sem detalhes */
+/* Qualidade das Ligações (mobile): quantas ligações foram avaliadas + feedback (só o próprio). Sem nota. */
 (function(){
 var API_Q='https://script.google.com/macros/s/AKfycbyUX25htVlM8Fs0voi7QK3QzAlF15jYgtzehFG-oUlbP4w0S4efX_Pc7UlrAa0p1_IU/exec';
-var DQ=null,TQ=0,PER='mes';
+var DQ=null,TQ=0,PER='mes',ABERTO='',TUDO=false;
 function nz(t){return String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim()}
-function cor(n){return n>=75?'#16a34a':n>=55?'#d4a937':'#dc2626'}
-function st(n){return n>=75?'Mandando bem!':n>=55?'No caminho certo':'Bora melhorar'}
-function curto(n){var p=String(n).trim().split(/\s+/).map(function(w){return w.charAt(0)+w.slice(1).toLowerCase()});return p.length>1?p[0]+' '+p[p.length-1]:p[0]}
+function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function curto(n){var P=['de','da','do','das','dos','e'];var w=String(n).trim().toLowerCase().split(/\s+/);var r=[w[0]];for(var i=1;i<w.length;i++)if(P.indexOf(w[i])<0){r.push(w[i]);break}return r.map(function(x){return x.charAt(0).toUpperCase()+x.slice(1)}).join(' ')}
 function dt(s){var m=String(s).match(/(\d{2})\/(\d{2})\/(\d{4})/);return m?new Date(+m[3],+m[2]-1,+m[1]):null}
 function souEu(f){if(typeof cU==='undefined'||!cU)return false;var a=nz(f).split(' '),b=nz(cU.nome).split(' ');if(!a[0]||a[0]!==b[0])return false;if(b.length===1)return true;return b.slice(1).some(function(w){return w.length>2&&a.indexOf(w)>=0})}
 function adm(){return typeof cU!=='undefined'&&cU&&cU.perfil==='admin'}
 function filtra(){
   var h=new Date(),ini;h.setHours(0,0,0,0);
   if(PER==='hoje')ini=h;else if(PER==='semana'){ini=new Date(h);ini.setDate(h.getDate()-((h.getDay()+6)%7))}else ini=new Date(h.getFullYear(),h.getMonth(),1);
-  var g={};(DQ||[]).forEach(function(r){var d=dt(r.d);if(!d||d<ini)return;var k=String(r.o).trim().toUpperCase();if(!g[k])g[k]={o:r.o,s:0,q:0};g[k].s+=Number(r.n)||0;g[k].q++});
-  return Object.keys(g).map(function(k){var x=g[k];return{o:x.o,n:Math.round(x.s/x.q),q:x.q}}).sort(function(a,b){return b.n-a.n});
+  var g={};(DQ||[]).forEach(function(r){var d=dt(r.d);if(!d||d<ini)return;var k=String(r.o).trim().toUpperCase();if(!g[k])g[k]={o:r.o,k:k,q:0,ac:0,L:[]};g[k].q++;if(/^acordo/i.test(r.r||''))g[k].ac++;g[k].L.push(r)});
+  var L=Object.keys(g).map(function(k){return g[k]});
+  L.forEach(function(x){x.L.sort(function(a,b){return(dt(b.d)-dt(a.d))||String(b.h||'').localeCompare(String(a.h||''))})});
+  return L.sort(function(a,b){return b.q-a.q||curto(a.o).localeCompare(curto(b.o))});
+}
+function fbs(L,max){
+  var v=L.filter(function(r){return String(r.f||'').trim()});
+  if(!v.length)return '<div class="qm-fb"><div class="qm-fb-t">Sem feedback escrito ainda</div>Assim que a monitoria ouvir, o feedback aparece aqui.</div>';
+  return v.slice(0,max||v.length).map(function(r){var ok=/^acordo/i.test(r.r||'');return '<div class="qm-fb" style="--c:'+(ok?'#16a34a':'#d4a937')+'"><div class="qm-fb-t">'+esc(r.d)+(r.h?' \u00E0s '+esc(r.h):'')+(r.r?'<span class="qm-tag'+(ok?' ok':'')+'">'+(ok?'acordo':'sem acordo')+'</span>':'')+'</div>'+esc(r.f)+'</div>'}).join('');
 }
 function hdr(){return typeof hdrPadrao==='function'?hdrPadrao('Qualidade das Liga\u00E7\u00F5es',(typeof rankData!=='undefined'&&rankData&&rankData.d)||''):''}
 function render(){
   var el=document.getElementById('pgQual');if(!el)return;
-  var L=filtra(),eu=-1;L.forEach(function(x,i){if(eu<0&&souEu(x.o))eu=i});var me=eu>=0?L[eu]:null;
+  var L=filtra(),A=adm(),eu=-1,mx=1;L.forEach(function(x,i){if(eu<0&&souEu(x.o))eu=i;if(x.q>mx)mx=x.q});var me=eu>=0?L[eu]:null;
   function tab(k,t){return '<button class="'+(PER===k?'on':'')+'" onclick="qualPer(\''+k+'\')">'+t+'</button>'}
   var h=hdr()+'<div class="qm"><div class="qm-tabs">'+tab('hoje','Hoje')+tab('semana','Semana')+tab('mes','M\u00EAs')+'</div>';
-  if(me)h+='<div class="qm-me"><div class="qm-me-top"><div class="qm-n">'+me.n+'<small>/100</small></div><div><div class="qm-t">Sua nota</div><div class="qm-s">'+st(me.n)+'</div></div></div><div class="qm-bar"><i style="width:'+me.n+'%;background:'+cor(me.n)+'"></i></div><div class="qm-sub">'+(eu+1)+'\u00BA de '+L.length+' \u00B7 '+me.q+' liga\u00E7'+(me.q>1?'\u00F5es ouvidas':'\u00E3o ouvida')+'</div></div>';
-  else if(!adm())h+='<div class="qm-me"><div class="qm-t">Sua nota</div><div class="qm-s">Ainda n\u00E3o ouvimos liga\u00E7\u00F5es suas nesse per\u00EDodo</div><div class="qm-sub">Assim que a monitoria ouvir, sua nota aparece aqui.</div></div>';
+  if(me){var nf=me.L.filter(function(r){return String(r.f||'').trim()}).length;
+    h+='<div class="qm-me"><div class="qm-me-top"><div class="qm-n">'+me.q+'</div><div><div class="qm-t">Suas liga\u00E7\u00F5es avaliadas</div><div class="qm-s">'+(me.ac?me.ac+' com acordo \u00B7 ':'')+'veja o feedback</div></div></div><div class="qm-fbs">'+fbs(me.L,TUDO?0:3)+'</div>'+(nf>3?'<button class="qm-mais" onclick="qualTudo()">'+(TUDO?'Mostrar menos':'Ver todos os '+nf+' feedbacks')+'</button>':'')+'</div>'}
+  else if(!A)h+='<div class="qm-me"><div class="qm-t">Suas liga\u00E7\u00F5es avaliadas</div><div class="qm-s">Ainda n\u00E3o ouvimos liga\u00E7\u00F5es suas nesse per\u00EDodo</div><div class="qm-sub">Assim que a monitoria ouvir, o feedback aparece aqui.</div></div>';
   if(!L.length)h+='<div class="qm-card"><div class="qm-vazio">Nenhuma liga\u00E7\u00E3o avaliada nesse per\u00EDodo ainda.</div></div>';
-  else{h+='<div class="qm-card">'+L.map(function(x,i){return '<div class="qm-row'+(i===eu?' me':'')+'"><div class="qm-pos">'+(i+1)+'\u00BA</div><div class="qm-nome">'+curto(x.o)+'</div><div class="qm-nota" style="color:'+cor(x.n)+'">'+x.n+'</div><div class="qm-b"><i style="width:'+x.n+'%;background:'+cor(x.n)+'"></i></div></div>'}).join('')+'</div>';
-    h+='<div class="qm-leg"><span style="--c:#16a34a">75+ mandando bem</span><span style="--c:#d4a937">55 a 74 no caminho</span><span style="--c:#dc2626">abaixo de 55 bora melhorar</span></div>'}
+  else{h+='<div class="qm-card">'+L.map(function(x,i){var ab=A&&ABERTO===x.k;return '<div class="qm-row q2'+(i===eu?' me':'')+(A?' clk':'')+'"'+(A?' onclick="qualAbre(\''+esc(x.k).replace(/'/g,"\\'")+'\')"':'')+'><div class="qm-pos">'+(i+1)+'\u00BA</div><div class="qm-nome">'+curto(x.o)+'</div><div class="qm-nota">'+x.q+'<small>'+(x.q>1?'liga\u00E7\u00F5es':'liga\u00E7\u00E3o')+'</small></div><div class="qm-b"><i style="width:'+Math.round(100*x.q/mx)+'%;background:#1e4e7e"></i></div>'+(ab?'<div class="qm-det"><div class="qm-fbs">'+fbs(x.L)+'</div></div>':'')+'</div>'}).join('')+'</div>';
+    h+='<div class="qm-leg"><span style="--c:#1e4e7e">'+(A?'Admin: toque num operador pra ver os feedbacks dele':'Barra = liga\u00E7\u00F5es avaliadas no per\u00EDodo. Seu feedback s\u00F3 aparece pra voc\u00EA.')+'</span></div>'}
   el.innerHTML=h+'</div>';
 }
-window.qualPer=function(p){PER=p;render()};
+window.qualPer=function(p){PER=p;ABERTO='';render()};
+window.qualTudo=function(){TUDO=!TUDO;render()};
+window.qualAbre=function(k){ABERTO=ABERTO===k?'':k;render()};
 function carregar(){
   var el=document.getElementById('pgQual');
-  if(DQ&&Date.now()-TQ<5*60000)return render();
+  if(DQ&&Date.now()-TQ<3*60000)return render();
   if(el&&!DQ)el.innerHTML=hdr()+'<div class="qm"><div class="qm-vazio">Carregando...</div></div>';
-  fetch(API_Q+'?acao=placar').then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.erro);DQ=j.placar||[];TQ=Date.now();render()})
-  .catch(function(){if(el)el.innerHTML=hdr()+'<div class="qm"><div class="qm-card"><div class="qm-vazio">N\u00E3o consegui carregar as notas agora. Tente de novo em alguns minutos.</div></div></div>'});
+  fetch(API_Q+'?acao=placar&t='+Date.now()).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.erro);DQ=j.placar||[];TQ=Date.now();render()})
+  .catch(function(){if(el)el.innerHTML=hdr()+'<div class="qm"><div class="qm-card"><div class="qm-vazio">N\u00E3o consegui carregar agora. Tente de novo em alguns minutos.</div></div></div>'});
 }
 var orig=window.go;
 window.go=function(t){
