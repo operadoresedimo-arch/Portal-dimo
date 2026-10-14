@@ -3401,7 +3401,7 @@ const PART=['de','da','do','das','dos','e'];
 const nc=n=>{const w=String(n).toLowerCase().split(' ').filter(Boolean);const r=[w[0]];const seg=w.slice(1).find(p=>!PART.includes(p));if(seg)r.push(seg);return r.filter(Boolean).map(p=>p.charAt(0).toUpperCase()+p.slice(1)).join(' ')};
 const ini=n=>nc(n).split(' ').map(p=>p.charAt(0)).join('').slice(0,2);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const temRes=l=>{const r=String(l.resultado||'').toLowerCase();return r.indexOf('acordo')===0||r.indexOf('retorno')>=0};
+const temRes=l=>{const r=String(l.resultado||'').toLowerCase();return r.indexOf('acordo')===0};
 const root=()=>$('pageAvaliacao');
 const vs=(n,eq)=>'<span class="'+(n>=eq?'avd-up':'avd-down')+'">'+(n>=eq?'▲ ':'▼ ')+Math.abs(n-eq).toFixed(0)+'</span> <span class="avd-mut">vs equipe</span>';
 
@@ -3441,8 +3441,8 @@ function filt(){
   const grp=$('avdGrp'),g=grp?grp.value:'';
   return DADOS.filter(l=>noPer(l.data)&&(!g||l.grupo===g));
 }
-const CNOME={abertura:'Abertura e identificação',motivo:'Explicou o motivo',avista:'Ofereceu à vista primeiro',objecao:'Contornou a objeção',escada:'Insistiu na negociação',valores:'Valores claros e corretos',saida:'Saiu com resultado',fechamento:'Fechamento formal'};
-const CFRACO={abertura:'Abertura fraca',motivo:'Não explica o motivo',avista:'Não oferece à vista primeiro',objecao:'Trava na objeção',escada:'Desiste sem negociar',valores:'Valores confusos',saida:'Encerra sem resultado',fechamento:'Fechamento incompleto'};
+const CNOME={abertura:'Abertura e identificação',motivo:'Explicou o motivo',avista:'Apresentou as opções',objecao:'Contornou a objeção',escada:'Insistiu na negociação',valores:'Valores claros e corretos',saida:'Buscou o fechamento',fechamento:'Fechamento formal',ganho:'Mostrou o ganho de pagar'};
+const CFRACO={abertura:'Abertura fraca',motivo:'Não explica o motivo',avista:'Não apresenta as opções',objecao:'Trava na objeção',escada:'Desiste sem negociar',valores:'Valores confusos',saida:'Não busca o fechamento',fechamento:'Fechamento incompleto',ganho:'Não mostra o ganho de pagar'};
 function cm(ls){const m={};ls.forEach(l=>l.criterios.forEach(c=>{if(!m[c.id])m[c.id]={nome:c.nome,fraco:c.fraco,p:0,max:0};m[c.id].p+=+c.pontos;m[c.id].max+=+c.max}));Object.keys(m).forEach(k=>m[k].pct=m[k].max?m[k].p/m[k].max*100:0);return m}
 function kpi(c,v,l,s,vw){const at=vw==='rank'?VIEW==='':VIEW===vw;return '<div class="avd-k'+(vw?' clk'+(at?' on':''):'')+'" style="--c:'+c+'"'+(vw?' onclick="avd.ver(\''+vw+'\')"':'')+'><div class="avd-kv">'+v+'</div><div class="avd-kl">'+l+'</div>'+(s?'<div class="avd-ks">'+s+'</div>':'')+(vw?'<div class="avd-hint">'+(vw==='rank'?(at?'ranking de qualidade':'clique pra voltar ao ranking'):(at?'clique pra voltar ao ranking':'clique pra detalhar'))+'</div>':'')+'</div>'}
 let VIEW='',CRIT='';
@@ -3463,7 +3463,7 @@ function render(){
   let h='<div class="avd-kpis">'+
     kpi('#1e4e7e',ls.length,'Ligações avaliadas',lin.length+' operadores','rank')+
     kpi('#d4a937',eq.toFixed(0),'Nota média da equipe','de 100 pontos','nota')+
-    kpi('#16a34a',(ls.length?(ls.filter(temRes).length/ls.length*100).toFixed(0):0)+'%','Saíram com acordo ou retorno','','res')+
+    kpi('#16a34a',(ls.length?(ls.filter(temRes).length/ls.length*100).toFixed(0):0)+'%','Saíram com acordo','','res')+
     kpi('#dc2626','<span style="font-size:1rem">'+(fr?esc(fr.fraco||fr.nome):'-')+'</span>','Principal erro da equipe',fr?fr.pct.toFixed(0)+'% de aproveitamento':'','erro')+
     (FUNIL?(()=>{const t=funilTot(funilFilt().filter(x=>x.tipo==='total'));return kpi('#7c3aed',fmtN(t.dis),'Discagens no período',fmtN(t.atd)+' atendidas · '+fmtN(t.aco)+' acordos','funil')})():'')+'</div>';
   if(VIEW){$('avdBody').innerHTML=h+visao(ls,lin,c,eq);return}
@@ -3482,7 +3482,7 @@ function detalhe(opEnc){
   const rank=Object.keys(rk).map(o=>[o,med(rk[o])]).sort((x,y)=>y[1]-x[1]),pos=rank.findIndex(r=>r[0]===op)+1;
   const co=cm(a),ce=cm(todos),ac=top(a,'acertos'),er=top(a,'erros'),nm=esc(nc(op));
   let h='<div class="avd-prof"><div class="avd-av">'+esc(ini(op))+'</div><div><h2>'+nm+(a[0]&&a[0].grupo==='novato'?' <span class="avd-tag">novato</span>':'')+'</h2><p>'+esc(op)+'</p></div><button class="avd-back" onclick="avd.render()">← Voltar</button></div>';
-  h+='<div class="avd-kpis">'+kpi('#d4a937',n.toFixed(0),'Nota média',vs(n,eq)+' ('+eq.toFixed(0)+')')+kpi('#1e4e7e',pos+'º','Posição no ranking','de '+rank.length+' operadores')+kpi('#16a34a',a.length,'Ligações ouvidas',a.filter(temRes).length+' com acordo ou retorno')+kpi('#b45309',a.filter(l=>!l.feedback_dado).length,'Feedback pendente')+'</div>';
+  h+='<div class="avd-kpis">'+kpi('#d4a937',n.toFixed(0),'Nota média',vs(n,eq)+' ('+eq.toFixed(0)+')')+kpi('#1e4e7e',pos+'º','Posição no ranking','de '+rank.length+' operadores')+kpi('#16a34a',a.length,'Ligações ouvidas',a.filter(temRes).length+' com acordo')+kpi('#b45309',a.filter(l=>!l.feedback_dado).length,'Feedback pendente')+'</div>';
   h+='<div class="avd-card"><div class="avd-ct">Critério a critério · '+nm+' x equipe</div><div class="avd-pad"><div class="avd-leg"><i style="background:#0f3557"></i>'+nm+'<i style="background:#c7d2e0"></i>Média da equipe</div>'+
    Object.keys(ce).map(id=>{const c=ce[id],o=co[id]?co[id].pct:0;return '<div class="avd-crit"><div class="l"><span>'+esc(c.nome)+'</span><span><b class="'+(o>=c.pct?'avd-up':'avd-down')+'">'+o.toFixed(0)+'%</b> <span class="avd-mut">/ equipe '+c.pct.toFixed(0)+'%</span></span></div><div class="avd-bar"><i class="e" style="width:'+c.pct+'%"></i><i class="o" style="width:'+o+'%"></i></div></div>'}).join('')+'</div></div>';
   const lst=(arr,ic)=>arr.length?'<ul class="avd-lst">'+arr.map(x=>'<li><span>'+ic+'</span><span>'+esc(x[0])+'</span><b>'+x[1]+'x</b></li>').join('')+'</ul>':'<div class="avd-empty" style="padding:14px">Sem dados ainda</div>';
