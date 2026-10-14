@@ -3720,11 +3720,13 @@ function render(){
 window.qualPer=function(p){PER=p;ABERTO='';render()};
 window.qualTudo=function(){TUDO=!TUDO;render()};
 window.qualAbre=function(k){ABERTO=ABERTO===k?'':k;render()};
+function chaveQ(){let k=localStorage.getItem('avd_chave')||'';if(!k){k=prompt('Senha da monitoria (a mesma da aba Avalia\u00E7\u00E3o):')||'';if(k)localStorage.setItem('avd_chave',k)}return k}
 window.qualCarregar=function(){
   const el=document.getElementById('pageQualidade');
   if(DQ&&Date.now()-TQ<3*60000)return render();
   if(el&&!DQ)el.innerHTML='<div class="loading-msg">Carregando...</div>';
-  fetch(API_Q+'?acao=placar&t='+Date.now()).then(r=>r.json()).then(j=>{if(!j.ok)throw new Error(j.erro);DQ=j.placar||[];TQ=Date.now();render()})
+  const k=chaveQ();if(!k){if(el)el.innerHTML='<div class="q-card"><div class="q-vazio">Precisa da senha da monitoria pra ver.</div></div>';return}
+  fetch(API_Q+'?acao=placar&chave='+encodeURIComponent(k)+'&t='+Date.now()).then(r=>r.json()).then(j=>{if(!j.ok){if(/chave/.test(j.erro||'')){localStorage.removeItem('avd_chave');DQ=null}throw new Error(j.erro)}DQ=j.placar||[];TQ=Date.now();render()})
   .catch(()=>{if(el)el.innerHTML='<div class="q-card"><div class="q-vazio">N\u00E3o consegui carregar agora. Tente de novo em alguns minutos.</div></div>'});
 };
 // BLOQUEIO: enquanto LIBERADO=false, so admin ve a Qualidade das Ligacoes. Pra liberar pros operadores, troque pra true.
