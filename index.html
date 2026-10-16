@@ -2523,7 +2523,7 @@ async function loadEntradas(){
   }catch(e){console.log('Error loading entradas:',e);}
 }
 
-setInterval(async function(){try{await loadPonto();updateFaltaAlert();if(cRD&&document.getElementById('pageRanking')&&document.getElementById('pageRanking').offsetParent)renderR(cRD);}catch(e){}},300000); // ponto atualiza a cada 5 min
+setInterval(async function(){try{await loadPonto();updateFaltaAlert();if(cRD&&document.getElementById('pageRanking')&&document.getElementById('pageRanking').offsetParent){const y=window.scrollY,mc=document.querySelector('.main,.content,main');const my=mc?mc.scrollTop:0;renderR(cRD);window.scrollTo(0,y);if(mc)mc.scrollTop=my}}catch(e){}},300000); // ponto atualiza a cada 5 min
 async function startApp(){showNav();showPage('ranking');const h=window.location.hash;if(h&&h.startsWith('#d=')){try{const j=LZString.decompressFromEncodedURIComponent(h.substring(3));if(j){cRD=JSON.parse(j);renderR(cRD);loadEntradas().then(function(){renderR(cRD)});loadCompDrive();return}}catch(e){}}await loadDrive();await loadEntradas();if(cRD)renderR(cRD);loadCompDrive();}
 
 async function loadDrive(){const rl0=document.getElementById('rankLoading');if(rl0)rl0.style.display='block';try{await loadPonto();const r=await fetch(RK+'&t='+Date.now());const csv=await r.text();const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{document.getElementById('rankLoading').innerHTML='Nenhum dado encontrado.'}}catch(e){document.getElementById('rankLoading').innerHTML='Erro ao carregar.'}}
@@ -3926,7 +3926,7 @@ function render(){
   if(!EL)return;
   var L=filtrados(),n=L.length,ac=L.filter(function(r){return /^acordo/i.test(r.r||'')}).length;
   function tab(k,t){return '<button class="'+(PER===k?'on':'')+'" onclick="MQ_per(\''+k+'\')">'+t+'</button>'}
-  var h=hdrQ()+'<div class="mq"><div class="mq-tabs">'+tab('semana','Semana')+tab('mes','M\u00EAs')+tab('tudo','60 dias')+seletor('')+'</div>';
+  var h=hdrQ()+'<div class="mq"><div class="mq-tabs">'+tab('semana','Semana')+tab('mes','M\u00EAs')+tab('tudo','60 dias')+(/class="hoje"/.test(HDR)?'':seletor(''))+'</div>';
   h+='<div class="mq-hero"><div class="mq-hero-top"><div class="mq-n">'+n+'</div><div><div class="mq-t">Suas liga\u00E7\u00F5es avaliadas</div><div class="mq-s">'+(n?(PER==='dia'?'Em '+DIA+': veja o que manter e o que mudar':'Veja abaixo o que manter e o que mudar'):(PER==='dia'?'Nenhuma liga\u00E7\u00E3o sua avaliada em '+DIA:'Nenhuma liga\u00E7\u00E3o sua avaliada nesse per\u00EDodo'))+'</div></div></div>';
   if(n)h+='<div class="mq-chips"><span class="mq-chip"><b>'+ac+'</b> com acordo</span><span class="mq-chip"><b>'+(n-ac)+'</b> sem acordo</span></div>';
   h+='</div>';
@@ -3944,16 +3944,18 @@ function foot(){return '<div class="mq-foot">A monitoria ouve algumas liga\u00E7
 function pedeSenha(msg){
   EL.innerHTML=HDR+'<div class="mq"><div class="mq-card mq-pw"><div class="mq-h">Confirme sua senha</div><div class="mq-sub">Pra sua seguran\u00E7a, s\u00F3 voc\u00EA pode ver as suas liga\u00E7\u00F5es. Digite a senha do portal uma vez neste aparelho.</div><input type="password" id="mqSenha" placeholder="Sua senha" onkeydown="if(event.key===\'Enter\')MQ_entrar()"><br><button onclick="MQ_entrar()">Ver minhas liga\u00E7\u00F5es</button>'+(msg?'<div class="mq-err">'+esc(msg)+'</div>':'')+'</div></div>';
 }
-function busca(b){
-  EL.innerHTML=HDR+'<div class="mq"><div class="mq-vazio">Carregando suas liga\u00E7\u00F5es...</div></div>';
+function keepRender(){var y=window.scrollY;render();window.scrollTo(0,y)}
+function busca(b,silencioso){
+  if(!silencioso)EL.innerHTML=HDR+'<div class="mq"><div class="mq-vazio">Carregando suas liga\u00E7\u00F5es...</div></div>';
   b.type='minhas';b.login=key();
   post(b).then(function(j){
-    if(j.status!=='ok'){if(j.relogin){try{localStorage.removeItem('mq_tok')}catch(e){}return pedeSenha(b.senha!==undefined?'Senha incorreta.':'')}throw new Error(j.msg)}
-    if(j.token)tokSet(j.token);D=j.ligacoes||[];TD=Date.now();KEYD=key();ABR={};
+    if(j.status!=='ok'){if(j.relogin){try{localStorage.removeItem('mq_tok')}catch(e){}D=null;return pedeSenha(b.senha!==undefined?'Senha incorreta.':'')}throw new Error(j.msg)}
+    if(j.token)tokSet(j.token);var mudou=JSON.stringify(j.ligacoes||[])!==JSON.stringify(D||[]);D=j.ligacoes||[];TD=Date.now();KEYD=key();
     try{localStorage.setItem('mq_cache',JSON.stringify({k:key(),t:Date.now(),d:D}))}catch(e){}
-    render();
+    if(!silencioso){ABR={};render()}else if(mudou&&EL&&EL.offsetParent!==null)keepRender();
   }).catch(function(e){
     var motivo=String((e&&e.message)||'sem resposta');
+    if(silencioso)return;   // ja esta mostrando os dados salvos: so tenta de novo na proxima vez
     if(!b._tentou){b._tentou=1;delete b.type;return setTimeout(function(){busca(b)},2500)}   // tenta mais uma vez sozinho
     var c=null;try{c=JSON.parse(localStorage.getItem('mq_cache')||'null')}catch(x){}
     if(c&&c.k===key()&&c.d){D=c.d;TD=0;KEYD=key();render();var av=document.createElement('div');av.className='mq-foot';av.style.cssText='color:#b45309;margin:0 0 10px';av.textContent='Mostrando os dados salvos em '+new Date(c.t).toLocaleString('pt-BR')+' (n\u00E3o consegui atualizar agora: '+motivo+').';var m=EL.querySelector('.mq');if(m)m.insertBefore(av,m.firstChild);return}
@@ -3962,8 +3964,10 @@ function busca(b){
 window.MQ_abrir=function(el,hdr){
   EL=el;HDR=hdr||'';if(!EL)return;
   if(!URLP||!key()){EL.innerHTML=HDR+'<div class="mq"><div class="mq-vazio">Entre com seu login pra ver suas liga\u00E7\u00F5es.</div></div>';return}
-  if(D&&KEYD===key()&&Date.now()-TD<3*60000)return render();
-  var t=tokGet();if(!t)return pedeSenha('');
+  var t=tokGet();
+  if(!(D&&KEYD===key())){var c=null;try{c=JSON.parse(localStorage.getItem('mq_cache')||'null')}catch(e){}if(c&&c.k===key()&&c.d){D=c.d;KEYD=key();TD=0}}
+  if(D&&KEYD===key()){render();if(t&&Date.now()-TD>2*60000)busca({token:t},true);return}   // abre na hora com o que ja tem
+  if(!t)return pedeSenha('');
   busca({token:t});
 };
 window.MQ_entrar=function(){var s=(document.getElementById('mqSenha')||{}).value||'';if(!s)return;busca({senha:s})};
@@ -3974,6 +3978,7 @@ window.MQ_abre=function(i){ABR[i]=!ABR[i];render()};
 window.MQ_ouvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(fr){fr.remove();b.textContent='\u25B6 Ouvir a liga\u00E7\u00E3o';return}fr=document.createElement('iframe');fr.src=b.getAttribute('data-src');fr.allow='autoplay';w.appendChild(fr);b.textContent='\u25A0 Fechar \u00E1udio'};
 })();
 </script>
+
 
 
 
