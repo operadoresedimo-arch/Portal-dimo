@@ -2318,6 +2318,7 @@ function pontoStatus(p,opName){
   const s=p.status.toUpperCase();
   if(s.includes('PRESENTE'))return'ok';
   if(s.includes('ATRASADO'))return'late';
+  if(s.includes('AGUARDANDO'))return'pending';
   if(!shiftStarted(opName||p.nome))return'pending';
   return'miss';
 }
@@ -2415,7 +2416,8 @@ function updateFaltaAlert(){
   if(!el||!pontoData)return;
   const faltas=pontoData.filter(p=>{
     const s=p.status.toUpperCase();
-    if(s.includes('PRESENTE')||s.includes('ATRASADO'))return false;
+    if(s.includes('PRESENTE')||s.includes('ATRASADO')||s.includes('AGUARDANDO'))return false;
+    if(!s.includes('FALTOU'))return false;
     return shiftStarted(p.nome);
   });
   if(faltas.length===0){el.style.display='none';const fp=document.getElementById('sbFaltaPanel');if(fp)fp.style.display='none';return;}
@@ -2502,6 +2504,7 @@ async function loadEntradas(){
   }catch(e){console.log('Error loading entradas:',e);}
 }
 
+setInterval(async function(){try{await loadPonto();updateFaltaAlert();if(cRD&&document.getElementById('pageRanking')&&document.getElementById('pageRanking').offsetParent)renderR(cRD);}catch(e){}},300000); // ponto atualiza a cada 5 min
 async function startApp(){showNav();showPage('ranking');const h=window.location.hash;if(h&&h.startsWith('#d=')){try{const j=LZString.decompressFromEncodedURIComponent(h.substring(3));if(j){cRD=JSON.parse(j);renderR(cRD);loadEntradas();loadCompDrive();return}}catch(e){}}await loadDrive();await loadEntradas();loadCompDrive();}
 
 async function loadDrive(){document.getElementById('rankLoading').style.display='block';try{await loadPonto();const r=await fetch(RK+'&t='+Date.now());const csv=await r.text();const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{document.getElementById('rankLoading').innerHTML='Nenhum dado encontrado.'}}catch(e){document.getElementById('rankLoading').innerHTML='Erro ao carregar.'}}
@@ -2545,7 +2548,7 @@ function renderR(data){
   h+='<div class="stat-card"><div class="sc-left sc-valor">💰</div><div class="sc-right"><div class="sc-label">Valor Total</div><div class="sc-val purple">'+fs(tv)+'</div></div></div>';
   h+='<div class="stat-card"><div class="sc-left sc-ops">👥</div><div class="sc-right"><div class="sc-label">Operadores</div><div class="sc-val cyan">'+allOps.length+'</div></div></div>';
   let ptOk=0,ptLate=0,ptMiss=0;
-  if(pontoData){pontoData.forEach(p=>{const s=p.status.toUpperCase();if(s.includes('PRESENTE'))ptOk++;else if(s.includes('ATRASADO'))ptLate++;else ptMiss++;});}
+  if(pontoData){pontoData.forEach(p=>{const s=p.status.toUpperCase();if(s.includes('PRESENTE'))ptOk++;else if(s.includes('ATRASADO'))ptLate++;else if(s.includes('FALTOU'))ptMiss++;});}
   if(pontoData)h+='<div class="stat-card"><div class="sc-left sc-ponto">📍</div><div class="sc-right"><div class="sc-label">Ponto</div><div class="sc-val" style="font-size:.7rem"><span style="color:var(--green)">'+ptOk+'</span> · <span style="color:#e67e22">'+ptLate+'</span> · <span style="color:var(--red)">'+ptMiss+'</span></div></div></div>';
   h+='</div>';
   h+='<div class="dash-grid" style="grid-template-columns:1fr">';
