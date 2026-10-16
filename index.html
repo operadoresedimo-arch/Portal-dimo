@@ -2222,9 +2222,9 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 <script>
 const SH='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?gid=92433521&single=true&output=csv';
 const RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XSTNkcp2pbSTKTsVsygCKucMChmcI4hTZkC_pNEsuFNeQ/pub?output=csv';
-const CP_M1='https://docs.google.com/spreadsheets/d/e/2PACX-1vTgVTpekyWnlnCtyKnOgisBZ9YM8WOOoNGe6XKH2PslfxaI3GIdjt4g_hEtLJtqYQ/pub?output=csv';
-const CP_M2='https://docs.google.com/spreadsheets/d/e/2PACX-1vRrs4woT4Rad3tsqEnkRBkBy4mOvXlP-3s24bIOQ3gaxRgPjfH3Lqw4PgMa1qfo-Q/pub?output=csv';
-const CP_NOW='https://docs.google.com/spreadsheets/d/e/2PACX-1vQt4Q6crwYKFDr0p6kbTVwk20IRpUXBvN3Ouftu4DTkle0CoUmbd3PGSikOG14Wdw/pub?output=csv';
+const CP_M1='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
+const CP_M2='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
+const CP_NOW='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=mes%20atual.xlsx';
 const PT='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?output=csv';
 let cU=null,cRD=null;const cD=[null,null,null];let allEntradas={};let allLogins={};let allAdmissao={};let pontoData=null;
 
@@ -2699,21 +2699,27 @@ function parseCompCSV(text){
   return{period,ops};
 }
 
+async function compRemota(url){
+  const j=await fetch(url+'&t='+Date.now()).then(r=>r.json());
+  if(!j.ok)throw new Error(j.msg||'arquivo nao encontrado');
+  const bin=atob(j.base64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
+  const wb=XLSX.read(a,{type:'array'}),csv=XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]]);
+  return parseCompCSV(csv);
+}
 async function loadCompDrive(){
   try{
-    const[r1,r2,r3]=await Promise.all([fetch(CP_M1+'&t='+Date.now()),fetch(CP_M2+'&t='+Date.now()),fetch(CP_NOW+'&t='+Date.now())]);
-    const csvs=[await r1.text(),await r2.text(),await r3.text()];
-    csvs.forEach((csv,idx)=>{
-      const d=parseCompCSV(csv);
-      if(d&&d.ops.length>0){
-        cD[idx]=d;
-        const el=document.getElementById('slot'+idx);
-        if(el){el.classList.add('loaded');el.querySelector('.slot-icon').textContent='✅';const de=document.getElementById('sd'+idx);de.textContent=d.period;de.style.display='block';}
-      }
-    });
+    const ds=await Promise.all([compRemota(CP_M1),compRemota(CP_M2),compRemota(CP_NOW)]);
+    ds.forEach((d,idx)=>{if(d&&d.ops.length>0){cD[idx]=d;const el=document.getElementById('slot'+idx);if(el){el.classList.add('loaded');el.querySelector('.slot-icon').textContent='✅';const de=document.getElementById('sd'+idx);de.textContent=d.period;de.style.display='block';}}});
     autoComp();
   }catch(e){console.log('Comp Drive error:',e);}
 }
+var compRefreshBusy=false;
+async function atualizarComissoesSilencioso(){
+  if(compRefreshBusy||document.hidden)return;
+  compRefreshBusy=true;var y=window.scrollY;
+  try{await loadCompDrive();window.scrollTo(0,y)}finally{compRefreshBusy=false}
+}
+setInterval(atualizarComissoesSilencioso,300000); // atualiza Drive a cada 5 min sem voltar ao inicio
 
 function getMeta(cfg){
   if(!cfg)return null;const c=cfg.toLowerCase();

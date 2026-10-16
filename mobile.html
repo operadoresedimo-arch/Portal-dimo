@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#0f2440">
 <link rel="apple-touch-icon" href="logo192.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(180deg,#eef2f7,#f5f7fa);color:#1a1f36;min-height:100vh;-webkit-font-smoothing:antialiased}
@@ -684,9 +685,9 @@ body.is-adm .op-only{display:none!important}
 var SH='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?gid=92433521&single=true&output=csv';
 var RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XSTNkcp2pbSTKTsVsygCKucMChmcI4hTZkC_pNEsuFNeQ/pub?output=csv';
 var PT='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?output=csv';
-var CP_M1='https://docs.google.com/spreadsheets/d/e/2PACX-1vTgVTpekyWnlnCtyKnOgisBZ9YM8WOOoNGe6XKH2PslfxaI3GIdjt4g_hEtLJtqYQ/pub?output=csv';
-var CP_M2='https://docs.google.com/spreadsheets/d/e/2PACX-1vRrs4woT4Rad3tsqEnkRBkBy4mOvXlP-3s24bIOQ3gaxRgPjfH3Lqw4PgMa1qfo-Q/pub?output=csv';
-var CP_NOW='https://docs.google.com/spreadsheets/d/e/2PACX-1vQt4Q6crwYKFDr0p6kbTVwk20IRpUXBvN3Ouftu4DTkle0CoUmbd3PGSikOG14Wdw/pub?output=csv';
+var CP_M1='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
+var CP_M2='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
+var CP_NOW='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=mes%20atual.xlsx';
 var cU=null,rankData=null,pontoData=null,compMonths=[null,null,null];
 // loginMap: {cobmaisLogin: fullName} e.g. {"1.gislaine.batista":"Gislaine Miranda Batista"}
 // nameMap: {fullNameLower: cobmaisLogin}
@@ -962,15 +963,23 @@ function loadPonto(){
   }).catch(function(){});
 }
 
-function loadComp(){
-  return Promise.all([
-    fetch(CP_M1+'&t='+Date.now()).then(function(r){return r.text()}),
-    fetch(CP_M2+'&t='+Date.now()).then(function(r){return r.text()}),
-    fetch(CP_NOW+'&t='+Date.now()).then(function(r){return r.text()})
-  ]).then(function(csvs){
-    csvs.forEach(function(csv,idx){compMonths[idx]=parseCompCSV(csv)});
-  }).catch(function(e){console.log('Comp error:',e)});
+function compRemota(url){
+  return fetch(url+'&t='+Date.now()).then(function(r){return r.json()}).then(function(j){
+    if(!j.ok)throw new Error(j.msg||'arquivo nao encontrado');
+    var bin=atob(j.base64),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
+    var wb=XLSX.read(a,{type:'array'}),csv=XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]]);return parseCompCSV(csv);
+  });
 }
+function loadComp(){
+  return Promise.all([compRemota(CP_M1),compRemota(CP_M2),compRemota(CP_NOW)]).then(function(ds){ds.forEach(function(d,idx){compMonths[idx]=d})}).catch(function(e){console.log('Comp error:',e)});
+}
+var compRefreshBusy=false;
+function atualizarComissoesSilencioso(){
+  if(compRefreshBusy||document.hidden)return;
+  compRefreshBusy=true;var y=window.scrollY;
+  loadComp().then(function(){salvarCache();if(curTab==='comp'||curTab==='comissao'||curTab==='beneficios'||curTab==='turnos'||curTab==='compgeral')goKeep(curTab);window.scrollTo(0,y)}).finally(function(){compRefreshBusy=false});
+}
+setInterval(atualizarComissoesSilencioso,300000); // atualiza as planilhas do Drive a cada 5 min, sem mexer na tela
 
 function parseCompCSV(text){
   var lines=text.split('\n'),period='';
