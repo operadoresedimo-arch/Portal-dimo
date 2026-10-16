@@ -2104,8 +2104,15 @@ function busca(b){
   b.type='minhas';b.login=key();
   post(b).then(function(j){
     if(j.status!=='ok'){if(j.relogin){try{localStorage.removeItem('mq_tok')}catch(e){}return pedeSenha(b.senha!==undefined?'Senha incorreta.':'')}throw new Error(j.msg)}
-    if(j.token)tokSet(j.token);D=j.ligacoes||[];TD=Date.now();KEYD=key();ABR={};render();
-  }).catch(function(){EL.innerHTML=HDR+'<div class="mq"><div class="mq-card"><div class="mq-vazio">N\u00E3o consegui carregar agora. Tente de novo em alguns minutos.</div></div></div>'});
+    if(j.token)tokSet(j.token);D=j.ligacoes||[];TD=Date.now();KEYD=key();ABR={};
+    try{localStorage.setItem('mq_cache',JSON.stringify({k:key(),t:Date.now(),d:D}))}catch(e){}
+    render();
+  }).catch(function(e){
+    var motivo=String((e&&e.message)||'sem resposta');
+    if(!b._tentou){b._tentou=1;delete b.type;return setTimeout(function(){busca(b)},2500)}   // tenta mais uma vez sozinho
+    var c=null;try{c=JSON.parse(localStorage.getItem('mq_cache')||'null')}catch(x){}
+    if(c&&c.k===key()&&c.d){D=c.d;TD=0;KEYD=key();render();var av=document.createElement('div');av.className='mq-foot';av.style.cssText='color:#b45309;margin:0 0 10px';av.textContent='Mostrando os dados salvos em '+new Date(c.t).toLocaleString('pt-BR')+' (n\u00E3o consegui atualizar agora: '+motivo+').';var m=EL.querySelector('.mq');if(m)m.insertBefore(av,m.firstChild);return}
+    EL.innerHTML=HDR+'<div class="mq"><div class="mq-card"><div class="mq-vazio">N\u00E3o consegui carregar agora. Tente de novo em alguns minutos.<br><small style="color:#9ca3af">Motivo: '+esc(motivo)+'</small></div></div></div>'});
 }
 window.MQ_abrir=function(el,hdr){
   EL=el;HDR=hdr||'';if(!EL)return;
@@ -2122,6 +2129,7 @@ window.MQ_abre=function(i){ABR[i]=!ABR[i];render()};
 window.MQ_ouvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(fr){fr.remove();b.textContent='\u25B6 Ouvir a liga\u00E7\u00E3o';return}fr=document.createElement('iframe');fr.src=b.getAttribute('data-src');fr.allow='autoplay';w.appendChild(fr);b.textContent='\u25A0 Fechar \u00E1udio'};
 })();
 </script>
+
 
 
 
