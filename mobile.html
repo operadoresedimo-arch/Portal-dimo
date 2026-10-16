@@ -2074,7 +2074,7 @@ function lig(r,i){
   }
   return h+'</div>'}
 function iso(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
-function seletor(cls){var h=new Date(),m=new Date();m.setDate(h.getDate()-60);var lab=PER==='dia'?DIA.slice(0,5):'Escolher dia';
+function seletor(cls){var h=new Date(),m=new Date();m.setDate(h.getDate()-60);var lab=PER==='dia'?DIA.slice(0,5):(cls?'Escolher dia':'Dia');
   return '<label class="mq-dia '+cls+(PER==='dia'?' on':'')+'">\uD83D\uDCC5 '+lab+' \u25BE<input type="date" min="'+iso(m)+'" max="'+iso(h)+'"'+(PER==='dia'?' value="'+DIA.split('/').reverse().join('-')+'"':'')+' onclick="try{this.showPicker()}catch(e){}" onchange="MQ_dia(this.value)"></label>'}
 function hdrQ(){return HDR.replace(/<div class="hoje">[^<]*<\/div>/,seletor('hoje'))}
 function render(){
@@ -2133,6 +2133,51 @@ window.MQ_ouvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(f
 
 
 
+
+
+<style id="inst-css">
+#instBtn{position:fixed;left:50%;transform:translateX(-50%);bottom:78px;z-index:9998;background:#0f3557;color:#fff;border:0;border-radius:99px;padding:12px 20px;font-weight:700;font-size:.9rem;box-shadow:0 6px 18px rgba(15,53,87,.35);display:none;align-items:center;gap:8px;font-family:inherit}
+#instBtn b{color:#f0c955}
+#instBtn .x{margin-left:6px;opacity:.6;font-weight:400;padding:0 4px}
+#instOv{position:fixed;inset:0;background:rgba(10,20,35,.6);z-index:9999;display:none;align-items:flex-end;justify-content:center}
+#instOv .bx{background:#fff;border-radius:20px 20px 0 0;padding:22px 20px 28px;width:100%;max-width:480px;font-family:inherit;color:#1a1f36}
+#instOv h3{margin:0 0 6px;color:#0f3557;font-size:1.1rem}
+#instOv p{margin:0 0 14px;font-size:.88rem;color:#4b5563}
+#instOv .st{display:flex;gap:12px;align-items:flex-start;margin:10px 0;font-size:.92rem}
+#instOv .st i{font-style:normal;flex:0 0 28px;height:28px;border-radius:50%;background:#d4a937;color:#13233a;font-weight:800;display:flex;align-items:center;justify-content:center}
+#instOv .ic{display:inline-block;border:1px solid #d6dde8;border-radius:6px;padding:0 6px;font-weight:700;background:#f6f8fb}
+#instOv button{width:100%;margin-top:14px;border:0;background:#0f3557;color:#fff;font-weight:700;border-radius:12px;padding:13px;font-size:.95rem;font-family:inherit}
+</style>
+<button id="instBtn" onclick="instAbrir()">📲 <span>Instalar o app <b>Édimo</b></span><span class="x" onclick="event.stopPropagation();instFechar(true)">✕</span></button>
+<div id="instOv" onclick="if(event.target===this)this.style.display='none'"><div class="bx" id="instBx"></div></div>
+<script id="inst-js">
+/* Botao "Instalar o app": no Android instala com 1 toque; no iPhone mostra o passo a passo */
+(function(){
+var ev=null;
+var ua=navigator.userAgent||'',ios=/iphone|ipad|ipod/i.test(ua),android=/android/i.test(ua);
+var instalado=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+function adiado(){try{return Date.now()<+(localStorage.getItem('instAdiado')||0)}catch(e){return false}}
+function mostra(){if(instalado||adiado())return;if(!ios&&!android)return;document.getElementById('instBtn').style.display='flex'}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();ev=e;mostra()});
+window.addEventListener('appinstalled',function(){instalado=true;document.getElementById('instBtn').style.display='none'});
+setTimeout(mostra,1500);
+window.instFechar=function(adiar){document.getElementById('instBtn').style.display='none';if(adiar)try{localStorage.setItem('instAdiado',String(Date.now()+3*864e5))}catch(e){}};
+window.instAbrir=function(){
+  if(ev){ev.prompt();ev.userChoice.then(function(r){if(r&&r.outcome==='accepted')instFechar(false)});ev=null;return}
+  var h;
+  if(ios)h='<h3>Instalar no iPhone</h3><p>Leva 10 segundos. Precisa estar no <b>Safari</b>.</p>'+
+    '<div class="st"><i>1</i><div>Toque no botão <span class="ic">⬆︎ Compartilhar</span> na barra de baixo do Safari</div></div>'+
+    '<div class="st"><i>2</i><div>Role e toque em <span class="ic">Adicionar à Tela de Início</span></div></div>'+
+    '<div class="st"><i>3</i><div>Toque em <span class="ic">Adicionar</span>. O ícone da Édimo aparece na sua tela.</div></div>';
+  else h='<h3>Instalar no Android</h3><p>Se o celular não abriu a instalação sozinho, faça assim no <b>Chrome</b>:</p>'+
+    '<div class="st"><i>1</i><div>Toque nos <span class="ic">⋮</span> três pontinhos, no canto de cima</div></div>'+
+    '<div class="st"><i>2</i><div>Toque em <span class="ic">Instalar app</span> ou <span class="ic">Adicionar à tela inicial</span></div></div>'+
+    '<div class="st"><i>3</i><div>Confirme em <span class="ic">Instalar</span>. O ícone da Édimo aparece na sua tela.</div></div>';
+  document.getElementById('instBx').innerHTML=h+'<button onclick="document.getElementById(\'instOv\').style.display=\'none\'">Entendi</button>';
+  document.getElementById('instOv').style.display='flex';
+};
+})();
+</script>
 
 </body>
 </html>

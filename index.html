@@ -3919,7 +3919,7 @@ function lig(r,i){
   }
   return h+'</div>'}
 function iso(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
-function seletor(cls){var h=new Date(),m=new Date();m.setDate(h.getDate()-60);var lab=PER==='dia'?DIA.slice(0,5):'Escolher dia';
+function seletor(cls){var h=new Date(),m=new Date();m.setDate(h.getDate()-60);var lab=PER==='dia'?DIA.slice(0,5):(cls?'Escolher dia':'Dia');
   return '<label class="mq-dia '+cls+(PER==='dia'?' on':'')+'">\uD83D\uDCC5 '+lab+' \u25BE<input type="date" min="'+iso(m)+'" max="'+iso(h)+'"'+(PER==='dia'?' value="'+DIA.split('/').reverse().join('-')+'"':'')+' onclick="try{this.showPicker()}catch(e){}" onchange="MQ_dia(this.value)"></label>'}
 function hdrQ(){return HDR.replace(/<div class="hoje">[^<]*<\/div>/,seletor('hoje'))}
 function render(){
@@ -3974,6 +3974,7 @@ window.MQ_abre=function(i){ABR[i]=!ABR[i];render()};
 window.MQ_ouvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(fr){fr.remove();b.textContent='\u25B6 Ouvir a liga\u00E7\u00E3o';return}fr=document.createElement('iframe');fr.src=b.getAttribute('data-src');fr.allow='autoplay';w.appendChild(fr);b.textContent='\u25A0 Fechar \u00E1udio'};
 })();
 </script>
+
 
 
 
