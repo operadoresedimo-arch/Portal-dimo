@@ -2507,7 +2507,7 @@ async function loadEntradas(){
 setInterval(async function(){try{await loadPonto();updateFaltaAlert();if(cRD&&document.getElementById('pageRanking')&&document.getElementById('pageRanking').offsetParent)renderR(cRD);}catch(e){}},300000); // ponto atualiza a cada 5 min
 async function startApp(){showNav();showPage('ranking');const h=window.location.hash;if(h&&h.startsWith('#d=')){try{const j=LZString.decompressFromEncodedURIComponent(h.substring(3));if(j){cRD=JSON.parse(j);renderR(cRD);loadEntradas().then(function(){renderR(cRD)});loadCompDrive();return}}catch(e){}}await loadDrive();await loadEntradas();if(cRD)renderR(cRD);loadCompDrive();}
 
-async function loadDrive(){document.getElementById('rankLoading').style.display='block';try{await loadPonto();const r=await fetch(RK+'&t='+Date.now());const csv=await r.text();const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{document.getElementById('rankLoading').innerHTML='Nenhum dado encontrado.'}}catch(e){document.getElementById('rankLoading').innerHTML='Erro ao carregar.'}}
+async function loadDrive(){const rl0=document.getElementById('rankLoading');if(rl0)rl0.style.display='block';try{await loadPonto();const r=await fetch(RK+'&t='+Date.now());const csv=await r.text();const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{document.getElementById('rankLoading').innerHTML='Nenhum dado encontrado.'}}catch(e){document.getElementById('rankLoading').innerHTML='Erro ao carregar.'}}
 
 function showNav(){document.getElementById('nav').style.display='block'}
 function showPage(p){
@@ -2534,7 +2534,7 @@ function showPage(p){
 const toolbar=document.getElementById('toolbar');
 
 function renderR(data){
-  document.getElementById('rankLoading').style.display='none';
+  const rl=document.getElementById('rankLoading');if(rl)rl.style.display='none';
   const{d:date,ta,tv,ops}=data,t3=ops.slice(0,3);
   const allOps=mergeOpsWithPonto(ops);
   const mx=Math.max(...allOps.map(o=>o.a),1);
@@ -3802,6 +3802,10 @@ if(document.readyState!=='loading'){run();mo.observe(document.body,{childList:tr
 .mq *{box-sizing:border-box}
 .mq-tabs{display:flex;background:#eef2f7;border-radius:12px;padding:3px;margin:0 0 14px;max-width:420px}
 .mq-tabs button{flex:1;border:0;background:transparent;padding:9px 0;border-radius:10px;font-weight:600;font-size:.82rem;color:#6b7280;font-family:inherit;cursor:pointer}
+label.mq-dia{position:relative;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+label.mq-dia input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.mq-tabs label.mq-dia{flex:1;padding:9px 0;border-radius:10px;font-weight:600;font-size:.82rem;color:#6b7280}
+.mq-tabs label.mq-dia.on{background:#fff;color:#0f3557;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .mq-tabs button.on{background:#fff;color:#0f3557;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .mq-hero{background:linear-gradient(135deg,#0f3557,#1e4e7e);color:#fff;border-radius:18px;padding:20px 22px;margin-bottom:14px}
 .mq-hero-top{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
@@ -3850,7 +3854,7 @@ if(document.readyState!=='loading'){run();mo.observe(document.body,{childList:tr
 /* Minha Qualidade: o operador ve SO as proprias ligacoes avaliadas (login conferido no Apps Script do portal) */
 (function(){
 var URLP=(typeof SCRIPT_URL!=='undefined'&&SCRIPT_URL)||'';
-var D=null,TD=0,KEYD='',PER='mes',ABR={},TODAS=false,EL=null,HDR='';
+var D=null,TD=0,KEYD='',PER='mes',DIA='',ABR={},TODAS=false,EL=null,HDR='';
 var TIP={abertura:'Falam no primeiro segundo e confirmam o nome completo antes de falar da d\u00EDvida.',
 motivo:'Dizem o motivo j\u00E1 com o benef\u00EDcio (limpar o nome) e explicam o protesto em cart\u00F3rio, com data.',
 avista:'T\u00EAm os valores prontos: \u00E0 vista sem juros e multa e a op\u00E7\u00E3o de entrada + parcelas. E perguntam o que fica mais vi\u00E1vel.',
@@ -3871,6 +3875,7 @@ function post(b){return fetch(URLP,{method:'POST',headers:{'Content-Type':'text/
 window.MQ_token=function(login,senha){if(!URLP)return;var k=String(login||'').trim().toLowerCase().replace(/^\d+\./,'');post({type:'qtoken',login:k,senha:senha}).then(function(j){if(j&&j.status==='ok')try{localStorage.setItem('mq_tok',JSON.stringify({k:k,t:j.token}))}catch(e){}}).catch(function(){})};
 function filtrados(){
   var h=new Date(),ini;h.setHours(0,0,0,0);
+  if(PER==='dia'){var d0=dt(DIA);return (D||[]).filter(function(r){var d=dt(r.d);return d&&d0&&d.getTime()===d0.getTime()}).sort(function(a,b){return String(b.h||'').localeCompare(String(a.h||''))})}
   if(PER==='semana'){ini=new Date(h);ini.setDate(h.getDate()-((h.getDay()+6)%7))}else if(PER==='mes')ini=new Date(h.getFullYear(),h.getMonth(),1);else ini=new Date(2000,0,1);
   return (D||[]).filter(function(r){var d=dt(r.d);return d&&d>=ini}).sort(function(a,b){return(dt(b.d)-dt(a.d))||String(b.h||'').localeCompare(String(a.h||''))});
 }
@@ -3894,15 +3899,19 @@ function lig(r,i){
     if(r.a)h+='<div class="mq-au" onclick="event.stopPropagation()"><button data-src="'+esc(r.a)+'" onclick="MQ_ouvir(this)">\u25B6 Ouvir a liga\u00E7\u00E3o</button></div>';
   }
   return h+'</div>'}
+function iso(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+function seletor(cls){var h=new Date(),m=new Date();m.setDate(h.getDate()-60);var lab=PER==='dia'?DIA.slice(0,5):'Escolher dia';
+  return '<label class="mq-dia '+cls+(PER==='dia'?' on':'')+'">\uD83D\uDCC5 '+lab+' \u25BE<input type="date" min="'+iso(m)+'" max="'+iso(h)+'"'+(PER==='dia'?' value="'+DIA.split('/').reverse().join('-')+'"':'')+' onclick="try{this.showPicker()}catch(e){}" onchange="MQ_dia(this.value)"></label>'}
+function hdrQ(){return HDR.replace(/<div class="hoje">[^<]*<\/div>/,seletor('hoje'))}
 function render(){
   if(!EL)return;
   var L=filtrados(),n=L.length,ac=L.filter(function(r){return /^acordo/i.test(r.r||'')}).length;
   function tab(k,t){return '<button class="'+(PER===k?'on':'')+'" onclick="MQ_per(\''+k+'\')">'+t+'</button>'}
-  var h=HDR+'<div class="mq"><div class="mq-tabs">'+tab('semana','Semana')+tab('mes','M\u00EAs')+tab('tudo','\u00DAltimos 60 dias')+'</div>';
-  h+='<div class="mq-hero"><div class="mq-hero-top"><div class="mq-n">'+n+'</div><div><div class="mq-t">Suas liga\u00E7\u00F5es avaliadas</div><div class="mq-s">'+(n?'Veja abaixo o que manter e o que mudar':'Nenhuma liga\u00E7\u00E3o sua avaliada nesse per\u00EDodo')+'</div></div></div>';
+  var h=hdrQ()+'<div class="mq"><div class="mq-tabs">'+tab('semana','Semana')+tab('mes','M\u00EAs')+tab('tudo','60 dias')+seletor('')+'</div>';
+  h+='<div class="mq-hero"><div class="mq-hero-top"><div class="mq-n">'+n+'</div><div><div class="mq-t">Suas liga\u00E7\u00F5es avaliadas</div><div class="mq-s">'+(n?(PER==='dia'?'Em '+DIA+': veja o que manter e o que mudar':'Veja abaixo o que manter e o que mudar'):(PER==='dia'?'Nenhuma liga\u00E7\u00E3o sua avaliada em '+DIA:'Nenhuma liga\u00E7\u00E3o sua avaliada nesse per\u00EDodo'))+'</div></div></div>';
   if(n)h+='<div class="mq-chips"><span class="mq-chip"><b>'+ac+'</b> com acordo</span><span class="mq-chip"><b>'+(n-ac)+'</b> sem acordo</span></div>';
   h+='</div>';
-  if(!n){h+='<div class="mq-card"><div class="mq-vazio">'+((D||[]).length?'Troque o per\u00EDodo l\u00E1 em cima pra ver liga\u00E7\u00F5es mais antigas.':'Assim que a monitoria ouvir uma liga\u00E7\u00E3o sua, o feedback aparece aqui.')+'</div></div>'+foot();EL.innerHTML=h+'</div>';return}
+  if(!n){h+='<div class="mq-card"><div class="mq-vazio">'+((D||[]).length?(PER==='dia'?'Escolha outro dia ou veja a semana e o m\u00EAs.':'Troque o per\u00EDodo l\u00E1 em cima pra ver liga\u00E7\u00F5es mais antigas.'):'Assim que a monitoria ouvir uma liga\u00E7\u00E3o sua, o feedback aparece aqui.')+'</div></div>'+foot();EL.innerHTML=h+'</div>';return}
   var S=habilidades(L),fortes=S.filter(function(x){return x.pc>=.75}).slice(0,3),fracos=S.slice().reverse().filter(function(x){return x.pc<.75}).slice(0,3);
   var er=repetidos(L,'er',5);
   h+='<div class="mq-grid"><div class="mq-card"><div class="mq-h">O que mudar primeiro</div><div class="mq-sub">Os pontos em que voc\u00EA mais se afasta do que as melhores cobradoras fazem</div>'+(fracos.length?fracos.map(function(x){return sk(x,true)}).join(''):'<div class="mq-vazio" style="padding:14px">Voc\u00EA est\u00E1 indo bem em todos os passos. Continue assim!</div>')+'</div>';
@@ -3932,12 +3941,15 @@ window.MQ_abrir=function(el,hdr){
   busca({token:t});
 };
 window.MQ_entrar=function(){var s=(document.getElementById('mqSenha')||{}).value||'';if(!s)return;busca({senha:s})};
+window.MQ_dia=function(v){if(!v)return;var p=v.split('-');DIA=p[2]+'/'+p[1]+'/'+p[0];PER='dia';ABR={};TODAS=false;render()};
 window.MQ_per=function(p){PER=p;ABR={};TODAS=false;render()};
 window.MQ_todas=function(){TODAS=!TODAS;render()};
 window.MQ_abre=function(i){ABR[i]=!ABR[i];render()};
 window.MQ_ouvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(fr){fr.remove();b.textContent='\u25B6 Ouvir a liga\u00E7\u00E3o';return}fr=document.createElement('iframe');fr.src=b.getAttribute('data-src');fr.allow='autoplay';w.appendChild(fr);b.textContent='\u25A0 Fechar \u00E1udio'};
 })();
 </script>
+
+
 
 
 </body>
