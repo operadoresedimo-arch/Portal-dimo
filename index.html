@@ -2505,7 +2505,7 @@ async function loadEntradas(){
 }
 
 setInterval(async function(){try{await loadPonto();updateFaltaAlert();if(cRD&&document.getElementById('pageRanking')&&document.getElementById('pageRanking').offsetParent)renderR(cRD);}catch(e){}},300000); // ponto atualiza a cada 5 min
-async function startApp(){showNav();showPage('ranking');const h=window.location.hash;if(h&&h.startsWith('#d=')){try{const j=LZString.decompressFromEncodedURIComponent(h.substring(3));if(j){cRD=JSON.parse(j);renderR(cRD);loadEntradas();loadCompDrive();return}}catch(e){}}await loadDrive();await loadEntradas();loadCompDrive();}
+async function startApp(){showNav();showPage('ranking');const h=window.location.hash;if(h&&h.startsWith('#d=')){try{const j=LZString.decompressFromEncodedURIComponent(h.substring(3));if(j){cRD=JSON.parse(j);renderR(cRD);loadEntradas().then(function(){renderR(cRD)});loadCompDrive();return}}catch(e){}}await loadDrive();await loadEntradas();if(cRD)renderR(cRD);loadCompDrive();}
 
 async function loadDrive(){document.getElementById('rankLoading').style.display='block';try{await loadPonto();const r=await fetch(RK+'&t='+Date.now());const csv=await r.text();const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{document.getElementById('rankLoading').innerHTML='Nenhum dado encontrado.'}}catch(e){document.getElementById('rankLoading').innerHTML='Erro ao carregar.'}}
 
