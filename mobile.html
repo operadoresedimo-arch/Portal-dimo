@@ -963,11 +963,15 @@ function loadPonto(){
   }).catch(function(){});
 }
 
+function wsBR(ws){for(var k in ws){if(k[0]==='!')continue;var c=ws[k];if(!c)continue;
+ if(c.t==='n'&&!(c.z&&XLSX.SSF.is_date(c.z))){c.w=String(Math.round(c.v*100)/100).replace('.',',');}
+ else if(c.t==='s'&&/^-?\d{1,3}(,\d{3})*\.\d{1,2}$|^-?\d+\.\d{1,2}$/.test(String(c.v).trim())){c.w=c.v=String(c.v).trim().replace(/,/g,'').replace('.',',');}}
+ return ws;}
 function compRemota(url){
   return fetch(url+'&t='+Date.now()).then(function(r){return r.json()}).then(function(j){
     if(!j.ok)throw new Error(j.msg||'arquivo nao encontrado');
     var bin=atob(j.base64),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
-    var wb=XLSX.read(a,{type:'array'}),csv=XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]]);return parseCompCSV(csv);
+    var wb=XLSX.read(a,{type:'array'}),csv=XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));return parseCompCSV(csv);
   });
 }
 function loadComp(){
