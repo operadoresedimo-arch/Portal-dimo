@@ -2702,10 +2702,10 @@ function parseCompCSV(text){
 
 function wsBR(ws){for(var k in ws){if(k[0]==='!')continue;var c=ws[k];if(!c)continue;
  if(c.t==='n'&&c.z&&XLSX.SSF.is_date(c.z)){var d=XLSX.SSF.parse_date_code(c.v);if(d){var p=function(n){return(n<10?'0':'')+n};c.w=p(d.d)+'/'+p(d.m)+'/'+d.y+((d.H||d.M)?' '+p(d.H)+':'+p(d.M):'');}continue;}
-function rkCSV(){return fetch(RK_DRIVE+'&t='+Date.now()).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.msg||'sem arquivo');var bin=atob(j.base64),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);var wb=XLSX.read(a,{type:'array'});return XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));}).catch(function(e){console.warn('Ranking: nao li o Relatorio de Acordos do Drive, usando link antigo:',e&&e.message||e);return fetch(RK+'&t='+Date.now()).then(function(r){return r.text()})});}
  if(c.t==='n'&&!(c.z&&XLSX.SSF.is_date(c.z))){c.w=String(Math.round(c.v*100)/100).replace('.',',');}
  else if(c.t==='s'&&/^-?\d{1,3}(,\d{3})*\.\d{1,2}$|^-?\d+\.\d{1,2}$/.test(String(c.v).trim())){c.w=c.v=String(c.v).trim().replace(/,/g,'').replace('.',',');}}
  return ws;}
+function rkCSV(){return fetch(RK_DRIVE+'&t='+Date.now()).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.msg||'sem arquivo');var bin=atob(j.base64),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);var wb=XLSX.read(a,{type:'array'});return XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));}).catch(function(e){console.warn('Ranking: nao li o Relatorio de Acordos do Drive, usando link antigo:',e&&e.message||e);return fetch(RK+'&t='+Date.now()).then(function(r){return r.text()})});}
 async function compRemota(url){
   const j=await fetch(url+'&t='+Date.now()).then(r=>r.json());
   if(!j.ok)throw new Error(j.msg||'arquivo nao encontrado');
