@@ -2222,6 +2222,7 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 <script>
 const SH='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?gid=92433521&single=true&output=csv';
 const RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XSTNkcp2pbSTKTsVsygCKucMChmcI4hTZkC_pNEsuFNeQ/pub?output=csv';
+var RK_DRIVE='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=Relat%C3%B3rio%20de%20Acordos.xlsx';
 const CP_M1='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
 const CP_M2='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
 const CP_NOW='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=mes%20atual.xlsx';
@@ -2526,7 +2527,7 @@ async function loadEntradas(){
 setInterval(async function(){try{await loadPonto();updateFaltaAlert();if(cRD&&document.getElementById('pageRanking')&&document.getElementById('pageRanking').offsetParent){const y=window.scrollY,mc=document.querySelector('.main,.content,main');const my=mc?mc.scrollTop:0;renderR(cRD);window.scrollTo(0,y);if(mc)mc.scrollTop=my}}catch(e){}},300000); // ponto atualiza a cada 5 min
 async function startApp(){showNav();showPage('ranking');const h=window.location.hash;if(h&&h.startsWith('#d=')){try{const j=LZString.decompressFromEncodedURIComponent(h.substring(3));if(j){cRD=JSON.parse(j);renderR(cRD);loadEntradas().then(function(){renderR(cRD)});loadCompDrive();return}}catch(e){}}await loadDrive();await loadEntradas();if(cRD)renderR(cRD);loadCompDrive();}
 
-async function loadDrive(){const rl0=document.getElementById('rankLoading');if(rl0)rl0.style.display='block';try{await loadPonto();const r=await fetch(RK+'&t='+Date.now());const csv=await r.text();const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{document.getElementById('rankLoading').innerHTML='Nenhum dado encontrado.'}}catch(e){document.getElementById('rankLoading').innerHTML='Erro ao carregar.'}}
+async function loadDrive(){const rl0=document.getElementById('rankLoading');if(rl0)rl0.style.display='block';try{await loadPonto();const csv=await rkCSV();const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{document.getElementById('rankLoading').innerHTML='Nenhum dado encontrado.'}}catch(e){document.getElementById('rankLoading').innerHTML='Erro ao carregar.'}}
 
 function showNav(){document.getElementById('nav').style.display='block'}
 function showPage(p){
@@ -2700,6 +2701,8 @@ function parseCompCSV(text){
 }
 
 function wsBR(ws){for(var k in ws){if(k[0]==='!')continue;var c=ws[k];if(!c)continue;
+ if(c.t==='n'&&c.z&&XLSX.SSF.is_date(c.z)){var d=XLSX.SSF.parse_date_code(c.v);if(d){var p=function(n){return(n<10?'0':'')+n};c.w=p(d.d)+'/'+p(d.m)+'/'+d.y+((d.H||d.M)?' '+p(d.H)+':'+p(d.M):'');}continue;}
+function rkCSV(){return fetch(RK_DRIVE+'&t='+Date.now()).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.msg||'sem arquivo');var bin=atob(j.base64),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);var wb=XLSX.read(a,{type:'array'});return XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));}).catch(function(){return fetch(RK+'&t='+Date.now()).then(function(r){return r.text()})});}
  if(c.t==='n'&&!(c.z&&XLSX.SSF.is_date(c.z))){c.w=String(Math.round(c.v*100)/100).replace('.',',');}
  else if(c.t==='s'&&/^-?\d{1,3}(,\d{3})*\.\d{1,2}$|^-?\d+\.\d{1,2}$/.test(String(c.v).trim())){c.w=c.v=String(c.v).trim().replace(/,/g,'').replace('.',',');}}
  return ws;}
@@ -2721,7 +2724,8 @@ var compRefreshBusy=false;
 async function atualizarComissoesSilencioso(){
   if(compRefreshBusy||document.hidden)return;
   compRefreshBusy=true;var y=window.scrollY;
-  try{await loadCompDrive();window.scrollTo(0,y)}finally{compRefreshBusy=false}
+  try{try{const d=parseCSV(await rkCSV());if(d&&d.ops.length>0){cRD=d;const pr=document.getElementById('pageRanking');if(pr&&pr.offsetParent){const mc=document.querySelector('.main,.content,main');const my=mc?mc.scrollTop:0;renderR(cRD);window.scrollTo(0,y);if(mc)mc.scrollTop=my}}}catch(e){}
+  await loadCompDrive();window.scrollTo(0,y)}finally{compRefreshBusy=false}
 }
 setInterval(atualizarComissoesSilencioso,300000); // atualiza Drive a cada 5 min sem voltar ao inicio
 
