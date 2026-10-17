@@ -1442,14 +1442,14 @@ function fdFotoSel(inp){
   var rd=new FileReader();
   rd.onload=function(){var img=new Image();
     img.onload=function(){
-      var dims=[900,720,600,480,380],url='';
+      var dims=[1600,1400,1200,1000,800],url='',LIM=400000;
       for(var di=0;di<dims.length;di++){
         var k=Math.min(1,dims[di]/Math.max(img.width,img.height)),c=document.createElement('canvas');
-        c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-        var q=.75;url=c.toDataURL('image/jpeg',q);while(url.length>47000&&q>.35){q-=.1;url=c.toDataURL('image/jpeg',q)}
-        if(url.length<=47000)break;
+        c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);var cx=c.getContext('2d');cx.imageSmoothingEnabled=true;cx.imageSmoothingQuality='high';cx.drawImage(img,0,0,c.width,c.height);
+        var q=.88;url=c.toDataURL('image/jpeg',q);while(url.length>LIM&&q>.6){q-=.07;url=c.toDataURL('image/jpeg',q)}
+        if(url.length<=LIM)break;
       }
-      if(url.length>47000){alert('Imagem muito grande');return}
+      if(url.length>LIM){alert('Imagem muito grande');return}
       feedImg=url;document.getElementById('fdPrev').innerHTML='<div class="fd-pi"><img src="'+url+'"><span onclick="feedImg=\'\';this.parentNode.remove()">\u2715</span></div>';
     };
     img.onerror=function(){alert('N\u00E3o consegui abrir essa imagem')};img.src=rd.result};
