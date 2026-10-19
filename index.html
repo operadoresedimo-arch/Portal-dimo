@@ -158,6 +158,61 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
   .comp-section{overflow-x:auto}
   
 }
+/* ===== Ranking TV + alertas ===== */
+#pageTV.active{display:block}
+#pageTV{background:#0c0d12;color:#f3f4f6;border-radius:16px;position:relative;overflow:hidden;font-family:'Inter',system-ui,sans-serif}
+#pageTV:fullscreen{border-radius:0;overflow:auto}
+.tv-wrap{padding:16px;display:flex;flex-direction:column;gap:14px;min-height:calc(100vh - 60px)}
+.tv-alerta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#131520;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:12px 16px}
+.tv-modo{font-weight:800;font-size:.85rem;color:#cbd5e1;display:flex;gap:12px;align-items:center}.tv-modo span{color:#64748b;font-family:monospace;font-size:1rem}
+.tv-al-txt{flex:1;font-weight:800;font-size:1rem}
+.tv-btns{display:flex;gap:6px;margin-left:auto}.tv-btns button{background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:8px;padding:7px 12px;font-weight:700;font-size:.72rem;cursor:pointer;font-family:inherit}
+.tv-grid{display:grid;grid-template-columns:400px 1fr;gap:16px;flex:1;min-height:0}
+.tv-left{background:#131520;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;border:1px solid rgba(255,255,255,.05);max-height:calc(100vh - 150px)}
+.tv-left h2{font-size:1.4rem;font-weight:800}
+.tv-champ{display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.tv-ph{position:relative;width:100px;height:100px;border-radius:50%;border:4px solid #eab308;box-shadow:0 0 20px rgba(234,179,8,.3);background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:900;color:#eab308}
+.tv-ph i{position:absolute;bottom:-6px;right:-6px;font-style:normal;font-size:1.4rem}
+.tv-cn{font-size:1.1rem;font-weight:800;text-transform:uppercase}.tv-cv{font-size:1.4rem;font-weight:900;color:#eab308}.tv-cs{color:#94a3b8;font-size:.85rem}
+.tv-scroll{flex:1;overflow:hidden;mask-image:linear-gradient(to bottom,#000 85%,transparent)}
+.tv-list{display:flex;flex-direction:column;gap:6px}.tv-list.anim{animation:tvsc var(--t) linear infinite}
+@keyframes tvsc{0%{transform:translateY(0)}100%{transform:translateY(calc(-50% - 3px))}}
+.tv-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:rgba(26,28,41,.8)}
+.tv-row.top{background:rgba(234,179,8,.15);border:1px solid rgba(234,179,8,.3)}
+.tv-row b{font-family:monospace;color:#64748b;width:24px;text-align:center}.tv-row.top b{color:#eab308}
+.tv-av{width:34px;height:34px;border-radius:50%;background:#2e334d;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#94a3b8}
+.tv-nm{flex:1;font-weight:600;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tv-ct{font-weight:800;color:#eab308}
+.tv-right{display:flex;flex-direction:column;gap:14px}
+.tv-card{background:rgba(19,21,32,.85);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:18px}
+.tv-spot{display:grid;grid-template-columns:1fr 1.6fr;align-items:center}
+.tv-crown{font-size:4rem;display:flex;flex-direction:column;align-items:center;gap:8px}.tv-badge{background:#eab308;color:#000;font-weight:800;font-size:1rem;padding:5px 20px;border-radius:20px}
+.tv-tag{display:inline-block;background:rgba(234,179,8,.2);color:#eab308;padding:3px 12px;border-radius:20px;font-size:.75rem;font-weight:800;text-transform:uppercase}
+.tv-sn{font-size:2.2rem;font-weight:900}.tv-sv{font-family:monospace;font-size:3.4rem;font-weight:900;line-height:1}.tv-ss{color:#94a3b8;font-size:1.1rem}
+.tv-mid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tv-tot{display:flex;flex-direction:column;align-items:center;gap:8px}.tv-tot span{color:#94a3b8;font-weight:700}.tv-tot b{font-family:monospace;font-size:3rem;font-weight:900}.tv-tot em{font-style:normal;color:#cbd5e1;font-weight:600}
+.tv-pod{display:flex;justify-content:center;align-items:flex-end;gap:18px}.tv-pod div{display:flex;flex-direction:column;align-items:center;width:90px}.tv-pod span{font-size:1.8rem}.tv-pod b{font-size:.95rem;margin-top:6px}.tv-pod em{font-style:normal;color:#94a3b8;font-size:.75rem}
+.tv-rit{border-left:6px solid var(--c)}.tv-rit.atual{box-shadow:0 0 0 1px var(--c) inset}
+.tv-rh{display:flex;justify-content:space-between;font-weight:800}.tv-rh b{color:var(--c)}
+.tv-rn{margin-top:8px;color:#94a3b8}.tv-rn b{font-size:2rem;color:#fff;font-family:monospace}.tv-rn em{display:block;font-style:normal;font-size:.72rem;color:#64748b}
+.tv-bar{height:10px;background:#1e293b;border-radius:6px;margin:8px 0;overflow:hidden}.tv-bar i{display:block;height:100%;background:var(--c);border-radius:6px;transition:width .6s}
+.tv-rs{font-size:.78rem;color:#94a3b8}.tv-rs b{color:var(--c)}
+.tv-abx{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.tv-abx span{background:rgba(239,68,68,.12);color:#fca5a5;border-radius:6px;padding:2px 7px;font-size:.68rem;font-weight:700}
+.tv-streak{display:flex;justify-content:space-between;align-items:center;font-size:1.6rem}.tv-streak span{display:block;font-size:.95rem;color:#94a3b8;font-weight:700}.tv-streak b{font-size:1.3rem}.tv-streak b em{color:#ff4500;font-style:normal}
+.tv-foot{text-align:center;color:#475569;font-style:italic;font-weight:600}
+/* niveis: quanto pior, mais chamativo */
+.tv-nivel-baixo .tv-alerta{background:#422006;border-color:#eab308;color:#fde047}
+.tv-nivel-muito .tv-alerta{background:#7c2d12;border-color:#f97316;color:#fed7aa;animation:tvpulse 1.4s ease-in-out infinite}
+.tv-nivel-muito{box-shadow:0 0 0 4px #f97316 inset}
+.tv-nivel-extremo .tv-alerta{background:#7f1d1d;border-color:#ef4444;color:#fff;animation:tvblink .7s steps(2) infinite}
+.tv-nivel-extremo{box-shadow:0 0 0 8px #ef4444 inset;animation:tvborda 1s ease-in-out infinite}
+.tv-nivel-extremo .tv-al-txt{font-size:1.4rem}
+@keyframes tvpulse{50%{box-shadow:0 0 24px #f97316}}
+@keyframes tvblink{50%{background:#ef4444}}
+@keyframes tvborda{50%{box-shadow:0 0 0 14px rgba(239,68,68,.6) inset}}
+#tvFlash{position:absolute;inset:0;background:#ef4444;opacity:0;pointer-events:none;z-index:50}
+#tvFlash.on{animation:tvflash 6s ease-out}
+@keyframes tvflash{0%,20%,40%,60%{opacity:.75}10%,30%,50%{opacity:0}100%{opacity:0}}
+@media (max-width:1100px){.tv-grid{grid-template-columns:1fr}.tv-mid{grid-template-columns:1fr}}
 </style>
 
 <style id="edimo-modern-overrides">
@@ -2137,6 +2192,7 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 <button class="sb-item" onclick="showPage('treinamentos')" id="sbT">🎓 Treinamentos</button>
 <button class="sb-item" onclick="showPage('qualidade')" id="sbQ">⭐ Qualidade das Ligações</button>
 <button class="sb-item" onclick="showPage('avaliacao')" id="sbA" style="display:none">🎧 Avaliação de Discagem</button>
+<button class="sb-item" onclick="showPage('tv')" id="sbTV" style="display:none">📺 Ranking TV e Alertas</button>
 <button class="sb-item" onclick="abrirSenha(false)">🔐 Alterar senha</button>
 <button class="sb-item" onclick="doLogout()">🚪 Sair</button>
 </nav>
@@ -2155,6 +2211,7 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 <div class="page" id="pageRanking"><div class="loading-msg" id="rankLoading">Carregando ranking...</div></div>
 <div class="page" id="pageQualidade"></div>
 <div class="page" id="pageAvaliacao"><div class="loading-msg">Carregando...</div></div>
+<div class="page" id="pageTV"></div>
 <div class="page" id="pageComp">
 <div class="comp-hero" id="compHero">
 <div class="comp-hero-left"><span class="comp-hero-icon">📋</span><div><h1 class="comp-hero-title">Comparativo de Acordos</h1><p class="comp-hero-sub">Acompanhe o desempenho de cada operador nos últimos 3 meses.</p></div></div>
@@ -2755,6 +2812,46 @@ function miniMetaBar(val,cfg){
 }
 function shortPeriod(p){if(!p)return'';const parts=p.split(' a ');if(parts.length===2){const d1=parts[0].substring(3),d2=parts[1].substring(3);return d1===d2?d1:d1+' a '+d2;}return p;}
 
+// ===== Comparativo por TURNO (Manha / Tarde / Novatos) nos 3 meses =====
+function compTurnosHtml(ms0){
+  const ini=m=>{const x=String(m.period||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);return x?+(x[3]+x[2]+x[1]):0};
+  const ms=ms0.filter(Boolean).slice().sort((a,b)=>ini(a)-ini(b));   // do mais antigo pro atual
+  const TS=[{t:1,n:'Manhã',ic:'☀️',c:'#16a34a'},{t:2,n:'Tarde',ic:'🌇',c:'#ea580c'},{t:0,n:'Novatos',ic:'🌱',c:'#7c3aed'}];
+  // dias uteis (seg-sex + sabado conta meio dia) do periodo "dd/mm/aaaa a dd/mm/aaaa"
+  const diasDe=p=>{const m=String(p||'').match(/(\d{2})\/(\d{2})\/(\d{4}).*?(\d{2})\/(\d{2})\/(\d{4})/);if(!m)return 0;
+    let d=new Date(+m[3],+m[2]-1,+m[1]),f=new Date(+m[6],+m[5]-1,+m[4]),n=0;while(d<=f){const w=d.getDay();if(w>=1&&w<=5)n+=1;else if(w===6)n+=.5;d.setDate(d.getDate()+1)}return n;};
+  const fk=v=>'R$ '+(v>=1000?(v/1000).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mil':v.toLocaleString('pt-BR',{maximumFractionDigits:0}));
+  const dado=ms.map(m=>{const dias=diasDe(m.period),tot={a:0,v:0};const r={};
+    TS.forEach(T=>{const L=(m.ops||[]).filter(o=>o.t===T.t);const a=L.reduce((s,o)=>s+o.a,0),v=L.reduce((s,o)=>s+o.v,0),ops=L.filter(o=>o.a>0).length;
+      r[T.t]={a,v,ops,porOp:ops&&dias?v/ops/dias:0,tk:a?v/a:0,dia:dias?v/dias:0};tot.a+=a;tot.v+=v;});
+    return {per:shortPeriod(m.period),dias,r,tot};});
+  const last=dado.length-1;
+  let h='<div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:16px 18px;margin:0 0 18px">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:12px"><div style="font-weight:800;font-size:.95rem;color:#111827">Comparativo por turno</div><div style="font-size:.62rem;color:#6b7280">Valor por dia útil deixa o mês atual (ainda em andamento) comparável com os meses fechados</div></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
+  TS.forEach(T=>{
+    const maxV=Math.max(1,...dado.map(d=>d.r[T.t].v));
+    const cur=dado[last].r[T.t],ant=last>0?dado[last-1].r[T.t]:null;
+    const varDia=ant&&ant.dia?Math.round((cur.dia/ant.dia-1)*100):null;
+    const part=dado[last].tot.v?Math.round(cur.v/dado[last].tot.v*100):0;
+    h+='<div style="border:1px solid #eef0f3;border-top:4px solid '+T.c+';border-radius:12px;padding:12px 14px;background:#fafbfc">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:800;color:'+T.c+';font-size:.85rem">'+T.ic+' '+T.n+'</div>'+(varDia===null?'':'<div title="valor por dia útil vs mês anterior" style="font-size:.7rem;font-weight:800;color:'+(varDia>=0?'#16a34a':'#dc2626')+'">'+(varDia>=0?'▲ ':'▼ ')+Math.abs(varDia)+'%</div>')+'</div>';
+    h+='<div style="font-size:1.25rem;font-weight:800;color:#111827;margin-top:6px">'+fm(cur.v)+'</div>';
+    h+='<div style="font-size:.66rem;color:#6b7280">'+cur.a+' acordos · '+cur.ops+' operadores · '+part+'% do total do mês</div>';
+    h+='<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:.66rem">';
+    h+='<tr style="color:#9ca3af;text-align:right"><td style="text-align:left">Mês</td><td>Acordos</td><td>Valor</td><td>Por dia</td><td>Oper./dia</td><td>Ticket</td></tr>';
+    dado.forEach((d,i)=>{const x=d.r[T.t];
+      h+='<tr style="text-align:right;color:#374151;'+(i===last?'font-weight:700':'')+'"><td style="text-align:left;padding:5px 0">'+d.per+(i===last?' <span style="color:#9ca3af;font-weight:400">(atual)</span>':'')+'</td><td>'+x.a+'</td><td>'+fk(x.v)+'</td><td>'+fk(x.dia)+'</td><td>'+fk(x.porOp)+'</td><td>'+fk(x.tk)+'</td></tr>';
+      h+='<tr><td colspan="6" style="padding:0 0 4px"><div style="height:5px;background:#eef0f3;border-radius:3px"><div style="height:5px;width:'+Math.round(x.v/maxV*100)+'%;background:'+T.c+';opacity:'+(i===last?1:.45)+';border-radius:3px"></div></div></td></tr>';
+    });
+    h+='</table></div>';
+  });
+  h+='</div>';
+  // quem rende mais por operador no mes atual
+  const rk=TS.map(T=>({n:T.n,c:T.c,v:dado[last].r[T.t].porOp})).sort((a,b)=>b.v-a.v);
+  if(rk[0].v>0)h+='<div style="margin-top:10px;font-size:.68rem;color:#374151">No mês atual, quem mais rende <b>por operador por dia</b> é a <b style="color:'+rk[0].c+'">'+rk[0].n+'</b> ('+fm(rk[0].v)+'), seguida de '+rk[1].n+' ('+fm(rk[1].v)+') e '+rk[2].n+' ('+fm(rk[2].v)+').</div>';
+  return h+'</div>';
+}
 function genComp(){
   const ms=cD.filter(d=>d!==null);if(ms.length<1)return;
   updateSidebarMonth();
@@ -2796,6 +2893,7 @@ function genComp(){
     h+='</div>';
     h+='<div style="text-align:center;margin-bottom:16px;font-size:.62rem;color:var(--text3)">';
     ms.forEach((m,i)=>{h+=(i>0?' vs ':'')+shortPeriod(m.period);});h+='</div>';
+    h+=compTurnosHtml(ms);
     // Month tabs
     var mtH='<button class="comp-month-tab'+(compMonthFilter==='all'?' active':'')+'" onclick="setMonthFilter(\'all\',this)">📅 Todos os Meses</button>';
     ms.forEach((m,i)=>{
@@ -3999,5 +4097,110 @@ window.MQ_ouvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(f
 
 
 
+<script id="edimo-tv">
+/* ===== RANKING TV + ALERTA DE RITMO (aba so do admin) =====
+   Meta: 4 acordos por operador em 5h40 de trabalho, contando da ENTRADA no ponto.
+   Conta o time (quem passa compensa quem fica abaixo), separado por turno.
+   Turnos: manha 08-14 (PREVIEW 08-09, POWER 09-14) | tarde 14-20 (PREVIEW 14-15, POWER 15-20).
+   Alarme so toca no modo POWER. Ajuste os numeros aqui embaixo se precisar. */
+(function(){
+const TV={META:4,JANELA_MIN:340,
+  NIVEIS:[{min:.85,id:'ok',nome:'No ritmo',cor:'#22c55e'},{min:.65,id:'baixo',nome:'BAIXO',cor:'#eab308'},{min:.45,id:'muito',nome:'MUITO BAIXO',cor:'#f97316'},{min:-1,id:'extremo',nome:'EXTREMAMENTE BAIXO',cor:'#ef4444'}],
+  SOM_A_CADA:{baixo:15,muito:5,extremo:2}};          // minutos entre um aviso sonoro e outro
+const $=id=>document.getElementById(id);
+const hm=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null};
+const agoraMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
+const fR=v=>'R$ '+Math.round(v||0).toLocaleString('pt-BR');
+const ini=n=>{const p=String(n||'').split(' ').filter(Boolean);return((p[0]||'?')[0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase()};
+function modo(t){
+  if(t>=480&&t<540)return{id:'preview',turno:'manha',txt:'MODO PREVIEW · Manhã (conferência dos acordos)'};
+  if(t>=540&&t<840)return{id:'power',turno:'manha',txt:'MODO POWER · Manhã'};
+  if(t>=840&&t<900)return{id:'preview',turno:'tarde',txt:'MODO PREVIEW · Tarde (conferência dos acordos)'};
+  if(t>=900&&t<1200)return{id:'power',turno:'tarde',txt:'MODO POWER · Tarde'};
+  return{id:'fora',turno:null,txt:'Fora do horário de cobrança'};
+}
+function loginDe(n){try{const k=Object.keys(allLogins||{}).find(x=>mesmaPessoa(n,x));return k?String(allLogins[k]||''):''}catch(e){return ''}}
+// monta o ritmo de cada turno
+function calcular(){
+  const t=agoraMin(),ops=cRD&&cRD.ops?mergeOpsWithPonto(cRD.ops):[];
+  const T={manha:{n:'Manhã',ops:[],feito:0,esp:0},tarde:{n:'Tarde',ops:[],feito:0,esp:0}};
+  ops.forEach(o=>{
+    const lg=loginDe(o.n);if(lg&&!/^[012]/.test(lg))return;          // so operadores 0, 1 e 2
+    const pt=typeof matchPonto==='function'?matchPonto(o.n):null,ent=pt?hm(pt.entrada):null;
+    if(ent===null)return;                                              // nao bateu ponto: nao entra na conta
+    const tur=ent<720?'manha':'tarde';
+    const dec=Math.max(0,Math.min(TV.JANELA_MIN,t-ent));
+    const esp=TV.META*dec/TV.JANELA_MIN;
+    const x={n:o.n,a:o.a||0,v:o.v||0,ent:pt.entrada,esp:esp};T[tur].ops.push(x);T[tur].feito+=x.a;T[tur].esp+=esp;
+  });
+  Object.values(T).forEach(g=>{g.r=g.esp>0?g.feito/g.esp:1;g.nivel=TV.NIVEIS.find(n=>g.r>=n.min);
+    g.metaFinal=g.ops.length*TV.META;g.falta=Math.max(0,Math.ceil(g.esp-g.feito));
+    g.ops.sort((a,b)=>(a.a-a.esp)-(b.a-b.esp));});
+  return{t,m:modo(t),T};
+}
+// ===== SOM (Web Audio, sem arquivo) =====
+let AC=null,somOn=localStorage.getItem('tv_som')!=='0';
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function bip(f,dur,quando,vol,tipo){const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=tipo||'sine';o.frequency.value=f;o.connect(g);g.connect(a.destination);
+  const t0=a.currentTime+(quando||0);g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol||.3,t0+.02);g.gain.linearRampToValueAtTime(0,t0+dur);o.start(t0);o.stop(t0+dur+.05)}
+function tocar(id){if(!somOn)return;
+  if(id==='baixo'){bip(880,.25,0,.25)}
+  else if(id==='muito'){[0,.35,.7].forEach(q=>bip(1046,.22,q,.4,'square'))}
+  else if(id==='extremo'){const a=ac();if(!a)return;for(let i=0;i<8;i++){bip(i%2?700:1200,.45,i*.5,.55,'sawtooth')}}}
+let ultimoSom={},ultimoNivel={};
+function alarmar(R){
+  if(R.m.id!=='power')return;
+  const g=R.T[R.m.turno];if(!g||!g.ops.length)return;
+  const id=g.nivel.id;if(id==='ok'){ultimoNivel[R.m.turno]=id;return}
+  const ag=Date.now(),piorou=ultimoNivel[R.m.turno]!==id;
+  if(piorou||!ultimoSom[id]||ag-ultimoSom[id]>TV.SOM_A_CADA[id]*60000){ultimoSom[id]=ag;tocar(id);if(id==='extremo')flash()}
+  ultimoNivel[R.m.turno]=id;
+}
+function flash(){const f=$('tvFlash');if(!f)return;f.classList.remove('on');void f.offsetWidth;f.classList.add('on');}
+// ===== TELA =====
+let rot=0;
+function render(){
+  const pg=$('pageTV');if(!pg||!pg.classList.contains('active'))return;
+  const R=calcular(),ops=(cRD&&cRD.ops?cRD.ops.slice():[]).filter(o=>!/rob/i.test(o.n)).sort((a,b)=>b.a-a.a||b.v-a.v);
+  const ta=ops.reduce((s,o)=>s+o.a,0),tv=ops.reduce((s,o)=>s+o.v,0),ativos=ops.filter(o=>o.a>0).length;
+  const g=R.m.turno?R.T[R.m.turno]:null,niv=R.m.id==='power'&&g&&g.ops.length?g.nivel:null;
+  pg.className='page active tv-nivel-'+(niv?niv.id:'none');
+  const ch=ops[rot%Math.min(3,Math.max(1,ops.length))]||null,pos=ops.indexOf(ch);
+  let h='<div id="tvFlash"></div><div class="tv-wrap">';
+  // faixa de alerta
+  h+='<div class="tv-alerta">';
+  h+='<div class="tv-modo">'+(R.m.id==='power'?'⚡ ':R.m.id==='preview'?'👀 ':'🌙 ')+R.m.txt+'<span>'+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</span></div>';
+  if(niv&&niv.id!=='ok')h+='<div class="tv-al-txt">'+(niv.id==='extremo'?'🚨🚨 ':niv.id==='muito'?'🚨 ':'⚠️ ')+'Ritmo '+niv.nome+' · '+g.n+': '+g.feito+' acordos de '+Math.round(g.esp)+' esperados ('+Math.round(g.r*100)+'%) · faltam '+g.falta+' pra voltar ao ritmo</div>';
+  else if(niv)h+='<div class="tv-al-txt">✅ '+g.n+' no ritmo: '+g.feito+' de '+Math.round(g.esp)+' esperados ('+Math.round(g.r*100)+'%)</div>';
+  h+='<div class="tv-btns"><button onclick="tvSom()">'+(somOn?'🔊 Som ligado':'🔇 Som desligado')+'</button><button onclick="tvTela()">⛶ Tela cheia</button></div></div>';
+  h+='<div class="tv-grid"><div class="tv-left"><h2>Ranking do Dia</h2>';
+  if(ops[0])h+='<div class="tv-champ"><div class="tv-ph">'+ini(ops[0].n)+'<i>👑</i></div><div class="tv-cn">'+ops[0].n+'</div><div class="tv-cv">'+fR(ops[0].v)+'</div><div class="tv-cs">'+ops[0].a+' acordos</div></div>';
+  const linhas=ops.map((o,i)=>'<div class="tv-row'+(i===0?' top':'')+'"><b>'+(i+1)+'</b><span class="tv-av">'+ini(o.n)+'</span><span class="tv-nm">'+o.n+'</span><span class="tv-ct">'+o.a+'</span></div>').join('');
+  h+='<div class="tv-scroll"><div class="tv-list'+(ops.length>8?' anim':'')+'" style="--t:'+(ops.length*3.5)+'s">'+linhas+(ops.length>8?linhas:'')+'</div></div></div>';
+  h+='<div class="tv-right">';
+  if(ch)h+='<div class="tv-card tv-spot"><div class="tv-crown">👑<div class="tv-badge">'+(pos+1)+'º Lugar</div></div><div><div class="tv-tag">👑 '+(pos+1)+'º Lugar</div><div class="tv-sn">'+ch.n+'</div><div class="tv-sv">'+fR(ch.v)+'</div><div class="tv-ss">'+ch.a+' acordos</div></div></div>';
+  h+='<div class="tv-mid"><div class="tv-card tv-tot"><span>Total do Time Hoje</span><b>'+fR(tv)+'</b><em>'+ta+' acordos fechados</em></div>';
+  h+='<div class="tv-card tv-pod">'+[1,0,2].map(i=>'<div><span>'+['🥇','🥈','🥉'][i]+'</span><b>'+(ops[i]?ops[i].n.split(' ')[0].toUpperCase():'-')+'</b><em>'+(ops[i]?ops[i].a+' ac.':'')+'</em></div>').join('')+'</div></div>';
+  // ritmo por turno
+  h+='<div class="tv-mid">'+['manha','tarde'].map(k=>{const x=R.T[k],nv=x.nivel,pc=Math.min(100,Math.round(x.r*100)),at=R.m.turno===k;
+    return '<div class="tv-card tv-rit'+(at?' atual':'')+'" style="--c:'+nv.cor+'"><div class="tv-rh"><span>'+(k==='manha'?'☀️ Manhã':'🌇 Tarde')+(at?' · agora':'')+'</span><b>'+(x.ops.length?nv.nome:'sem ponto')+'</b></div>'+
+    '<div class="tv-rn"><b>'+x.feito+'</b> / '+Math.round(x.esp)+' esperados <em>meta do turno: '+x.metaFinal+'</em></div><div class="tv-bar"><i style="width:'+pc+'%"></i></div>'+
+    '<div class="tv-rs">'+x.ops.length+' operadores no ponto'+(x.falta?' · faltam <b>'+x.falta+'</b> pro ritmo':' · ritmo em dia')+'</div>'+
+    (x.ops.length?'<div class="tv-abx">'+x.ops.filter(o=>o.a<Math.floor(o.esp)).slice(0,6).map(o=>'<span>'+o.n.split(' ')[0]+' '+o.a+'/'+Math.floor(o.esp)+'</span>').join('')+'</div>':'')+'</div>'}).join('')+'</div>';
+  h+='<div class="tv-card tv-streak"><div><span>Operadores com Acordos</span><b><em>'+ativos+' de '+ops.length+'</em> ativos</b></div><div>'+'🔥'.repeat(Math.min(ativos,6))+'</div></div>';
+  h+='</div></div><div class="tv-foot">"Quem fecha mais, aparece mais."</div></div>';
+  pg.innerHTML=h;
+  alarmar(R);
+}
+window.tvSom=function(){somOn=!somOn;localStorage.setItem('tv_som',somOn?'1':'0');if(somOn){ac();bip(660,.15,0,.2)}render()};
+window.tvTela=function(){const el=$('pageTV');ac();if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen()};
+window.tvTeste=function(n){tocar(n);if(n==='extremo')flash()};   // no Console: tvTeste('baixo'|'muito'|'extremo')
+setInterval(render,30000);setInterval(()=>{rot++},5*60000);
+setInterval(()=>{const ok=typeof isA==='function'&&isA();const s=$('sbTV');if(s)s.style.display=ok?'flex':'none'},1000);
+const sp=window.showPage;
+window.showPage=function(p){sp(p);const pg=$('pageTV'),sb=$('sbTV');if(pg)pg.classList.toggle('active',p==='tv');if(sb)sb.classList.toggle('active',p==='tv');
+  if(p==='tv'){ac();render()}};
+})();
+</script>
 </body>
 </html>
