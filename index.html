@@ -215,6 +215,13 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 #tvFlash.baixo.on{animation-duration:1.6s}#tvFlash.muito.on{animation-duration:1.1s}#tvFlash.extremo.on{animation-duration:.7s}
 @keyframes tvflash{0%,100%{opacity:0}50%{opacity:1}}
 @media (max-width:1100px){.tv-grid{grid-template-columns:1fr}.tv-mid{grid-template-columns:1fr}}
+
+/* ===== Historico de acordos (escolher o dia) ===== */
+.hist-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0;flex-wrap:wrap}
+.hist-bar input{background:var(--card,#0d1a30);color:var(--text,#eaf0fa);border:1px solid var(--border2,#1a3055);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:.8rem;color-scheme:dark}
+.hist-bar button{background:var(--card2,#101f38);color:var(--text2,#7e93b0);border:1px solid var(--border2,#1a3055);border-radius:8px;padding:7px 12px;font-family:inherit;font-size:.75rem;font-weight:700;cursor:pointer}
+.hist-bar button.on{background:linear-gradient(135deg,#096fe8,#197ff0);color:#fff;border-color:transparent}
+.hist-msg{font-size:.72rem;color:var(--gold,#d4a937);font-weight:600}
 </style>
 
 <style id="edimo-modern-overrides">
@@ -4221,6 +4228,45 @@ setInterval(()=>{const ok=typeof isA==='function'&&isA();const s=$('sbTV');if(s)
 const sp=window.showPage;
 window.showPage=function(p){sp(p);const pg=$('pageTV'),sb=$('sbTV');if(pg)pg.classList.toggle('active',p==='tv');if(sb)sb.classList.toggle('active',p==='tv');
   if(p==='tv'){ac();render();atualizarDadosTV(true)}else flashOff()};
+})();
+</script>
+<script id="edimo-historico">
+/* ===== HISTORICO: ver os acordos de outro dia =====
+   O Script Ponto guarda 1 copia do Relatorio de Acordos por dia (pasta "Historico Acordos").
+   Aqui o operador/admin escolhe a data e o ranking mostra aquele dia. "Hoje" volta pro ao vivo. */
+(function(){
+let rankDia='',histData=null,histInfo='',histDias=null;
+const hoje=()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())};
+const br=iso=>iso.split('-').reverse().join('/');
+const base=()=>String(RK_DRIVE).split('?')[0];
+window.rankHistAtivo=()=>!!rankDia;
+const _render=window.renderR;
+window.renderR=function(d){
+  if(rankDia&&histData){const pd=pontoData;pontoData=null;try{_render(histData)}finally{pontoData=pd}}
+  else _render(d);
+  barra();
+};
+function barra(){
+  const hd=document.querySelector('#pageRanking .date-header');if(!hd||hd.querySelector('.hist-bar'))return;
+  const max=hoje(),min=histDias&&histDias.length?histDias[0]:'';
+  hd.insertAdjacentHTML('beforeend','<div class="hist-bar"><button class="'+(rankDia?'':'on')+'" onclick="histDia(\'\')">Hoje (ao vivo)</button>'+
+    '<input type="date" max="'+max+'"'+(min?' min="'+min+'"':'')+' value="'+(rankDia||'')+'" onchange="histDia(this.value)" title="Escolha o dia">'+
+    (histInfo?'<span class="hist-msg">'+histInfo+'</span>':'')+'</div>');
+}
+window.histDia=async function(dia){
+  if(!dia||dia===hoje()){rankDia='';histData=null;histInfo='';if(cRD)renderR(cRD);if(typeof loadDrive==='function')loadDrive();return}
+  rankDia=dia;histInfo='Carregando '+br(dia)+'...';if(cRD)renderR(cRD);
+  try{
+    const j=await fetch(base()+'?type=acordosdia&data='+dia+'&t='+Date.now()).then(r=>r.json());
+    if(rankDia!==dia)return;
+    if(!j.ok){histData=null;rankDia='';histInfo=(j.msg==='sem registro desse dia'?'Sem registro em '+br(dia)+'. O histórico começa a ser salvo a partir de hoje.':'Não consegui abrir: '+(j.msg||'erro'));if(cRD)renderR(cRD);return}
+    const bin=atob(j.base64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
+    const wb=XLSX.read(a,{type:'array'}),d=parseCSV(XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]])));
+    if(!d){throw new Error('planilha sem dados')}
+    d.d=br(dia);histData=d;histInfo='Mostrando '+br(dia)+' · fechamento salvo às '+String(j.salvo||'').slice(11);renderR(histData);
+  }catch(e){rankDia='';histData=null;histInfo='Não consegui abrir esse dia agora.';if(cRD)renderR(cRD)}
+};
+fetch(base()+'?type=diashist&t='+Date.now()).then(r=>r.json()).then(j=>{if(j&&j.ok){histDias=j.dias||[];const i=document.querySelector('.hist-bar input');if(i&&histDias[0])i.min=histDias[0]}}).catch(()=>{});
 })();
 </script>
 </body>
