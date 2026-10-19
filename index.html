@@ -4162,6 +4162,17 @@ function alarmar(R){
   ultimoNivel[R.m.turno]=id;
 }
 function flash(){const f=$('tvFlash');if(!f)return;f.classList.remove('on');void f.offsetWidth;f.classList.add('on');}
+// A planilha do portal é trocada pelo robô a cada 30 minutos. Releia o ranking nesse mesmo ritmo.
+let tvAtualizando=false;
+async function atualizarDadosTV(){
+  if(tvAtualizando||!cRD)return; tvAtualizando=true;
+  try{
+    const csv=await rkCSV(),data=parseCSV(csv);
+    if(data&&data.ops&&data.ops.length){cRD=data; if(typeof loadPonto==='function')await loadPonto(); render();}
+  }catch(e){console.warn('TV: nao consegui atualizar a planilha agora',e)}
+  finally{tvAtualizando=false;}
+}
+// primeira leitura ao abrir a aba e depois exatamente a cada meia hora
 // ===== TELA =====
 let rot=0;
 function render(){
@@ -4201,11 +4212,11 @@ function render(){
 window.tvSom=function(){somOn=!somOn;localStorage.setItem('tv_som',somOn?'1':'0');if(somOn){ac();bip(660,.15,0,.2)}render()};
 window.tvTela=function(){const el=$('pageTV');ac();if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen()};
 window.tvTeste=function(n){tocar(n);if(n==='extremo')flash();alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300)};   // no Console: tvTeste('baixo'|'muito'|'extremo')
-setInterval(render,30000);setInterval(()=>{rot++},5*60000);
+setInterval(render,30000);setInterval(()=>{rot++},5*60000);setInterval(atualizarDadosTV,30*60000);
 setInterval(()=>{const ok=typeof isA==='function'&&isA();const s=$('sbTV');if(s)s.style.display=ok?'flex':'none'},1000);
 const sp=window.showPage;
 window.showPage=function(p){sp(p);const pg=$('pageTV'),sb=$('sbTV');if(pg)pg.classList.toggle('active',p==='tv');if(sb)sb.classList.toggle('active',p==='tv');
-  if(p==='tv'){ac();render()}};
+  if(p==='tv'){ac();render();atualizarDadosTV()}};
 })();
 </script>
 </body>
