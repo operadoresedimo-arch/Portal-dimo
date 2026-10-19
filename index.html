@@ -212,6 +212,8 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 .tv-al-big{text-align:center;font-size:2.6rem!important;font-weight:900;letter-spacing:.04em;line-height:1.05}
 #pageTV:fullscreen .tv-al-big{font-size:3.4rem!important}
 .tv-pl{font-family:inherit!important;font-size:.72rem!important;color:#64748b!important;font-weight:600}.tv-pl-x{color:#fbbf24!important}
+body.tv-full #pageTV{position:fixed;inset:0;z-index:9000;border-radius:0;overflow:auto;margin:0}
+body.tv-full .tv-al-big{font-size:3.4rem!important}
 #tvFlash{position:fixed;inset:0;pointer-events:none;z-index:99999;display:none;align-items:center;justify-content:center}
 #tvFlash.on{display:flex}
 #tvFlash .tf-bg{position:absolute;inset:0;opacity:0;animation:tvflash 1s ease-in-out infinite}
@@ -254,6 +256,9 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 .dgs-f{font-size:7.5vh;font-weight:800;line-height:1.12;color:#fde047;text-wrap:balance}
 .dgs-bar{position:absolute;left:4vw;right:4vw;bottom:5vh;height:1.6vh;background:#1e293b;border-radius:1vh;overflow:hidden}
 .dgs-bar i{display:block;height:100%;width:100%;background:#eab308;transform-origin:left;animation:dgbar linear forwards}
+.dgs-1{font-size:11vh!important;line-height:1.08}
+#dgOver.dg-erro{background:#1a0506}#dgOver.dg-sug{background:#04130a}
+#dgOver.dg-erro .dgs-lb{font-size:5vh}#dgOver.dg-sug .dgs-lb{font-size:5vh;margin-top:0}
 @keyframes dgbar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @keyframes dgin{from{transform:translateY(3vh);opacity:0}to{transform:none;opacity:1}}
 @media (max-width:1100px){.dg-c{grid-template-columns:1fr}}
@@ -4205,7 +4210,7 @@ function alarmar(R){
 }
 // a camada que pisca fica fora da tela redesenhada; em TELA CHEIA ela precisa estar dentro do elemento em tela cheia
 let flashTm=null,flashEl=null;
-function flashPai(){const f=flashEl;if(!f)return;const pai=document.fullscreenElement||document.body;if(f.parentNode!==pai)pai.appendChild(f)}
+function flashPai(){const f=flashEl;if(!f)return;if(f.parentNode!==document.body)document.body.appendChild(f)}
 const NOME_NIVEL={baixo:'BAIXO',muito:'MUITO BAIXO',extremo:'EXTREMAMENTE BAIXO'};
 function flash(id){if(!flashEl){flashEl=document.createElement('div');flashEl.id='tvFlash';flashEl.innerHTML='<div class="tf-bg"></div><div class="tf-txt"></div>'}flashPai();
   id=id||'extremo';flashEl.querySelector('.tf-txt').textContent=NOME_NIVEL[id]||'';flashEl.className=id+' on';clearTimeout(flashTm);flashTm=setTimeout(()=>{flashEl.className=''},TV.ALERTA_SEG*1000);}
@@ -4273,13 +4278,14 @@ function render(){
   pg.innerHTML=h;flashPai();
 }
 window.tvSom=function(){somOn=!somOn;localStorage.setItem('tv_som',somOn?'1':'0');if(somOn){ac();bip(660,.15,0,.2)}render()};
-window.tvTela=function(){const el=$('pageTV');ac();if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen()};
+window.tvTela=function(){ac();if(document.fullscreenElement)document.exitFullscreen();else{const el=document.documentElement;(el.requestFullscreen?el.requestFullscreen():Promise.resolve()).catch(()=>{});document.body.classList.add('tv-full')}};
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)document.body.classList.remove('tv-full');else if($('pageTV')&&$('pageTV').classList.contains('active'))document.body.classList.add('tv-full')});
 window.tvTeste=function(n){tocar(n);flash(n);alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300)};   // no Console: tvTeste('baixo'|'muito'|'extremo')
 setInterval(render,30000);setInterval(()=>{rot++},5*60000);setInterval(()=>atualizarDadosTV(false),5*60000);
 setInterval(()=>{const ok=typeof isA==='function'&&isA();const s=$('sbTV');if(s)s.style.display=ok?'flex':'none'},1000);
 const sp=window.showPage;
 window.showPage=function(p){sp(p);const pg=$('pageTV'),sb=$('sbTV');if(pg)pg.classList.toggle('active',p==='tv');if(sb)sb.classList.toggle('active',p==='tv');
-  if(p==='tv'){ac();render();atualizarDadosTV(true)}else flashOff()};
+  if(p==='tv'){ac();render();atualizarDadosTV(true)}else{flashOff();document.body.classList.remove('tv-full')}};
 })();
 </script>
 <script id="edimo-historico">
@@ -4343,7 +4349,7 @@ fetch(base()+'?type=diashist&t='+Date.now()).then(r=>r.json()).then(j=>{if(j&&j.
    Regras da casa: NAO fazemos agendamento (criterio "saida" nao conta) e "fechamento" so conta em ligacao com acordo.
    Sem custo de IA: e so leitura do que o robo de avaliacao ja gravou. */
 (function(){
-const DG={JANELA_MIN:60,MIN_LIG:4,SLIDE_SEG:60,MAX_SLIDES:3};
+const DG={JANELA_MIN:60,MIN_LIG:4,PASSO_SEG:30,REPETE:2,MAX_SLIDES:3};   // cada dica: erro 30s > sugestao 30s, repetido 2x (pedido do gerente)
 const API_Q='https://script.google.com/macros/s/AKfycbyUX25htVlM8Fs0voi7QK3QzAlF15jYgtzehFG-oUlbP4w0S4efX_Pc7UlrAa0p1_IU/exec';   // Script Avaliacao de ligacoes
 const IGNORA=['saida'];                       // nao fazemos agendamento
 // frases CURTAS pra TV (lidas a 15-20 m): p = problema, f = faca assim
@@ -4410,19 +4416,22 @@ function cardFixo(){
 }
 // ===== TELA CHEIA: 1 dica por vez, 60 s cada, letra gigante pra ler a 15-20 m =====
 function overEl(){let o=$('dgOver');if(!o){o=document.createElement('div');o.id='dgOver';o.onclick=()=>proximo()}
-  const pai=document.fullscreenElement||document.body;if(o.parentNode!==pai)pai.appendChild(o);return o}
+  if(o.parentNode!==document.body)document.body.appendChild(o);return o}
 function mostra(){
   const o=overEl();clearTimeout(slideTm);
   if(si>=slides.length){o.className='';o.innerHTML='';return}
-  const x=slides[si];
-  o.innerHTML='<div class="dgs"><div class="dgs-top"><span>'+x.tag+'</span><span>'+(si+1)+' de '+slides.length+'</span></div>'+
-    '<div class="dgs-lb dgs-r">O PROBLEMA</div><div class="dgs-p">'+x.p+'</div>'+
-    '<div class="dgs-lb dgs-g">FAÇA ASSIM</div><div class="dgs-f">'+x.f+'</div>'+
-    '<div class="dgs-bar"><i style="animation-duration:'+DG.SLIDE_SEG+'s"></i></div></div>';
-  o.className='on';slideTm=setTimeout(proximo,DG.SLIDE_SEG*1000);
+  const x=slides[si],erro=x.lado==='p';
+  o.innerHTML='<div class="dgs"><div class="dgs-top"><span>'+x.tag+'</span><span>Dica '+x.n+' de '+x.tot+' · '+x.vez+'ª vez</span></div>'+
+    (erro?'<div class="dgs-lb dgs-r">O ERRO</div><div class="dgs-p dgs-1">'+x.p+'</div>'
+         :'<div class="dgs-lb dgs-g">FAÇA ASSIM</div><div class="dgs-f dgs-1">'+x.f+'</div>')+
+    '<div class="dgs-bar"><i style="animation-duration:'+DG.PASSO_SEG+'s"></i></div></div>';
+  o.className='on '+(erro?'dg-erro':'dg-sug');slideTm=setTimeout(proximo,DG.PASSO_SEG*1000);
 }
 function proximo(){si++;mostra()}
-function iniciaSlides(){if(!ULT||ULT.erro||!ULT.itens.length)return;slides=ULT.itens.slice(0,DG.MAX_SLIDES);si=0;mostra()}
+function iniciaSlides(){if(!ULT||ULT.erro||!ULT.itens.length)return;
+  const L=ULT.itens.slice(0,DG.MAX_SLIDES);slides=[];
+  L.forEach((x,i)=>{for(let v=1;v<=DG.REPETE;v++){slides.push(Object.assign({},x,{lado:'p',n:i+1,tot:L.length,vez:v}));slides.push(Object.assign({},x,{lado:'f',n:i+1,tot:L.length,vez:v}))}});
+  si=0;mostra()}
 // chamado pela TV quando dispara um alerta: espera o pulso de 60 s acabar e começa as dicas
 window.tvDiagnostico=async function(){
   const D=await buscar();ULT=D.erro?D:analisar(D);cardFixo();
