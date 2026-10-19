@@ -4245,8 +4245,8 @@ function render(){
   const linhas=ops.map((o,i)=>'<div class="tv-row'+(i===0?' top':'')+'"><b>'+(i+1)+'</b><span class="tv-av">'+ini(o.n)+'</span><span class="tv-nm">'+o.n+'</span><span class="tv-ct">'+o.a+'</span></div>').join('');
   h+='<div class="tv-scroll"><div class="tv-list'+(ops.length>8?' anim':'')+'" style="--t:'+(ops.length*3.5)+'s">'+linhas+(ops.length>8?linhas:'')+'</div></div></div>';
   h+='<div class="tv-right">';
-  if(ch)h+='<div class="tv-card tv-spot"><div class="tv-crown">👑<div class="tv-badge">'+(pos+1)+'º Lugar</div></div><div><div class="tv-tag">👑 '+(pos+1)+'º Lugar</div><div class="tv-sn">'+ch.n+'</div><div class="tv-sv">'+fR(ch.v)+'</div><div class="tv-ss">'+ch.a+' acordos</div></div></div>';
-  h+='<div class="tv-mid"><div class="tv-card tv-tot"><span>Total do Time Hoje</span><b>'+fR(tv)+'</b><em>'+ta+' acordos fechados</em></div>';
+  if(ch)h+='<div class="tv-card tv-spot"><div class="tv-crown">👑<div class="tv-badge">'+(pos+1)+'º Lugar</div></div><div><div class="tv-tag">👑 '+(pos+1)+'º Lugar</div><div class="tv-sn">'+ch.n+'</div><div class="tv-sv">'+ch.a+' acordo'+(ch.a===1?'':'s')+'</div><div class="tv-ss">'+fR(ch.v)+'</div></div></div>';
+  h+='<div class="tv-mid"><div class="tv-card tv-tot"><span>Total do Time Hoje</span><b>'+ta+' acordos</b><em>'+fR(tv)+'</em></div>';
   h+='<div class="tv-card tv-pod">'+[1,0,2].map(i=>'<div><span>'+['🥇','🥈','🥉'][i]+'</span><b>'+(ops[i]?ops[i].n.split(' ')[0].toUpperCase():'-')+'</b><em>'+(ops[i]?ops[i].a+' ac.':'')+'</em></div>').join('')+'</div></div>';
   // ritmo por turno
   h+='<div class="tv-mid">'+['manha','tarde'].map(k=>{const x=R.T[k],nv=x.nivel,pc=Math.min(100,Math.round(x.r*100)),at=R.m.turno===k;
