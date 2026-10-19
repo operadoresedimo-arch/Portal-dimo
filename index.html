@@ -209,9 +209,11 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 @keyframes tvpulse{50%{box-shadow:0 0 24px #f97316}}
 @keyframes tvblink{50%{background:#ef4444}}
 @keyframes tvborda{50%{box-shadow:0 0 0 14px rgba(239,68,68,.6) inset}}
-#tvFlash{position:absolute;inset:0;background:#ef4444;opacity:0;pointer-events:none;z-index:50}
-#tvFlash.on{animation:tvflash 6s ease-out}
-@keyframes tvflash{0%,20%,40%,60%{opacity:.75}10%,30%,50%{opacity:0}100%{opacity:0}}
+#tvFlash{position:fixed;inset:0;opacity:0;pointer-events:none;z-index:99999;display:none}
+#tvFlash.on{display:block;animation:tvflash 1s ease-in-out infinite}
+#tvFlash.baixo{background:rgba(234,179,8,.35)}#tvFlash.muito{background:rgba(249,115,22,.5)}#tvFlash.extremo{background:rgba(239,68,68,.7)}
+#tvFlash.baixo.on{animation-duration:1.6s}#tvFlash.muito.on{animation-duration:1.1s}#tvFlash.extremo.on{animation-duration:.7s}
+@keyframes tvflash{0%,100%{opacity:0}50%{opacity:1}}
 @media (max-width:1100px){.tv-grid{grid-template-columns:1fr}.tv-mid{grid-template-columns:1fr}}
 </style>
 
@@ -4106,7 +4108,6 @@ window.MQ_ouvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(f
 (function(){
 const TV={META:4,JANELA_MIN:340,
   NIVEIS:[{min:.85,id:'ok',nome:'No ritmo',cor:'#22c55e'},{min:.65,id:'baixo',nome:'BAIXO',cor:'#eab308'},{min:.45,id:'muito',nome:'MUITO BAIXO',cor:'#f97316'},{min:-1,id:'extremo',nome:'EXTREMAMENTE BAIXO',cor:'#ef4444'}],
-  SOM_A_CADA:{baixo:15,muito:5,extremo:2},
   ALERTA_SEG:60};                                    // o alerta chama atencao por 60s e depois a tela volta ao normal          // minutos entre um aviso sonoro e outro
 const $=id=>document.getElementById(id);
 const hm=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null};
@@ -4151,28 +4152,32 @@ function tocar(id){if(!somOn)return;
   if(id==='baixo'){[0,.4].forEach(q=>bip(660,.3,q,.12))}                                   // 2 bipes suaves e baixos
   else if(id==='muito'){for(let i=0;i<6;i++)bip(1000,.25,i*.35,.5,'square')}               // 6 bipes fortes (~2s)
   else if(id==='extremo'){for(let i=0;i<12;i++)bip(i%2?650:1300,.48,i*.5,1,'sawtooth')}}  // sirene no volume maximo (~6s)
-let ultimoSom={},ultimoNivel={},alertaAte=0,alertaTm=null;
+let alertaAte=0,alertaTm=null;
+// Alerta so dispara quando chega planilha NOVA do robo (ou quando abre a aba). Fica 60s e some.
 function alarmar(R){
-  if(R.m.id!=='power')return;
+  if(R.m.id!=='power'){flashOff();return}
   const g=R.T[R.m.turno];if(!g||!g.ops.length)return;
-  const id=g.nivel.id;if(id==='ok'){ultimoNivel[R.m.turno]=id;return}
-  const ag=Date.now(),piorou=ultimoNivel[R.m.turno]!==id;
-  if(piorou||!ultimoSom[id]||ag-ultimoSom[id]>TV.SOM_A_CADA[id]*60000){ultimoSom[id]=ag;tocar(id);if(id==='extremo')flash();
-    alertaAte=ag+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300);}
-  ultimoNivel[R.m.turno]=id;
+  const id=g.nivel.id;if(id==='ok'){flashOff();alertaAte=0;return}
+  tocar(id);flash(id);alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300);
 }
-function flash(){const f=$('tvFlash');if(!f)return;f.classList.remove('on');void f.offsetWidth;f.classList.add('on');}
+let flashTm=null;
+function flash(id){let f=$('tvFlash');if(!f){f=document.createElement('div');f.id='tvFlash';document.body.appendChild(f)}
+  f.className=(id||'extremo')+' on';clearTimeout(flashTm);flashTm=setTimeout(()=>{f.className=''},TV.ALERTA_SEG*1000);}
+function flashOff(){const f=$('tvFlash');if(f)f.className='';clearTimeout(flashTm);}
 // A planilha do portal é trocada pelo robô a cada 30 minutos. Releia o ranking nesse mesmo ritmo.
-let tvAtualizando=false;
-async function atualizarDadosTV(){
-  if(tvAtualizando||!cRD)return; tvAtualizando=true;
+let tvAtualizando=false,tvUltimaPlanilha='';
+// Confere a cada 5 min se o robo ja trocou a planilha (o arquivo muda a cada rodada, ~30 min).
+// So quando a planilha for NOVA: atualiza os numeros e dispara o alerta (se o ritmo estiver baixo).
+async function atualizarDadosTV(abrindo){
+  if(tvAtualizando)return; tvAtualizando=true;
   try{
-    const csv=await rkCSV(),data=parseCSV(csv);
-    if(data&&data.ops&&data.ops.length){cRD=data; if(typeof loadPonto==='function')await loadPonto(); render();}
-  }catch(e){console.warn('TV: nao consegui atualizar a planilha agora',e)}
+    const csv=await rkCSV();
+    const nova=csv&&csv!==tvUltimaPlanilha;
+    if(nova){const data=parseCSV(csv);if(data&&data.ops&&data.ops.length){tvUltimaPlanilha=csv;cRD=data;if(typeof loadPonto==='function')await loadPonto();}}
+    if(nova||abrindo){render();const pg=$('pageTV');if(pg&&pg.classList.contains('active'))alarmar(calcular());render();}
+  }catch(e){console.warn('TV: nao consegui ler a planilha agora',e)}
   finally{tvAtualizando=false;}
 }
-// primeira leitura ao abrir a aba e depois exatamente a cada meia hora
 // ===== TELA =====
 let rot=0;
 function render(){
@@ -4180,11 +4185,10 @@ function render(){
   const R=calcular(),ops=(cRD&&cRD.ops?cRD.ops.slice():[]).filter(o=>!/rob/i.test(o.n)).sort((a,b)=>b.a-a.a||b.v-a.v);
   const ta=ops.reduce((s,o)=>s+o.a,0),tv=ops.reduce((s,o)=>s+o.v,0),ativos=ops.filter(o=>o.a>0).length;
   const g=R.m.turno?R.T[R.m.turno]:null,niv0=R.m.id==='power'&&g&&g.ops.length?g.nivel:null;
-  alarmar(R);                                                         // decide se toca agora (e liga os 60s de alerta)
   const emAlerta=Date.now()<alertaAte,niv=niv0&&(niv0.id==='ok'||emAlerta)?niv0:null;
   pg.className='page active tv-nivel-'+(niv?niv.id:'none');
   const ch=ops[rot%Math.min(3,Math.max(1,ops.length))]||null,pos=ops.indexOf(ch);
-  let h='<div id="tvFlash"></div><div class="tv-wrap">';
+  let h='<div class="tv-wrap">';
   // faixa de alerta
   h+='<div class="tv-alerta">';
   h+='<div class="tv-modo">'+(R.m.id==='power'?'⚡ ':R.m.id==='preview'?'👀 ':'🌙 ')+R.m.txt+'<span>'+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</span></div>';
@@ -4211,12 +4215,12 @@ function render(){
 }
 window.tvSom=function(){somOn=!somOn;localStorage.setItem('tv_som',somOn?'1':'0');if(somOn){ac();bip(660,.15,0,.2)}render()};
 window.tvTela=function(){const el=$('pageTV');ac();if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen()};
-window.tvTeste=function(n){tocar(n);if(n==='extremo')flash();alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300)};   // no Console: tvTeste('baixo'|'muito'|'extremo')
-setInterval(render,30000);setInterval(()=>{rot++},5*60000);setInterval(atualizarDadosTV,30*60000);
+window.tvTeste=function(n){tocar(n);flash(n);alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300)};   // no Console: tvTeste('baixo'|'muito'|'extremo')
+setInterval(render,30000);setInterval(()=>{rot++},5*60000);setInterval(()=>atualizarDadosTV(false),5*60000);
 setInterval(()=>{const ok=typeof isA==='function'&&isA();const s=$('sbTV');if(s)s.style.display=ok?'flex':'none'},1000);
 const sp=window.showPage;
 window.showPage=function(p){sp(p);const pg=$('pageTV'),sb=$('sbTV');if(pg)pg.classList.toggle('active',p==='tv');if(sb)sb.classList.toggle('active',p==='tv');
-  if(p==='tv'){ac();render();atualizarDadosTV()}};
+  if(p==='tv'){ac();render();atualizarDadosTV(true)}else flashOff()};
 })();
 </script>
 </body>
