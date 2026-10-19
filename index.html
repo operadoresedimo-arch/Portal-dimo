@@ -212,7 +212,10 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 .tv-al-big{text-align:center;font-size:2.6rem!important;font-weight:900;letter-spacing:.04em;line-height:1.05}
 #pageTV:fullscreen .tv-al-big{font-size:3.4rem!important}
 .tv-pl{font-family:inherit!important;font-size:.72rem!important;color:#64748b!important;font-weight:600}.tv-pl-x{color:#fbbf24!important}
-body.tv-full #pageTV{position:fixed;inset:0;z-index:9000;border-radius:0;overflow:auto;margin:0}
+body.tv-full{overflow:hidden!important}
+body.tv-full>*:not(#pageTV):not(#tvFlash):not(#dgOver){display:none!important}
+body.tv-full #pageTV{display:block!important;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2147483000;border-radius:0;overflow:auto;margin:0;padding:0}
+#tvFlash{z-index:2147483600!important}#dgOver{z-index:2147483500!important}
 body.tv-full .tv-al-big{font-size:3.4rem!important}
 #tvFlash{position:fixed;inset:0;pointer-events:none;z-index:99999;display:none;align-items:center;justify-content:center}
 #tvFlash.on{display:flex}
@@ -4278,14 +4281,20 @@ function render(){
   pg.innerHTML=h;flashPai();
 }
 window.tvSom=function(){somOn=!somOn;localStorage.setItem('tv_som',somOn?'1':'0');if(somOn){ac();bip(660,.15,0,.2)}render()};
-window.tvTela=function(){ac();if(document.fullscreenElement)document.exitFullscreen();else{const el=document.documentElement;(el.requestFullscreen?el.requestFullscreen():Promise.resolve()).catch(()=>{});document.body.classList.add('tv-full')}};
-document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)document.body.classList.remove('tv-full');else if($('pageTV')&&$('pageTV').classList.contains('active'))document.body.classList.add('tv-full')});
+// TELA CHEIA: a aba da TV sai de dentro do portal e vai direto pro <body>, e o resto da pagina some.
+// Assim nada do portal (menu lateral, outras abas) aparece por cima, e o alerta/dicas ficam por cima de tudo.
+let tvLugar=null;
+function tvFullOn(){const pg=$('pageTV');if(!pg)return;if(!tvLugar)tvLugar={pai:pg.parentNode,prox:pg.nextSibling};if(pg.parentNode!==document.body)document.body.appendChild(pg);document.body.classList.add('tv-full');flashPai()}
+function tvFullOff(){const pg=$('pageTV');document.body.classList.remove('tv-full');if(pg&&tvLugar){tvLugar.pai.insertBefore(pg,tvLugar.prox&&tvLugar.prox.parentNode===tvLugar.pai?tvLugar.prox:null);tvLugar=null}}
+window.tvTela=function(){ac();if(document.fullscreenElement){document.exitFullscreen();return}
+  const el=document.documentElement;tvFullOn();(el.requestFullscreen?el.requestFullscreen():Promise.resolve()).catch(()=>{})};
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)tvFullOff()});
 window.tvTeste=function(n){tocar(n);flash(n);alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300)};   // no Console: tvTeste('baixo'|'muito'|'extremo')
 setInterval(render,30000);setInterval(()=>{rot++},5*60000);setInterval(()=>atualizarDadosTV(false),5*60000);
 setInterval(()=>{const ok=typeof isA==='function'&&isA();const s=$('sbTV');if(s)s.style.display=ok?'flex':'none'},1000);
 const sp=window.showPage;
 window.showPage=function(p){sp(p);const pg=$('pageTV'),sb=$('sbTV');if(pg)pg.classList.toggle('active',p==='tv');if(sb)sb.classList.toggle('active',p==='tv');
-  if(p==='tv'){ac();render();atualizarDadosTV(true)}else{flashOff();document.body.classList.remove('tv-full')}};
+  if(p==='tv'){ac();render();atualizarDadosTV(true)}else{flashOff();if(document.fullscreenElement)document.exitFullscreen();tvFullOff()}};
 })();
 </script>
 <script id="edimo-historico">
