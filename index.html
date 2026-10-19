@@ -209,6 +209,8 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 @keyframes tvpulse{50%{box-shadow:0 0 24px #f97316}}
 @keyframes tvblink{50%{background:#ef4444}}
 @keyframes tvborda{50%{box-shadow:0 0 0 14px rgba(239,68,68,.6) inset}}
+.tv-al-big{text-align:center;font-size:2.6rem!important;font-weight:900;letter-spacing:.04em;line-height:1.05}
+#pageTV:fullscreen .tv-al-big{font-size:3.4rem!important}
 #tvFlash{position:fixed;inset:0;opacity:0;pointer-events:none;z-index:99999;display:none}
 #tvFlash.on{display:block;animation:tvflash 1s ease-in-out infinite}
 #tvFlash.baixo{background:rgba(234,179,8,.35)}#tvFlash.muito{background:rgba(249,115,22,.5)}#tvFlash.extremo{background:rgba(239,68,68,.7)}
@@ -217,10 +219,21 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 @media (max-width:1100px){.tv-grid{grid-template-columns:1fr}.tv-mid{grid-template-columns:1fr}}
 
 /* ===== Historico de acordos (escolher o dia) ===== */
-.hist-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0;flex-wrap:wrap}
-.hist-bar input{background:var(--card,#0d1a30);color:var(--text,#eaf0fa);border:1px solid var(--border2,#1a3055);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:.8rem;color-scheme:dark}
-.hist-bar button{background:var(--card2,#101f38);color:var(--text2,#7e93b0);border:1px solid var(--border2,#1a3055);border-radius:8px;padding:7px 12px;font-family:inherit;font-size:.75rem;font-weight:700;cursor:pointer}
-.hist-bar button.on{background:linear-gradient(135deg,#096fe8,#197ff0);color:#fff;border-color:transparent}
+.hist-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0;flex-wrap:wrap;position:relative}
+.hist-bar button{background:#fff;color:#1f2937;border:1px solid #d1d5db;border-radius:8px;padding:8px 14px;font-family:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
+.hist-bar button.on{background:#096fe8;color:#fff;border-color:#096fe8}
+.hist-cal{position:absolute;top:44px;left:50%;transform:translateX(-50%);z-index:500;background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 18px 40px rgba(15,23,42,.18);padding:14px;width:300px;color:#111827}
+.hist-cal .hc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-weight:800;text-transform:capitalize}
+.hist-cal .hc-top button{border:none;background:#f3f4f6;width:32px;height:32px;border-radius:8px;font-size:1rem;padding:0}
+.hist-cal .hc-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.hist-cal .hc-w{font-size:.66rem;font-weight:700;color:#9ca3af;padding:4px 0}
+.hist-cal .hc-d{border:none;background:transparent;border-radius:8px;height:34px;font-size:.82rem;font-weight:600;color:#374151;padding:0;position:relative}
+.hist-cal .hc-d:hover:not(:disabled){background:#eff6ff}
+.hist-cal .hc-d.tem::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:#16a34a}
+.hist-cal .hc-d.hoje{outline:2px solid #096fe8;outline-offset:-2px}
+.hist-cal .hc-d.sel{background:#096fe8;color:#fff}.hist-cal .hc-d.sel::after{background:#fff}
+.hist-cal .hc-d:disabled{color:#d1d5db;cursor:default}
+.hist-cal .hc-leg{margin-top:10px;font-size:.66rem;color:#6b7280;display:flex;align-items:center;gap:6px}.hist-cal .hc-leg i{width:6px;height:6px;border-radius:50%;background:#16a34a;display:inline-block}
 .hist-msg{font-size:.72rem;color:var(--gold,#d4a937);font-weight:600}
 </style>
 
@@ -4167,10 +4180,13 @@ function alarmar(R){
   const id=g.nivel.id;if(id==='ok'){flashOff();alertaAte=0;return}
   tocar(id);flash(id);alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300);
 }
-let flashTm=null;
-function flash(id){let f=$('tvFlash');if(!f){f=document.createElement('div');f.id='tvFlash';document.body.appendChild(f)}
-  f.className=(id||'extremo')+' on';clearTimeout(flashTm);flashTm=setTimeout(()=>{f.className=''},TV.ALERTA_SEG*1000);}
-function flashOff(){const f=$('tvFlash');if(f)f.className='';clearTimeout(flashTm);}
+// a camada que pisca fica fora da tela redesenhada; em TELA CHEIA ela precisa estar dentro do elemento em tela cheia
+let flashTm=null,flashEl=null;
+function flashPai(){const f=flashEl;if(!f)return;const pai=document.fullscreenElement||document.body;if(f.parentNode!==pai)pai.appendChild(f)}
+function flash(id){if(!flashEl){flashEl=document.createElement('div');flashEl.id='tvFlash'}flashPai();
+  flashEl.className=(id||'extremo')+' on';clearTimeout(flashTm);flashTm=setTimeout(()=>{flashEl.className=''},TV.ALERTA_SEG*1000);}
+function flashOff(){if(flashEl)flashEl.className='';clearTimeout(flashTm);}
+document.addEventListener('fullscreenchange',flashPai);
 // A planilha do portal é trocada pelo robô a cada 30 minutos. Releia o ranking nesse mesmo ritmo.
 let tvAtualizando=false,tvUltimaPlanilha='';
 // Confere a cada 5 min se o robo ja trocou a planilha (o arquivo muda a cada rodada, ~30 min).
@@ -4199,8 +4215,8 @@ function render(){
   // faixa de alerta
   h+='<div class="tv-alerta">';
   h+='<div class="tv-modo">'+(R.m.id==='power'?'⚡ ':R.m.id==='preview'?'👀 ':'🌙 ')+R.m.txt+'<span>'+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</span></div>';
-  if(niv&&niv.id!=='ok')h+='<div class="tv-al-txt">'+(niv.id==='extremo'?'🚨🚨 ':niv.id==='muito'?'🚨 ':'⚠️ ')+'Ritmo '+niv.nome+' · '+g.n+': '+g.feito+' acordos de '+Math.round(g.esp)+' esperados ('+Math.round(g.r*100)+'%) · faltam '+g.falta+' pra voltar ao ritmo</div>';
-  else if(niv)h+='<div class="tv-al-txt">✅ '+g.n+' no ritmo: '+g.feito+' de '+Math.round(g.esp)+' esperados ('+Math.round(g.r*100)+'%)</div>';
+  if(niv&&niv.id!=='ok')h+='<div class="tv-al-txt tv-al-big">'+niv.nome+'</div>';
+  else if(niv)h+='<div class="tv-al-txt tv-al-big">NO RITMO</div>';
   h+='<div class="tv-btns"><button onclick="tvSom()">'+(somOn?'🔊 Som ligado':'🔇 Som desligado')+'</button><button onclick="tvTela()">⛶ Tela cheia</button></div></div>';
   h+='<div class="tv-grid"><div class="tv-left"><h2>Ranking do Dia</h2>';
   if(ops[0])h+='<div class="tv-champ"><div class="tv-ph">'+ini(ops[0].n)+'<i>👑</i></div><div class="tv-cn">'+ops[0].n+'</div><div class="tv-cv">'+fR(ops[0].v)+'</div><div class="tv-cs">'+ops[0].a+' acordos</div></div>';
@@ -4218,7 +4234,7 @@ function render(){
     (x.ops.length?'<div class="tv-abx">'+x.ops.filter(o=>o.a<Math.floor(o.esp)).slice(0,6).map(o=>'<span>'+o.n.split(' ')[0]+' '+o.a+'/'+Math.floor(o.esp)+'</span>').join('')+'</div>':'')+'</div>'}).join('')+'</div>';
   h+='<div class="tv-card tv-streak"><div><span>Operadores com Acordos</span><b><em>'+ativos+' de '+ops.length+'</em> ativos</b></div><div>'+'🔥'.repeat(Math.min(ativos,6))+'</div></div>';
   h+='</div></div><div class="tv-foot">"Quem fecha mais, aparece mais."</div></div>';
-  pg.innerHTML=h;
+  pg.innerHTML=h;flashPai();
 }
 window.tvSom=function(){somOn=!somOn;localStorage.setItem('tv_som',somOn?'1':'0');if(somOn){ac();bip(660,.15,0,.2)}render()};
 window.tvTela=function(){const el=$('pageTV');ac();if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen()};
@@ -4246,13 +4262,29 @@ window.renderR=function(d){
   else _render(d);
   barra();
 };
+let calAberto=false,calMes=null;
+const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 function barra(){
   const hd=document.querySelector('#pageRanking .date-header');if(!hd||hd.querySelector('.hist-bar'))return;
-  const max=hoje(),min=histDias&&histDias.length?histDias[0]:'';
   hd.insertAdjacentHTML('beforeend','<div class="hist-bar"><button class="'+(rankDia?'':'on')+'" onclick="histDia(\'\')">Hoje (ao vivo)</button>'+
-    '<input type="date" max="'+max+'"'+(min?' min="'+min+'"':'')+' value="'+(rankDia||'')+'" onchange="histDia(this.value)" title="Escolha o dia">'+
-    (histInfo?'<span class="hist-msg">'+histInfo+'</span>':'')+'</div>');
+    '<button class="'+(rankDia?'on':'')+'" onclick="histCal(event)">📅 '+(rankDia?br(rankDia):'Escolher dia')+'</button>'+
+    (histInfo?'<span class="hist-msg">'+histInfo+'</span>':'')+(calAberto?calHtml():'')+'</div>');
 }
+function calHtml(){
+  const ref=calMes||new Date(),y=ref.getFullYear(),m=ref.getMonth(),p=n=>String(n).padStart(2,'0');
+  const prim=new Date(y,m,1).getDay(),dias=new Date(y,m+1,0).getDate(),hj=hoje(),tem=histDias||[];
+  let h='<div class="hist-cal" onclick="event.stopPropagation()"><div class="hc-top"><button onclick="histMes(-1)">‹</button><span>'+MESES[m]+' '+y+'</span><button onclick="histMes(1)">›</button></div><div class="hc-g">';
+  ['D','S','T','Q','Q','S','S'].forEach(w=>h+='<div class="hc-w">'+w+'</div>');
+  for(let i=0;i<prim;i++)h+='<div></div>';
+  for(let d=1;d<=dias;d++){const iso=y+'-'+p(m+1)+'-'+p(d),fut=iso>hj;
+    h+='<button class="hc-d'+(tem.indexOf(iso)>=0?' tem':'')+(iso===hj?' hoje':'')+(iso===rankDia?' sel':'')+'"'+(fut?' disabled':'')+' onclick="histEscolhe(\''+iso+'\')">'+d+'</button>'}
+  return h+'</div><div class="hc-leg"><i></i> dia com fechamento salvo</div></div>';
+}
+function redesenha(){const b=document.querySelector('#pageRanking .hist-bar');if(b)b.remove();barra()}
+window.histCal=function(e){if(e)e.stopPropagation();calAberto=!calAberto;if(calAberto){const r=rankDia||hoje();calMes=new Date(+r.slice(0,4),+r.slice(5,7)-1,1)}redesenha()};
+window.histMes=function(n){calMes=new Date(calMes.getFullYear(),calMes.getMonth()+n,1);redesenha()};
+window.histEscolhe=function(iso){calAberto=false;histDia(iso)};
+document.addEventListener('click',()=>{if(calAberto){calAberto=false;redesenha()}});
 window.histDia=async function(dia){
   if(!dia||dia===hoje()){rankDia='';histData=null;histInfo='';if(cRD)renderR(cRD);if(typeof loadDrive==='function')loadDrive();return}
   rankDia=dia;histInfo='Carregando '+br(dia)+'...';if(cRD)renderR(cRD);
@@ -4266,7 +4298,7 @@ window.histDia=async function(dia){
     d.d=br(dia);histData=d;histInfo='Mostrando '+br(dia)+' · fechamento salvo às '+String(j.salvo||'').slice(11);renderR(histData);
   }catch(e){rankDia='';histData=null;histInfo='Não consegui abrir esse dia agora.';if(cRD)renderR(cRD)}
 };
-fetch(base()+'?type=diashist&t='+Date.now()).then(r=>r.json()).then(j=>{if(j&&j.ok){histDias=j.dias||[];const i=document.querySelector('.hist-bar input');if(i&&histDias[0])i.min=histDias[0]}}).catch(()=>{});
+fetch(base()+'?type=diashist&t='+Date.now()).then(r=>r.json()).then(j=>{if(j&&j.ok){histDias=j.dias||[];if(calAberto)redesenha()}}).catch(()=>{});
 })();
 </script>
 </body>
