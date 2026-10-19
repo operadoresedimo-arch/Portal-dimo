@@ -211,10 +211,13 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 @keyframes tvborda{50%{box-shadow:0 0 0 14px rgba(239,68,68,.6) inset}}
 .tv-al-big{text-align:center;font-size:2.6rem!important;font-weight:900;letter-spacing:.04em;line-height:1.05}
 #pageTV:fullscreen .tv-al-big{font-size:3.4rem!important}
-#tvFlash{position:fixed;inset:0;opacity:0;pointer-events:none;z-index:99999;display:none}
-#tvFlash.on{display:block;animation:tvflash 1s ease-in-out infinite}
-#tvFlash.baixo{background:rgba(234,179,8,.35)}#tvFlash.muito{background:rgba(249,115,22,.5)}#tvFlash.extremo{background:rgba(239,68,68,.7)}
-#tvFlash.baixo.on{animation-duration:1.6s}#tvFlash.muito.on{animation-duration:1.1s}#tvFlash.extremo.on{animation-duration:.7s}
+#tvFlash{position:fixed;inset:0;pointer-events:none;z-index:99999;display:none;align-items:center;justify-content:center}
+#tvFlash.on{display:flex}
+#tvFlash .tf-bg{position:absolute;inset:0;opacity:0;animation:tvflash 1s ease-in-out infinite}
+#tvFlash.baixo .tf-bg{background:rgba(234,179,8,.35);animation-duration:1.6s}#tvFlash.muito .tf-bg{background:rgba(249,115,22,.5);animation-duration:1.1s}#tvFlash.extremo .tf-bg{background:rgba(239,68,68,.7);animation-duration:.7s}
+#tvFlash .tf-txt{position:relative;max-width:92vw;text-align:center;font-family:'Inter',system-ui,sans-serif;font-weight:900;font-size:clamp(3rem,8vw,9rem);line-height:1;letter-spacing:.03em;color:#fff;padding:.25em .5em;border-radius:24px;background:rgba(0,0,0,.55);text-shadow:0 6px 30px rgba(0,0,0,.6);animation:tvtxt 1s ease-in-out infinite}
+#tvFlash.baixo .tf-txt{color:#fde047}#tvFlash.muito .tf-txt{color:#fdba74}
+@keyframes tvtxt{50%{transform:scale(1.06)}}
 @keyframes tvflash{0%,100%{opacity:0}50%{opacity:1}}
 @media (max-width:1100px){.tv-grid{grid-template-columns:1fr}.tv-mid{grid-template-columns:1fr}}
 
@@ -235,6 +238,21 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 .hist-cal .hc-d:disabled{color:#d1d5db;cursor:default}
 .hist-cal .hc-leg{margin-top:10px;font-size:.66rem;color:#6b7280;display:flex;align-items:center;gap:6px}.hist-cal .hc-leg i{width:6px;height:6px;border-radius:50%;background:#16a34a;display:inline-block}
 .hist-msg{font-size:.72rem;color:var(--gold,#d4a937);font-weight:600}
+/* ===== Diagnostico da TV ===== */
+.dg-card .dg-h b{display:block;font-size:1.05rem;color:#fff}.dg-card .dg-h span{font-size:.78rem;color:#94a3b8}
+.dg-c{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:10px}
+.dg-col i{display:block;font-style:normal;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#eab308;margin-bottom:6px}
+.dg-col p{font-size:.86rem;line-height:1.35;color:#e5e7eb;margin:0 0 8px}.dg-col p em{font-style:normal;font-size:.7rem;color:#94a3b8;margin-left:4px}
+#dgOver{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;background:rgba(5,6,10,.72)}
+#dgOver.on{display:flex}
+#dgOver .dg-box{width:min(1100px,92vw);background:#131520;border:2px solid #eab308;border-radius:22px;padding:30px 34px;box-shadow:0 30px 80px rgba(0,0,0,.6);color:#fff;font-family:'Inter',system-ui,sans-serif;animation:dgin .4s ease-out}
+#dgOver .dg-h b{display:block;font-size:2.2rem;font-weight:900}#dgOver .dg-h span{font-size:1rem;color:#94a3b8}
+#dgOver .dg-c{gap:30px;margin-top:20px}#dgOver .dg-col i{font-size:.95rem}
+#dgOver .dg-col p{font-size:1.25rem;line-height:1.4;margin-bottom:14px}
+#dgOver .dg-f{margin-top:8px;font-size:1rem;color:#86efac;font-weight:700}
+#dgOver .dg-x{margin-top:14px;text-align:right;font-size:.75rem;color:#64748b}
+@keyframes dgin{from{transform:scale(.94);opacity:0}to{transform:none;opacity:1}}
+@media (max-width:1100px){.dg-c{grid-template-columns:1fr}}
 </style>
 
 <style id="edimo-modern-overrides">
@@ -4178,13 +4196,14 @@ function alarmar(R){
   if(R.m.id!=='power'){flashOff();return}
   const g=R.T[R.m.turno];if(!g||!g.ops.length)return;
   const id=g.nivel.id;if(id==='ok'){flashOff();alertaAte=0;return}
-  tocar(id);flash(id);alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300);
+  tocar(id);flash(id);if(window.tvDiagnostico)window.tvDiagnostico();alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300);
 }
 // a camada que pisca fica fora da tela redesenhada; em TELA CHEIA ela precisa estar dentro do elemento em tela cheia
 let flashTm=null,flashEl=null;
 function flashPai(){const f=flashEl;if(!f)return;const pai=document.fullscreenElement||document.body;if(f.parentNode!==pai)pai.appendChild(f)}
-function flash(id){if(!flashEl){flashEl=document.createElement('div');flashEl.id='tvFlash'}flashPai();
-  flashEl.className=(id||'extremo')+' on';clearTimeout(flashTm);flashTm=setTimeout(()=>{flashEl.className=''},TV.ALERTA_SEG*1000);}
+const NOME_NIVEL={baixo:'BAIXO',muito:'MUITO BAIXO',extremo:'EXTREMAMENTE BAIXO'};
+function flash(id){if(!flashEl){flashEl=document.createElement('div');flashEl.id='tvFlash';flashEl.innerHTML='<div class="tf-bg"></div><div class="tf-txt"></div>'}flashPai();
+  id=id||'extremo';flashEl.querySelector('.tf-txt').textContent=NOME_NIVEL[id]||'';flashEl.className=id+' on';clearTimeout(flashTm);flashTm=setTimeout(()=>{flashEl.className=''},TV.ALERTA_SEG*1000);}
 function flashOff(){if(flashEl)flashEl.className='';clearTimeout(flashTm);}
 document.addEventListener('fullscreenchange',flashPai);
 // A planilha do portal é trocada pelo robô a cada 30 minutos. Releia o ranking nesse mesmo ritmo.
@@ -4299,6 +4318,104 @@ window.histDia=async function(dia){
   }catch(e){rankDia='';histData=null;histInfo='Não consegui abrir esse dia agora.';if(cRD)renderR(cRD)}
 };
 fetch(base()+'?type=diashist&t='+Date.now()).then(r=>r.json()).then(j=>{if(j&&j.ok){histDias=j.dias||[];if(calAberto)redesenha()}}).catch(()=>{});
+})();
+</script>
+<script id="edimo-diagnostico">
+/* ===== DIAGNOSTICO DA TV: depois que a tela para de pulsar, explica o motivo e sugere o que fazer =====
+   Usa as ligacoes avaliadas pela IA nos ultimos 60 min (por horario da ligacao) + o funil do discador.
+   Sem custo de IA: e so leitura do que o robo de avaliacao ja gravou. */
+(function(){
+const DG={JANELA_MIN:60,MIN_LIG:4,MOSTRA_SEG:120};
+const API_Q='https://script.google.com/macros/s/AKfycbyUX25htVlM8Fs0voi7QK3QzAlF15jYgtzehFG-oUlbP4w0S4efX_Pc7UlrAa0p1_IU/exec';   // Script Avaliacao de ligacoes
+const MOT={
+ abertura:'Abertura fraca: não se apresenta ou não confirma o devedor antes de falar da dívida, e a ligação esfria logo no começo.',
+ motivo:'Explicação confusa: o devedor não entende credor, valor e consequência, e não sente urgência em resolver.',
+ avista:'Não está oferecendo o À VISTA primeiro (sem juros e multa), que é o argumento mais forte da casa.',
+ objecao:'Aceitam o "não tenho dinheiro" / "vou ver" e encerram, sem perguntar quando a pessoa recebe e quanto consegue.',
+ escada:'Fazem uma proposta só e desistem, sem descer a escada (entrada menor, mais parcelas, data mais longa).',
+ valores:'Valores confusos ou calculados ao vivo com pausas longas: o devedor perde a confiança.',
+ saida:'Ligações terminando sem acordo e sem retorno agendado com dia e hora.',
+ fechamento:'Fechamento incompleto: não confirma dados, valores e envio do boleto, e o acordo fica frágil.'};
+const SUG={
+ abertura:'Abra assim: "Boa tarde, aqui é [nome] da Édimo Advocacia, falo com o(a) [devedor]?" e só depois fale da dívida.',
+ motivo:'Explique em uma frase: credor, valor original e o que acontece se não regularizar (SPC/protesto).',
+ avista:'Comece SEMPRE pelo à vista: "Hoje consigo tirar todos os juros e a multa, fica só R$ X."',
+ objecao:'No "não tenho dinheiro": "Quando você recebe?" e "Quanto consegue separar até lá?" e feche o acordo nessa data.',
+ escada:'Antes de aceitar o não, ofereça pelo menos 3 opções: entrada menor, mais parcelas, primeira parcela mais pra frente.',
+ valores:'Deixe o valor pronto na tela antes de oferecer; fale o número uma vez, claro, e confirme com o devedor.',
+ saida:'Não desligue sem acordo OU sem "Posso te ligar dia X às Y horas?" agendado no sistema.',
+ fechamento:'No acordo: repita nome/CPF, valor e data, avise que a ligação é gravada e mande o boleto no WhatsApp na hora.'};
+const NOMEC={abertura:'Abertura',motivo:'Explicação',avista:'À vista primeiro',objecao:'Contornar objeção',escada:'Escada de negociação',valores:'Valores claros',saida:'Sair com resultado',fechamento:'Fechamento'};
+const $=id=>document.getElementById(id);
+const hm=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null};
+const agora=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()};
+const nm=o=>String(o||'').toLowerCase().split(' ').filter(Boolean).slice(0,1).map(w=>w[0].toUpperCase()+w.slice(1)).join(' ');
+let ULT=null,mostraAte=0,tmr=null;
+function chave(){return localStorage.getItem('avd_chave')||''}
+async function buscar(){
+  const k=chave();if(!k)return{erro:'sem_chave'};
+  const [a,f]=await Promise.all([
+    fetch(API_Q+'?acao=recentes&chave='+encodeURIComponent(k)+'&t='+Date.now()).then(r=>r.json()).catch(()=>null),
+    fetch(API_Q+'?acao=funil&dias=1&chave='+encodeURIComponent(k)+'&t='+Date.now()).then(r=>r.json()).catch(()=>null)]);
+  if(!a||!a.ok)return{erro:(a&&a.erro)||'sem_dados'};
+  return{lig:a.ligacoes||[],funil:(f&&f.ok?f.funil:[])||[]};
+}
+function analisar(D){
+  const t=agora();let L=D.lig.filter(l=>{const h=hm(l.h);return h!==null&&h<=t&&h>=t-DG.JANELA_MIN});let jan='nos últimos 60 min';
+  if(L.length<DG.MIN_LIG){L=D.lig.slice().sort((a,b)=>(hm(b.h)||0)-(hm(a.h)||0)).slice(0,8);jan='nas últimas '+L.length+' ligações avaliadas de hoje'}
+  const tot={};L.forEach(l=>l.cr.forEach(c=>{const x=tot[c.id]=tot[c.id]||{p:0,m:0};x.p+=c.p;x.m+=c.m}));
+  const crit=Object.keys(tot).filter(k=>MOT[k]).map(k=>({id:k,pct:Math.round(tot[k].p/tot[k].m*100)})).sort((a,b)=>a.pct-b.pct);
+  const res={acordo:0,retorno:0,sem:0};L.forEach(l=>{const r=l.r.toLowerCase();if(r.indexOf('acordo')===0)res.acordo++;else if(r.indexOf('retorno')>=0)res.retorno++;else res.sem++});
+  const nota=L.length?Math.round(L.reduce((s,l)=>s+l.n,0)/L.length):0;
+  // quem esta com nota mais baixa
+  const po={};L.forEach(l=>{const k=nm(l.op);(po[k]=po[k]||[]).push(l.n)});
+  const piores=Object.keys(po).map(k=>({n:k,m:Math.round(po[k].reduce((a,b)=>a+b,0)/po[k].length)})).filter(x=>x.m<60).sort((a,b)=>a.m-b.m).slice(0,4);
+  // funil do discador: ultima hora fechada da equipe
+  const hh=String(new Date().getHours()).padStart(2,'0'),hp=String(new Date().getHours()-1).padStart(2,'0');
+  const tot2=D.funil.filter(x=>x.tipo==='total'&&(String(x.hora).padStart(2,'0')===hp||String(x.hora).padStart(2,'0')===hh));
+  const F=tot2.reduce((a,x)=>{['dis','atd','op','cpc','aco','muda','ele'].forEach(k=>a[k]+=Number(x[k])||0);return a},{dis:0,atd:0,op:0,cpc:0,aco:0,muda:0,ele:0});
+  const motivos=[],sug=[];
+  crit.filter(c=>c.pct<70).slice(0,3).forEach(c=>{motivos.push({t:MOT[c.id],x:NOMEC[c.id]+' '+c.pct+'%'});sug.push(SUG[c.id])});
+  if(L.length&&res.sem/L.length>=.5)motivos.push({t:res.sem+' de '+L.length+' ligações avaliadas terminaram SEM acordo e sem retorno.',x:'resultado'});
+  if(F.dis>50&&F.muda/F.dis>.25){motivos.push({t:Math.round(F.muda/F.dis*100)+'% das discagens caíram em muda/silêncio: o discador está queimando tempo.',x:'discador'});sug.push('Avise o TI/Fastway: revisar o AMD e o mailing que está gerando muda.')}
+  if(F.op>0&&F.cpc/F.op<.35){motivos.push({t:'Só '+Math.round(F.cpc/F.op*100)+'% das ligações atendidas falaram com o devedor certo: mailing fraco ou muito número errado.',x:'contato'});sug.push('Trocar/priorizar o mailing com melhor contato e tabular "não conhece" certinho pra limpar a base.')}
+  if(!crit.length&&!motivos.length)motivos.push({t:'Ainda não há ligações avaliadas suficientes nessa janela pra apontar o motivo.',x:''});
+  if(piores.length)sug.splice(Math.min(2,sug.length),0,'Supervisor: passe na mesa de '+piores.map(p=>p.n).join(', ')+' e ouça uma ligação junto agora.');
+  sug.push('Meta do turno: 4 acordos por operador. Quem já bateu, ajuda puxando os retornos agendados do dia.');
+  const fortes=crit.filter(c=>c.pct>=80).slice(-2).map(c=>NOMEC[c.id]);
+  return{jan,n:L.length,nota,res,motivos:motivos.slice(0,4),sug:sug.slice(0,4),fortes,F};
+}
+function html(A,compacto){
+  if(!A)return '';
+  let h='<div class="dg-h"><b>Por que os acordos estão baixos</b><span>'+A.n+' ligações '+A.jan+' · nota média '+A.nota+' · '+A.res.acordo+' acordo, '+A.res.retorno+' retorno, '+A.res.sem+' sem acordo</span></div>';
+  h+='<div class="dg-c"><div class="dg-col"><i>Motivos</i>'+A.motivos.map(m=>'<p>❗ '+m.t+(m.x?' <em>'+m.x+'</em>':'')+'</p>').join('')+'</div>';
+  h+='<div class="dg-col"><i>O que fazer agora</i>'+A.sug.map(s=>'<p>✅ '+s+'</p>').join('')+'</div></div>';
+  if(A.fortes.length&&!compacto)h+='<div class="dg-f">Ponto forte da equipe: '+A.fortes.join(' e ')+'</div>';
+  return h;
+}
+function cardFixo(){
+  const pg=$('pageTV');if(!pg||!pg.classList.contains('active'))return;
+  const dir=pg.querySelector('.tv-right');if(!dir)return;
+  let c=dir.querySelector('.dg-card');if(!c){c=document.createElement('div');c.className='tv-card dg-card';dir.appendChild(c)}
+  if(ULT&&ULT.erro==='sem_chave'){c.innerHTML='<div class="dg-h"><b>Diagnóstico das ligações</b><span>Abra a aba Avaliação de Discagem uma vez e digite a senha da monitoria pra liberar.</span></div>';return}
+  c.innerHTML=ULT&&!ULT.erro?html(ULT,true):'<div class="dg-h"><b>Diagnóstico das ligações</b><span>Carregando...</span></div>';
+}
+function overlay(){
+  let o=$('dgOver');if(!o){o=document.createElement('div');o.id='dgOver';o.onclick=()=>{mostraAte=0;o.className=''}}
+  const pai=document.fullscreenElement||document.body;if(o.parentNode!==pai)pai.appendChild(o);
+  if(Date.now()<mostraAte&&ULT&&!ULT.erro){o.innerHTML='<div class="dg-box">'+html(ULT,false)+'<div class="dg-x">toque pra fechar</div></div>';o.className='on'}else o.className='';
+}
+// chamado pela TV quando dispara um alerta: espera o pulso de 60s acabar e mostra o diagnostico
+window.tvDiagnostico=async function(){
+  const D=await buscar();ULT=D.erro?D:analisar(D);cardFixo();
+  clearTimeout(tmr);tmr=setTimeout(()=>{mostraAte=Date.now()+DG.MOSTRA_SEG*1000;overlay();setTimeout(overlay,DG.MOSTRA_SEG*1000+300)},60500);
+};
+// mantem o cartao fixo depois de cada redesenho da TV
+const _sp=window.showPage;window.showPage=function(p){_sp(p);if(p==='tv'){buscar().then(D=>{ULT=D.erro?D:analisar(D);cardFixo()})}else{const o=$('dgOver');if(o)o.className=''}};
+new MutationObserver(()=>{const pg=$('pageTV');if(pg&&pg.classList.contains('active')&&!pg.querySelector('.dg-card'))cardFixo()}).observe(document.body,{childList:true,subtree:true});
+document.addEventListener('fullscreenchange',overlay);
+setInterval(()=>{const pg=$('pageTV');if(pg&&pg.classList.contains('active'))buscar().then(D=>{ULT=D.erro?D:analisar(D);cardFixo()})},10*60000);
+window.dgTeste=function(){mostraAte=Date.now()+DG.MOSTRA_SEG*1000;overlay()};
 })();
 </script>
 </body>
