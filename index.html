@@ -2535,7 +2535,7 @@ function parseCSV(text){
     // Filtra: só operadores (prefixo 0, 1, 2) + Andrieli
     const prefix=name.charAt(0);
     if(prefix!=='0'&&prefix!=='1'&&prefix!=='2'&&!name.toLowerCase().includes('andriel'))continue;
-    ops.push({n:cn(name),a:totalQtd,v:Math.round(totalVal*100)/100});
+    ops.push({n:cn(name),a:totalQtd,v:Math.round(totalVal*100)/100,pre:prefix});
   }
   ops.sort((a,b)=>b.a-a.a||b.v-a.v);
   return{d:dt,ta,tv:Math.round(tv*100)/100,ops};
@@ -4106,7 +4106,8 @@ window.MQ_ouvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(f
 (function(){
 const TV={META:4,JANELA_MIN:340,
   NIVEIS:[{min:.85,id:'ok',nome:'No ritmo',cor:'#22c55e'},{min:.65,id:'baixo',nome:'BAIXO',cor:'#eab308'},{min:.45,id:'muito',nome:'MUITO BAIXO',cor:'#f97316'},{min:-1,id:'extremo',nome:'EXTREMAMENTE BAIXO',cor:'#ef4444'}],
-  SOM_A_CADA:{baixo:15,muito:5,extremo:2}};          // minutos entre um aviso sonoro e outro
+  SOM_A_CADA:{baixo:15,muito:5,extremo:2},
+  ALERTA_SEG:60};                                    // o alerta chama atencao por 60s e depois a tela volta ao normal          // minutos entre um aviso sonoro e outro
 const $=id=>document.getElementById(id);
 const hm=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null};
 const agoraMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
@@ -4125,13 +4126,15 @@ function calcular(){
   const t=agoraMin(),ops=cRD&&cRD.ops?mergeOpsWithPonto(cRD.ops):[];
   const T={manha:{n:'Manhã',ops:[],feito:0,esp:0},tarde:{n:'Tarde',ops:[],feito:0,esp:0}};
   ops.forEach(o=>{
-    const lg=loginDe(o.n);if(lg&&!/^[012]/.test(lg))return;          // so operadores 0, 1 e 2
-    const pt=typeof matchPonto==='function'?matchPonto(o.n):null,ent=pt?hm(pt.entrada):null;
-    if(ent===null)return;                                              // nao bateu ponto: nao entra na conta
-    const tur=ent<720?'manha':'tarde';
+    // turno pelo LOGIN: 1 = manha, 2 = tarde; novato (0) vai pelo horario de entrada
+    const pre=String(o.pre||loginDe(o.n)||'').charAt(0);if(pre&&!/[012]/.test(pre))return;   // so operadores 0, 1 e 2
+    const pt=typeof matchPonto==='function'?matchPonto(o.n):null;let ent=pt?hm(pt.entrada):null;
+    let tur=pre==='1'?'manha':pre==='2'?'tarde':(ent!==null?(ent<720?'manha':'tarde'):(t>=840?'tarde':'manha'));
+    if(ent===null){if(!(o.a>0))return;ent=tur==='tarde'?840:480}       // fez acordo mas o ponto nao achou: conta do inicio do turno
+    ent=Math.max(ent,tur==='tarde'?840:480);                            // chegar antes do turno nao aumenta a meta
     const dec=Math.max(0,Math.min(TV.JANELA_MIN,t-ent));
     const esp=TV.META*dec/TV.JANELA_MIN;
-    const x={n:o.n,a:o.a||0,v:o.v||0,ent:pt.entrada,esp:esp};T[tur].ops.push(x);T[tur].feito+=x.a;T[tur].esp+=esp;
+    const x={n:o.n,a:o.a||0,v:o.v||0,ent:pt?pt.entrada:'',esp:esp};T[tur].ops.push(x);T[tur].feito+=x.a;T[tur].esp+=esp;
   });
   Object.values(T).forEach(g=>{g.r=g.esp>0?g.feito/g.esp:1;g.nivel=TV.NIVEIS.find(n=>g.r>=n.min);
     g.metaFinal=g.ops.length*TV.META;g.falta=Math.max(0,Math.ceil(g.esp-g.feito));
@@ -4143,17 +4146,19 @@ let AC=null,somOn=localStorage.getItem('tv_som')!=='0';
 function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
 function bip(f,dur,quando,vol,tipo){const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=tipo||'sine';o.frequency.value=f;o.connect(g);g.connect(a.destination);
   const t0=a.currentTime+(quando||0);g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol||.3,t0+.02);g.gain.linearRampToValueAtTime(0,t0+dur);o.start(t0);o.stop(t0+dur+.05)}
+// volume sobe junto com o nivel: baixo = baixinho, muito baixo = alto, extremamente baixo = no maximo
 function tocar(id){if(!somOn)return;
-  if(id==='baixo'){bip(880,.25,0,.25)}
-  else if(id==='muito'){[0,.35,.7].forEach(q=>bip(1046,.22,q,.4,'square'))}
-  else if(id==='extremo'){const a=ac();if(!a)return;for(let i=0;i<8;i++){bip(i%2?700:1200,.45,i*.5,.55,'sawtooth')}}}
-let ultimoSom={},ultimoNivel={};
+  if(id==='baixo'){[0,.4].forEach(q=>bip(660,.3,q,.12))}                                   // 2 bipes suaves e baixos
+  else if(id==='muito'){for(let i=0;i<6;i++)bip(1000,.25,i*.35,.5,'square')}               // 6 bipes fortes (~2s)
+  else if(id==='extremo'){for(let i=0;i<12;i++)bip(i%2?650:1300,.48,i*.5,1,'sawtooth')}}  // sirene no volume maximo (~6s)
+let ultimoSom={},ultimoNivel={},alertaAte=0,alertaTm=null;
 function alarmar(R){
   if(R.m.id!=='power')return;
   const g=R.T[R.m.turno];if(!g||!g.ops.length)return;
   const id=g.nivel.id;if(id==='ok'){ultimoNivel[R.m.turno]=id;return}
   const ag=Date.now(),piorou=ultimoNivel[R.m.turno]!==id;
-  if(piorou||!ultimoSom[id]||ag-ultimoSom[id]>TV.SOM_A_CADA[id]*60000){ultimoSom[id]=ag;tocar(id);if(id==='extremo')flash()}
+  if(piorou||!ultimoSom[id]||ag-ultimoSom[id]>TV.SOM_A_CADA[id]*60000){ultimoSom[id]=ag;tocar(id);if(id==='extremo')flash();
+    alertaAte=ag+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300);}
   ultimoNivel[R.m.turno]=id;
 }
 function flash(){const f=$('tvFlash');if(!f)return;f.classList.remove('on');void f.offsetWidth;f.classList.add('on');}
@@ -4163,7 +4168,9 @@ function render(){
   const pg=$('pageTV');if(!pg||!pg.classList.contains('active'))return;
   const R=calcular(),ops=(cRD&&cRD.ops?cRD.ops.slice():[]).filter(o=>!/rob/i.test(o.n)).sort((a,b)=>b.a-a.a||b.v-a.v);
   const ta=ops.reduce((s,o)=>s+o.a,0),tv=ops.reduce((s,o)=>s+o.v,0),ativos=ops.filter(o=>o.a>0).length;
-  const g=R.m.turno?R.T[R.m.turno]:null,niv=R.m.id==='power'&&g&&g.ops.length?g.nivel:null;
+  const g=R.m.turno?R.T[R.m.turno]:null,niv0=R.m.id==='power'&&g&&g.ops.length?g.nivel:null;
+  alarmar(R);                                                         // decide se toca agora (e liga os 60s de alerta)
+  const emAlerta=Date.now()<alertaAte,niv=niv0&&(niv0.id==='ok'||emAlerta)?niv0:null;
   pg.className='page active tv-nivel-'+(niv?niv.id:'none');
   const ch=ops[rot%Math.min(3,Math.max(1,ops.length))]||null,pos=ops.indexOf(ch);
   let h='<div id="tvFlash"></div><div class="tv-wrap">';
@@ -4190,11 +4197,10 @@ function render(){
   h+='<div class="tv-card tv-streak"><div><span>Operadores com Acordos</span><b><em>'+ativos+' de '+ops.length+'</em> ativos</b></div><div>'+'🔥'.repeat(Math.min(ativos,6))+'</div></div>';
   h+='</div></div><div class="tv-foot">"Quem fecha mais, aparece mais."</div></div>';
   pg.innerHTML=h;
-  alarmar(R);
 }
 window.tvSom=function(){somOn=!somOn;localStorage.setItem('tv_som',somOn?'1':'0');if(somOn){ac();bip(660,.15,0,.2)}render()};
 window.tvTela=function(){const el=$('pageTV');ac();if(document.fullscreenElement)document.exitFullscreen();else if(el.requestFullscreen)el.requestFullscreen()};
-window.tvTeste=function(n){tocar(n);if(n==='extremo')flash()};   // no Console: tvTeste('baixo'|'muito'|'extremo')
+window.tvTeste=function(n){tocar(n);if(n==='extremo')flash();alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300)};   // no Console: tvTeste('baixo'|'muito'|'extremo')
 setInterval(render,30000);setInterval(()=>{rot++},5*60000);
 setInterval(()=>{const ok=typeof isA==='function'&&isA();const s=$('sbTV');if(s)s.style.display=ok?'flex':'none'},1000);
 const sp=window.showPage;
