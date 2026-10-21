@@ -4413,7 +4413,7 @@ function htmlCard(A){
   let h='<div class="dg-h"><b>Por que os acordos estão baixos</b><span>'+A.n+' ligações avaliadas '+A.jan+' · nota média '+A.nota+' · '+A.acordos+' com acordo, '+A.sem+' sem acordo</span></div>';
   if(!A.itens.length)return h+'<div class="dg-c"><div class="dg-col"><p>Sem ligações avaliadas suficientes pra apontar o motivo.</p></div></div>';
   h+='<div class="dg-c"><div class="dg-col"><i>Motivos</i>'+A.itens.map(m=>'<p>❗ '+m.p+' <em>'+m.tag+'</em></p>').join('')+'</div>';
-  h+='<div class="dg-col"><i>O que fazer agora</i>'+A.itens.map(m=>'<p>✅ '+m.f+'</p>').join('')+(A.piores.length?'<p>👀 Supervisor: ouvir '+A.piores.map(p=>p.n).join(', ')+'</p>':'')+'</div></div>';
+  h+='<div class="dg-col"><i>O que fazer agora</i>'+A.itens.map(m=>'<p>✅ '+m.f+'</p>').join('')+(A.piores.length?'<p>👀 Supervisor: veja na aba Avaliação de Discagem quem precisa de apoio</p>':'')+'</div></div>';
   return h;
 }
 function cardFixo(){
