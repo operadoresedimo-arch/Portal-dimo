@@ -2006,6 +2006,10 @@ body::before,body::after{display:none!important}
 .avd-fil{display:flex;gap:8px;flex-wrap:wrap}
 .avd-fil select,.avd-fil button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:9px 12px;font-family:inherit;font-size:.76rem;font-weight:600;cursor:pointer}
 .avd-fil select option{color:#1a1f36}
+.avd-fil input[type=time]{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:7px 10px;font-family:inherit;font-size:.76rem;font-weight:600;color-scheme:dark}
+.avd-st{display:inline-block;font-size:.66rem;font-weight:700;padding:2px 9px;border-radius:20px;margin-left:6px;vertical-align:1px}.avd-st.bem{background:#dcfce7;color:#15803d}.avd-st.parte{background:#fef3c7;color:#b45309}.avd-st.nao{background:#fee2e2;color:#b91c1c}.avd-st.na{background:#f1f5f9;color:#64748b}
+.avd-ul{display:grid;grid-template-columns:96px minmax(140px,190px) 1fr 120px;gap:12px;align-items:center;padding:10px 16px;border-top:1px solid #eef1f5;cursor:pointer;font-size:.8rem}.avd-ul:hover{background:#f8fafc}.avd-ul .h{font-weight:800;color:var(--nv);font-variant-numeric:tabular-nums}.avd-ul .h small{display:block;font-weight:500;color:#9ca3af;font-size:.68rem}.avd-ul .o{font-weight:700;color:var(--tx)}.avd-ul .f{display:flex;gap:5px;flex-wrap:wrap}.avd-ul .f span{font-size:.68rem;font-weight:600;background:#fee2e2;color:#b91c1c;border-radius:99px;padding:2px 8px}.avd-ul .f span.ok{background:#dcfce7;color:#15803d}.avd-ul .r{text-align:right}
+@media(max-width:900px){.avd-ul{grid-template-columns:80px 1fr}.avd-ul .f,.avd-ul .r{grid-column:1/-1;text-align:left}}
 .avd-fil input[type=date]{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:7px 10px;font-family:inherit;font-size:.76rem;font-weight:600;color-scheme:dark}
 .avd-in{background:#f9fafb;color:var(--tx);border:1px solid #e5e7eb;border-radius:10px;padding:11px 14px;font-family:inherit;font-size:.8rem;cursor:pointer}
 .avd-btn{width:auto;padding:11px 16px;border:0;border-radius:10px;background:linear-gradient(180deg,#1e4e7e,#0f3557);color:#fff;font-family:inherit;font-size:.8rem;font-weight:700;cursor:pointer}
@@ -3592,8 +3596,8 @@ const temRes=l=>{const r=String(l.resultado||'').toLowerCase();return r.indexOf(
 const root=()=>$('pageAvaliacao');
 const vs=(n,eq)=>'<span class="'+(n>=eq?'avd-up':'avd-down')+'">'+(n>=eq?'▲ ':'▼ ')+Math.abs(n-eq).toFixed(0)+'</span> <span class="avd-mut">vs equipe</span>';
 
-function cabec(extra){return '<div class="avd-head"><div><h2>🎧 Avaliação de <span>Discagem</span>'+(DEMO_MODE?'<span class="avd-demo">DEMONSTRAÇÃO</span>':'')+'</h2><p>Ligações ouvidas e avaliadas pela IA · régua de 100 pontos</p></div>'+(extra||'')+'</div>'}
-function filtrosHTML(){return '<div class="avd-fil"><select id="avdPer" onchange="avd.render()"><option value="0">Tudo</option><option value="hoje">Hoje</option><option value="ontem">Ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="dia">Escolher dia...</option></select><input type="date" id="avdDia" onchange="avd.render()" style="display:none"><select id="avdGrp" onchange="avd.render()"><option value="">Todos</option><option value="novato">Novatos</option><option value="veterano">Veteranos</option></select><button onclick="avd.carregar(true)">↻ Atualizar</button></div>'}
+function cabec(extra){return '<div class="avd-head"><div><h2>🎧 Avaliação de <span>Discagem</span>'+(DEMO_MODE?'<span class="avd-demo">DEMONSTRAÇÃO</span>':'')+'</h2><p>Ligações ouvidas pela IA · feedback de cobradora experiente, sem nota</p></div>'+(extra||'')+'</div>'}
+function filtrosHTML(){return '<div class="avd-fil"><select id="avdPer" onchange="avd.render()"><option value="0">Tudo</option><option value="hoje">Hoje</option><option value="ontem">Ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="dia">Escolher dia...</option></select><input type="date" id="avdDia" onchange="avd.render()" style="display:none"><select id="avdHr" onchange="avd.render()"><option value="">O dia todo</option><option value="1">Última hora</option><option value="2">Últimas 2 horas</option><option value="3">Últimas 3 horas</option><option value="manha">Manhã (8h às 14h)</option><option value="tarde">Tarde (14h às 20h)</option><option value="faixa">Escolher horário...</option></select><span id="avdFx" style="display:none;gap:6px;align-items:center"><input type="time" id="avdHi" onchange="avd.render()"><span style="color:#fff;font-size:.74rem">às</span><input type="time" id="avdHf" onchange="avd.render()"></span><select id="avdGrp" onchange="avd.render()"><option value="">Todos</option><option value="novato">Novatos</option><option value="veterano">Veteranos</option></select><button onclick="avd.carregar(true)">↻ Atualizar</button></div>'}
 function telaSenha(msg){root().innerHTML=cabec()+'<div class="avd-login"><div class="avd-ic">🔐</div><h3>Área do supervisor</h3><p>Digite a senha da avaliação de discagem</p><input class="avd-in" type="password" id="avdSenha" placeholder="Senha" onkeydown="if(event.key===\'Enter\')avd.entrar()"><button class="avd-btn" onclick="avd.entrar()">Entrar</button><p style="color:#ef4444;margin-top:10px">'+(msg||'')+'</p></div>'}
 
 async function carregar(forcar){
@@ -3624,14 +3628,38 @@ function noPer(dstr){
   if(v==='dia'){const x=$('avdDia');if(!x||!x.value)return true;const p=x.value.split('-');return +d===+new Date(+p[0],p[1]-1,+p[2])}
   const lim=new Date(h);lim.setDate(h.getDate()-(+v));return d>=lim;
 }
+const mins=h=>{const m=String(h||'').match(/(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null};
+const quando=l=>{const d=dt(String(l.data).replace(/^'/,''));const m=mins(l.hora);if(isNaN(d)||m===null)return null;d.setMinutes(m);return d};
+function noHr(l){
+  const v=$('avdHr')?$('avdHr').value:'';if(!v)return true;
+  if(/^\d$/.test(v)){const q=quando(l);return !!q&&q.getTime()>=Date.now()-(+v)*3600e3&&q.getTime()<=Date.now()+5*60e3}
+  const m=mins(l.hora);if(m===null)return false;
+  if(v==='manha')return m>=480&&m<840;
+  if(v==='tarde')return m>=840&&m<1200;
+  const a=mins(($('avdHi')||{}).value),b=mins(($('avdHf')||{}).value);
+  return (a===null||m>=a)&&(b===null||m<=b);
+}
+// critério sem nota: fez bem / fez em parte / não fez / não se aplica
+const ST_C={bem:'Fez bem',parte:'Fez em parte',nao:'Não fez',na:'Não se aplica'};
+function stC(c){const s=String(c.status||'').toLowerCase();if(ST_C[s])return s;const mx=+c.max||0;if(!mx)return 'na';const p=(+c.pontos||0)/mx;return p>=.75?'bem':p>=.4?'parte':'nao'}
+const falhas=l=>(l.criterios||[]).filter(c=>stC(c)==='nao').map(c=>c.fraco||c.nome);
+const ordT=(a,b)=>((quando(b)||0)-(quando(a)||0));
 function filt(){
   const grp=$('avdGrp'),g=grp?grp.value:'';
-  return DADOS.filter(l=>noPer(l.data)&&(!g||l.grupo===g));
+  return DADOS.filter(l=>String(l.operador||'').trim()&&noPer(l.data)&&noHr(l)&&(!g||l.grupo===g));
+}
+function ultimas(ls,titulo,max,soId){
+  let L=ls.slice().sort(ordT);if(soId)L=L.filter(l=>(l.criterios||[]).some(c=>c.id===soId&&stC(c)==='nao'));
+  const tot=L.length;L=L.slice(0,max||12);
+  let h='<div class="avd-card"><div class="avd-ct">'+titulo+' <span class="avd-mut" style="text-transform:none;letter-spacing:0;font-weight:500">'+(tot?'· '+tot+' no filtro, mais recentes primeiro':'')+'</span></div>';
+  if(!L.length)return h+'<div class="avd-empty" style="padding:18px">Nenhuma ligação nesse dia/horário.</div></div>';
+  h+=L.map(l=>{const f=falhas(l);return '<div class="avd-ul" onclick="avd.lig(\''+esc(l.id)+'\')"><div class="h">'+esc(String(l.hora).slice(0,5))+'<small>'+esc(String(l.data).replace(/^'/,'').slice(0,5))+'</small></div><div class="o">'+esc(nc(l.operador))+(l.grupo==='novato'?' <span class="avd-tag">novato</span>':'')+'</div><div class="f">'+(f.length?f.slice(0,4).map(x=>'<span>'+esc(x)+'</span>').join('')+(f.length>4?'<span>+'+(f.length-4)+'</span>':''):'<span class="ok">Sem falha grave</span>')+'</div><div class="r"><span class="avd-pl rs">'+esc(l.resultado||'-')+'</span></div></div>'}).join('');
+  return h+'</div>';
 }
 const CNOME={abertura:'Abertura e identificação',motivo:'Explicou o motivo',avista:'Apresentou as opções',objecao:'Contornou a objeção',escada:'Insistiu na negociação',valores:'Valores claros e corretos',saida:'Buscou o fechamento',fechamento:'Fechamento formal',ganho:'Mostrou o ganho de pagar'};
 const CFRACO={abertura:'Abertura fraca',motivo:'Não explica o motivo',avista:'Não apresenta as opções',objecao:'Trava na objeção',escada:'Desiste sem negociar',valores:'Valores confusos',saida:'Não busca o fechamento',fechamento:'Fechamento incompleto',ganho:'Não mostra o ganho de pagar'};
 function cm(ls){const m={};ls.forEach(l=>l.criterios.forEach(c=>{if(!m[c.id])m[c.id]={nome:c.nome,fraco:c.fraco,p:0,max:0};m[c.id].p+=+c.pontos;m[c.id].max+=+c.max}));Object.keys(m).forEach(k=>m[k].pct=m[k].max?m[k].p/m[k].max*100:0);return m}
-function kpi(c,v,l,s,vw){const at=vw==='rank'?VIEW==='':VIEW===vw;return '<div class="avd-k'+(vw?' clk'+(at?' on':''):'')+'" style="--c:'+c+'"'+(vw?' onclick="avd.ver(\''+vw+'\')"':'')+'><div class="avd-kv">'+v+'</div><div class="avd-kl">'+l+'</div>'+(s?'<div class="avd-ks">'+s+'</div>':'')+(vw?'<div class="avd-hint">'+(vw==='rank'?(at?'ranking de qualidade':'clique pra voltar ao ranking'):(at?'clique pra voltar ao ranking':'clique pra detalhar'))+'</div>':'')+'</div>'}
+function kpi(c,v,l,s,vw){const at=vw==='rank'?VIEW==='':VIEW===vw;return '<div class="avd-k'+(vw?' clk'+(at?' on':''):'')+'" style="--c:'+c+'"'+(vw?' onclick="avd.ver(\''+vw+'\')"':'')+'><div class="avd-kv">'+v+'</div><div class="avd-kl">'+l+'</div>'+(s?'<div class="avd-ks">'+s+'</div>':'')+(vw?'<div class="avd-hint">'+(vw==='rank'?(at?'lista por operador':'clique pra voltar à lista'):(at?'clique pra voltar à lista':'clique pra detalhar'))+'</div>':'')+'</div>'}
 let VIEW='',CRIT='';
 function ver(v){VIEW=(v==='rank'||VIEW===v)?'':v;CRIT='';render()}
 function crit(id){CRIT=id;render()}
@@ -3640,22 +3668,23 @@ const pc=(x,t)=>t?(x/t*100):0;
 const mini=(p,c)=>'<span class="avd-mini"><i style="width:'+Math.max(2,Math.min(100,p)).toFixed(0)+'%;background:'+c+'"></i></span>';
 
 function render(){
-  const per=$('avdPer')?$('avdPer').value:'0',grp=$('avdGrp')?$('avdGrp').value:'',dia=$('avdDia')?$('avdDia').value:'';
+  const per=$('avdPer')?$('avdPer').value:'0',grp=$('avdGrp')?$('avdGrp').value:'',dia=$('avdDia')?$('avdDia').value:'',hr=$('avdHr')?$('avdHr').value:'',hi=$('avdHi')?$('avdHi').value:'',hf=$('avdHf')?$('avdHf').value:'';
   root().innerHTML=cabec(filtrosHTML())+'<div id="avdBody"></div>';
-  $('avdPer').value=per;$('avdGrp').value=grp;if($('avdDia')){$('avdDia').value=dia||new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);$('avdDia').style.display=per==='dia'?'':'none'}
+  $('avdPer').value=per;$('avdGrp').value=grp;$('avdHr').value=hr;$('avdHi').value=hi;$('avdHf').value=hf;$('avdFx').style.display=hr==='faixa'?'inline-flex':'none';if($('avdDia')){$('avdDia').value=dia||new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);$('avdDia').style.display=per==='dia'?'':'none'}
   OP=null;const ls=filt(),eq=med(ls.map(l=>l.nota)),c=cm(ls);
   const fr=Object.values(c).sort((a,b)=>a.pct-b.pct)[0];
   const ops={};ls.forEach(l=>(ops[l.operador]=ops[l.operador]||[]).push(l));
-  const lin=Object.keys(ops).map(op=>{const a=ops[op],n=med(a.map(l=>l.nota)),f=Object.values(cm(a)).sort((x,y)=>x.pct-y.pct)[0];return{op,a,n,g:a[0].grupo,res:a.filter(temRes).length/a.length*100,f,pend:a.filter(l=>!l.feedback_dado).length}}).sort((x,y)=>y.n-x.n);
+  const lin=Object.keys(ops).map(op=>{const a=ops[op],cc=cm(a),f=Object.values(cc).sort((x,y)=>x.pct-y.pct)[0],tp=Object.values(cc).reduce((s,x)=>[s[0]+x.p,s[1]+x.max],[0,0]);return{op,a,n:tp[1]?tp[0]/tp[1]*100:0,g:a[0].grupo,res:a.filter(temRes).length/a.length*100,f,pend:a.filter(l=>!l.feedback_dado).length,ult:a.slice().sort(ordT)[0]}}).sort((x,y)=>x.n-y.n);
   let h='<div class="avd-kpis">'+
     kpi('#1e4e7e',ls.length,'Ligações avaliadas',lin.length+' operadores','rank')+
-    kpi('#d4a937',eq.toFixed(0),'Nota média da equipe','de 100 pontos','nota')+
+    kpi('#d4a937',ls.filter(l=>!l.feedback_dado).length,'Feedbacks pendentes','avaliadas e ainda não conversadas')+
     kpi('#16a34a',(ls.length?(ls.filter(temRes).length/ls.length*100).toFixed(0):0)+'%','Saíram com acordo','','res')+
     kpi('#dc2626','<span style="font-size:1rem">'+(fr?esc(fr.fraco||fr.nome):'-')+'</span>','Principal erro da equipe',fr?fr.pct.toFixed(0)+'% de aproveitamento':'','erro')+
     (FUNIL?(()=>{const t=funilTot(funilFilt().filter(x=>x.tipo==='total'));return kpi('#7c3aed',fmtN(t.dis),'Discagens no período',fmtN(t.atd)+' atendidas · '+fmtN(t.aco)+' acordos','funil')})():'')+'</div>';
   if(VIEW){$('avdBody').innerHTML=h+visao(ls,lin,c,eq);return}
-  h+='<div class="avd-card"><div class="avd-ct">Ranking de qualidade</div>';
-  h+=lin.map((o,i)=>'<div class="avd-row" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><div class="avd-pos">'+(i+1)+'º</div><div class="avd-av'+(i<3?' top':'')+'">'+esc(ini(o.op))+'</div><div class="avd-b"><div class="avd-nm">'+esc(nc(o.op))+(o.g==='novato'?'<span class="avd-tag">novato</span>':'')+'</div><div class="avd-sb">'+o.a.length+' ouvida'+(o.a.length>1?'s':'')+' · '+o.res.toFixed(0)+'% com resultado'+(o.f?' · ponto fraco: '+esc(o.f.fraco||o.f.nome):'')+'</div></div><div class="avd-r"><span class="avd-n '+cl(o.n)+'">'+o.n.toFixed(0)+'</span><div class="avd-vs">'+vs(o.n,eq)+'</div>'+(o.pend?'<div class="avd-vs"><span class="avd-pl pd">'+o.pend+' feedback'+(o.pend>1?'s':'')+'</span></div>':'')+'</div></div>').join('');
+  h+=ultimas(ls,'Últimas ligações avaliadas pela IA',12);
+  h+='<div class="avd-card"><div class="avd-ct">Por operador · quem mais precisa de apoio primeiro</div>';
+  h+=lin.map((o,i)=>'<div class="avd-row" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><div class="avd-av">'+esc(ini(o.op))+'</div><div class="avd-b"><div class="avd-nm">'+esc(nc(o.op))+(o.g==='novato'?'<span class="avd-tag">novato</span>':'')+'</div><div class="avd-sb">'+o.a.length+' ouvida'+(o.a.length>1?'s':'')+' · '+o.res.toFixed(0)+'% com acordo'+(o.f?' · mais falha em: <b style="color:#b91c1c">'+esc(o.f.fraco||o.f.nome)+'</b>':'')+'</div></div><div class="avd-r">'+(o.ult?'<div class="avd-vs avd-mut">última: '+esc(String(o.ult.data).replace(/^\'/,'').slice(0,5))+' '+esc(String(o.ult.hora).slice(0,5))+'</div>':'')+(o.pend?'<div class="avd-vs"><span class="avd-pl pd">'+o.pend+' feedback'+(o.pend>1?'s':'')+' pendente'+(o.pend>1?'s':'')+'</span></div>':'')+'</div></div>').join('');
   h+=(lin.length?'':'<div class="avd-empty">Nenhuma ligação avaliada nesse período.</div>')+'</div>';
   $('avdBody').innerHTML=h;
 }
@@ -3663,20 +3692,21 @@ function top(ls,campo){const m={};ls.forEach(l=>(l[campo]||[]).forEach(f=>{const
 
 function detalhe(opEnc){
   const op=decodeURIComponent(opEnc);OP=op;
-  const todos=filt(),a=todos.filter(l=>l.operador===op).sort((x,y)=>dt(y.data)-dt(x.data)||String(y.hora).localeCompare(String(x.hora)));
+  const todos=filt(),a=todos.filter(l=>l.operador===op).sort(ordT);
   const eq=med(todos.map(l=>l.nota)),n=med(a.map(l=>l.nota));
   const rk={};todos.forEach(l=>(rk[l.operador]=rk[l.operador]||[]).push(l.nota));
   const rank=Object.keys(rk).map(o=>[o,med(rk[o])]).sort((x,y)=>y[1]-x[1]),pos=rank.findIndex(r=>r[0]===op)+1;
   const co=cm(a),ce=cm(todos),ac=top(a,'acertos'),er=top(a,'erros'),nm=esc(nc(op));
   let h='<div class="avd-prof"><div class="avd-av">'+esc(ini(op))+'</div><div><h2>'+nm+(a[0]&&a[0].grupo==='novato'?' <span class="avd-tag">novato</span>':'')+'</h2><p>'+esc(op)+'</p></div><button class="avd-back" onclick="avd.render()">← Voltar</button></div>';
-  h+='<div class="avd-kpis">'+kpi('#d4a937',n.toFixed(0),'Nota média',vs(n,eq)+' ('+eq.toFixed(0)+')')+kpi('#1e4e7e',pos+'º','Posição no ranking','de '+rank.length+' operadores')+kpi('#16a34a',a.length,'Ligações ouvidas',a.filter(temRes).length+' com acordo')+kpi('#b45309',a.filter(l=>!l.feedback_dado).length,'Feedback pendente')+'</div>';
+  const pf=Object.values(co).sort((x,y)=>x.pct-y.pct)[0];
+  h+='<div class="avd-kpis">'+kpi('#16a34a',a.length,'Ligações ouvidas',a.filter(temRes).length+' com acordo')+kpi('#dc2626','<span style="font-size:1rem">'+(pf?esc(pf.fraco||pf.nome):'-')+'</span>','Onde mais precisa melhorar','')+kpi('#b45309',a.filter(l=>!l.feedback_dado).length,'Feedback pendente')+(a[0]?kpi('#1e4e7e','<span style="font-size:1rem">'+esc(String(a[0].data).replace(/^\'/,'').slice(0,5))+' '+esc(String(a[0].hora).slice(0,5))+'</span>','Última ligação avaliada',''):'')+'</div>';
   h+='<div class="avd-card"><div class="avd-ct">Critério a critério · '+nm+' x equipe</div><div class="avd-pad"><div class="avd-leg"><i style="background:#0f3557"></i>'+nm+'<i style="background:#c7d2e0"></i>Média da equipe</div>'+
    Object.keys(ce).map(id=>{const c=ce[id],o=co[id]?co[id].pct:0;return '<div class="avd-crit"><div class="l"><span>'+esc(c.nome)+'</span><span><b class="'+(o>=c.pct?'avd-up':'avd-down')+'">'+o.toFixed(0)+'%</b> <span class="avd-mut">/ equipe '+c.pct.toFixed(0)+'%</span></span></div><div class="avd-bar"><i class="e" style="width:'+c.pct+'%"></i><i class="o" style="width:'+o+'%"></i></div></div>'}).join('')+'</div></div>';
   const lst=(arr,ic)=>arr.length?'<ul class="avd-lst">'+arr.map(x=>'<li><span>'+ic+'</span><span>'+esc(x[0])+'</span><b>'+x[1]+'x</b></li>').join('')+'</ul>':'<div class="avd-empty" style="padding:14px">Sem dados ainda</div>';
   h+='<div class="avd-g2"><div class="avd-card"><div class="avd-ct">O que mais acerta</div><div class="avd-pad">'+lst(ac,'✅')+'</div></div><div class="avd-card"><div class="avd-ct">Onde mais erra</div><div class="avd-pad">'+lst(er,'⚠️')+'</div></div></div>';
-  h+='<div class="avd-card"><div class="avd-ct">Ligações ouvidas</div>'+a.map((l,i)=>'<div class="avd-row" onclick="avd.abre('+i+')"><span class="avd-n '+cl(l.nota)+'">'+l.nota+'</span><div class="avd-b"><div class="avd-nm">'+esc(l.data)+' · '+esc(String(l.hora).slice(0,5))+' <span class="avd-pl rs">'+esc(l.resultado||'-')+'</span></div><div class="avd-sb">'+esc(l.duracao)+' · '+esc(l.tabulacao)+'</div></div><div class="avd-r">'+(l.feedback_dado?'<span class="avd-pl fb">✔ feedback dado</span>':'<span class="avd-pl pd" title="Avaliação pronta. Falta dar o feedback pro operador.">feedback pendente</span>')+'</div></div>'+
-   '<div class="avd-lig-b" id="avdLb'+i+'">'+(l.audio_url?'<iframe data-src="'+esc(l.audio_url)+'" allow="autoplay"></iframe><a class="avd-drv" href="'+esc(String(l.audio_url).replace('/preview','/view'))+'" target="_blank">Abrir \u00E1udio no Drive \u203A</a>':'')+'<p><b>Resumo:</b> '+esc(l.resumo)+'</p><p><b>O que falar no feedback:</b> '+esc(l.feedback)+'</p>'+
-   l.criterios.map(c=>'<div class="avd-ev"><b>'+esc(c.nome)+' · '+c.pontos+'/'+c.max+'</b><br>'+esc(c.evidencia)+'</div>').join('')+
+  h+='<div class="avd-card"><div class="avd-ct">Ligações ouvidas</div>'+a.map((l,i)=>'<div class="avd-row" id="avdLr'+i+'" onclick="avd.abre('+i+')"><span class="avd-n '+(temRes(l)?'avd-ok':falhas(l).length>=3?'avd-bad':'avd-mid')+'" title="'+(temRes(l)?'acordo':'sem acordo')+'">'+esc(String(l.hora).slice(0,5))+'</span><div class="avd-b"><div class="avd-nm">'+esc(l.data)+' · '+esc(String(l.hora).slice(0,5))+' <span class="avd-pl rs">'+esc(l.resultado||'-')+'</span></div><div class="avd-sb">'+esc(l.duracao)+' · '+esc(l.tabulacao)+'</div></div><div class="avd-r">'+(l.feedback_dado?'<span class="avd-pl fb">✔ feedback dado</span>':'<span class="avd-pl pd" title="Avaliação pronta. Falta dar o feedback pro operador.">feedback pendente</span>')+'</div></div>'+
+   '<div class="avd-lig-b" id="avdLb'+i+'">'+(l.audio_url?'<iframe data-src="'+esc(l.audio_url)+'" allow="autoplay"></iframe><a class="avd-drv" href="'+esc(String(l.audio_url).replace('/preview','/view'))+'" target="_blank">Abrir \u00E1udio no Drive \u203A</a>':'')+'<p><b>Resumo:</b> '+esc(l.resumo)+'</p><p><b>Feedback da cobradora:</b> '+esc(l.feedback)+'</p>'+(l.melhorar?'<p><b>O que fazer na próxima:</b> '+esc(l.melhorar)+'</p>':'')+
+   l.criterios.map(c=>{const k=stC(c);return '<div class="avd-ev"><b>'+esc(c.nome)+'</b><span class="avd-st '+k+'">'+ST_C[k]+'</span><br>'+esc(c.evidencia)+'</div>'}).join('')+
    '<details><summary>Ver transcrição</summary><pre>'+esc(l.transcricao)+'</pre></details><button class="avd-btn'+(l.feedback_dado?' sec':'')+'" style="margin-top:10px" onclick="event.stopPropagation();avd.feedback(\''+esc(l.id)+'\','+(l.feedback_dado?0:1)+',this)">'+(l.feedback_dado?'Desmarcar feedback':'✔ Marcar feedback dado')+'</button></div>').join('')+(a.length?'':'<div class="avd-empty">Sem ligações</div>')+'</div>';
   $('avdBody').innerHTML=h;window.scrollTo(0,0);
 }
@@ -3724,25 +3754,27 @@ function visao(ls,lin,c,eq){
     h+='<div class="avd-card"><div class="avd-ct">'+(VIEW==='nota'?'Nota média x acordos feitos e perdidos':'Resultado das ligações ouvidas')+'</div>';
     h+='<div class="avd-split"><i style="width:'+pc(T.a,N)+'%;background:#16a34a"></i><i style="width:'+pc(T.r,N)+'%;background:#d4a937"></i><i style="width:'+pc(T.s,N)+'%;background:#dc2626"></i></div>';
     h+='<div class="avd-leg"><span>Acordo feito: <b>'+T.a+' ('+pc(T.a,N).toFixed(0)+'%)</b></span><span>Retorno agendado: <b>'+T.r+' ('+pc(T.r,N).toFixed(0)+'%)</b></span><span>Perdido (sem acordo): <b>'+T.s+' ('+pc(T.s,N).toFixed(0)+'%)</b></span></div>';
-    h+='<table class="avd-tb"><tr><th>Operador</th><th>Nota</th><th>Ouvidas</th><th>Acordo</th><th>Retorno</th><th>Perdido</th><th>% acordo feito</th><th>% perdido</th></tr>';
-    h+=L.map(o=>linha(o,['<span class="avd-n '+cl(o.n)+'">'+o.n.toFixed(0)+'</span>',o.a.length,o.t.a,o.t.r,o.t.s,'<b style="color:#16a34a">'+pc(o.t.a,o.a.length).toFixed(0)+'%</b>'+mini(pc(o.t.a,o.a.length),'#16a34a'),'<b style="color:#dc2626">'+pc(o.t.s,o.a.length).toFixed(0)+'%</b>'+mini(pc(o.t.s,o.a.length),'#dc2626')])).join('');
+    h+='<table class="avd-tb"><tr><th>Operador</th><th>Ouvidas</th><th>Acordo</th><th>Retorno</th><th>Perdido</th><th>% acordo feito</th><th>% perdido</th></tr>';
+    h+=L.map(o=>linha(o,[o.a.length,o.t.a,o.t.r,o.t.s,'<b style="color:#16a34a">'+pc(o.t.a,o.a.length).toFixed(0)+'%</b>'+mini(pc(o.t.a,o.a.length),'#16a34a'),'<b style="color:#dc2626">'+pc(o.t.s,o.a.length).toFixed(0)+'%</b>'+mini(pc(o.t.s,o.a.length),'#dc2626')])).join('');
     h+='</table></div>';
-    if(VIEW==='nota'){
+    if(false){
       const fx=[['75 ou mais',l=>l.nota>=75],['55 a 74',l=>l.nota>=55&&l.nota<75],['abaixo de 55',l=>l.nota<55]];
       h+='<div class="avd-card"><div class="avd-ct">A nota faz diferença? Acordos por faixa de nota</div><table class="avd-tb"><tr><th>Faixa de nota</th><th>Ligações</th><th>% acordo feito</th><th>% perdido</th></tr>'+
         fx.map(([n,f])=>{const a=ls.filter(f),t=conta(a);return '<tr><td class="nm">'+n+'</td><td>'+a.length+'</td><td><b style="color:#16a34a">'+pc(t.a,a.length).toFixed(0)+'%</b>'+mini(pc(t.a,a.length),'#16a34a')+'</td><td><b style="color:#dc2626">'+pc(t.s,a.length).toFixed(0)+'%</b>'+mini(pc(t.s,a.length),'#dc2626')+'</td></tr>'}).join('')+'</table></div>';
     }
   }else if(VIEW==='erro'){
     const ids=Object.keys(c);const piorId=ids.slice().sort((a,b)=>c[a].pct-c[b].pct)[0];const id=CRIT||piorId;if(!id)return '';
-    const L=lin.map(o=>{let p=0,mx=0,fal=0;o.a.forEach(l=>{const k=(l.criterios||[]).find(x=>x.id===id);if(k){p+=+k.pontos;mx+=+k.max;if(+k.pontos<+k.max/2)fal++}});return Object.assign({},o,{pct:mx?p/mx*100:0,fal})}).sort((x,y)=>x.pct-y.pct);
+    const L=lin.map(o=>{let p=0,mx=0,fal=0;o.a.forEach(l=>{const k=(l.criterios||[]).find(x=>x.id===id);if(k){p+=+k.pontos;mx+=+k.max;if(stC(k)==='nao')fal++}});return Object.assign({},o,{pct:mx?p/mx*100:0,fal})}).sort((x,y)=>y.fal-x.fal||x.pct-y.pct);
     h+='<div class="avd-card"><div class="avd-ct">Quem mais erra em: '+esc(CFRACO[id]||id)+'</div><div class="avd-chips">'+ids.sort((a,b)=>c[a].pct-c[b].pct).map(k=>'<button class="avd-chip'+(k===id?' on':'')+'" onclick="avd.crit(\''+k+'\')">'+esc(CFRACO[k]||k)+' · '+c[k].pct.toFixed(0)+'%</button>').join('')+'</div>';
-    h+='<table class="avd-tb"><tr><th>Operador</th><th>Aproveitamento</th><th>Errou em</th><th>Nota geral</th></tr>';
-    h+=L.map(o=>linha(o,['<b class="'+(o.pct>=75?'avd-up':o.pct<55?'avd-down':'')+'">'+o.pct.toFixed(0)+'%</b>'+mini(o.pct,o.pct>=75?'#16a34a':o.pct>=55?'#d4a937':'#dc2626'),o.fal+' de '+o.a.length,'<span class="avd-n '+cl(o.n)+'">'+o.n.toFixed(0)+'</span>'])).join('');
-    h+='</table><div class="avd-leg" style="padding-top:10px">"Errou em" = ligações em que tirou menos da metade dos pontos nesse critério. Clique no nome pra ver as ligações.</div></div>';
+    h+='<table class="avd-tb"><tr><th>Operador</th><th>Aproveitamento</th><th>Errou em</th><th>Última ligação</th></tr>';
+    h+=L.filter(o=>o.fal||o.pct<100).map(o=>linha(o,['<b class="'+(o.pct>=75?'avd-up':o.pct<55?'avd-down':'')+'">'+o.pct.toFixed(0)+'%</b>'+mini(o.pct,o.pct>=75?'#16a34a':o.pct>=55?'#d4a937':'#dc2626'),o.fal+' de '+o.a.length,o.ult?esc(String(o.ult.data).replace(/^\'/,'').slice(0,5))+' '+esc(String(o.ult.hora).slice(0,5)):'-'])).join('');
+    h+='</table><div class="avd-leg" style="padding-top:10px">"Errou em" = ligações em que a IA marcou "não fez" nesse ponto. Clique no nome pra ver as ligações.</div></div>';
+    h+=ultimas(ls,'Últimas ligações com: '+esc(CFRACO[id]||id),25,id);
   }
   return h;
 }
-window.avd={carregar,entrar,render,detalhe,abre,feedback,ver,crit};
+function lig(id){const l=DADOS.find(x=>String(x.id)===String(id));if(!l)return;detalhe(encodeURIComponent(l.operador));const a=filt().filter(x=>x.operador===l.operador).sort(ordT),i=a.findIndex(x=>String(x.id)===String(id));if(i>=0){abre(i);const r=$('avdLr'+i);if(r)setTimeout(()=>r.scrollIntoView({behavior:'smooth',block:'start'}),60)}}
+window.avd={carregar,entrar,render,detalhe,abre,feedback,ver,crit,lig};
 // atualiza sozinho a cada 3 min enquanto a aba estiver aberta (sem fechar ligação que estiver ouvindo)
 setInterval(()=>{const pg=$('pageAvaliacao');if(!pg||!pg.classList.contains('active')||!DADOS||DEMO_MODE||!CHAVE)return;
   if([].some.call(document.querySelectorAll('.avd-lig-b'),b=>b.style.display==='block'))return;carregar(true)},180000);
