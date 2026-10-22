@@ -3937,7 +3937,13 @@ function dicaPara(txt){
   if(s.includes('opcoes')||s.includes('avista'))return DICA.opcoes;
   if(s.includes('entrada')||s.includes('ganho')||s.includes('perda'))return DICA.ganho;
   if(s.includes('negoci')||s.includes('objecao'))return DICA.escada;
-  return 'Compare o trecho da gravação com o script do Método dos Campeões e use uma frase pronta na próxima ligação.';
+  return 'Na próxima, não encerre ainda: pergunte “o que te impede de resolver hoje?”, volte ao benefício e ofereça uma alternativa concreta de entrada, prazo ou parcelas.';
+}
+function insightAcerto(x){
+  return typeof x==='string'?{ponto:x,trecho:'',por_que:''}:Object.assign({ponto:'',trecho:'',por_que:''},x||{});
+}
+function insightErro(x){
+  return typeof x==='string'?{problema:x,trecho:'',como_contornar:'',frase_sugerida:''}:Object.assign({problema:'',trecho:'',como_contornar:'',frase_sugerida:''},x||{});
 }
 function cm(ls){const m={};ls.forEach(l=>l.criterios.forEach(c=>{const id=idC(c);if(!m[id])m[id]={nome:CNOME[id]||c.nome||id,fraco:CFRACO[id]||c.fraco||id,p:0,max:0,na:0};const s=statusC(c);if(s==='na'){m[id].na++;return}m[id].p+=s==='bem'?1:s==='parte'?.5:0;m[id].max++}));Object.keys(m).forEach(k=>{m[k].pct=m[k].max?m[k].p/m[k].max*100:0;m[k].status=m[k].max?(m[k].pct>=75?'bem':m[k].pct>=40?'parte':'nao'):'na'});return m}
 function ader(ls){const v=Object.values(cm(ls)||{}).filter(x=>x.max).map(x=>x.pct);return med(v)}
@@ -3958,11 +3964,11 @@ function selecionarTab(t){AVD_TAB=t;guardarFiltros();render()}
 function tabsHTML(){return '<div class="avd-tabs"><button class="'+(AVD_TAB==='todos'?'on':'')+'" onclick="avd.tab(\'todos\')">Todas</button><button class="'+(AVD_TAB==='acordos'?'on':'')+'" onclick="avd.tab(\'acordos\')">Acordos</button><button class="'+(AVD_TAB==='sem'?'on':'')+'" onclick="avd.tab(\'sem\')">Sem acordo</button><button class="'+(AVD_TAB==='atencao'?'on':'')+'" onclick="avd.tab(\'atencao\')">⚠ Precisa de atenção</button></div>'}
 function acaoHoje(ls){
   const hoje=ls.slice().sort((a,b)=>dt(b.data)-dt(a.data)||String(b.hora).localeCompare(String(a.hora))),rep={};
-  hoje.forEach(l=>(l.erros||[]).slice(0,3).forEach(e=>rep[e]=(rep[e]||0)+1));
+  hoje.forEach(l=>(l.erros||[]).slice(0,3).forEach(e=>{const n=insightErro(e),k=n.problema||'Falha identificada';rep[k]=(rep[k]||0)+1}));
   const falhas=hoje.filter(temFalha).slice(0,4),erros=Object.entries(rep).sort((a,b)=>b[1]-a[1]).slice(0,3);
   if(!falhas.length&&!erros.length)return '';
   const item=(l,txt)=>'<div class="avd-action-item" onclick="avd.detalhe(\''+encodeURIComponent(l.operador||'')+'\')"><span class="avd-action-dot"></span><div><b>'+esc(nc(l.operador||''))+'</b><small>'+esc(txt)+'</small></div></div>';
-  return '<div class="avd-actions"><div class="avd-card"><div class="avd-ct">Ações de hoje · ligações críticas</div>'+falhas.map(l=>item(l,(l.revisar?'Revisar acordo · ':'')+((l.erros||[]).slice(0,2).join(' · ')||'critério abaixo do esperado'))).join('')+'</div><div class="avd-card"><div class="avd-ct">Falhas repetidas no período</div>'+erros.map(e=>'<div class="avd-action-item" onclick="avd.crit(\''+Object.keys(CNOME).find(k=>CNOME[k]===e[0])+'\')"><span class="avd-action-dot"></span><div><b>'+esc(e[0])+'</b><small>'+e[1]+' ocorrência(s), abrir critério para investigar</small></div></div>').join('')+'</div></div>';
+  return '<div class="avd-actions"><div class="avd-card"><div class="avd-ct">Ações de hoje · ligações críticas</div>'+falhas.map(l=>item(l,(l.revisar?'Revisar acordo · ':'')+((l.erros||[]).slice(0,2).map(e=>insightErro(e).problema).join(' · ')||'critério abaixo do esperado'))).join('')+'</div><div class="avd-card"><div class="avd-ct">Falhas repetidas no período</div>'+erros.map(e=>'<div class="avd-action-item"><span class="avd-action-dot"></span><div><b>'+esc(e[0])+'</b><small>'+e[1]+' ocorrência(s), abrir a ligação para ver como contornar</small></div></div>').join('')+'</div></div>';
 }
 function ver(v){VIEW=(v==='rank'||VIEW===v)?'':v;CRIT='';render()}
 function crit(id){CRIT=id;render()}
@@ -3997,7 +4003,7 @@ function render(preservar){
   h+=(lin.length?'':'<div class="avd-empty">Nenhuma ligação avaliada nesse período.</div>')+'</div>';
   $('avdBody').innerHTML=h;
 }
-function top(ls,campo){const m={};ls.forEach(l=>(l[campo]||[]).forEach(f=>{const k=String(f).trim();if(k)m[k]=(m[k]||0)+1}));return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,7)}
+function top(ls,campo){const m={};ls.forEach(l=>(l[campo]||[]).forEach(f=>{const n=campo==='acertos'?insightAcerto(f):insightErro(f);const k=String(campo==='acertos'?n.ponto:n.problema).trim();if(k)m[k]=(m[k]||0)+1}));return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,7)}
 
 function detalhe(opEnc){
   const op=decodeURIComponent(opEnc);OP=op;
@@ -4010,8 +4016,8 @@ function detalhe(opEnc){
   h+='<div class="avd-kpis">'+kpi('#d4a937',n.toFixed(0)+'%','Aderência média',vs(n,eq)+' ('+eq.toFixed(0)+'%)')+kpi('#1e4e7e',pos+'º','Posição por aderência','de '+rank.length+' operadores')+kpi('#16a34a',a.length,'Ligações ouvidas',a.filter(temRes).length+' com acordo')+kpi('#b45309',a.filter(l=>!l.feedback_dado).length,'Feedback pendente')+'</div>';
   h+='<div class="avd-card"><div class="avd-ct">Critério a critério · '+nm+' x equipe</div><div class="avd-pad"><div class="avd-leg">Percentual de aderência entre 0 e 100%, calculado somente nas ligações em que o critério se aplicava</div>'+
    Object.keys(ce).map(id=>{const c=ce[id],o=co[id]?co[id]:{pct:0,max:0},opPct=Math.round(o.pct||0),eqPct=Math.round(c.pct||0);return '<div class="avd-crit-status"><span><b>'+esc(c.nome)+'</b><br><small>Operador: <b>'+opPct+'%</b> · '+(o.max||0)+' avaliada'+(o.max===1?'':'s')+' | Equipe: <b>'+eqPct+'%</b> · '+(c.max||0)+' avaliada'+(c.max===1?'':'s')+'</small><div class="avd-pctrow"><div class="avd-pctmeta"><span>Operador</span><b>'+opPct+'%</b></div><div class="avd-pctbar"><i style="width:'+opPct+'%"></i></div><div class="avd-pctmeta" style="margin-top:4px"><span>Equipe</span><b>'+eqPct+'%</b></div><div class="avd-pctbar team"><i style="width:'+eqPct+'%"></i></div></div></span><span class="avd-quality '+qualidade(opPct)+'">'+qualidadeTxt(opPct)+'</span></div>'}).join('')+'</div></div>';
-  const lst=(arr,ic)=>arr.length?'<ul class="avd-lst">'+arr.map(x=>'<li><span>'+ic+'</span><span>'+esc(x[0])+'<span class="avd-dica"><strong>Como deveria ter falado:</strong> '+esc(dicaPara(x[0]))+'</span></span><b>'+x[1]+'x</b></li>').join('')+'</ul>':'<div class="avd-empty" style="padding:14px">Sem dados ainda</div>';
-  h+='<div class="avd-g2"><div class="avd-card"><div class="avd-ct">O que mais acerta</div><div class="avd-pad">'+lst(ac,'✅')+'</div></div><div class="avd-card"><div class="avd-ct">Onde mais erra</div><div class="avd-pad">'+lst(er,'⚠️')+'</div></div></div>';
+  const lst=(arr,ic,kind)=>arr.length?'<ul class="avd-lst">'+arr.map(x=>{const n=kind==='ok'?insightAcerto(x):insightErro(x);const title=kind==='ok'?n.ponto:n.problema;const detail=kind==='ok'?(n.trecho?'<strong>O que ela falou:</strong> “'+esc(n.trecho)+'”'+(n.por_que?'<br><strong>Por que foi bom:</strong> '+esc(n.por_que):''):'<strong>Trecho falado:</strong> não foi salvo nesta avaliação; as próximas já guardarão a fala exata.'):(n.como_contornar||n.frase_sugerida?'<strong>Como contornar e buscar o acordo:</strong> '+esc(n.como_contornar||'')+(n.frase_sugerida?'<br><strong>Frase sugerida:</strong> “'+esc(n.frase_sugerida)+'”':''):(n.trecho?'<strong>O que ela falou:</strong> “'+esc(n.trecho)+'”':'<strong>Como contornar:</strong> '+esc(dicaPara(title))));return '<li><span>'+ic+'</span><span>'+esc(title)+(detail?'<span class="avd-dica">'+detail+'</span>':'')+'</span><b>'+arr.filter(y=>(kind==='ok'?insightAcerto(y).ponto:insightErro(y).problema)===title).length+'x</b></li>'}).join('')+'</ul>':'<div class="avd-empty" style="padding:14px">Sem dados ainda</div>';
+  h+='<div class="avd-g2"><div class="avd-card"><div class="avd-ct">O que mais acerta</div><div class="avd-pad">'+lst(ac,'✅','ok')+'</div></div><div class="avd-card"><div class="avd-ct">Onde mais erra e como contornar</div><div class="avd-pad">'+lst(er,'⚠️','err')+'</div></div></div>';
   h+='<div class="avd-card"><div class="avd-ct">Ligações ouvidas</div>'+a.map((l,i)=>'<div class="avd-row" onclick="avd.abre('+i+')"><span class="avd-quality '+(l.revisar||temFalha(l)?'review':'ok')+'">'+(l.revisar||temFalha(l)?'Revisar':'Bem')+'</span><div class="avd-b"><div class="avd-nm">'+esc(l.data)+' · '+esc(String(l.hora).slice(0,5))+' <span class="avd-pl rs">'+esc(l.resultado||'-')+'</span></div><div class="avd-sb">'+esc(l.duracao)+' · '+esc(l.tabulacao)+'</div></div><div class="avd-r">'+(l.feedback_dado?'<span class="avd-pl fb">✔ feedback dado</span>':'<span class="avd-pl pd" title="Avaliação pronta. Falta dar o feedback pro operador.">feedback pendente</span>')+'</div></div>'+
    '<div class="avd-lig-b" id="avdLb'+i+'">'+(l.audio_url?'<iframe data-src="'+esc(l.audio_url)+'" allow="autoplay"></iframe><a class="avd-drv" href="'+esc(String(l.audio_url).replace('/preview','/view'))+'" target="_blank">Abrir \u00E1udio no Drive \u203A</a>':'')+'<p><b>Resumo:</b> '+esc(l.resumo)+'</p><p><b>O que falar no feedback:</b> '+esc(l.feedback)+'</p>'+
    (l.motivo_curta||l.contato_alcancado||l.causa_encerramento||l.etapa_alcancada?'<div class="avd-short"><b>Etapa alcançada:</b> <span class="avd-stage">'+esc(l.etapa_alcancada||'não informada')+'</span><br><b>Análise da ligação curta:</b> '+esc(l.motivo_curta||'Sem motivo adicional informado.')+'<br><b>Contato:</b> '+esc(l.contato_alcancado||'indeterminado')+' · <b>Causa:</b> '+esc(l.causa_encerramento||'não aplicável')+' · <b>Ação:</b> '+esc(l.acao_curta||'revisar manualmente')+'</div>':'')+
