@@ -2078,6 +2078,11 @@ body::before,body::after{display:none!important}
 .avd-rota-k div{background:#f8fafc;border-radius:8px;padding:7px;text-align:center}
 .avd-rota-k b{display:block;font-size:.95rem;color:#0f3557}.avd-rota-k span{font-size:.62rem;color:var(--mu)}
 .avd-rota-sug{font-size:.74rem;line-height:1.45;color:#374151;background:#f6f9ff;border-left:3px solid #d4a937;border-radius:0 8px 8px 0;padding:8px 9px}
+.avd-quality{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:4px 10px;font-size:.7rem;font-weight:800}
+.avd-quality.ok{background:#dcfce7;color:#15803d}.avd-quality.review{background:#fee2e2;color:#b91c1c}.avd-quality.na{background:#f1f5f9;color:#64748b}
+.avd-crit-status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.avd-crit-status small{color:var(--mu);font-size:.68rem}
+.avd-no-score{display:none}
 @media(max-width:800px){.avd-rotas{grid-template-columns:1fr}.avd-rota-k{grid-template-columns:repeat(2,1fr)}}
 .avd-lig-b{display:none;padding:14px 16px 16px;background:#f8fafc;border-top:1px solid #eef1f5;font-size:.78rem;line-height:1.55}
 .avd-lig-b iframe{display:block;width:100%;height:120px;border:0;border-radius:12px;background:#1f1f1f;margin-bottom:6px}
@@ -3930,7 +3935,10 @@ function dicaPara(txt){
   if(s.includes('negoci')||s.includes('objecao'))return DICA.escada;
   return 'Compare o trecho da gravação com o script do Método dos Campeões e use uma frase pronta na próxima ligação.';
 }
-function cm(ls){const m={};ls.forEach(l=>l.criterios.forEach(c=>{if(!m[c.id])m[c.id]={nome:c.nome,fraco:c.fraco,p:0,max:0};m[c.id].p+=+c.pontos;m[c.id].max+=+c.max}));Object.keys(m).forEach(k=>m[k].pct=m[k].max?m[k].p/m[k].max*100:0);return m}
+function cm(ls){const m={};ls.forEach(l=>l.criterios.forEach(c=>{if(!m[c.id])m[c.id]={nome:c.nome,fraco:c.fraco,p:0,max:0,na:0};const s=statusC(c);if(s==='na'){m[c.id].na++;return}m[c.id].p+=s==='bem'?1:s==='parte'?.5:0;m[c.id].max++}));Object.keys(m).forEach(k=>{m[k].pct=m[k].max?m[k].p/m[k].max*100:0;m[k].status=m[k].max?(m[k].pct>=75?'bem':m[k].pct>=40?'parte':'nao'):'na'});return m}
+function ader(ls){const v=Object.values(cm(ls)||{}).filter(x=>x.max).map(x=>x.pct);return med(v)}
+function qualidade(p){return p>=75?'ok':p>0?'review':'na'}
+function qualidadeTxt(p){return p>=75?'Bem':p>0?'Precisa revisar':'Sem dados'}
 function kpi(c,v,l,s,vw){const at=vw==='rank'?VIEW==='':VIEW===vw;return '<div class="avd-k'+(vw?' clk'+(at?' on':''):'')+'" style="--c:'+c+'"'+(vw?' onclick="avd.ver(\''+vw+'\')"':'')+'><div class="avd-kv">'+v+'</div><div class="avd-kl">'+l+'</div>'+(s?'<div class="avd-ks">'+s+'</div>':'')+(vw?'<div class="avd-hint">'+(vw==='rank'?(at?'ranking de qualidade':'clique pra voltar ao ranking'):(at?'clique pra voltar ao ranking':'clique pra detalhar'))+'</div>':'')+'</div>'}
 let VIEW='',CRIT='',AVD_TAB='todos';
 function guardarFiltros(){
@@ -3968,10 +3976,10 @@ function render(preservar){
   const per=$('avdPer'),dia=$('avdDia');if(dia){dia.value=dia.value||new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);dia.style.display=per&&per.value==='dia'?'':'none'}
   ['avdIni','avdFim','avdHIni','avdHFim'].forEach(id=>{const e=$(id);if(e)e.style.display=per&&per.value==='custom'?'':'none'});
   guardarFiltros();
-  OP=null;const ls=filt(),eq=med(ls.map(l=>l.nota)),c=cm(ls);
+  OP=null;const ls=filt(),eq=ader(ls),c=cm(ls);
   const fr=Object.values(c).sort((a,b)=>a.pct-b.pct)[0];
   const ops={};ls.forEach(l=>(ops[l.operador]=ops[l.operador]||[]).push(l));
-  const lin=Object.keys(ops).map(op=>{const a=ops[op],n=med(a.map(l=>l.nota)),f=Object.values(cm(a)).sort((x,y)=>x.pct-y.pct)[0];return{op,a,n,g:a[0].grupo,res:a.filter(temRes).length/a.length*100,f,pend:a.filter(l=>!l.feedback_dado).length}}).sort((x,y)=>y.n-x.n);
+  const lin=Object.keys(ops).map(op=>{const a=ops[op],n=ader(a),f=Object.values(cm(a)).filter(x=>x.max).sort((x,y)=>x.pct-y.pct)[0];return{op,a,n,g:a[0].grupo,res:a.filter(temRes).length/a.length*100,f,pend:a.filter(l=>!l.feedback_dado).length}}).sort((x,y)=>y.n-x.n);
   let h='<div class="avd-kpis">'+
     kpi('#1e4e7e',ls.length,'Ligações avaliadas',lin.length+' operadores','rank')+
     kpi('#d4a937',eq.toFixed(0)+'%','Aderência média da equipe','status dos critérios','nota')+
@@ -3981,7 +3989,7 @@ function render(preservar){
   if(VIEW){$('avdBody').innerHTML=h+tabsHTML()+acaoHoje(ls)+visao(ls,lin,c,eq);return}
   h+=tabsHTML()+acaoHoje(ls);
   h+='<div class="avd-card"><div class="avd-ct">Ranking de qualidade</div>';
-  h+=lin.map((o,i)=>'<div class="avd-row" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><div class="avd-pos">'+(i+1)+'º</div><div class="avd-av'+(i<3?' top':'')+'">'+esc(ini(o.op))+'</div><div class="avd-b"><div class="avd-nm">'+esc(nc(o.op))+(o.g==='novato'?'<span class="avd-tag">novato</span>':'')+'</div><div class="avd-sb">'+o.a.length+' ouvida'+(o.a.length>1?'s':'')+' · '+o.res.toFixed(0)+'% com resultado'+(o.f?' · ponto fraco: '+esc(o.f.fraco||o.f.nome):'')+'</div></div><div class="avd-r"><span class="avd-n '+cl(o.n)+'">'+o.n.toFixed(0)+'</span><div class="avd-vs">'+vs(o.n,eq)+'</div>'+(o.pend?'<div class="avd-vs"><span class="avd-pl pd">'+o.pend+' feedback'+(o.pend>1?'s':'')+'</span></div>':'')+'</div></div>').join('');
+  h+=lin.map((o,i)=>'<div class="avd-row" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><div class="avd-pos">'+(i+1)+'º</div><div class="avd-av'+(i<3?' top':'')+'">'+esc(ini(o.op))+'</div><div class="avd-b"><div class="avd-nm">'+esc(nc(o.op))+(o.g==='novato'?'<span class="avd-tag">novato</span>':'')+'</div><div class="avd-sb">'+o.a.length+' ouvida'+(o.a.length>1?'s':'')+' · '+(o.res.toFixed(0))+'% com resultado'+(o.f?' · ponto fraco: '+esc(o.f.fraco||o.f.nome):'')+'</div></div><div class="avd-r"><span class="avd-quality '+(o.a.some(temFalha)?'review':'ok')+'">'+(o.a.some(temFalha)?'Revisar':'Bem')+'</span>'+(o.pend?'<div class="avd-vs"><span class="avd-pl pd">'+o.pend+' feedback'+(o.pend>1?'s':'')+'</span></div>':'')+'</div></div>').join('');
   h+=(lin.length?'':'<div class="avd-empty">Nenhuma ligação avaliada nesse período.</div>')+'</div>';
   $('avdBody').innerHTML=h;
 }
@@ -3990,17 +3998,17 @@ function top(ls,campo){const m={};ls.forEach(l=>(l[campo]||[]).forEach(f=>{const
 function detalhe(opEnc){
   const op=decodeURIComponent(opEnc);OP=op;
   const todos=filt(),a=todos.filter(l=>l.operador===op).sort((x,y)=>dt(y.data)-dt(x.data)||String(y.hora).localeCompare(String(x.hora)));
-  const eq=med(todos.map(l=>l.nota)),n=med(a.map(l=>l.nota));
+  const eq=ader(todos),n=ader(a);
   const rk={};todos.forEach(l=>(rk[l.operador]=rk[l.operador]||[]).push(l.nota));
   const rank=Object.keys(rk).map(o=>[o,med(rk[o])]).sort((x,y)=>y[1]-x[1]),pos=rank.findIndex(r=>r[0]===op)+1;
   const co=cm(a),ce=cm(todos),ac=top(a,'acertos'),er=top(a,'erros'),nm=esc(nc(op));
   let h='<div class="avd-prof"><div class="avd-av">'+esc(ini(op))+'</div><div><h2>'+nm+(a[0]&&a[0].grupo==='novato'?' <span class="avd-tag">novato</span>':'')+'</h2><p>'+esc(op)+'</p></div><div class="avd-prof-actions"><button class="avd-back" onclick="avd.exportarExcel(\'operador\',\''+esc(op).replace(/'/g,'&#39;')+'\')">▣ Excel</button><button class="avd-back" onclick="avd.exportarPDF(\'operador\',\''+esc(op).replace(/'/g,'&#39;')+'\')">▤ PDF</button><button class="avd-back" onclick="avd.render()">← Voltar</button></div></div>';
   h+='<div class="avd-kpis">'+kpi('#d4a937',n.toFixed(0)+'%','Aderência média',vs(n,eq)+' ('+eq.toFixed(0)+'%)')+kpi('#1e4e7e',pos+'º','Posição por aderência','de '+rank.length+' operadores')+kpi('#16a34a',a.length,'Ligações ouvidas',a.filter(temRes).length+' com acordo')+kpi('#b45309',a.filter(l=>!l.feedback_dado).length,'Feedback pendente')+'</div>';
-  h+='<div class="avd-card"><div class="avd-ct">Critério a critério · '+nm+' x equipe</div><div class="avd-pad"><div class="avd-leg"><i style="background:#0f3557"></i>'+nm+'<i style="background:#c7d2e0"></i>Média da equipe</div>'+
-   Object.keys(ce).map(id=>{const c=ce[id],o=co[id]?co[id].pct:0;return '<div class="avd-crit"><div class="l"><span>'+esc(c.nome)+'</span><span><b class="'+(o>=c.pct?'avd-up':'avd-down')+'">'+o.toFixed(0)+'%</b> <span class="avd-mut">/ equipe '+c.pct.toFixed(0)+'%</span></span></div><div class="avd-bar"><i class="e" style="width:'+c.pct+'%"></i><i class="o" style="width:'+o+'%"></i></div></div>'}).join('')+'</div></div>';
+  h+='<div class="avd-card"><div class="avd-ct">Critério a critério · '+nm+' x equipe</div><div class="avd-pad"><div class="avd-leg">Status qualitativo da ligação, sem nota nem percentual</div>'+
+   Object.keys(ce).map(id=>{const c=ce[id],o=co[id]?co[id].pct:0;return '<div class="avd-crit-status"><span><b>'+esc(c.nome)+'</b><br><small>Equipe: '+qualidadeTxt(c.pct)+'</small></span><span class="avd-quality '+qualidade(o)+'">'+qualidadeTxt(o)+'</span></div>'}).join('')+'</div></div>';
   const lst=(arr,ic)=>arr.length?'<ul class="avd-lst">'+arr.map(x=>'<li><span>'+ic+'</span><span>'+esc(x[0])+'<span class="avd-dica"><strong>Como deveria ter falado:</strong> '+esc(dicaPara(x[0]))+'</span></span><b>'+x[1]+'x</b></li>').join('')+'</ul>':'<div class="avd-empty" style="padding:14px">Sem dados ainda</div>';
   h+='<div class="avd-g2"><div class="avd-card"><div class="avd-ct">O que mais acerta</div><div class="avd-pad">'+lst(ac,'✅')+'</div></div><div class="avd-card"><div class="avd-ct">Onde mais erra</div><div class="avd-pad">'+lst(er,'⚠️')+'</div></div></div>';
-  h+='<div class="avd-card"><div class="avd-ct">Ligações ouvidas</div>'+a.map((l,i)=>'<div class="avd-row" onclick="avd.abre('+i+')"><span class="avd-n '+cl(l.nota)+'">'+l.nota+'</span><div class="avd-b"><div class="avd-nm">'+esc(l.data)+' · '+esc(String(l.hora).slice(0,5))+' <span class="avd-pl rs">'+esc(l.resultado||'-')+'</span></div><div class="avd-sb">'+esc(l.duracao)+' · '+esc(l.tabulacao)+'</div></div><div class="avd-r">'+(l.feedback_dado?'<span class="avd-pl fb">✔ feedback dado</span>':'<span class="avd-pl pd" title="Avaliação pronta. Falta dar o feedback pro operador.">feedback pendente</span>')+'</div></div>'+
+  h+='<div class="avd-card"><div class="avd-ct">Ligações ouvidas</div>'+a.map((l,i)=>'<div class="avd-row" onclick="avd.abre('+i+')"><span class="avd-quality '+(l.revisar||temFalha(l)?'review':'ok')+'">'+(l.revisar||temFalha(l)?'Revisar':'Bem')+'</span><div class="avd-b"><div class="avd-nm">'+esc(l.data)+' · '+esc(String(l.hora).slice(0,5))+' <span class="avd-pl rs">'+esc(l.resultado||'-')+'</span></div><div class="avd-sb">'+esc(l.duracao)+' · '+esc(l.tabulacao)+'</div></div><div class="avd-r">'+(l.feedback_dado?'<span class="avd-pl fb">✔ feedback dado</span>':'<span class="avd-pl pd" title="Avaliação pronta. Falta dar o feedback pro operador.">feedback pendente</span>')+'</div></div>'+
    '<div class="avd-lig-b" id="avdLb'+i+'">'+(l.audio_url?'<iframe data-src="'+esc(l.audio_url)+'" allow="autoplay"></iframe><a class="avd-drv" href="'+esc(String(l.audio_url).replace('/preview','/view'))+'" target="_blank">Abrir \u00E1udio no Drive \u203A</a>':'')+'<p><b>Resumo:</b> '+esc(l.resumo)+'</p><p><b>O que falar no feedback:</b> '+esc(l.feedback)+'</p>'+
    (l.motivo_curta||l.contato_alcancado||l.causa_encerramento?'<div class="avd-short"><b>Análise da ligação curta:</b> '+esc(l.motivo_curta||'Sem motivo adicional informado.')+'<br><b>Contato:</b> '+esc(l.contato_alcancado||'indeterminado')+' · <b>Causa:</b> '+esc(l.causa_encerramento||'não aplicável')+' · <b>Ação:</b> '+esc(l.acao_curta||'revisar manualmente')+'</div>':'')+
    l.criterios.map(c=>'<div class="avd-ev"><b>'+esc(c.nome)+'</b> <span class="avd-status '+c.status+'">'+statusTxt(c.status)+'</span><br>'+esc(c.evidencia||'Sem evidência registrada.')+(c.status!=='bem'&&c.status!=='na'?'<div class="avd-dica-ev"><strong>Como deveria ter falado:</strong> '+esc(DICA[c.id]||dicaPara(c.nome))+'</div>':'')+'</div>').join('')+
@@ -4751,7 +4759,6 @@ function analisar(D){
   const itens=[];   // cada item = 1 problema + o que fazer
   crit.filter(c=>c.pct<70).slice(0,3).forEach(c=>itens.push({tag:SL[c.id].nome+' · '+c.pct+'%',p:SL[c.id].p,f:SL[c.id].f}));
   if(F.dis>50&&F.muda/F.dis>.25)itens.push({tag:'Discador',p:Math.round(F.muda/F.dis*100)+'% das ligações caem em muda',f:'TI: revisar o discador, as rotas e a distribuição das chamadas'});
-  if(F.op>0&&F.cpc/F.op<.35)itens.push({tag:'Contato',p:'Pouco contato com o devedor certo',f:'Revisar os telefones da rota e tabular "não conhece" certinho'});
   if(!itens.length&&L.length&&sem/L.length>=.5)itens.push({tag:'Resultado',p:sem+' de '+L.length+' ligações sem acordo',f:'Não aceite o primeiro não: investigue e negocie'});
   const fortes=crit.filter(c=>c.pct>=80).slice(-2).map(c=>SL[c.id].nome);
   return{jan,n:L.length,nota,acordos,sem,itens,piores,fortes};
