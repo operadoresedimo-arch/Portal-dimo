@@ -4005,6 +4005,20 @@ function render(preservar){
   $('avdBody').innerHTML=h;
 }
 function top(ls,campo){const m={};ls.forEach(l=>(l[campo]||[]).forEach(f=>{const n=campo==='acertos'?insightAcerto(f):insightErro(f);const k=String(campo==='acertos'?n.ponto:n.problema).trim();if(k)m[k]=(m[k]||0)+1}));return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,7)}
+function insightsComFallback(ls){
+  const ac=[],er=[];
+  ls.forEach(l=>{
+    (l.acertos||[]).forEach(x=>ac.push(x));
+    (l.erros||[]).forEach(x=>er.push(x));
+    if(!(l.acertos||[]).length&&!(l.erros||[]).length){
+      (l.criterios||[]).forEach(c=>{
+        if(c.status==='bem')ac.push({ponto:c.evidencia||('Fez bem: '+c.nome),trecho:c.evidencia||'',por_que:'Aplicou corretamente este ponto da ligação.'});
+        else if(c.status==='parte'||c.status==='nao')er.push({problema:c.evidencia||('Precisa melhorar: '+c.nome),trecho:c.evidencia||'',como_contornar:'Na próxima, mantenha a conversa e aplique esta etapa antes de encerrar.',frase_sugerida:DICA[c.id]||dicaPara(c.nome)});
+      });
+    }
+  });
+  return {ac,er};
+}
 
 function detalhe(opEnc){
   const op=decodeURIComponent(opEnc);OP=op;
@@ -4012,12 +4026,23 @@ function detalhe(opEnc){
   const eq=ader(todos),n=ader(a);
   const rk={};todos.forEach(l=>(rk[l.operador]=rk[l.operador]||[]).push(l.nota));
   const rank=Object.keys(rk).map(o=>[o,med(rk[o])]).sort((x,y)=>y[1]-x[1]),pos=rank.findIndex(r=>r[0]===op)+1;
-  const co=cm(a),ce=cm(todos),ac=top(a,'acertos'),er=top(a,'erros'),nm=esc(nc(op));
+  const co=cm(a),ce=cm(todos),ins=insightsComFallback(a),ac=top(ins.ac.map(x=>({acertos:[x]})),'acertos'),er=top(ins.er.map(x=>({erros:[x]})),'erros'),nm=esc(nc(op));
   let h='<div class="avd-prof"><div class="avd-av">'+esc(ini(op))+'</div><div><h2>'+nm+(a[0]&&a[0].grupo==='novato'?' <span class="avd-tag">novato</span>':'')+'</h2><p>'+esc(op)+'</p></div><div class="avd-prof-actions"><button class="avd-back" onclick="avd.exportarExcel(\'operador\',\''+esc(op).replace(/'/g,'&#39;')+'\')">▣ Excel</button><button class="avd-back" onclick="avd.exportarPDF(\'operador\',\''+esc(op).replace(/'/g,'&#39;')+'\')">▤ PDF</button><button class="avd-back" onclick="avd.render()">← Voltar</button></div></div>';
   h+='<div class="avd-kpis">'+kpi('#d4a937',n.toFixed(0)+'%','Aderência média',vs(n,eq)+' ('+eq.toFixed(0)+'%)')+kpi('#1e4e7e',pos+'º','Posição por aderência','de '+rank.length+' operadores')+kpi('#16a34a',a.length,'Ligações ouvidas',a.filter(temRes).length+' com acordo')+kpi('#b45309',a.filter(l=>!l.feedback_dado).length,'Feedback pendente')+'</div>';
   h+='<div class="avd-card"><div class="avd-ct">Critério a critério · '+nm+' x equipe</div><div class="avd-pad"><div class="avd-leg">Percentual de aderência entre 0 e 100%, calculado somente nas ligações em que o critério se aplicava</div>'+
    Object.keys(ce).map(id=>{const c=ce[id],o=co[id]?co[id]:{pct:0,max:0},opPct=Math.round(o.pct||0),eqPct=Math.round(c.pct||0);return '<div class="avd-crit-status"><span><b>'+esc(c.nome)+'</b><br><small>Operador: <b>'+opPct+'%</b> · '+(o.max||0)+' avaliada'+(o.max===1?'':'s')+' | Equipe: <b>'+eqPct+'%</b> · '+(c.max||0)+' avaliada'+(c.max===1?'':'s')+'</small><div class="avd-pctrow"><div class="avd-pctmeta"><span>Operador</span><b>'+opPct+'%</b></div><div class="avd-pctbar"><i style="width:'+opPct+'%"></i></div><div class="avd-pctmeta" style="margin-top:4px"><span>Equipe</span><b>'+eqPct+'%</b></div><div class="avd-pctbar team"><i style="width:'+eqPct+'%"></i></div></div></span><span class="avd-quality '+qualidade(opPct)+'">'+qualidadeTxt(opPct)+'</span></div>'}).join('')+'</div></div>';
-  const lst=(arr,ic,kind)=>{const valid=arr.map(x=>kind==='ok'?insightAcerto(x):insightErro(x)).filter(n=>kind==='ok'?n.ponto:n.problema);if(!valid.length)return '<div class="avd-empty" style="padding:14px">Sem dados detalhados nesta avaliação.</div>';const seen={};return '<ul class="avd-lst">'+valid.filter(n=>{const k=kind==='ok'?n.ponto:n.problema;if(seen[k])return false;seen[k]=1;return true}).map(n=>{const title=kind==='ok'?n.ponto:n.problema;const detail=kind==='ok'?(n.trecho?'<strong>O que ela falou:</strong> “'+esc(n.trecho)+'”'+(n.por_que?'<br><strong>Por que foi bom:</strong> '+esc(n.por_que):''):'<strong>Detalhe:</strong> não foi salvo nesta avaliação antiga; as próximas guardarão a fala exata.'):(n.como_contornar||n.frase_sugerida?'<strong>Como contornar e buscar o acordo:</strong> '+esc(n.como_contornar||'')+(n.frase_sugerida?'<br><strong>Frase sugerida:</strong> “'+esc(n.frase_sugerida)+'”':''):(n.trecho?'<strong>O que ela falou:</strong> “'+esc(n.trecho)+'”':'<strong>Como contornar:</strong> '+esc(dicaPara(title))));const qtd=valid.filter(y=>(kind==='ok'?y.ponto:y.problema)===title).length;return '<li><span>'+ic+'</span><span>'+esc(title)+(detail?'<span class="avd-dica">'+detail+'</span>':'')+'</span><b>'+qtd+'x</b></li>'}).join('')+'</ul>'};
+  const lst=(arr,ic,kind)=>{
+    const raw=arr.map(x=>Array.isArray(x)?(kind==='ok'?{ponto:x[0],trecho:'',por_que:'' ,_q:x[1]}:{problema:x[0],trecho:'',como_contornar:'',frase_sugerida:'',_q:x[1]}):(kind==='ok'?insightAcerto(x):insightErro(x)));
+    const valid=raw.filter(n=>kind==='ok'?n.ponto:n.problema);
+    if(!valid.length)return '<div class="avd-empty" style="padding:14px">Sem dados detalhados nesta avaliação.</div>';
+    const seen={};
+    return '<ul class="avd-lst">'+valid.filter(n=>{const k=kind==='ok'?n.ponto:n.problema;if(seen[k])return false;seen[k]=1;return true}).map(n=>{
+      const title=kind==='ok'?n.ponto:n.problema;
+      const detail=kind==='ok'?(n.trecho?'<strong>O que ela falou:</strong> “'+esc(n.trecho)+'”'+(n.por_que?'<br><strong>Por que foi bom:</strong> '+esc(n.por_que):''):'<strong>Detalhe:</strong> não foi salvo nesta avaliação antiga; as próximas guardarão a fala exata.'):(n.como_contornar||n.frase_sugerida?'<strong>Como contornar e buscar o acordo:</strong> '+esc(n.como_contornar||'')+(n.frase_sugerida?'<br><strong>Frase sugerida:</strong> “'+esc(n.frase_sugerida)+'”':''):(n.trecho?'<strong>O que ela falou:</strong> “'+esc(n.trecho)+'”':'<strong>Como contornar:</strong> '+esc(dicaPara(title))));
+      const qtd=n._q||valid.filter(y=>(kind==='ok'?y.ponto:y.problema)===title).length;
+      return '<li><span>'+ic+'</span><span>'+esc(title)+(detail?'<span class="avd-dica">'+detail+'</span>':'')+'</span><b>'+qtd+'x</b></li>';
+    }).join('')+'</ul>';
+  };
   h+='<div class="avd-g2"><div class="avd-card"><div class="avd-ct">O que mais acerta</div><div class="avd-pad">'+lst(ac,'✅','ok')+'</div></div><div class="avd-card"><div class="avd-ct">Onde mais erra e como contornar</div><div class="avd-pad">'+lst(er,'⚠️','err')+'</div></div></div>';
   h+='<div class="avd-card"><div class="avd-ct">Ligações ouvidas</div>'+a.map((l,i)=>'<div class="avd-row" onclick="avd.abre('+i+')"><span class="avd-quality '+(l.revisar||temFalha(l)?'review':'ok')+'">'+(l.revisar||temFalha(l)?'Revisar':'Bem')+'</span><div class="avd-b"><div class="avd-nm">'+esc(l.data)+' · '+esc(String(l.hora).slice(0,5))+' <span class="avd-pl rs">'+esc(l.resultado||'-')+'</span></div><div class="avd-sb">'+esc(l.duracao)+' · '+esc(l.tabulacao)+'</div></div><div class="avd-r">'+(l.feedback_dado?'<span class="avd-pl fb">✔ feedback dado</span>':'<span class="avd-pl pd" title="Avaliação pronta. Falta dar o feedback pro operador.">feedback pendente</span>')+'</div></div>'+
    '<div class="avd-lig-b" id="avdLb'+i+'">'+(l.audio_url?'<iframe data-src="'+esc(l.audio_url)+'" allow="autoplay"></iframe><a class="avd-drv" href="'+esc(String(l.audio_url).replace('/preview','/view'))+'" target="_blank">Abrir \u00E1udio no Drive \u203A</a>':'')+'<p><b>Resumo:</b> '+esc(l.resumo)+'</p><p><b>O que falar no feedback:</b> '+esc(l.feedback)+'</p>'+
@@ -4094,25 +4119,20 @@ function visao(ls,lin,c,eq){
   const linha=(o,cols)=>'<tr class="lk" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><td class="nm">'+esc(nc(o.op))+(o.g==='novato'?' <span class="avd-tag">novato</span>':'')+'</td>'+cols.map(x=>'<td>'+x+'</td>').join('')+'</tr>';
   let h='';
   if(VIEW==='nota'||VIEW==='res'){
-    const L=lin.map(o=>Object.assign({},o,{t:conta(o.a)})).sort(VIEW==='nota'?(x,y)=>y.n-x.n:(x,y)=>pc(y.t.a,y.a.length)-pc(x.t.a,x.a.length)||pc(x.t.s,x.a.length)-pc(y.t.s,y.a.length));
-    h+='<div class="avd-card"><div class="avd-ct">'+(VIEW==='nota'?'Nota média x acordos feitos e perdidos':'Resultado das ligações ouvidas')+'</div>';
+    const L=lin.map(o=>Object.assign({},o,{t:conta(o.a)})).sort((x,y)=>pc(y.t.a,y.a.length)-pc(x.t.a,x.a.length)||pc(x.t.s,x.a.length)-pc(y.t.s,y.a.length));
+    h+='<div class="avd-card"><div class="avd-ct">Resultado das ligações ouvidas</div>';
     h+='<div class="avd-split"><i style="width:'+pc(T.a,N)+'%;background:#16a34a"></i><i style="width:'+pc(T.r,N)+'%;background:#d4a937"></i><i style="width:'+pc(T.s,N)+'%;background:#dc2626"></i></div>';
     h+='<div class="avd-leg"><span>Acordo feito: <b>'+T.a+' ('+pc(T.a,N).toFixed(0)+'%)</b></span><span>Retorno agendado: <b>'+T.r+' ('+pc(T.r,N).toFixed(0)+'%)</b></span><span>Perdido (sem acordo): <b>'+T.s+' ('+pc(T.s,N).toFixed(0)+'%)</b></span></div>';
-    h+='<table class="avd-tb"><tr><th>Operador</th><th>Nota</th><th>Ouvidas</th><th>Acordo</th><th>Retorno</th><th>Perdido</th><th>% acordo feito</th><th>% perdido</th></tr>';
-    h+=L.map(o=>linha(o,['<span class="avd-n '+cl(o.n)+'">'+o.n.toFixed(0)+'</span>',o.a.length,o.t.a,o.t.r,o.t.s,'<b style="color:#16a34a">'+pc(o.t.a,o.a.length).toFixed(0)+'%</b>'+mini(pc(o.t.a,o.a.length),'#16a34a'),'<b style="color:#dc2626">'+pc(o.t.s,o.a.length).toFixed(0)+'%</b>'+mini(pc(o.t.s,o.a.length),'#dc2626')])).join('');
+    h+='<table class="avd-tb"><tr><th>Operador</th><th>Status</th><th>Ouvidas</th><th>Acordo</th><th>Retorno</th><th>Perdido</th><th>% acordo feito</th><th>% perdido</th></tr>';
+    h+=L.map(o=>linha(o,['<span class="avd-quality '+(o.a.some(temFalha)?'review':'ok')+'">'+(o.a.some(temFalha)?'Revisar':'Bem')+'</span>',o.a.length,o.t.a,o.t.r,o.t.s,'<b style="color:#16a34a">'+pc(o.t.a,o.a.length).toFixed(0)+'%</b>'+mini(pc(o.t.a,o.a.length),'#16a34a'),'<b style="color:#dc2626">'+pc(o.t.s,o.a.length).toFixed(0)+'%</b>'+mini(pc(o.t.s,o.a.length),'#dc2626')])).join('');
     h+='</table></div>';
-    if(VIEW==='nota'){
-      const fx=[['75 ou mais',l=>l.nota>=75],['55 a 74',l=>l.nota>=55&&l.nota<75],['abaixo de 55',l=>l.nota<55]];
-      h+='<div class="avd-card"><div class="avd-ct">A nota faz diferença? Acordos por faixa de nota</div><table class="avd-tb"><tr><th>Faixa de nota</th><th>Ligações</th><th>% acordo feito</th><th>% perdido</th></tr>'+
-        fx.map(([n,f])=>{const a=ls.filter(f),t=conta(a);return '<tr><td class="nm">'+n+'</td><td>'+a.length+'</td><td><b style="color:#16a34a">'+pc(t.a,a.length).toFixed(0)+'%</b>'+mini(pc(t.a,a.length),'#16a34a')+'</td><td><b style="color:#dc2626">'+pc(t.s,a.length).toFixed(0)+'%</b>'+mini(pc(t.s,a.length),'#dc2626')+'</td></tr>'}).join('')+'</table></div>';
-    }
   }else if(VIEW==='erro'){
     const ids=Object.keys(c);const piorId=ids.slice().sort((a,b)=>c[a].pct-c[b].pct)[0];const id=CRIT||piorId;if(!id)return '';
-    const L=lin.map(o=>{let p=0,mx=0,fal=0;o.a.forEach(l=>{const k=(l.criterios||[]).find(x=>x.id===id);if(k){p+=+k.pontos;mx+=+k.max;if(+k.pontos<+k.max/2)fal++}});return Object.assign({},o,{pct:mx?p/mx*100:0,fal})}).sort((x,y)=>x.pct-y.pct);
-    h+='<div class="avd-card"><div class="avd-ct">Quem mais erra em: '+esc(CFRACO[id]||id)+'</div><div class="avd-chips">'+ids.sort((a,b)=>c[a].pct-c[b].pct).map(k=>'<button class="avd-chip'+(k===id?' on':'')+'" onclick="avd.crit(\''+k+'\')">'+esc(CFRACO[k]||k)+' · '+c[k].pct.toFixed(0)+'%</button>').join('')+'</div>';
-    h+='<table class="avd-tb"><tr><th>Operador</th><th>Aproveitamento</th><th>Errou em</th><th>Nota geral</th></tr>';
-    h+=L.map(o=>linha(o,['<b class="'+(o.pct>=75?'avd-up':o.pct<55?'avd-down':'')+'">'+o.pct.toFixed(0)+'%</b>'+mini(o.pct,o.pct>=75?'#16a34a':o.pct>=55?'#d4a937':'#dc2626'),o.fal+' de '+o.a.length,'<span class="avd-n '+cl(o.n)+'">'+o.n.toFixed(0)+'</span>'])).join('');
-    h+='</table><div class="avd-leg" style="padding-top:10px">"Errou em" = ligações em que tirou menos da metade dos pontos nesse critério. Clique no nome pra ver as ligações.</div></div>';
+    const L=lin.map(o=>{let p=0,mx=0,fal=0;o.a.forEach(l=>{const k=(l.criterios||[]).find(x=>idC(x)===id);if(k){const s=statusC(k);if(s!=='na'){mx++;p+=s==='bem'?1:s==='parte'?.5:0;if(s==='nao')fal++}}});return Object.assign({},o,{pct:mx?p/mx*100:0,fal,mx})}).sort((x,y)=>x.pct-y.pct);
+    h+='<div class="avd-card"><div class="avd-ct">Quem mais precisa revisar em: '+esc(CFRACO[id]||id)+'</div><div class="avd-chips">'+ids.sort((a,b)=>c[a].pct-c[b].pct).map(k=>'<button class="avd-chip'+(k===id?' on':'')+'" onclick="avd.crit(\''+k+'\')">'+esc(CFRACO[k]||k)+' · '+c[k].pct.toFixed(0)+'%</button>').join('')+'</div>';
+    h+='<table class="avd-tb"><tr><th>Operador</th><th>Status</th><th>Avaliadas</th><th>Precisa revisar</th></tr>';
+    h+=L.map(o=>linha(o,['<span class="avd-quality '+qualidade(o.pct)+'">'+qualidadeTxt(o.pct)+'</span>',o.mx,o.fal])).join('');
+    h+='</table><div class="avd-leg" style="padding-top:10px">Aproveitamento calculado somente nas ligações em que esse critério se aplicava. "Não se aplica" não reduz o resultado.</div></div>';
   }
   return h;
 }
