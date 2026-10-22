@@ -2066,6 +2066,7 @@ body::before,body::after{display:none!important}
 .avd-dica strong{color:#8a6a12}
 .avd-status{display:inline-block;font-size:.68rem;font-weight:800;border-radius:99px;padding:3px 8px;margin-left:6px}
 .avd-status.bem{background:#dcfce7;color:#15803d}.avd-status.parte{background:#fef3c7;color:#a16207}.avd-status.nao{background:#fee2e2;color:#b91c1c}.avd-status.na{background:#f1f5f9;color:#64748b}
+.avd-pctrow{margin-top:7px}.avd-pctmeta{display:flex;justify-content:space-between;gap:8px;font-size:.68rem;color:var(--mu);margin-bottom:4px}.avd-pctmeta b{color:#0f3557}.avd-pctbar{height:8px;background:#eef2f7;border-radius:99px;overflow:hidden;position:relative}.avd-pctbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#1e4e7e,#d4a937)}.avd-pctbar.team i{background:#c7d2e0}.avd-pctline{font-size:.62rem;color:#9ca3af;margin-top:2px}
 .avd-short{background:#fff8e1;border:1px solid #f1d98b;border-radius:10px;padding:10px 12px;color:#5f4b10;margin-bottom:10px;font-size:.76rem;line-height:1.45}
 .avd-short b{color:#8a6a12}.avd-copy{margin-top:8px}
 .avd-stage{display:inline-block;background:#eef2f7;color:#475569;border-radius:99px;padding:3px 8px;font-size:.68rem;font-weight:800;margin-left:5px}
@@ -3923,8 +3924,10 @@ function statusC(c){
   const p=Number(c.pontos);const m=Number(c.max)||1;
   return c.pontos!==undefined?(p/m>=.75?'bem':p/m>=.4?'parte':'nao'):'na';
 }
+const ID_ALIAS={avista:'opcoes',objecao:'insistencia',escada:'insistencia',valores:'opcoes',saida:'fechamento'};
+function idC(c){const id=String(c.id||'').toLowerCase();return ID_ALIAS[id]||id}
 function normalizaC(c){
-  const st=statusC(c);return Object.assign({},c,{status:st,pontos:st==='bem'?1:st==='parte'?.5:0,max:1,nome:CNOME[c.id]||c.nome||c.id,fraco:CFRACO[c.id]||c.nome||c.id});
+  const id=idC(c),st=statusC(c);return Object.assign({},c,{id,status:st,pontos:st==='bem'?1:st==='parte'?.5:0,max:1,nome:CNOME[id]||c.nome||id,fraco:CFRACO[id]||c.nome||id});
 }
 function statusTxt(s){return s==='bem'?'Bem':s==='parte'?'Em parte':s==='nao'?'Não fez':'Não se aplica'}
 function dicaPara(txt){
@@ -3936,7 +3939,7 @@ function dicaPara(txt){
   if(s.includes('negoci')||s.includes('objecao'))return DICA.escada;
   return 'Compare o trecho da gravação com o script do Método dos Campeões e use uma frase pronta na próxima ligação.';
 }
-function cm(ls){const m={};ls.forEach(l=>l.criterios.forEach(c=>{if(!m[c.id])m[c.id]={nome:c.nome,fraco:c.fraco,p:0,max:0,na:0};const s=statusC(c);if(s==='na'){m[c.id].na++;return}m[c.id].p+=s==='bem'?1:s==='parte'?.5:0;m[c.id].max++}));Object.keys(m).forEach(k=>{m[k].pct=m[k].max?m[k].p/m[k].max*100:0;m[k].status=m[k].max?(m[k].pct>=75?'bem':m[k].pct>=40?'parte':'nao'):'na'});return m}
+function cm(ls){const m={};ls.forEach(l=>l.criterios.forEach(c=>{const id=idC(c);if(!m[id])m[id]={nome:CNOME[id]||c.nome||id,fraco:CFRACO[id]||c.fraco||id,p:0,max:0,na:0};const s=statusC(c);if(s==='na'){m[id].na++;return}m[id].p+=s==='bem'?1:s==='parte'?.5:0;m[id].max++}));Object.keys(m).forEach(k=>{m[k].pct=m[k].max?m[k].p/m[k].max*100:0;m[k].status=m[k].max?(m[k].pct>=75?'bem':m[k].pct>=40?'parte':'nao'):'na'});return m}
 function ader(ls){const v=Object.values(cm(ls)||{}).filter(x=>x.max).map(x=>x.pct);return med(v)}
 function qualidade(p){return p>=75?'ok':p>0?'review':'na'}
 function qualidadeTxt(p){return p>=75?'Bem':p>0?'Precisa revisar':'Sem dados'}
@@ -4005,8 +4008,8 @@ function detalhe(opEnc){
   const co=cm(a),ce=cm(todos),ac=top(a,'acertos'),er=top(a,'erros'),nm=esc(nc(op));
   let h='<div class="avd-prof"><div class="avd-av">'+esc(ini(op))+'</div><div><h2>'+nm+(a[0]&&a[0].grupo==='novato'?' <span class="avd-tag">novato</span>':'')+'</h2><p>'+esc(op)+'</p></div><div class="avd-prof-actions"><button class="avd-back" onclick="avd.exportarExcel(\'operador\',\''+esc(op).replace(/'/g,'&#39;')+'\')">▣ Excel</button><button class="avd-back" onclick="avd.exportarPDF(\'operador\',\''+esc(op).replace(/'/g,'&#39;')+'\')">▤ PDF</button><button class="avd-back" onclick="avd.render()">← Voltar</button></div></div>';
   h+='<div class="avd-kpis">'+kpi('#d4a937',n.toFixed(0)+'%','Aderência média',vs(n,eq)+' ('+eq.toFixed(0)+'%)')+kpi('#1e4e7e',pos+'º','Posição por aderência','de '+rank.length+' operadores')+kpi('#16a34a',a.length,'Ligações ouvidas',a.filter(temRes).length+' com acordo')+kpi('#b45309',a.filter(l=>!l.feedback_dado).length,'Feedback pendente')+'</div>';
-  h+='<div class="avd-card"><div class="avd-ct">Critério a critério · '+nm+' x equipe</div><div class="avd-pad"><div class="avd-leg">Status qualitativo da ligação, sem nota nem percentual</div>'+
-   Object.keys(ce).map(id=>{const c=ce[id],o=co[id]?co[id].pct:0;return '<div class="avd-crit-status"><span><b>'+esc(c.nome)+'</b><br><small>Equipe: '+qualidadeTxt(c.pct)+'</small></span><span class="avd-quality '+qualidade(o)+'">'+qualidadeTxt(o)+'</span></div>'}).join('')+'</div></div>';
+  h+='<div class="avd-card"><div class="avd-ct">Critério a critério · '+nm+' x equipe</div><div class="avd-pad"><div class="avd-leg">Percentual de aderência entre 0 e 100%, calculado somente nas ligações em que o critério se aplicava</div>'+
+   Object.keys(ce).map(id=>{const c=ce[id],o=co[id]?co[id]:{pct:0,max:0},opPct=Math.round(o.pct||0),eqPct=Math.round(c.pct||0);return '<div class="avd-crit-status"><span><b>'+esc(c.nome)+'</b><br><small>Operador: <b>'+opPct+'%</b> · '+(o.max||0)+' avaliada'+(o.max===1?'':'s')+' | Equipe: <b>'+eqPct+'%</b> · '+(c.max||0)+' avaliada'+(c.max===1?'':'s')+'</small><div class="avd-pctrow"><div class="avd-pctmeta"><span>Operador</span><b>'+opPct+'%</b></div><div class="avd-pctbar"><i style="width:'+opPct+'%"></i></div><div class="avd-pctmeta" style="margin-top:4px"><span>Equipe</span><b>'+eqPct+'%</b></div><div class="avd-pctbar team"><i style="width:'+eqPct+'%"></i></div></div></span><span class="avd-quality '+qualidade(opPct)+'">'+qualidadeTxt(opPct)+'</span></div>'}).join('')+'</div></div>';
   const lst=(arr,ic)=>arr.length?'<ul class="avd-lst">'+arr.map(x=>'<li><span>'+ic+'</span><span>'+esc(x[0])+'<span class="avd-dica"><strong>Como deveria ter falado:</strong> '+esc(dicaPara(x[0]))+'</span></span><b>'+x[1]+'x</b></li>').join('')+'</ul>':'<div class="avd-empty" style="padding:14px">Sem dados ainda</div>';
   h+='<div class="avd-g2"><div class="avd-card"><div class="avd-ct">O que mais acerta</div><div class="avd-pad">'+lst(ac,'✅')+'</div></div><div class="avd-card"><div class="avd-ct">Onde mais erra</div><div class="avd-pad">'+lst(er,'⚠️')+'</div></div></div>';
   h+='<div class="avd-card"><div class="avd-ct">Ligações ouvidas</div>'+a.map((l,i)=>'<div class="avd-row" onclick="avd.abre('+i+')"><span class="avd-quality '+(l.revisar||temFalha(l)?'review':'ok')+'">'+(l.revisar||temFalha(l)?'Revisar':'Bem')+'</span><div class="avd-b"><div class="avd-nm">'+esc(l.data)+' · '+esc(String(l.hora).slice(0,5))+' <span class="avd-pl rs">'+esc(l.resultado||'-')+'</span></div><div class="avd-sb">'+esc(l.duracao)+' · '+esc(l.tabulacao)+'</div></div><div class="avd-r">'+(l.feedback_dado?'<span class="avd-pl fb">✔ feedback dado</span>':'<span class="avd-pl pd" title="Avaliação pronta. Falta dar o feedback pro operador.">feedback pendente</span>')+'</div></div>'+
