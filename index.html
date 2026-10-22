@@ -2068,6 +2068,17 @@ body::before,body::after{display:none!important}
 .avd-status.bem{background:#dcfce7;color:#15803d}.avd-status.parte{background:#fef3c7;color:#a16207}.avd-status.nao{background:#fee2e2;color:#b91c1c}.avd-status.na{background:#f1f5f9;color:#64748b}
 .avd-short{background:#fff8e1;border:1px solid #f1d98b;border-radius:10px;padding:10px 12px;color:#5f4b10;margin-bottom:10px;font-size:.76rem;line-height:1.45}
 .avd-short b{color:#8a6a12}.avd-copy{margin-top:8px}
+.avd-rotas{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.avd-rota{background:#fff;border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.avd-rota-head{padding:12px 14px;color:#fff;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+.avd-rota-head.vorus{background:linear-gradient(135deg,#0f3557,#1e4e7e)}
+.avd-rota-head.novatech{background:linear-gradient(135deg,#6b3fa0,#a855f7)}
+.avd-rota-body{padding:12px 14px}
+.avd-rota-k{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.avd-rota-k div{background:#f8fafc;border-radius:8px;padding:7px;text-align:center}
+.avd-rota-k b{display:block;font-size:.95rem;color:#0f3557}.avd-rota-k span{font-size:.62rem;color:var(--mu)}
+.avd-rota-sug{font-size:.74rem;line-height:1.45;color:#374151;background:#f6f9ff;border-left:3px solid #d4a937;border-radius:0 8px 8px 0;padding:8px 9px}
+@media(max-width:800px){.avd-rotas{grid-template-columns:1fr}.avd-rota-k{grid-template-columns:repeat(2,1fr)}}
 .avd-lig-b{display:none;padding:14px 16px 16px;background:#f8fafc;border-top:1px solid #eef1f5;font-size:.78rem;line-height:1.55}
 .avd-lig-b iframe{display:block;width:100%;height:120px;border:0;border-radius:12px;background:#1f1f1f;margin-bottom:6px}
 .avd-drv{display:inline-block;font-size:.74rem;color:#1e4e7e;font-weight:600;margin-bottom:12px;text-decoration:none}.avd-drv:hover{text-decoration:underline}
@@ -3809,7 +3820,7 @@ async function carregar(forcar){
     await pf;
     if(!j.ok){localStorage.removeItem('avd_chave');CHAVE='';telaSenha('Senha incorreta');return}
     localStorage.setItem('avd_chave',CHAVE);
-    DADOS=j.linhas.map(l=>{const cs=J(l.criterios).map(normalizaC);const ader=cs.length?Math.round(cs.reduce((s,c)=>s+c.pontos,0)/cs.length*100):0;return Object.assign({},l,{nota:+l.nota||ader,criterios:cs,acertos:J(l.acertos),erros:J(l.erros),motivo_curta:l.motivo_curta||l.motivo_termino_curta||''})});
+    DADOS=j.linhas.filter(l=>String(l.operador||'').trim().toUpperCase()!=='OPERADOR TESTE'&&!String(l.id||'').toUpperCase().startsWith('TESTE-')).map(l=>{const cs=J(l.criterios).map(normalizaC);const ader=cs.length?Math.round(cs.reduce((s,c)=>s+c.pontos,0)/cs.length*100):0;return Object.assign({},l,{nota:+l.nota||ader,criterios:cs,acertos:J(l.acertos),erros:J(l.erros),motivo_curta:l.motivo_curta||l.motivo_termino_curta||''})});
     TS=Date.now();
     if(manter&&DADOS.some(l=>String(l.operador).trim().toUpperCase()===String(manter).trim().toUpperCase()))detalhe(encodeURIComponent(manter));else render();
   }catch(e){root().innerHTML=cabec()+'<div class="avd-empty">Não consegui conectar na planilha: '+esc(e.message)+'</div>'}
@@ -4015,6 +4026,26 @@ const fmtN=n=>Math.round(n||0).toLocaleString('pt-BR');
 function funilFilt(){return (FUNIL||[]).filter(x=>noPer(x.data))}
 function funilTot(rs){const t={dis:0,atd:0,op:0,cpc:0,aco:0,ele:0,muda:0,nc:0,seg:0};rs.forEach(r=>Object.keys(t).forEach(k=>t[k]+=+r[k]||0));return t}
 function funilAgr(rs){const g={};rs.forEach(r=>{const k=String(r.nome);(g[k]=g[k]||[]).push(r)});return Object.keys(g).map(k=>Object.assign({nome:k},funilTot(g[k])))}
+function nomeRota(r){
+  const s=String(r.rota||r.campanha||r.nome_campanha||r.nome||'').toUpperCase();
+  if(/\bVORUS\b|\bVOROS\b/.test(s))return'VORUS';
+  if(/NOVATECH|NOVATEK/.test(s))return'NOVATECH';
+  return'OUTRA';
+}
+function rotaSug(t){
+  const sug=[];
+  if(!t.dis)return'Ainda não há dados identificados para esta rota.';
+  if(pc(t.atd,t.dis)<15)sug.push('Poucas chamadas atendidas: revisar horários, discador e telefones da rota.');
+  if(t.op&&pc(t.nc,t.op)>=35)sug.push('Muitos números que não conhecem o devedor: higienizar a base antes de discar.');
+  if(t.op&&pc(t.cpc,t.op)<35)sug.push('Pouco contato com o devedor certo: revisar a origem e a qualidade dos telefones.');
+  if(t.cpc&&pc(t.aco,t.cpc)<2)sug.push('Acordos baixos: ouvir amostras e reforçar abordagem, oferta à vista e negociação.');
+  return sug.length?sug.join(' '):'Rota saudável no período; manter acompanhamento e comparar com a outra rota.';
+}
+function visaoRotas(rs){
+  const base=rs.filter(x=>x.tipo==='rota'), groups={VORUS:[],NOVATECH:[]};
+  base.forEach(r=>{const k=nomeRota(r);if(groups[k])groups[k].push(r)});
+  return '<div class="avd-card"><div class="avd-ct">Discagem por rota · situação e sugestão</div><div class="avd-rotas">'+Object.keys(groups).map(k=>{const t=funilTot(groups[k]),cls=k.toLowerCase();return '<div class="avd-rota"><div class="avd-rota-head '+cls+'"><span>'+k+'</span><small>'+fmtN(t.dis)+' discagens</small></div><div class="avd-rota-body"><div class="avd-rota-k"><div><b>'+pc(t.atd,t.dis).toFixed(0)+'%</b><span>atendidas</span></div><div><b>'+pc(t.cpc,t.op).toFixed(0)+'%</b><span>devedor certo</span></div><div><b>'+fmtN(t.aco)+'</b><span>acordos</span></div><div><b>'+pc(t.aco,t.cpc).toFixed(1)+'%</b><span>acordo/contato</span></div></div><div class="avd-rota-sug"><b>Sugestão:</b> '+esc(rotaSug(t))+'</div></div></div>'}).join('')+'</div><div class="avd-leg">A rota é identificada pelo nome da campanha/tronco enviado pelo Fastway. Registros antigos sem essa identificação aparecem somente no funil geral até a próxima rodada.</div></div>';
+}
 function visaoFunil(){
   const rs=funilFilt();if(!rs.length)return '<div class="avd-card"><div class="avd-empty">Ainda sem dados do funil nesse período. O robô manda a cada rodada de 30 min.</div></div>';
   const T=funilTot(rs.filter(x=>x.tipo==='total'));
@@ -4022,6 +4053,7 @@ function visaoFunil(){
   let h='<div class="avd-card"><div class="avd-ct">Funil da discagem</div><table class="avd-tb"><tr><th>Etapa</th><th>Quantidade</th><th>% da etapa anterior</th><th>% das discagens</th></tr>'+
     et.map((e,i)=>'<tr><td class="nm">'+e[0]+'</td><td><b>'+fmtN(e[1])+'</b></td><td>'+(i?pc(e[1],et[i-1][1]).toFixed(1)+'%'+mini(pc(e[1],et[i-1][1]),e[2]):'-')+'</td><td>'+pc(e[1],T.dis).toFixed(2)+'%</td></tr>').join('')+'</table>'+
     '<div class="avd-leg" style="padding-top:10px">Das discagens, <b>'+pc(T.ele,T.dis).toFixed(0)+'%</b> caíram em caixa postal ou máquina e <b>'+pc(T.muda,T.dis).toFixed(0)+'%</b> foram ligação muda. Dos atendimentos com operador, <b>'+pc(T.nc,T.op).toFixed(0)+'%</b> foram "não conhece o cliente" (número errado).</div></div>';
+  h+=visaoRotas(rs);
   const O=funilAgr(rs.filter(x=>x.tipo==='op')).sort((a,b)=>b.aco-a.aco||pc(b.aco,b.cpc)-pc(a.aco,a.cpc));
   h+='<div class="avd-card"><div class="avd-ct">Por operador</div><table class="avd-tb"><tr><th>Operador</th><th>Atendimentos</th><th>Contato devedor</th><th>Acordos</th><th>% acordo / contato</th><th>Tempo médio falando</th></tr>'+
     O.map(o=>{const tm=o.op?o.seg/o.op:0;return '<tr class="lk" onclick="avd.detalhe(\''+encodeURIComponent(o.nome)+'\')"><td class="nm">'+esc(nc(o.nome))+'</td><td>'+fmtN(o.op)+'</td><td>'+fmtN(o.cpc)+'</td><td><b>'+fmtN(o.aco)+'</b></td><td><b style="color:#16a34a">'+pc(o.aco,o.cpc).toFixed(0)+'%</b>'+mini(pc(o.aco,o.cpc),'#16a34a')+'</td><td>'+Math.floor(tm/60)+'m'+String(Math.round(tm%60)).padStart(2,'0')+'s</td></tr>'}).join('')+'</table></div>';
@@ -4718,8 +4750,8 @@ function analisar(D){
   const F=D.funil.filter(x=>x.tipo==='total'&&[hh,hp].indexOf(String(x.hora).padStart(2,'0'))>=0).reduce((a,x)=>{['dis','op','cpc','muda'].forEach(k=>a[k]+=Number(x[k])||0);return a},{dis:0,op:0,cpc:0,muda:0});
   const itens=[];   // cada item = 1 problema + o que fazer
   crit.filter(c=>c.pct<70).slice(0,3).forEach(c=>itens.push({tag:SL[c.id].nome+' · '+c.pct+'%',p:SL[c.id].p,f:SL[c.id].f}));
-  if(F.dis>50&&F.muda/F.dis>.25)itens.push({tag:'Discador',p:Math.round(F.muda/F.dis*100)+'% das ligações caem em muda',f:'TI: revisar o discador e o mailing agora'});
-  if(F.op>0&&F.cpc/F.op<.35)itens.push({tag:'Contato',p:'Pouco contato com o devedor certo',f:'Trocar o mailing e tabular "não conhece" certinho'});
+  if(F.dis>50&&F.muda/F.dis>.25)itens.push({tag:'Discador',p:Math.round(F.muda/F.dis*100)+'% das ligações caem em muda',f:'TI: revisar o discador, as rotas e a distribuição das chamadas'});
+  if(F.op>0&&F.cpc/F.op<.35)itens.push({tag:'Contato',p:'Pouco contato com o devedor certo',f:'Revisar os telefones da rota e tabular "não conhece" certinho'});
   if(!itens.length&&L.length&&sem/L.length>=.5)itens.push({tag:'Resultado',p:sem+' de '+L.length+' ligações sem acordo',f:'Não aceite o primeiro não: investigue e negocie'});
   const fortes=crit.filter(c=>c.pct>=80).slice(-2).map(c=>SL[c.id].nome);
   return{jan,n:L.length,nota,acordos,sem,itens,piores,fortes};
