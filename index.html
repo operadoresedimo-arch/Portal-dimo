@@ -235,15 +235,28 @@ body.tv-full .tv-al-big{font-size:3.4rem!important}
 /* TV sem ranking: so numeros do time, ritmo e diagnostico, letra grande pra ler a 10 m */
 .tv-grid{display:block}
 .tv-right{display:flex;flex-direction:column;gap:18px}
-.tv-top{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}
-.tv-top .tv-tot{justify-content:center;padding:26px}
-.tv-top .tv-tot span{font-size:1.6rem}
-.tv-top .tv-tot b{font-size:clamp(4rem,7vw,7.5rem);line-height:1}
-.tv-top .tv-tot em{font-size:2rem;color:#eab308;font-weight:800}
-.tv-top .tv-streak{flex-direction:column;justify-content:center;align-items:flex-start;gap:14px;padding:26px}
-.tv-top .tv-streak span{font-size:1.6rem}
-.tv-top .tv-streak b{font-size:clamp(2.6rem,4.5vw,4.6rem);line-height:1.05}
-.tv-top .tv-streak .tv-fogo{font-size:2.4rem;letter-spacing:.1em}
+.tv-top{display:grid;grid-template-columns:1.7fr 1fr;gap:18px}
+.tv-spot2{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:36px;padding:28px 40px;background:linear-gradient(135deg,rgba(234,179,8,.16),rgba(19,21,32,.9) 60%);border-color:rgba(234,179,8,.35)}
+.tv-spot2 .tv-crown{font-size:6rem}
+.tv-spot2 .tv-badge{font-size:1.5rem;padding:6px 26px}
+.tv-spot2 .tv-tag{font-size:1.1rem;padding:5px 16px}
+.tv-spot2 .tv-sn{font-size:clamp(2.6rem,4.2vw,4.4rem);line-height:1.05;margin:10px 0 6px;text-transform:uppercase}
+.tv-spot2 .tv-sv{font-family:inherit;font-size:clamp(3rem,5vw,5.2rem);color:#eab308}
+.tv-spot2 .tv-ss{font-size:1.8rem;margin-top:6px}
+.tv-spot2.vazio .tv-sn{color:#94a3b8}
+.tv-spot2{position:relative;overflow:hidden}
+.tv-spot2.l2{background:linear-gradient(135deg,rgba(203,213,225,.16),rgba(19,21,32,.9) 60%);border-color:rgba(203,213,225,.35)}.tv-spot2.l2 .tv-badge{background:#cbd5e1}.tv-spot2.l2 .tv-sv{color:#e2e8f0}
+.tv-spot2.l3{background:linear-gradient(135deg,rgba(217,119,6,.18),rgba(19,21,32,.9) 60%);border-color:rgba(217,119,6,.4)}.tv-spot2.l3 .tv-badge{background:#d97706}.tv-spot2.l3 .tv-sv{color:#f59e0b}
+.tv-pts{display:flex;gap:10px;margin-top:14px}.tv-pts i{font-style:normal;font-weight:800;font-size:1.1rem;padding:4px 14px;border-radius:20px;background:#1e293b;color:#64748b}.tv-pts i.on{background:#eab308;color:#000}
+.tv-tempo{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,.06)}.tv-tempo i{display:block;height:100%;width:0;background:#eab308;animation:tvtempo linear forwards}
+@keyframes tvtempo{from{width:var(--w0,0%)}to{width:100%}}
+.tv-lado{display:flex;flex-direction:column;gap:18px}
+.tv-lado .tv-tot{flex:1;justify-content:center;padding:20px}
+.tv-lado .tv-tot span,.tv-lado .tv-streak span{font-size:1.35rem;color:#94a3b8;font-weight:700}
+.tv-lado .tv-tot b{font-family:inherit;font-size:clamp(2.6rem,4vw,4rem);line-height:1}
+.tv-lado .tv-tot em{font-size:1.6rem;color:#eab308;font-weight:800}
+.tv-lado .tv-streak{flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px}
+.tv-lado .tv-streak b{font-size:clamp(2.2rem,3.4vw,3.4rem);line-height:1}
 .tv-right .tv-mid{grid-template-columns:1fr 1fr;gap:18px}
 .tv-right .tv-rit{padding:24px}
 .tv-right .tv-rh{font-size:1.6rem}
@@ -4772,6 +4785,9 @@ function render(){
   const g=R.m.turno?R.T[R.m.turno]:null,niv0=R.m.id==='power'&&g&&g.ops.length?g.nivel:null;
   const emAlerta=Date.now()<alertaAte,niv=niv0&&(niv0.id==='ok'||emAlerta)?niv0:null;
   pg.className='page active tv-nivel-'+(niv?niv.id:'none');
+  // pelo relogio: todas as TVs mostram o mesmo lugar ao mesmo tempo, troca a cada 5 min
+  const n3=Math.min(3,ops.length),slot=Math.floor(Date.now()/300000),pos=n3?slot%n3:0,ch=n3?ops[pos]:null;
+  const falta=300000-Date.now()%300000;
   let h='<div class="tv-wrap">';
   if(!cRD){
     const hora=new Date().getHours();
@@ -4786,8 +4802,11 @@ function render(){
   h+='<div class="tv-btns"><button onclick="tvSom()">'+(somOn?'🔊 Som ligado':'🔇 Som desligado')+'</button><button onclick="tvTela()">⛶ Tela cheia</button></div></div>';
   // sem nomes de operador na TV: so o resultado do time, o ritmo e o diagnostico
   h+='<div class="tv-grid"><div class="tv-right">';
-  h+='<div class="tv-top"><div class="tv-card tv-tot"><span>Total do Time Hoje</span><b>'+ta+' acordo'+(ta===1?'':'s')+'</b><em>'+fR(tv)+'</em></div>';
-  h+='<div class="tv-card tv-streak"><span>Operadores com Acordos</span><b><em>'+ativos+'</em> de '+ops.length+' ativos</b><div class="tv-fogo">'+'🔥'.repeat(Math.min(ativos,6))+'</div></div></div>';
+  // destaque: alterna entre o 1o, 2o e 3o lugar a cada 5 min
+  if(ch)h+='<div class="tv-top"><div class="tv-card tv-spot2 l'+(pos+1)+'"><div class="tv-crown">'+['🥇','🥈','🥉'][pos]+'<div class="tv-badge">'+(pos+1)+'º Lugar</div></div><div class="tv-spot-tx"><div class="tv-tag">Top 3 do dia</div><div class="tv-sn">'+ch.n+'</div><div class="tv-sv">'+ch.a+' acordo'+(ch.a===1?'':'s')+'</div><div class="tv-ss">'+fR(ch.v)+'</div><div class="tv-pts">'+[0,1,2].slice(0,n3).map(i=>'<i class="'+(i===pos?'on':'')+'">'+(i+1)+'º</i>').join('')+'</div></div><div class="tv-tempo"><i style="--w0:'+Math.round((300000-falta)/3000)+'%;animation-duration:'+Math.round(falta/1000)+'s"></i></div></div>';
+  else h+='<div class="tv-top"><div class="tv-card tv-spot2 vazio"><div class="tv-crown">👑</div><div class="tv-spot-tx"><div class="tv-tag">Destaque do dia</div><div class="tv-sn">Quem será o primeiro?</div></div></div>';
+  h+='<div class="tv-lado"><div class="tv-card tv-tot"><span>Total do Time Hoje</span><b>'+ta+' acordo'+(ta===1?'':'s')+'</b><em>'+fR(tv)+'</em></div>';
+  h+='<div class="tv-card tv-streak"><span>Operadores com Acordos</span><b><em>'+ativos+'</em> de '+ops.length+'</b></div></div></div>';
   h+='<div class="tv-mid">'+['manha','tarde'].map(k=>{const x=R.T[k],nv=x.nivel,pc=Math.min(100,Math.round(x.r*100)),at=R.m.turno===k;
     return '<div class="tv-card tv-rit'+(at?' atual':'')+'" style="--c:'+nv.cor+'"><div class="tv-rh"><span>'+(k==='manha'?'☀️ Manhã':'🌇 Tarde')+(at?' · agora':'')+'</span><b>'+(x.ops.length?nv.nome:'sem ponto')+'</b></div>'+
     '<div class="tv-rn"><b>'+x.feito+'</b> / '+Math.round(x.esp)+' esperados <em>meta do turno: '+x.metaFinal+'</em></div><div class="tv-bar"><i style="width:'+pc+'%"></i></div>'+
@@ -4805,7 +4824,7 @@ window.tvTela=function(){ac();if(document.fullscreenElement){document.exitFullsc
   const el=document.documentElement;tvFullOn();(el.requestFullscreen?el.requestFullscreen():Promise.resolve()).catch(()=>{})};
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)tvFullOff()});
 window.tvTeste=function(n){tocar(n);flash(n);alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300)};   // no Console: tvTeste('baixo'|'muito'|'extremo')
-setInterval(render,30000);setInterval(()=>{rot++},5*60000);setInterval(()=>atualizarDadosTV(false),5*60000);
+setInterval(render,30000);(function vira(){setTimeout(()=>{render();vira()},300000-Date.now()%300000+500)})();setInterval(()=>atualizarDadosTV(false),5*60000);
 setInterval(()=>{const ok=typeof isA==='function'&&isA();const s=$('sbTV');if(s)s.style.display=ok?'flex':'none'},1000);
 const sp=window.showPage;
 window.showPage=function(p){sp(p);const pg=$('pageTV'),sb=$('sbTV');if(pg)pg.classList.toggle('active',p==='tv');if(sb)sb.classList.toggle('active',p==='tv');
@@ -4926,12 +4945,12 @@ function analisar(D){
   const fortes=crit.filter(c=>c.pct>=80).slice(-2).map(c=>SL[c.id].nome);
   return{jan,n:L.length,acordos,sem,itens,fortes};
 }
-// cartao fixo (pequeno, pra quem esta perto da TV / supervisor)
+// cartao fixo da TV: so motivo + o que fazer, sem nomes e sem recado de supervisor
 function htmlCard(A){
   let h='<div class="dg-h"><b>Por que os acordos estão baixos</b><span>'+A.n+' ligações avaliadas '+A.jan+' · '+A.acordos+' com acordo, '+A.sem+' sem acordo</span></div>';
   if(!A.itens.length)return h+'<div class="dg-c"><div class="dg-col"><p>Sem ligações avaliadas suficientes pra apontar o motivo.</p></div></div>';
   h+='<div class="dg-c"><div class="dg-col"><i>Motivos</i>'+A.itens.map(m=>'<p>❗ '+m.p+' <em>'+m.tag+'</em></p>').join('')+'</div>';
-  h+='<div class="dg-col"><i>O que fazer agora</i>'+A.itens.map(m=>'<p>✅ '+m.f+'</p>').join('')+'<p>👀 Supervisor: veja na aba Avaliação de Discagem quem precisa de apoio</p>'+'</div></div>';
+  h+='<div class="dg-col"><i>O que fazer agora</i>'+A.itens.map(m=>'<p>✅ '+m.f+'</p>').join('')+'</div></div>';
   return h;
 }
 function cardFixo(){
