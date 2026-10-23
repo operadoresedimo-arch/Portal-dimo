@@ -1,4 +1,4 @@
-const CACHE = 'portal-edimo-live-v20261023-1420b';
+const CACHE = 'portal-edimo-live-v20261023-1450';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -16,6 +16,8 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
+  // planilhas do Drive, Apps Script e CDN: nunca guardar (sao arquivos grandes e mudam toda hora)
+  if (url.origin !== self.location.origin) return;
 
   // HTML e scripts sempre vêm do GitHub Pages. Cache antigo aqui é veneno.
   if (request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('.js')) {

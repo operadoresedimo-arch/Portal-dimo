@@ -4158,7 +4158,7 @@ async function carregar(forcar){
     await pf;
     if(!j.ok){localStorage.removeItem('avd_chave');CHAVE='';telaSenha('Senha incorreta');return}
     localStorage.setItem('avd_chave',CHAVE);
-    DADOS=j.linhas.filter(l=>String(l.operador||'').trim().toUpperCase()!=='OPERADOR TESTE'&&!String(l.id||'').toUpperCase().startsWith('TESTE-')&&!/^(SHIRLEY|ANDREIA|PAMELA)(\s|$)/i.test(String(l.operador||''))).map(l=>{const cs=J(l.criterios).map(normalizaC);const ader=cs.length?Math.round(cs.reduce((s,c)=>s+c.pontos,0)/cs.length*100):0;return Object.assign({},l,{nota:+l.nota||ader,criterios:cs,acertos:J(l.acertos),erros:J(l.erros),motivo_curta:l.motivo_curta||l.motivo_termino_curta||''})});
+    DADOS=j.linhas.filter(l=>String(l.operador||'').trim().toUpperCase()!=='OPERADOR TESTE'&&!String(l.id||'').toUpperCase().startsWith('TESTE-')&&!/^(SHIRLEY|ANDREIA)(\s|$)/i.test(String(l.operador||''))).map(l=>{const cs=J(l.criterios).map(normalizaC);const ader=cs.length?Math.round(cs.reduce((s,c)=>s+c.pontos,0)/cs.length*100):0;return Object.assign({},l,{nota:+l.nota||ader,criterios:cs,acertos:J(l.acertos),erros:J(l.erros),motivo_curta:l.motivo_curta||l.motivo_termino_curta||''})});
     TS=Date.now();
     if(manter&&DADOS.some(l=>String(l.operador).trim().toUpperCase()===String(manter).trim().toUpperCase()))detalhe(encodeURIComponent(manter));else render();
   }catch(e){root().innerHTML=cabec()+'<div class="avd-empty">Não consegui conectar na planilha: '+esc(e.message)+'</div>'}
@@ -4904,7 +4904,7 @@ async function carregar(force){
   CARR=true;
   try{const j=await fetch(API+'?chave='+encodeURIComponent(k)+'&t='+Date.now()).then(r=>r.json());
     if(!j.ok){if(/chave|senha/i.test(j.erro||''))localStorage.removeItem('avd_chave');throw new Error(j.erro||'erro')}
-    D=(j.linhas||[]).filter(l=>String(l.operador||'').trim().toUpperCase()!=='OPERADOR TESTE'&&!String(l.id||'').toUpperCase().startsWith('TESTE-')&&!/^(SHIRLEY|ANDREIA|PAMELA)(\s|$)/i.test(String(l.operador||''))).map(normaliza);TS=Date.now();
+    D=(j.linhas||[]).filter(l=>String(l.operador||'').trim().toUpperCase()!=='OPERADOR TESTE'&&!String(l.id||'').toUpperCase().startsWith('TESTE-')&&!/^(SHIRLEY|ANDREIA)(\s|$)/i.test(String(l.operador||''))).map(normaliza);TS=Date.now();
   }catch(e){if(el)el.innerHTML='<div class="q-card"><div class="q-vazio">Não consegui carregar as avaliações agora. Tente de novo em alguns minutos.</div></div>';CARR=false;return}
   CARR=false;if(el&&el.classList.contains('active'))render(el);
 }
@@ -6183,7 +6183,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261023-1420b',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261023-1450',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
