@@ -2884,12 +2884,25 @@ function mergeOpsWithPonto(ops){
   return addLoginOps([...ops,...extra]);
 }
 // todo operador com login 0, 1 ou 2 aparece na lista, mesmo sem acordo e sem ponto
-function mesmaPessoa(x,y){
+function mesmaPessoaBase(x,y){
   const a=normN(x).split(/\s+/).filter(Boolean),b=normN(y).split(/\s+/).filter(Boolean);
   if(!a.length||!b.length||a[0]!==b[0])return false;
   if(a.length===1||b.length===1)return true;
   const ra=a.slice(1).filter(w=>w.length>2),rb=b.slice(1).filter(w=>w.length>2);
   return ra.some(w=>rb.includes(w));
+}
+// Duas pessoas com nome parecido (ex.: duas "Maria Eduarda"): so casa com quem tem MAIS sobrenomes em comum.
+// Se empatar entre dois logins, nao casa com nenhum (melhor ficar de fora do que ir pra pessoa errada).
+function pontosNome(x,y){const a=normN(x).split(/\s+/).filter(w=>w.length>2),b=normN(y).split(/\s+/).filter(w=>w.length>2);if(!a.length||!b.length||a[0]!==b[0])return 0;if(a.join(' ')===b.join(' '))return 1000;return 1+a.slice(1).filter(w=>b.slice(1).includes(w)).length}
+function mesmaPessoa(x,y){
+  if(!mesmaPessoaBase(x,y))return false;
+  let ks=[];try{ks=Object.keys(allLogins||{})}catch(e){}
+  const ny=normN(y),yLogin=ks.some(k=>normN(k)===ny);
+  if(!yLogin)return true;
+  const cand=ks.filter(k=>mesmaPessoaBase(x,k));if(cand.length<=1)return true;
+  const py=pontosNome(x,y),mx=Math.max(...cand.map(k=>pontosNome(x,k)));
+  if(py<mx)return false;
+  return cand.filter(k=>pontosNome(x,k)===mx).length===1;
 }
 function addLoginOps(list){
   const out=list.slice();
@@ -4324,7 +4337,7 @@ window.addEventListener('load',()=>setTimeout(avdNav,50));
 .qa-row{display:grid;grid-template-columns:minmax(200px,1.3fr) 120px minmax(200px,1.4fr) 80px minmax(200px,1.3fr);gap:14px;align-items:center;padding:11px 0;border-bottom:1px solid #f0f2f6;font-size:.86rem}
 .qa-row.qa-hd{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;font-weight:700}
 .qa-row.clk{cursor:pointer}.qa-row.clk:hover{background:#f8fafc}
-.qa-n b{display:block}.qa-n small{color:#9ca3af}.qa-z{color:#9ca3af;font-style:italic}
+.qa-n b{display:block}.qa-n small{color:#9ca3af;display:block}.qa-n small.qa-conf{color:#b45309;font-weight:700}.qa-z{color:#9ca3af;font-style:italic}
 .qa-b{display:flex;align-items:center;gap:10px}.qa-b span{font-weight:800;min-width:42px}
 .qa-bar{flex:1;height:10px;background:#eef2f7;overflow:hidden}.qa-bar i{display:block;height:100%}
 .qa-w span{display:inline-block;background:#fef2f2;color:#b91c1c;font-weight:700;font-size:.72rem;padding:3px 8px;margin:2px 4px 2px 0}.qa-w em{color:#16a34a;font-style:normal;font-weight:700;font-size:.78rem}
@@ -4553,14 +4566,35 @@ function normaliza(l){
   return Object.assign({},l,{cr,ac:J(l.acertos),er:J(l.erros),dd:dt(l.data)});
 }
 // ---- funcionarios: todos da aba Login (0/1/2) + quem aparece nas avaliacoes ----
-function mesma(a,b){try{if(typeof mesmaPessoa==='function')return mesmaPessoa(a,b)}catch(e){}const x=nz(a).split(' '),y=nz(b).split(' ');if(!x[0]||x[0]!==y[0])return false;if(x.length===1||y.length===1)return true;return x.slice(1).some(w=>w.length>2&&y.includes(w))}
+// ---- casar o nome do discador com o funcionario certo ----
+// Regra: nunca juntar duas pessoas. Primeiro nome igual + o maior numero de sobrenomes em comum
+// (o sobrenome do login vale mais). Se der empate entre duas pessoas, NAO junta: a ligacao fica numa
+// linha propria marcada "conferir", pra ninguem receber gravacao de outro.
+const PAL=w=>nz(w).split(' ').filter(x=>x&&!['de','da','do','das','dos','e'].includes(x));
+function pontos(f,op){
+  const o=PAL(op),n=PAL(f.n),lg=PAL(String(f.login||'').replace(/^\d+\.?/,'').replace(/[._]/g,' '));
+  if(!o.length||!n.length||o[0]!==n[0])return 0;
+  if(o.join(' ')===n.join(' '))return 1000;
+  let p=1;o.slice(1).forEach(w=>{if(w.length>1&&n.slice(1).includes(w))p+=10;if(w.length>1&&lg.slice(1).includes(w))p+=15});
+  return p;
+}
+function dono(F,op){
+  let best=null,bp=0,emp=false;
+  F.forEach(f=>{if(!f.login)return;const p=pontos(f,op);if(p>bp){bp=p;best=f;emp=false}else if(p===bp&&p>0)emp=true});
+  return bp>0&&!emp?best:null;
+}
 function funcionarios(){
   const L=filtrados(),F=[];
-  try{Object.keys(allLogins||{}).forEach(n=>{const lg=String(allLogins[n]||'').trim(),pre=lg.charAt(0);if(!/[012]/.test(pre))return;F.push({n:tit(n),login:lg,pre,L:[]})})}catch(e){}
-  L.forEach(l=>{let f=F.find(x=>mesma(x.n,l.operador));if(!f){f=F.find(x=>!x.login&&nz(x.n)===nz(l.operador));if(!f){f={n:tit(l.operador),login:'',pre:'',L:[]};F.push(f)}}f.L.push(l)});
-  F.forEach(f=>{f.k=nz(f.n+' '+f.login);f.res=resumo(f.L)});
+  try{Object.keys(allLogins||{}).forEach(n=>{const lg=String(allLogins[n]||'').trim(),pre=lg.charAt(0);if(!/[012]/.test(pre))return;F.push({n:tit(n),login:lg,pre,L:[],fw:{}})})}catch(e){}
+  const cache={};
+  L.forEach(l=>{const op=String(l.operador||'').trim();if(!(op in cache))cache[op]=dono(F,op);
+    let f=cache[op];
+    if(!f){f=F.find(x=>!x.login&&x.fwNome===op);if(!f){const parecido=F.some(x=>x.login&&pontos(x,op)>0);f={n:tit(op),login:'',pre:'',L:[],fw:{},fwNome:op,conferir:parecido};F.push(f)}}
+    f.L.push(l);f.fw[op]=(f.fw[op]||0)+1});
+  F.forEach(f=>{f.k=nz(f.n+' '+f.login+' '+(f.fwNome||''));f.res=resumo(f.L)});
   return F.sort((a,b)=>(b.L.length>0)-(a.L.length>0)||b.L.length-a.L.length||a.n.localeCompare(b.n));
 }
+window.QA_dono=dono;window.QA_pontos=pontos;
 function filtrados(){
   const h=new Date();h.setHours(0,0,0,0);let ini=null;
   if(PER==='hoje')ini=h;else if(PER==='semana'){ini=new Date(h);ini.setDate(h.getDate()-((h.getDay()+6)%7))}else if(PER==='mes')ini=new Date(h.getFullYear(),h.getMonth(),1);else if(PER==='30')ini=new Date(h.getTime()-29*864e5);
@@ -4599,7 +4633,7 @@ function lista(){
   const c=document.getElementById('qaCont');if(c)c.textContent=F.length+' funcionário'+(F.length===1?'':'s');
   if(!F.length){box.innerHTML='<div class="q-vazio">Ninguém com esse nome.</div>';return}
   box.innerHTML='<div class="qa-row qa-hd"><div>Funcionário</div><div>Ligações</div><div>Aproveitamento geral</div><div>Acordos</div><div>Precisa melhorar em</div></div>'+F.map(f=>{const r=f.res,p=r.geral;
-    return '<div class="qa-row clk" onclick="QA.abre(\''+esc(f.k).replace(/'/g,"\\'")+'\')"><div class="qa-n"><b>'+esc(f.n)+'</b><small>'+esc([f.login,turno(f.pre)].filter(Boolean).join(' · '))+'</small></div>'+
+    return '<div class="qa-row clk" onclick="QA.abre(\''+esc(f.k).replace(/'/g,"\\'")+'\')"><div class="qa-n"><b>'+esc(f.n)+'</b><small>'+esc([f.login,turno(f.pre)].filter(Boolean).join(' · '))+(f.conferir?'</small><small class="qa-conf">⚠ nome do discador parecido com outro funcionário, conferir no cadastro':'')+'</small></div>'+
       '<div class="qa-q">'+(r.n?'<b>'+r.n+'</b> avaliada'+(r.n>1?'s':''):'<span class="qa-z">nenhuma</span>')+'</div>'+
       '<div class="qa-b">'+(p===null?'<span class="qa-z">sem dados '+perTxt()+'</span>':'<div class="qa-bar"><i style="width:'+p+'%;background:'+cor(p)+'"></i></div><span style="color:'+cor(p)+'">'+p+'%</span>')+'</div>'+
       '<div class="qa-q">'+(r.n?r.ac:'-')+'</div><div class="qa-w">'+(r.piores.length?r.piores.slice(0,2).map(id=>'<span>'+NOME[id]+'</span>').join(''):r.n?'<em>tudo em dia</em>':'')+'</div></div>'}).join('');
@@ -4609,7 +4643,7 @@ function relatorio(f){
   const r=f.res,L=f.L.slice().sort((a,b)=>(b.dd||0)-(a.dd||0)||String(b.hora||'').localeCompare(String(a.hora||''))),T=resumo(filtrados());
   const hoje=new Date().toLocaleDateString('pt-BR');
   const dts=L.map(l=>l.dd).filter(Boolean),ini=dts.length?new Date(Math.min(...dts)).toLocaleDateString('pt-BR'):'-',fim=dts.length?new Date(Math.max(...dts)).toLocaleDateString('pt-BR'):'-';
-  let h='<div class="qr"><div class="qr-top"><div><small>Advocacia Édimo · Avaliação individual de ligações</small><h1>'+esc(f.n)+'</h1><p>'+esc([f.login,turno(f.pre)].filter(Boolean).join(' · '))+(f.login||f.pre?' · ':'')+'Período: '+ini+' a '+fim+' · Emitido em '+hoje+'</p></div></div>';
+  let h='<div class="qr"><div class="qr-top"><div><small>Advocacia Édimo · Avaliação individual de ligações</small><h1>'+esc(f.n)+'</h1><p>'+esc([f.login,turno(f.pre)].filter(Boolean).join(' · '))+(f.login||f.pre?' · ':'')+'Período: '+ini+' a '+fim+' · Emitido em '+hoje+'</p>'+(Object.keys(f.fw||{}).length?'<p class="qr-fw">Nome no discador: '+Object.keys(f.fw).map(k=>esc(k)+' ('+f.fw[k]+')').join(' · ')+'</p>':'')+'</div></div>';
   if(!r.n)return h+'<div class="qr-box">Nenhuma ligação avaliada '+perTxt()+'.</div></div>';
   // numeros
   h+='<div class="qr-kpis"><div><b>'+r.n+'</b><span>ligações avaliadas</span></div><div><b>'+r.ac+'</b><span>com acordo ('+Math.round(r.ac/r.n*100)+'%)</span></div><div><b>'+r.sem+'</b><span>sem acordo</span></div><div><b style="color:'+cor(r.geral)+'">'+(r.geral===null?'-':r.geral+'%')+'</b><span>aproveitamento geral · time: '+(T.geral===null?'-':T.geral+'%')+'</span></div></div>';
@@ -4655,7 +4689,7 @@ function detalhe(el,f){
 }
 const CSS_REL=`.qr{font-family:Inter,Arial,sans-serif;color:#1a1f36;font-size:13px;line-height:1.45}
 .qr-top{border-bottom:3px solid #0f3557;padding-bottom:10px;margin-bottom:14px}.qr-top small{color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:11px}
-.qr h1{margin:4px 0;font-size:26px;color:#0f3557}.qr-top p{margin:0;color:#4b5563}
+.qr h1{margin:4px 0;font-size:26px;color:#0f3557}.qr-top p{margin:0;color:#4b5563}.qr-fw{font-size:11px;color:#6b7280!important;margin-top:3px!important}
 .qr h2{font-size:16px;color:#0f3557;margin:22px 0 8px;border-left:4px solid #d4a937;padding-left:8px;page-break-after:avoid}
 .qr-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.qr-kpis div{border:1px solid #e3e8ef;border-radius:10px;padding:10px 12px}.qr-kpis b{display:block;font-size:24px}.qr-kpis span{color:#6b7280;font-size:12px}
 .qr-sub{color:#6b7280;font-size:12px;margin:8px 0}
