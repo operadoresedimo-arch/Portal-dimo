@@ -2581,7 +2581,8 @@ body .sidebar .sb-nav .sb-item.active{background:#fff!important}
 <style id="edimo-visual-v2">
 /* ===== Visual novo (modelo do Gemini) com a lateral cinza e a logo atual ===== */
 #pageRanking,#pageComp{font-family:'Inter',system-ui,sans-serif;color:#1e293b}
-#pageRanking .nx,#pageComp{max-width:1280px;margin:0 auto}
+#pageRanking .nx,#pageComp{max-width:none;margin:0}
+.main:has(#pageComp.active),.main:has(#pageRanking.active){max-width:none!important}
 .nx-head{display:flex!important;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;border:1px solid #e2e8f0;border-radius:16px!important;padding:16px 20px!important;margin-bottom:18px!important;text-align:left!important}
 .nx-head-l{flex:1;min-width:260px}.nx-tt{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .nx-head h2{margin:0;font-size:1.35rem;font-weight:800;color:#0f172a;letter-spacing:-.01em}
@@ -3440,8 +3441,10 @@ function compTurnosHtml(ms0){
   if(rk[0].v>0)h+='<div class="nx-insight">💡 <b>Insight do mês:</b> no mês atual, quem mais rende por operador por dia é '+(rk[0].n==='Novatos'?'o grupo de ':'o turno da ')+'<b>'+rk[0].n+' ('+fm(rk[0].v)+')</b>, seguido de <b>'+rk[1].n+' ('+fm(rk[1].v)+')</b> e <b>'+rk[2].n+' ('+fm(rk[2].v)+')</b>.</div>';
   return h+'</div>';
 }
+// meses sempre do mais antigo pro atual (o Drive as vezes entrega fora de ordem)
+function mesesEmOrdem(){const ini=m=>{const x=String(m.period||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);return x?+(x[3]+x[2]+x[1]):0};return cD.filter(d=>d!==null).slice().sort((a,b)=>ini(a)-ini(b))}
 function genComp(){
-  const ms=cD.filter(d=>d!==null);if(ms.length<1)return;
+  const ms=mesesEmOrdem();if(ms.length<1)return;
   updateSidebarMonth();
   const now=ms[ms.length-1],prev=ms.length>=2?ms[ms.length-2]:null,oldest=ms.length>=3?ms[0]:null;
   const uN=cU?cU.nome.toLowerCase():'';
@@ -3722,7 +3725,7 @@ function filterCompTable(){
 }
 
 function updateSidebarMonth(curA,curV){
-  const ms=cD.filter(d=>d!==null);
+  const ms=mesesEmOrdem();
   if(ms.length>0){
     const last=ms[ms.length-1];
     const p=last.period||'';
