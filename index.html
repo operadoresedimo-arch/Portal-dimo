@@ -250,6 +250,72 @@ body.tv-full .tv-al-big{font-size:3.4rem!important}
 .tv-pts{display:flex;gap:10px;margin-top:14px}.tv-pts i{font-style:normal;font-weight:800;font-size:1.1rem;padding:4px 14px;border-radius:20px;background:#1e293b;color:#64748b}.tv-pts i.on{background:#eab308;color:#000}
 .tv-tempo{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,.06)}.tv-tempo i{display:block;height:100%;width:0;background:#eab308;animation:tvtempo linear forwards}
 @keyframes tvtempo{from{width:var(--w0,0%)}to{width:100%}}
+/* ===== TV v7 (ideias do modelo do Gemini, sem CDN) ===== */
+#pageTV{background:#070a12}
+.tv-wrap{padding:14px 18px;gap:14px}
+.tv-right{gap:14px}.tv-right .tv-rit{padding:16px 24px!important;gap:10px!important}.tv-right .dg-card{padding:16px!important}.tv-k{padding:20px 26px!important}
+.tv-card{background:#111827;border:2px solid #1e293b;border-radius:22px}
+.tv-hd{background:#0f172a;border:1px solid #1e293b;border-radius:18px;padding:12px 22px;gap:22px;flex-wrap:nowrap}
+.tv-hd-l{display:flex;align-items:center;gap:16px;min-width:0}
+.tv-live{display:inline-flex;align-items:center;gap:9px;background:rgba(30,58,138,.55);color:#93c5fd;border:1px solid rgba(59,130,246,.5);border-radius:9px;padding:5px 12px;font-weight:800;font-size:1rem;letter-spacing:.08em;white-space:nowrap}
+.tv-live i{width:12px;height:12px;border-radius:50%;background:#10b981;box-shadow:0 0 0 0 rgba(16,185,129,.7);animation:tvping 1.6s infinite}
+.tv-live.off i{background:#64748b;animation:none}
+@keyframes tvping{70%{box-shadow:0 0 0 10px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+.tv-hd-t{font-size:1.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tv-hd-r{display:flex;align-items:center;gap:18px;margin-left:auto}
+.tv-hd-pl{text-align:right}.tv-hd-pl small{display:block;font-size:.8rem;color:#64748b;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.tv-hd-pl .tv-pl{font-size:1.15rem!important;color:#e2e8f0!important;font-weight:700}.tv-hd-pl .tv-pl b{color:#34d399}.tv-hd-pl .tv-pl-x{color:#fbbf24!important}
+.tv-clock{font-size:2.3rem;font-weight:900;letter-spacing:.06em;background:#0b1120;border:1px solid #334155;border-radius:12px;padding:4px 18px;font-variant-numeric:tabular-nums}
+.tv-hd .tv-btns button{font-size:1rem;padding:6px 10px}
+.tv-top{display:grid;grid-template-columns:1.25fr 1fr .8fr;gap:18px}
+.tv-spot2{padding:24px 30px;gap:26px}
+.tv-spot2 .tv-crown{font-size:5rem}
+.tv-spot2 .tv-sn{font-size:clamp(2.2rem,3.4vw,3.6rem)}
+.tv-spot2 .tv-sv{font-size:clamp(2.6rem,4vw,4.2rem);font-weight:900}
+.tv-spot2 .tv-ss{font-size:1.6rem}
+.tv-k{display:flex;flex-direction:column;justify-content:space-between;padding:24px 28px;position:relative;overflow:hidden}
+.tv-k-h{font-size:1.3rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8}
+.tv-k-n{display:flex;align-items:center;gap:22px;margin:auto 0}
+.tv-k-n>b{font-size:clamp(6rem,10vw,9.5rem);font-weight:900;line-height:.9;letter-spacing:-.04em;color:#fff;text-shadow:0 6px 24px rgba(0,0,0,.5)}
+.tv-k-n>b.lar{color:#f97316;text-shadow:0 0 24px rgba(249,115,22,.45)}
+.tv-k-n em{display:block;font-style:normal;font-size:clamp(2.4rem,3.6vw,3.8rem);font-weight:800;line-height:1}
+.tv-k-n strong{display:block;font-size:clamp(2rem,3vw,3rem);font-weight:900;color:#f59e0b;text-shadow:0 0 20px rgba(245,158,11,.45);margin-top:8px}
+.tv-tot2:after{content:"";position:absolute;right:-70px;bottom:-70px;width:260px;height:260px;border-radius:50%;background:rgba(245,158,11,.1);filter:blur(40px)}
+.tv-op2 p{font-size:1.3rem;color:#94a3b8;margin:0}
+.tv-right .tv-mid{grid-template-columns:1.25fr 1fr;gap:18px}
+.tv-right .tv-rit{border:2px solid #1e293b;border-left:8px solid var(--c);padding:22px 26px;display:flex;flex-direction:column;gap:12px}
+.tv-rit.atual{box-shadow:none}
+.tv-rit.critico{background:#1a0c16;border-color:var(--c);animation:tvglow 2s infinite alternate}
+@keyframes tvglow{from{box-shadow:0 0 14px color-mix(in srgb,var(--c) 30%,transparent)}to{box-shadow:0 0 34px color-mix(in srgb,var(--c) 65%,transparent)}}
+.tv-rit.sem{opacity:.75}
+.tv-right .tv-rh{font-size:1.9rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;align-items:center}
+.tv-pill{background:var(--c);color:#fff!important;border-radius:12px;padding:5px 16px;font-size:1.25rem;font-weight:900;letter-spacing:.05em;text-transform:uppercase}
+.tv-rit.sem .tv-pill{background:#1e293b;color:#94a3b8!important;border:1px solid #334155}
+.tv-right .tv-rn{display:flex;justify-content:space-between;align-items:flex-end;margin:0;font-size:2rem;font-weight:700;color:#cbd5e1}
+.tv-right .tv-rn b{font-size:clamp(3.6rem,5.4vw,5.4rem);font-weight:900;color:var(--c);font-family:inherit;line-height:1}
+.tv-rit.sem .tv-rn b{color:#64748b}
+.tv-right .tv-rn em{display:inline;font-size:1.35rem;color:#94a3b8;font-style:normal;font-weight:700}.tv-rn em strong{color:#fff}
+.tv-right .tv-bar{height:30px;border-radius:14px;padding:4px;background:#0f172a;border:1px solid #1e293b;margin:0}
+.tv-right .tv-bar i{border-radius:10px}
+.tv-right .tv-rs{display:flex;justify-content:space-between;align-items:center;font-size:1.35rem;font-weight:700;color:#cbd5e1;background:rgba(15,23,42,.7);border:1px solid #1e293b;border-radius:14px;padding:10px 16px}
+.tv-rs .tv-pill{font-size:1.2rem}.tv-rs .ok{color:#34d399}
+.tv-right .dg-card{padding:20px;background:#0f172a}
+.dg2{display:grid;grid-template-columns:5fr 7fr;gap:20px}
+.dg2-l,.dg2-r{background:rgba(15,23,42,.9);border:1px solid rgba(245,158,11,.3);border-radius:16px;padding:18px 22px}
+.dg2-r{border-color:rgba(16,185,129,.3)}
+.dg2-h{font-size:1.6rem;font-weight:900;text-transform:uppercase;color:#f59e0b;letter-spacing:.02em}.dg2-h.ok{color:#34d399}
+.dg2-s{display:block;font-size:1.05rem;color:#94a3b8;margin-top:4px}
+.dg2-v{font-size:1.4rem;margin:14px 0 0}
+.dg2-main{margin-top:14px;background:rgba(245,158,11,.1);border-left:8px solid #f59e0b;border-radius:0 12px 12px 0;padding:12px 16px}
+.dg2-main small{display:block;color:#f59e0b;font-weight:900;font-size:.95rem;letter-spacing:.1em;text-transform:uppercase}
+.dg2-main b{display:block;font-size:1.9rem;font-weight:900;line-height:1.2;margin-top:4px}.dg2-main em{font-style:normal;color:#94a3b8;font-size:1.1rem;font-weight:700}
+.dg2-mais p{font-size:1.25rem;color:#cbd5e1;margin:10px 0 0}
+.dg2-acs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:14px}
+.dg2-ac{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px 16px}
+.dg2-ac span{display:inline-block;background:#2563eb;color:#fff;font-weight:900;font-size:.95rem;text-transform:uppercase;letter-spacing:.06em;border-radius:6px;padding:3px 10px}
+.dg2-ac p{font-size:1.45rem;font-weight:800;line-height:1.3;margin:10px 0 0}
+@media (max-width:1300px){.tv-top{grid-template-columns:1fr 1fr}.tv-spot2{grid-column:1/-1}.dg2{grid-template-columns:1fr}}
+
 .tv-lado{display:flex;flex-direction:column;gap:18px}
 .tv-lado .tv-tot{flex:1;justify-content:center;padding:20px}
 .tv-lado .tv-tot span,.tv-lado .tv-streak span{font-size:1.35rem;color:#94a3b8;font-weight:700}
@@ -4773,7 +4839,7 @@ function statusPlanilha(){
     if(L&&L.data&&!L.hoje)return '<span class="tv-pl tv-pl-x">Planilha do Drive ainda é de '+L.data+' '+(L.hora||'')+' · esperando a de hoje · conferida '+hh(tvLidaEm)+'</span>';
     return '<span class="tv-pl">Esperando a primeira planilha de hoje · conferida '+hh(tvLidaEm)+'</span>';
   }
-  return '<span class="tv-pl'+(parada?' tv-pl-x':'')+'">'+(parada?'⚠ planilha sem mudar desde '+hh(tvTrocouEm)+' (conferir robô)':'Planilha de hoje '+(tvEmissao||hh(tvTrocouEm))+' · conferida '+hh(tvLidaEm))+'</span>';
+  return '<span class="tv-pl'+(parada?' tv-pl-x':'')+'">'+(parada?'⚠ planilha sem mudar desde '+hh(tvTrocouEm)+' (conferir robô)':'Planilha de hoje <b>'+(tvEmissao||hh(tvTrocouEm))+'</b> · conferida <b>'+hh(tvLidaEm)+'</b>')+'</span>';
 }
 // ===== TELA =====
 let rot=0;
@@ -4794,24 +4860,25 @@ function render(){
     if(hora>=21)h+='<div class="tv-alerta"><div class="tv-modo">🌙 Fora do horário de cobrança</div><div class="tv-al-txt">Relatório zerado para amanhã</div></div>';
     else if(!tvAtualizadoHoje)h+=dicasTV();
   }else if(!ops.reduce((s,o)=>s+o.a,0))h+=dicasTV(true);
-  // faixa de alerta
-  h+='<div class="tv-alerta">';
-  h+='<div class="tv-modo">'+(R.m.id==='power'?'⚡ ':R.m.id==='preview'?'👀 ':'🌙 ')+R.m.txt+'<span>'+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</span>'+statusPlanilha()+'</div>';
-  if(niv&&niv.id!=='ok')h+='<div class="tv-al-txt tv-al-big">'+niv.nome+'</div>';
-  else if(niv)h+='<div class="tv-al-txt tv-al-big">NO RITMO</div>';
-  h+='<div class="tv-btns"><button onclick="tvSom()">'+(somOn?'🔊 Som ligado':'🔇 Som desligado')+'</button><button onclick="tvTela()">⛶ Tela cheia</button></div></div>';
-  // sem nomes de operador na TV: so o resultado do time, o ritmo e o diagnostico
-  h+='<div class="tv-grid"><div class="tv-right">';
-  // destaque: alterna entre o 1o, 2o e 3o lugar a cada 5 min
-  if(ch)h+='<div class="tv-top"><div class="tv-card tv-spot2 l'+(pos+1)+'"><div class="tv-crown">'+['🥇','🥈','🥉'][pos]+'<div class="tv-badge">'+(pos+1)+'º Lugar</div></div><div class="tv-spot-tx"><div class="tv-tag">Top 3 do dia</div><div class="tv-sn">'+ch.n+'</div><div class="tv-sv">'+ch.a+' acordo'+(ch.a===1?'':'s')+'</div><div class="tv-ss">'+fR(ch.v)+'</div><div class="tv-pts">'+[0,1,2].slice(0,n3).map(i=>'<i class="'+(i===pos?'on':'')+'">'+(i+1)+'º</i>').join('')+'</div></div><div class="tv-tempo"><i style="--w0:'+Math.round((300000-falta)/3000)+'%;animation-duration:'+Math.round(falta/1000)+'s"></i></div></div>';
-  else h+='<div class="tv-top"><div class="tv-card tv-spot2 vazio"><div class="tv-crown">👑</div><div class="tv-spot-tx"><div class="tv-tag">Destaque do dia</div><div class="tv-sn">Quem será o primeiro?</div></div></div>';
-  h+='<div class="tv-lado"><div class="tv-card tv-tot"><span>Total do Time Hoje</span><b>'+ta+' acordo'+(ta===1?'':'s')+'</b><em>'+fR(tv)+'</em></div>';
-  h+='<div class="tv-card tv-streak"><span>Operadores com Acordos</span><b><em>'+ativos+'</em> de '+ops.length+'</b></div></div></div>';
-  h+='<div class="tv-mid">'+['manha','tarde'].map(k=>{const x=R.T[k],nv=x.nivel,pc=Math.min(100,Math.round(x.r*100)),at=R.m.turno===k;
-    return '<div class="tv-card tv-rit'+(at?' atual':'')+'" style="--c:'+nv.cor+'"><div class="tv-rh"><span>'+(k==='manha'?'☀️ Manhã':'🌇 Tarde')+(at?' · agora':'')+'</span><b>'+(x.ops.length?nv.nome:'sem ponto')+'</b></div>'+
-    '<div class="tv-rn"><b>'+x.feito+'</b> / '+Math.round(x.esp)+' esperados <em>meta do turno: '+x.metaFinal+'</em></div><div class="tv-bar"><i style="width:'+pc+'%"></i></div>'+
-    '<div class="tv-rs">'+x.ops.length+' operadores no ponto'+(x.falta?' · faltam <b>'+x.falta+'</b> pro ritmo':' · ritmo em dia')+'</div></div>'}).join('')+'</div>';
-  h+='</div></div><div class="tv-foot">"Quem fecha mais, aparece mais."</div></div>';
+  // ===== cabecalho: ao vivo + turno + planilha + relogio grande =====
+  const hhmmss=()=>new Date().toLocaleTimeString('pt-BR');
+  h+='<div class="tv-alerta tv-hd"><div class="tv-hd-l"><span class="tv-live'+(R.m.id==='power'?'':' off')+'"><i></i>'+(R.m.id==='power'?'AO VIVO':R.m.id==='preview'?'PRÉVIA':'FORA DO HORÁRIO')+'</span><b class="tv-hd-t">'+R.m.txt.replace(/^modo\s+\w+\s*·\s*/i,'')+'</b></div>';
+  if(niv)h+='<div class="tv-al-txt tv-al-big">'+(niv.id==='ok'?'NO RITMO':niv.nome)+'</div>';
+  h+='<div class="tv-hd-r"><div class="tv-hd-pl"><small>Última atualização</small>'+statusPlanilha()+'</div><div class="tv-clock" id="tvRelogio">'+hhmmss()+'</div>'+
+     '<div class="tv-btns"><button onclick="tvSom()">'+(somOn?'🔊':'🔇')+'</button><button onclick="tvTela()">⛶</button></div></div></div>';
+  // sem lista de operadores na TV: Top 3 (1 por vez), numeros do time, ritmo e diagnostico
+  const noPonto=R.T.manha.ops.length+R.T.tarde.ops.length||ops.length,pctAt=noPonto?Math.round(ativos/noPonto*100):0;
+  h+='<div class="tv-grid"><div class="tv-right"><div class="tv-top">';
+  if(ch)h+='<div class="tv-card tv-spot2 l'+(pos+1)+'"><div class="tv-crown">'+['🥇','🥈','🥉'][pos]+'<div class="tv-badge">'+(pos+1)+'º Lugar</div></div><div class="tv-spot-tx"><div class="tv-tag">Top 3 do dia</div><div class="tv-sn">'+ch.n.split(' ').slice(0,2).join(' ')+'</div><div class="tv-sv">'+ch.a+' acordo'+(ch.a===1?'':'s')+'</div><div class="tv-ss">'+fR(ch.v)+'</div><div class="tv-pts">'+[0,1,2].slice(0,n3).map(i=>'<i class="'+(i===pos?'on':'')+'">'+(i+1)+'º</i>').join('')+'</div></div><div class="tv-tempo"><i style="--w0:'+Math.round((300000-falta)/3000)+'%;animation-duration:'+Math.round(falta/1000)+'s"></i></div></div>';
+  else h+='<div class="tv-card tv-spot2 vazio"><div class="tv-crown">👑</div><div class="tv-spot-tx"><div class="tv-tag">Top 3 do dia</div><div class="tv-sn">Quem será o primeiro?</div></div></div>';
+  h+='<div class="tv-card tv-k tv-tot2"><span class="tv-k-h">Total do time hoje</span><div class="tv-k-n"><b>'+ta+'</b><div><em>acordo'+(ta===1?'':'s')+'</em><strong>'+fR(tv)+'</strong></div></div></div>';
+  h+='<div class="tv-card tv-k tv-op2"><span class="tv-k-h">Operadores com acordo 🔥</span><div class="tv-k-n"><b class="lar">'+ativos+'</b><div><em>de '+noPonto+'</em></div></div><p>'+pctAt+'% da equipe já pontuou</p></div></div>';
+  h+='<div class="tv-mid">'+['manha','tarde'].map(k=>{const x=R.T[k],nv=x.nivel,pc=Math.min(100,Math.round(x.r*100)),at=R.m.turno===k,sem=!x.ops.length;
+    const ruim=!sem&&nv.id!=='ok',cor=sem?'#475569':nv.cor;
+    return '<div class="tv-card tv-rit'+(at?' atual':'')+(ruim&&at?' critico':'')+(sem?' sem':'')+'" style="--c:'+cor+'"><div class="tv-rh"><span>'+(k==='manha'?'Manhã':'Tarde')+(at?' · agora':'')+'</span><b class="tv-pill">'+(sem?'sem ponto':nv.nome)+'</b></div>'+
+    '<div class="tv-rn"><span><b>'+x.feito+'</b> / '+Math.round(x.esp)+' esperados</span><em>Meta do turno: <strong>'+x.metaFinal+'</strong></em></div><div class="tv-bar"><i style="width:'+(sem?0:pc)+'%"></i></div>'+
+    '<div class="tv-rs"><span>👥 '+x.ops.length+' operadores no ponto</span>'+(sem?'<span>'+(k==='tarde'?'começa às 14h':'')+'</span>':x.falta?'<b class="tv-pill">FALTAM '+x.falta+' PRO RITMO</b>':'<span class="ok">✔ ritmo em dia</span>')+'</div></div>'}).join('')+'</div>';
+  h+='</div></div></div>';
   pg.innerHTML=h;flashPai();
 }
 window.tvSom=function(){somOn=!somOn;localStorage.setItem('tv_som',somOn?'1':'0');if(somOn){ac();bip(660,.15,0,.2)}render()};
@@ -4824,6 +4891,7 @@ window.tvTela=function(){ac();if(document.fullscreenElement){document.exitFullsc
   const el=document.documentElement;tvFullOn();(el.requestFullscreen?el.requestFullscreen():Promise.resolve()).catch(()=>{})};
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)tvFullOff()});
 window.tvTeste=function(n){tocar(n);flash(n);alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300)};   // no Console: tvTeste('baixo'|'muito'|'extremo')
+setInterval(()=>{const c=document.getElementById('tvRelogio');if(c)c.textContent=new Date().toLocaleTimeString('pt-BR')},1000);
 setInterval(render,30000);(function vira(){setTimeout(()=>{render();vira()},300000-Date.now()%300000+500)})();setInterval(()=>atualizarDadosTV(false),5*60000);
 setInterval(()=>{const ok=typeof isA==='function'&&isA();const s=$('sbTV');if(s)s.style.display=ok?'flex':'none'},1000);
 const sp=window.showPage;
@@ -4947,10 +5015,13 @@ function analisar(D){
 }
 // cartao fixo da TV: so motivo + o que fazer, sem nomes e sem recado de supervisor
 function htmlCard(A){
-  let h='<div class="dg-h"><b>Por que os acordos estão baixos</b><span>'+A.n+' ligações avaliadas '+A.jan+' · '+A.acordos+' com acordo, '+A.sem+' sem acordo</span></div>';
-  if(!A.itens.length)return h+'<div class="dg-c"><div class="dg-col"><p>Sem ligações avaliadas suficientes pra apontar o motivo.</p></div></div>';
-  h+='<div class="dg-c"><div class="dg-col"><i>Motivos</i>'+A.itens.map(m=>'<p>❗ '+m.p+' <em>'+m.tag+'</em></p>').join('')+'</div>';
-  h+='<div class="dg-col"><i>O que fazer agora</i>'+A.itens.map(m=>'<p>✅ '+m.f+'</p>').join('')+'</div></div>';
+  const sub=A.n+' ligações avaliadas '+A.jan+' · '+A.acordos+' com acordo, '+A.sem+' sem acordo';
+  if(!A.itens.length)return '<div class="dg2"><div class="dg2-l"><div class="dg2-h">⚠ Por que os acordos estão baixos?</div><span class="dg2-s">'+sub+'</span><p class="dg2-v">Ainda não há ligações avaliadas suficientes pra apontar o motivo.</p></div></div>';
+  const m0=A.itens[0],resto=A.itens.slice(1);
+  let h='<div class="dg2"><div class="dg2-l"><div class="dg2-h">⚠ Por que os acordos estão baixos?</div><span class="dg2-s">'+sub+'</span>';
+  h+='<div class="dg2-main"><small>Motivo principal</small><b>'+m0.p+'</b><em>'+m0.tag+'</em></div>';
+  if(resto.length)h+='<div class="dg2-mais">'+resto.map(m=>'<p>• '+m.p+'</p>').join('')+'</div>';
+  h+='</div><div class="dg2-r"><div class="dg2-h ok">✔ O que fazer agora</div><div class="dg2-acs">'+A.itens.map(m=>'<div class="dg2-ac"><span>'+(m.tag==='Discador'?'Ação TI':m.tag)+'</span><p>'+m.f+'</p></div>').join('')+'</div></div></div>';
   return h;
 }
 function cardFixo(){
