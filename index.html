@@ -2081,6 +2081,11 @@ body::before,body::after{display:none!important}
 .avd-rota-k div{background:#f8fafc;border-radius:8px;padding:7px;text-align:center}
 .avd-rota-k b{display:block;font-size:.95rem;color:#0f3557}.avd-rota-k span{font-size:.62rem;color:var(--mu)}
 .avd-rota-sug{font-size:.74rem;line-height:1.45;color:#374151;background:#f6f9ff;border-left:3px solid #d4a937;border-radius:0 8px 8px 0;padding:8px 9px}
+.avd-melhoria{border:2px solid #d4a937;box-shadow:0 4px 18px rgba(212,169,55,.12)}
+.avd-melhoria-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;padding:0 16px 16px}
+.avd-melhoria-item{display:flex;gap:10px;padding:12px;border-radius:11px;background:#fff8e1;border:1px solid #f1d98b}
+.avd-melhoria-icon{font-size:1.45rem;line-height:1}
+.avd-melhoria-item b{display:block;font-size:.82rem;color:#0f3557}.avd-melhoria-item strong{display:block;font-size:.78rem;color:#b45309;margin-top:3px}.avd-melhoria-item p{font-size:.7rem;line-height:1.4;color:#374151;margin:4px 0 0}
 .avd-quality{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:4px 10px;font-size:.7rem;font-weight:800}
 .avd-quality.ok{background:#dcfce7;color:#15803d}.avd-quality.review{background:#fee2e2;color:#b91c1c}.avd-quality.na{background:#f1f5f9;color:#64748b}
 .avd-crit-status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
@@ -3997,7 +4002,7 @@ function render(preservar){
     kpi('#16a34a',(ls.length?(ls.filter(temRes).length/ls.length*100).toFixed(0):0)+'%','Saíram com acordo','','res')+
     kpi('#dc2626','<span style="font-size:1rem">'+(fr?esc(fr.fraco||fr.nome):'-')+'</span>','Principal erro da equipe',fr?fr.pct.toFixed(0)+'% de aproveitamento':'','erro')+
     (FUNIL?(()=>{const t=funilTot(funilFilt().filter(x=>x.tipo==='total'));return kpi('#7c3aed',fmtN(t.dis),'Discagens no período',fmtN(t.atd)+' atendidas · '+fmtN(t.aco)+' acordos','funil')})():'')+'</div>';
-  if(VIEW){$('avdBody').innerHTML=h+tabsHTML()+acaoHoje(ls)+visao(ls,lin,c,eq);return}
+  if(VIEW){$('avdBody').innerHTML=h+tabsHTML()+(VIEW==='funil'?'':acaoHoje(ls))+visao(ls,lin,c,eq);return}
   h+=tabsHTML()+acaoHoje(ls);
   h+='<div class="avd-card"><div class="avd-ct">Ranking de qualidade</div>';
   h+=lin.map((o,i)=>'<div class="avd-row" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><div class="avd-pos">'+(i+1)+'º</div><div class="avd-av'+(i<3?' top':'')+'">'+esc(ini(o.op))+'</div><div class="avd-b"><div class="avd-nm">'+esc(nc(o.op))+(o.g==='novato'?'<span class="avd-tag">novato</span>':'')+'</div><div class="avd-sb">'+o.a.length+' ouvida'+(o.a.length>1?'s':'')+' · '+(o.res.toFixed(0))+'% com resultado'+(o.f?' · ponto fraco: '+esc(o.f.fraco||o.f.nome):'')+'</div></div><div class="avd-r"><span class="avd-quality '+(o.a.some(temFalha)?'review':'ok')+'">'+(o.a.some(temFalha)?'Revisar':'Bem')+'</span>'+(o.pend?'<div class="avd-vs"><span class="avd-pl pd">'+o.pend+' feedback'+(o.pend>1?'s':'')+'</span></div>':'')+'</div></div>').join('');
@@ -4085,6 +4090,15 @@ function rotaSug(t){
   if(t.cpc&&pc(t.aco,t.cpc)<2)sug.push('Acordos baixos: ouvir amostras e reforçar abordagem, oferta à vista e negociação.');
   return sug.length?sug.join(' '):'Rota saudável no período; manter acompanhamento e comparar com a outra rota.';
 }
+function melhoriaDiscador(T){
+  const itens=[],muda=pc(T.muda,T.dis),at=pc(T.atd,T.dis),nc=pc(T.nc,T.op),cpc=pc(T.cpc,T.op);
+  if(muda>=20)itens.push(['🔇','Reduzir ligação muda',muda.toFixed(0)+'% das discagens','Revisar cadência, tempo de espera e capacidade de operadores no Fastway.']);
+  if(at<35)itens.push(['📞','Melhorar atendimento',at.toFixed(0)+'% chegam a uma pessoa','Testar horários por rota e remover números que repetem caixa postal.']);
+  if(nc>=25)itens.push(['🧹','Higienizar telefones',nc.toFixed(0)+'% não conhecem o cliente','Separar números errados e atualizar a base antes de rediscar.']);
+  if(cpc<35)itens.push(['🎯','Aumentar contato com devedor',cpc.toFixed(0)+'% dos atendimentos viram contato certo','Priorizar telefones móveis e revisar a distribuição por rota.']);
+  if(!itens.length)itens.push(['✅','Manter e medir','Indicadores dentro do esperado','Comparar VORUS e NOVATECH por horário antes de mudar a configuração.']);
+  return '<div class="avd-card avd-melhoria"><div class="avd-ct">O que fazer para melhorar o discador</div><div class="avd-melhoria-grid">'+itens.map(x=>'<div class="avd-melhoria-item"><div class="avd-melhoria-icon">'+x[0]+'</div><div><b>'+x[1]+'</b><strong>'+x[2]+'</strong><p>'+x[3]+'</p></div></div>').join('')+'</div></div>';
+}
 function visaoRotas(rs){
   const base=rs.filter(x=>x.tipo==='rota'), groups={VORUS:[],NOVATECH:[]};
   base.forEach(r=>{const k=nomeRota(r);if(groups[k])groups[k].push(r)});
@@ -4097,6 +4111,7 @@ function visaoFunil(){
   let h='<div class="avd-card"><div class="avd-ct">Funil da discagem</div><table class="avd-tb"><tr><th>Etapa</th><th>Quantidade</th><th>% da etapa anterior</th><th>% das discagens</th></tr>'+
     et.map((e,i)=>'<tr><td class="nm">'+e[0]+'</td><td><b>'+fmtN(e[1])+'</b></td><td>'+(i?pc(e[1],et[i-1][1]).toFixed(1)+'%'+mini(pc(e[1],et[i-1][1]),e[2]):'-')+'</td><td>'+pc(e[1],T.dis).toFixed(2)+'%</td></tr>').join('')+'</table>'+
     '<div class="avd-leg" style="padding-top:10px">Das discagens, <b>'+pc(T.ele,T.dis).toFixed(0)+'%</b> caíram em caixa postal ou máquina e <b>'+pc(T.muda,T.dis).toFixed(0)+'%</b> foram ligação muda. Dos atendimentos com operador, <b>'+pc(T.nc,T.op).toFixed(0)+'%</b> foram "não conhece o cliente" (número errado).</div></div>';
+  h+=melhoriaDiscador(T);
   h+=visaoRotas(rs);
   const O=funilAgr(rs.filter(x=>x.tipo==='op')).sort((a,b)=>b.aco-a.aco||pc(b.aco,b.cpc)-pc(a.aco,a.cpc));
   h+='<div class="avd-card"><div class="avd-ct">Por operador</div><table class="avd-tb"><tr><th>Operador</th><th>Atendimentos</th><th>Contato devedor</th><th>Acordos</th><th>% acordo / contato</th><th>Tempo médio falando</th></tr>'+
@@ -4449,9 +4464,22 @@ function tokSet(t){try{localStorage.setItem('mq_tok',JSON.stringify({k:key(),t:t
 function dt(s){var m=String(s).match(/(\d{2})\/(\d{2})\/(\d{4})/);return m?new Date(+m[3],+m[2]-1,+m[1]):null}
 function semNome(t){t=String(t||'').trim();var m=t.match(/^(ol[a\u00E1],?\s+)?([A-Z\u00C0-\u00DD][a-z\u00E0-\u00FF]+)(\s+[A-Z\u00C0-\u00DD][a-z\u00E0-\u00FF]+)?\s*[,!]\s*/);var K=['excelente','parabens','otimo','otima','boa','bom','muito','atencao','cuidado','olha','entao','aqui','hoje','sim','nao','legal','show','perfeito','importante','resumindo','infelizmente','apesar','embora','mandou','voce'];if(!m)return t;var w=m[2].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(K.indexOf(w)>=0)return t;var r=t.slice(m[0].length);return r.charAt(0).toUpperCase()+r.slice(1)}
 function post(b){return fetch(URLP,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)}).then(function(r){return r.json()})}
+function itemTexto(x,ok){
+  if(typeof x==='string')return x;
+  x=x||{};
+  if(ok)return String(x.ponto||x.acerto||x.resumo||x.trecho||'');
+  return String(x.problema||x.erro||x.resumo||x.como_contornar||'');
+}
+function normalizaMinhas(r){
+  r=Object.assign({},r);
+  r.ac=(r.ac||r.acertos||[]).map(function(x){return itemTexto(x,true)}).filter(Boolean);
+  r.er=(r.er||r.erros||[]).map(function(x){return itemTexto(x,false)}).filter(Boolean);
+  return r;
+}
 // chamado no login: guarda o "passe" pra nao pedir senha de novo
 window.MQ_token=function(login,senha){if(!URLP)return;var k=String(login||'').trim().toLowerCase().replace(/^\d+\./,'');post({type:'qtoken',login:k,senha:senha}).then(function(j){if(j&&j.status==='ok')try{localStorage.setItem('mq_tok',JSON.stringify({k:k,t:j.token}))}catch(e){}}).catch(function(){})};
 function filtrados(){
+  D=(D||[]).map(normalizaMinhas);
   var h=new Date(),ini;h.setHours(0,0,0,0);
   if(PER==='dia'){var d0=dt(DIA);return (D||[]).filter(function(r){var d=dt(r.d);return d&&d0&&d.getTime()===d0.getTime()}).sort(function(a,b){return String(b.h||'').localeCompare(String(a.h||''))})}
   if(PER==='semana'){ini=new Date(h);ini.setDate(h.getDate()-((h.getDay()+6)%7))}else if(PER==='mes')ini=new Date(h.getFullYear(),h.getMonth(),1);else ini=new Date(2000,0,1);
@@ -4509,7 +4537,7 @@ function busca(b,silencioso){
   b.type='minhas';b.login=key();
   post(b).then(function(j){
     if(j.status!=='ok'){if(j.relogin){try{localStorage.removeItem('mq_tok')}catch(e){}D=null;return pedeSenha(b.senha!==undefined?'Senha incorreta.':'')}throw new Error(j.msg)}
-    if(j.token)tokSet(j.token);var mudou=JSON.stringify(j.ligacoes||[])!==JSON.stringify(D||[]);D=j.ligacoes||[];TD=Date.now();KEYD=key();
+    if(j.token)tokSet(j.token);var novas=(j.ligacoes||[]).map(normalizaMinhas);var mudou=JSON.stringify(novas)!==JSON.stringify(D||[]);D=novas;TD=Date.now();KEYD=key();
     try{localStorage.setItem('mq_cache',JSON.stringify({k:key(),t:Date.now(),d:D}))}catch(e){}
     if(!silencioso){ABR={};render()}else if(mudou&&EL&&EL.offsetParent!==null)keepRender();
   }).catch(function(e){
