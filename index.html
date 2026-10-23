@@ -266,7 +266,7 @@ body.tv-full .tv-al-big{font-size:3.4rem!important}
 .tv-hd-pl{text-align:right}.tv-hd-pl small{display:block;font-size:.8rem;color:#64748b;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
 .tv-hd-pl .tv-pl{font-size:1.15rem!important;color:#e2e8f0!important;font-weight:700}.tv-hd-pl .tv-pl b{color:#34d399}.tv-hd-pl .tv-pl-x{color:#fbbf24!important}
 .tv-clock{font-size:2.3rem;font-weight:900;letter-spacing:.06em;background:#0b1120;border:1px solid #334155;border-radius:12px;padding:4px 18px;font-variant-numeric:tabular-nums}
-.tv-hd .tv-btns button{font-size:1rem;padding:6px 10px}
+.tv-hd .tv-btns button{font-size:.95rem;padding:8px 14px;color:#cbd5e1}
 .tv-top{display:grid;grid-template-columns:1.25fr 1fr .8fr;gap:18px}
 .tv-spot2{padding:24px 30px;gap:26px}
 .tv-spot2 .tv-crown{font-size:5rem}
@@ -4865,7 +4865,7 @@ function render(){
   h+='<div class="tv-alerta tv-hd"><div class="tv-hd-l"><span class="tv-live'+(R.m.id==='power'?'':' off')+'"><i></i>'+(R.m.id==='power'?'AO VIVO':R.m.id==='preview'?'PRÉVIA':'FORA DO HORÁRIO')+'</span><b class="tv-hd-t">'+R.m.txt.replace(/^modo\s+\w+\s*·\s*/i,'')+'</b></div>';
   if(niv)h+='<div class="tv-al-txt tv-al-big">'+(niv.id==='ok'?'NO RITMO':niv.nome)+'</div>';
   h+='<div class="tv-hd-r"><div class="tv-hd-pl"><small>Última atualização</small>'+statusPlanilha()+'</div><div class="tv-clock" id="tvRelogio">'+hhmmss()+'</div>'+
-     '<div class="tv-btns"><button onclick="tvSom()">'+(somOn?'🔊':'🔇')+'</button><button onclick="tvTela()">⛶</button></div></div></div>';
+     '<div class="tv-btns"><button onclick="tvSom()">'+(somOn?'Som ligado':'Som desligado')+'</button><button onclick="tvTela()">Tela cheia</button></div></div></div>';
   // sem lista de operadores na TV: Top 3 (1 por vez), numeros do time, ritmo e diagnostico
   const noPonto=R.T.manha.ops.length+R.T.tarde.ops.length||ops.length,pctAt=noPonto?Math.round(ativos/noPonto*100):0;
   h+='<div class="tv-grid"><div class="tv-right"><div class="tv-top">';
@@ -5008,8 +5008,8 @@ function analisar(D){
   const F=D.funil.filter(x=>x.tipo==='total'&&[hh,hp].indexOf(String(x.hora).padStart(2,'0'))>=0).reduce((a,x)=>{['dis','op','cpc','muda'].forEach(k=>a[k]+=Number(x[k])||0);return a},{dis:0,op:0,cpc:0,muda:0});
   const itens=[];   // cada item = 1 problema + o que fazer
   crit.filter(c=>c.pct<70).slice(0,3).forEach(c=>itens.push({tag:SL[c.id].nome,p:SL[c.id].p,f:SL[c.id].f}));
-  if(F.dis>50&&F.muda/F.dis>.25)itens.push({tag:'Discador',p:Math.round(F.muda/F.dis*100)+'% das ligações caem em muda',f:'TI: revisar o discador, as rotas e a distribuição das chamadas'});
-  if(!itens.length&&L.length&&sem/L.length>=.5)itens.push({tag:'Resultado',p:sem+' de '+L.length+' ligações sem acordo',f:'Não aceite o primeiro não: investigue e negocie'});
+  // discador/TI nao aparece na TV (fica so na aba Avaliacao de Discagem)
+  if(!itens.length&&L.length&&sem/L.length>=.5){itens.push({tag:'Insistência',p:sem+' de '+L.length+' ligações sem acordo',f:'Não aceite o primeiro não: "Quanto você consegue e em que dia?"'});itens.push({tag:'Mostrar o ganho',p:'',f:'"Pagando a entrada, cancelo o protocolo e o nome sai em 5 a 7 dias úteis"'})}
   const fortes=crit.filter(c=>c.pct>=80).slice(-2).map(c=>SL[c.id].nome);
   return{jan,n:L.length,acordos,sem,itens,fortes};
 }
@@ -5020,8 +5020,8 @@ function htmlCard(A){
   const m0=A.itens[0],resto=A.itens.slice(1);
   let h='<div class="dg2"><div class="dg2-l"><div class="dg2-h">⚠ Por que os acordos estão baixos?</div><span class="dg2-s">'+sub+'</span>';
   h+='<div class="dg2-main"><small>Motivo principal</small><b>'+m0.p+'</b><em>'+m0.tag+'</em></div>';
-  if(resto.length)h+='<div class="dg2-mais">'+resto.map(m=>'<p>• '+m.p+'</p>').join('')+'</div>';
-  h+='</div><div class="dg2-r"><div class="dg2-h ok">✔ O que fazer agora</div><div class="dg2-acs">'+A.itens.map(m=>'<div class="dg2-ac"><span>'+(m.tag==='Discador'?'Ação TI':m.tag)+'</span><p>'+m.f+'</p></div>').join('')+'</div></div></div>';
+  if(resto.filter(m=>m.p).length)h+='<div class="dg2-mais">'+resto.filter(m=>m.p).map(m=>'<p>• '+m.p+'</p>').join('')+'</div>';
+  h+='</div><div class="dg2-r"><div class="dg2-h ok">✔ O que fazer agora</div><div class="dg2-acs">'+A.itens.map(m=>'<div class="dg2-ac"><span>'+m.tag+'</span><p>'+m.f+'</p></div>').join('')+'</div></div></div>';
   return h;
 }
 function cardFixo(){
