@@ -2171,6 +2171,10 @@ body::before,body::after{display:none!important}
 .avd-k.clk:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,23,42,.08)}
 .avd-k.on{background:#f6f9ff;box-shadow:0 0 0 2px var(--c,#1e4e7e) inset}
 .avd-k .avd-hint{font-size:.62rem;color:#9ca3af;margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.avd-exp{margin:4px 16px 12px;padding:10px 14px;background:#f0f9fb;border-left:3px solid #0891b2;border-radius:8px;font-size:.84rem;line-height:1.6;color:#334155}.avd-exp div+div{margin-top:4px}.avd-exp b{color:#0e5a6e}
+.avd-todo{margin-top:14px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}.avd-todo-t{background:#0f3557;color:#fff;font-weight:700;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;padding:9px 14px}.avd-todo-i{display:flex;gap:12px;padding:10px 14px;border-top:1px solid #eef1f5;font-size:.88rem;line-height:1.55;color:#374151}.avd-todo-i>span{font-size:1.2rem;line-height:1.3}
+.avd-big3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.avd-big3>div{border:1px solid;border-radius:12px;padding:12px;text-align:center;font-size:.82rem;color:#475569}.avd-big3 b{display:block;font-size:1.6rem;line-height:1.2}@media(max-width:700px){.avd-big3{grid-template-columns:1fr}}
+.avd-heat td{padding:7px 6px;font-size:.76rem}
 .avd-tb{width:100%;border-collapse:collapse;font-size:.8rem}
 .avd-tb th{font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;font-weight:700;text-align:right;padding:8px 12px;border-top:1px solid #eef1f5;white-space:nowrap}
 .avd-tb th:first-child,.avd-tb td:first-child{text-align:left}
@@ -4459,7 +4463,7 @@ function visaoFunil(){
 const pf=(v,d)=>Number(v||0).toFixed(d).replace('.',',');
 const brl=v=>'R$ '+(Math.round(v*100)/100).toFixed(2).replace('.',',');
 function operFilt(b){return (OPER||[]).filter(x=>x.bloco===b&&x.dados&&noPer(x.data))}
-function operJunta(b){const m={};operFilt(b).forEach(x=>(x.dados||[]).forEach(r=>{const t=m[r.k]=m[r.k]||{k:r.k};Object.keys(r).forEach(c=>{if(c!=='k'&&typeof r[c]==='number')t[c]=(t[c]||0)+r[c]})}));return Object.values(m)}
+function operJunta(b){const m={};operFilt(b).forEach(x=>(x.dados||[]).forEach(r=>{const t=m[r.k]=m[r.k]||{k:r.k};Object.keys(r).forEach(c=>{if(c!=='k'&&typeof r[c]==='number')t[c]=(t[c]||0)+r[c];else if(c!=='k'&&typeof r[c]==='string'&&!t[c])t[c]=r[c]})}));return Object.values(m)}
 const hm=s=>{s=Math.round(s||0);const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h+'h'+String(m).padStart(2,'0')};
 const pctc=(v,t,cor)=>'<td>'+pf(pc(v,t),pc(v,t)<10?1:0)+'%'+mini(pc(v,t),cor)+'</td>';
 function diagMail(m){const at=pc(m.at,m.dis),ne=pc(m.ne,m.dis);
@@ -4470,51 +4474,118 @@ function diagMail(m){const at=pc(m.at,m.dis),ne=pc(m.ne,m.dis);
 function operOps(){const m={};operFilt('operadores').forEach(x=>(x.dados||[]).forEach(o=>{const t=m[o.k]=m[o.k]||{k:o.k,n:o.n,g:o.g,ini:o.ini,fim:o.fim,dias:0,pausas:{}};t.dias++;
   ['login','fala','ocioso','pausa','manual','bloqueio'].forEach(c=>t[c]=(t[c]||0)+(o[c]||0));if(o.ini&&o.ini<t.ini)t.ini=o.ini;if(o.fim&&o.fim>t.fim)t.fim=o.fim;
   (o.pausas||[]).forEach(p=>{const q=t.pausas[p.k]=t.pausas[p.k]||{q:0,s:0};q.q+=p.q;q.s+=p.s})}));return Object.values(m)}
-let BLOQ=[];
-function baixarBloq(){if(!BLOQ.length){sT('Nenhum número na lista');return}
-  const txt='telefone;motivo;tentativas\r\n'+BLOQ.map(x=>x.f+';'+(x.ne?'NUMERO NAO EXISTE':'CAIXA POSTAL '+x.el+'x')+';'+x.t).join('\r\n');
-  const b=new Blob(['\ufeff'+txt],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='numeros-para-bloquear.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+let BLOQ=[],PAUSA=[];
+const UF_DDD={11:'SP',12:'SP',13:'SP',14:'SP',15:'SP',16:'SP',17:'SP',18:'SP',19:'SP',21:'RJ',22:'RJ',24:'RJ',27:'ES',28:'ES',31:'MG',32:'MG',33:'MG',34:'MG',35:'MG',37:'MG',38:'MG',41:'PR',42:'PR',43:'PR',44:'PR',45:'PR',46:'PR',47:'SC',48:'SC',49:'SC',51:'RS',53:'RS',54:'RS',55:'RS',61:'DF',62:'GO',64:'GO',63:'TO',65:'MT',66:'MT',67:'MS',68:'AC',69:'RO',71:'BA',73:'BA',74:'BA',75:'BA',77:'BA',79:'SE',81:'PE',87:'PE',82:'AL',83:'PB',84:'RN',85:'CE',88:'CE',86:'PI',89:'PI',91:'PA',93:'PA',94:'PA',92:'AM',97:'AM',95:'RR',96:'AP',98:'MA',99:'MA'};
+const dddNome=d=>d==='??'?'sem DDD':d+(UF_DDD[d]?' · '+UF_DDD[d]:'');
+const motivoTxt=x=>x.tipo==='nc'?'atendeu e não conhece o cliente':x.tipo==='ne'?'número não existe':'caixa postal '+(x.el||3)+'x';
+function baixaCsv(lista,nome){if(!lista.length){sT('Nenhum número nessa lista');return}
+  const txt='telefone;motivo;tentativas\r\n'+lista.map(x=>x.f+';'+motivoTxt(x).toUpperCase()+';'+x.t).join('\r\n');
+  const b=new Blob(['\ufeff'+txt],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nome;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function baixarBloq(q){if(q==='pausa')baixaCsv(PAUSA,'pausar-7-dias.csv');else baixaCsv(BLOQ,'bloquear-definitivo.csv')}
+// caixa "O que é / Como ler / O que fazer" de cada painel
+const explica=(oque,ler,fazer)=>'<div class="avd-exp"><div><b>O que é:</b> '+oque+'</div><div><b>Como ler:</b> '+ler+'</div><div><b>O que fazer:</b> '+fazer+'</div></div>';
+const pill=(t,bg,c)=>'<span class="avd-pl" style="background:'+bg+';color:'+c+'">'+t+'</span>';
+const tbw=h=>'<div style="overflow-x:auto">'+h+'</div>';
+function melhorHora(lista,min){const ok=lista.filter(x=>x.dis>=min);if(!ok.length)return null;return ok.sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis))[0]}
+function decideMail(m,base){const at=pc(m.at,m.dis),ne=pc(m.ne,m.dis),mil=m.dis?m.aco/m.dis*1000:0;
+  if(m.dis<500)return {o:4,t:'pouco discado',bg:'#f1f5f9',c:'#64748b',p:'Menos de 500 discagens: ainda não dá pra julgar.'};
+  if(ne>=15)return {o:3,t:'limpar antes',bg:'#fee2e2',c:'#b91c1c',p:pf(ne,0)+'% dos números não existem. Pedir telefone atualizado ao credor ou higienizar no Cobmais.'};
+  if(at<1.5)return {o:3,t:'limpar antes',bg:'#fee2e2',c:'#b91c1c',p:'Só '+pf(at,1)+'% atende. A base está gastando discagem à toa.'};
+  if(m.aco>=2&&mil>=base*1.3)return {o:0,t:'priorizar',bg:'#dcfce7',c:'#15803d',p:'Rende '+pf(mil,1)+' acordos a cada mil discagens (média da casa: '+pf(base,1)+').'};
+  if(m.aco===0&&m.dis>=3000)return {o:2,t:'pausar',bg:'#ffedd5',c:'#c2410c',p:fmtN(m.dis)+' discagens e nenhum acordo. Pausar e trocar por um mailing melhor.'};
+  return {o:1,t:'manter',bg:'#fef3c7',c:'#b45309',p:'Dentro da média da casa.'}}
 function visaoOper(){
   if(!OPER||!OPER.length)return '<div class="avd-card"><div class="avd-empty">Ainda sem dados da operação. Troque o avaliacao.js, publique o Apps Script novo e rode <b>node avaliacao.js --operacao</b> (depois ele coleta sozinho a cada rodada).</div></div>';
   const H=operJunta('hora').sort((a,b)=>a.k.localeCompare(b.k)),T=H.reduce((s,x)=>{['dis','at','ne','el','mu','op','aco','custo'].forEach(c=>s[c]=(s[c]||0)+(x[c]||0));return s},{});
   if(!T.dis)return '<div class="avd-card"><div class="avd-empty">Sem dados da operação nesse período. Troque o filtro de data lá em cima.</div></div>';
+  const dias=new Set(operFilt('hora').map(x=>x.data)).size,umDia=dias===1,perTxt=umDia?'no dia':'nos '+dias+' dias do filtro';
   const O=operOps().sort((a,b)=>pc(b.ocioso,b.login)-pc(a.ocioso,a.login)),EQ=O.reduce((s,o)=>{['login','fala','ocioso','pausa','manual'].forEach(c=>s[c]=(s[c]||0)+(o[c]||0));return s},{});
-  const prosp=o=>/prospec/i.test(o.g||''),manual=O.filter(o=>!prosp(o)&&pc(o.manual,o.login)>20);const umDia=new Set(operFilt('operadores').map(x=>x.data)).size===1;
-  let h='<div class="avd-card"><div class="avd-ct">Operação do discador · resumo</div><div class="avd-pad"><div style="font-size:.92rem;line-height:1.8;color:#374151">'+
-    'De <b>'+fmtN(T.dis)+'</b> discagens, só <b>'+fmtN(T.at)+' ('+pf(pc(T.at,T.dis),1)+'%)</b> foram atendidas. <b>'+pf(pc(T.el,T.dis),0)+'%</b> caíram em caixa postal e <b>'+pf(pc(T.ne,T.dis),0)+'%</b> eram número que não existe.'+
-    (EQ.login?'<br>A equipe passou <b>'+pf(pc(EQ.fala,EQ.login),0)+'%</b> do tempo logado falando, <b>'+pf(pc(EQ.ocioso,EQ.login),0)+'%</b> ociosa esperando ligação e <b>'+pf(pc(EQ.pausa,EQ.login),0)+'%</b> em pausa. '+(pc(EQ.ocioso,EQ.login)>=25&&pc(EQ.pausa,EQ.login)<12?'<b style="color:#b91c1c">O gargalo é o mailing/discador, não a equipe.</b>':''):'')+
-    (manual.length?'<br><b style="color:#b45309">⚠ Modo manual acima de 20%:</b> '+manual.map(o=>esc(nc(o.n))+' ('+pf(pc(o.manual,o.login),0)+'%)').join(', ')+'.':'')+'</div></div></div>';
-  // 1. mailing
-  const M=operJunta('mailing').filter(m=>m.k!=='0'&&m.dis>=200).sort((a,b)=>b.dis-a.dis);
-  h+='<div class="avd-card"><div class="avd-ct">1 · Qualidade do mailing (todas as discagens)</div><table class="avd-tb"><tr><th>Mailing</th><th>Discagens</th><th>% atendidas</th><th>% não existe</th><th>% caixa postal</th><th>% muda</th><th>Com operador</th><th>Acordos</th><th>Diagnóstico</th></tr>'+
-    M.map(m=>'<tr><td class="nm">'+esc(m.k)+'</td><td>'+fmtN(m.dis)+'</td>'+pctc(m.at,m.dis,'#16a34a')+pctc(m.ne,m.dis,'#dc2626')+pctc(m.el,m.dis,'#64748b')+pctc(m.mu,m.dis,'#b45309')+'<td>'+fmtN(m.op)+'</td><td><b>'+fmtN(m.aco)+'</b></td><td>'+diagMail(m)+'</td></tr>').join('')+
-    '</table><div class="avd-leg" style="padding:10px 16px">"Mailing ruim" = menos de 1,5% atendidas ou 15%+ de número que não existe. Vale cobrar o credor por telefone atualizado ou higienizar a base no Cobmais antes de discar de novo.</div></div>';
-  // 2. operadoras
-  h+='<div class="avd-card"><div class="avd-ct">2 · Tempo das operadoras</div><table class="avd-tb"><tr><th>Operadora</th><th>Logada</th><th>Falando</th><th>Ociosa</th><th>Pausa</th><th>Manual</th><th>Bloqueio</th>'+(umDia?'<th>Entrou</th><th>Saiu</th>':'<th>Dias</th>')+'<th>Alerta</th></tr>'+
+  const prosp=o=>/prospec/i.test(o.g||''),manual=O.filter(o=>!prosp(o)&&pc(o.manual,o.login)>20);
+  // ---- dados dos paineis
+  const RU=operFilt('ruins'),mb={},mp={};let ne=0,ncl=0,el=0,gB=0,gP=0,novo=false;
+  RU.forEach(x=>{const d=x.dados||{};if(d.v>=2)novo=true;ne+=d.ne||0;ncl+=d.nc||0;el+=d.el||0;gB+=d.gastoBloq||0;gP+=d.gastoPausa||0;
+    (d.top||[]).forEach(t=>{const tipo=t.tipo||(t.ne?'ne':'el');const alvo=tipo==='el'?mp:mb;const y=alvo[t.f]=alvo[t.f]||{f:t.f,t:0,tipo,el:0};y.t+=t.t;y.el=Math.max(y.el,t.el||0)});
+    (d.topPausa||[]).forEach(t=>{const y=mp[t.f]=mp[t.f]||{f:t.f,t:0,tipo:'el',el:0};y.t+=t.t;y.el=Math.max(y.el,t.el||0)})});
+  BLOQ=Object.values(mb).sort((a,b)=>b.t-a.t);PAUSA=Object.values(mp).filter(x=>!mb[x.f]).sort((a,b)=>b.t-a.t);
+  const baseMil=T.aco/T.dis*1000,HM=operJunta('hm'),HD=operJunta('hd');
+  const M=operJunta('mailing').filter(m=>m.k!=='0'&&m.dis>=200).map(m=>{const d=decideMail(m,baseMil),bh=melhorHora(HM.filter(x=>x.k.split('|')[0]===m.k).map(x=>Object.assign({},x,{h:x.k.split('|')[1]})),40);return Object.assign(m,{d,mil:m.aco/m.dis*1000,bh})})
+    .sort((a,b)=>a.d.o-b.d.o||b.mil-a.mil||pc(b.at,b.dis)-pc(a.at,a.dis));
+  const Hok=H.filter(x=>x.dis>=200),pico=Hok.slice().sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis)).slice(0,3).map(x=>x.k),fraco=Hok.slice().sort((a,b)=>pc(a.at,a.dis)-pc(b.at,b.dis)).slice(0,2).map(x=>x.k);
+  // ---- O que fazer hoje
+  const acoes=[];
+  if(ne+ncl)acoes.push(['🚫','Bloquear '+fmtN(ne+ncl)+' números de vez',fmtN(ne)+' não existem e '+fmtN(ncl)+' atenderam dizendo que não conhecem o cliente. '+(gB?'Só '+perTxt+' eles gastaram <b>'+fmtN(gB)+' discagens</b>.':'')+' Baixe a lista no painel 1 e cadastre na blacklist.']);
+  if(el)acoes.push(['⏸','Pausar '+fmtN(el)+' números por 7 dias','Caíram 3 vezes ou mais na caixa postal e ninguém atendeu. Não apague: pausa e tenta de novo depois, em outro horário.'+(gP?' Gastaram <b>'+fmtN(gP)+' discagens</b>.':'')]);
+  const ruins=M.filter(m=>m.d.o===3||m.d.o===2),bons=M.filter(m=>m.d.o===0);
+  if(bons.length)acoes.push(['⭐','Dar prioridade a '+bons.slice(0,3).map(m=>esc(m.nome||('mailing '+m.k))).join(', '),'São os que mais viram acordo. Coloque no discador nos horários de pico.']);
+  if(ruins.length)acoes.push(['🧹','Limpar ou pausar '+ruins.length+' mailing'+(ruins.length>1?'s':''),ruins.slice(0,3).map(m=>esc(m.nome||('mailing '+m.k))+' ('+m.d.t+')').join(', ')+'. Detalhe no painel 2.']);
+  if(pico.length)acoes.push(['🕐','Equipe completa às '+pico.map(h=>h+'h').join(', '),'É quando mais gente atende. Lanche e pausa às '+fraco.map(h=>h+'h').join(' e ')+', os horários mais fracos.']);
+  if(EQ.login&&pc(EQ.ocioso,EQ.login)>=25)acoes.push(['📭','Faltou ligação pra equipe',pf(pc(EQ.ocioso,EQ.login),0)+'% do tempo logado as operadoras ficaram esperando. Isso é mailing fraco ou discador lento, não preguiça. Limpar a base resolve.']);
+  if(manual.length)acoes.push(['✋','Conversar sobre modo manual',manual.map(o=>esc(nc(o.n))).join(', ')+' passaram mais de 20% do tempo discando na mão (fora do discador).']);
+  let h='<div class="avd-card"><div class="avd-ct">Operação do discador · '+(umDia?'resumo do dia':'resumo de '+dias+' dias')+'</div><div class="avd-pad"><div style="font-size:.95rem;line-height:1.8;color:#374151">'+
+    'De <b>'+fmtN(T.dis)+'</b> discagens, só <b>'+fmtN(T.at)+' ('+pf(pc(T.at,T.dis),1)+'%)</b> foram atendidas por uma pessoa. <b>'+pf(pc(T.el,T.dis),0)+'%</b> caíram em caixa postal e <b>'+pf(pc(T.ne,T.dis),0)+'%</b> eram número que não existe. No fim saíram <b>'+fmtN(T.aco)+' acordos</b> ('+pf(baseMil,1)+' a cada mil discagens).'+
+    (EQ.login?'<br>A equipe passou <b>'+pf(pc(EQ.fala,EQ.login),0)+'%</b> do tempo logado falando, <b>'+pf(pc(EQ.ocioso,EQ.login),0)+'%</b> esperando ligação e <b>'+pf(pc(EQ.pausa,EQ.login),0)+'%</b> em pausa.':'')+'</div>'+
+    (acoes.length?'<div class="avd-todo"><div class="avd-todo-t">O que fazer agora</div>'+acoes.map(a=>'<div class="avd-todo-i"><span>'+a[0]+'</span><div><b>'+a[1]+'</b><br>'+a[2]+'</div></div>').join('')+'</div>':'')+'</div></div>';
+  // 1. lista segura de bloqueio
+  h+='<div class="avd-card"><div class="avd-ct">1 · Lista segura de bloqueio</div>'+
+    explica('Telefones que o discador ficou ligando sem nenhuma chance de falar com o devedor. Número que alguém atendeu de verdade <b>nunca</b> entra aqui.',
+      '<b>Bloquear de vez</b> = número não existe, ou quem atendeu disse que não conhece o cliente. <b>Pausar 7 dias</b> = caixa postal 3 vezes ou mais: pode ser celular desligado, então não apaga, só dá um tempo.',
+      'Baixe as duas listas e cadastre na Fastway (Configurações → Blacklist; a de pausa em Regras de Renitência). Cada número a menos é discagem sobrando pra quem atende.')+
+    '<div class="avd-pad"><div class="avd-big3">'+
+      '<div style="border-color:#fecaca"><b style="color:#b91c1c">'+fmtN(ne)+'</b>não existem</div>'+
+      '<div style="border-color:#fecaca"><b style="color:#b91c1c">'+fmtN(ncl)+'</b>não conhecem o cliente'+(novo?'':'<br><small>(aparece na próxima coleta)</small>')+'</div>'+
+      '<div style="border-color:#fed7aa"><b style="color:#c2410c">'+fmtN(el)+'</b>caixa postal 3x+</div></div>'+
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0"><button class="avd-btn" onclick="avd.baixarBloq()">🚫 Baixar "bloquear de vez" ('+fmtN(BLOQ.length)+' mais discados)</button><button class="avd-btn" style="background:linear-gradient(180deg,#c2410c,#9a3412)" onclick="avd.baixarBloq(\'pausa\')">⏸ Baixar "pausar 7 dias" ('+fmtN(PAUSA.length)+' mais discados)</button></div>'+
+    '<div class="avd-leg" style="padding:0">O portal guarda os 250 mais discados de cada lista. As listas completas ficam no PC do robô: <b>bloquear-definitivo-DD-MM-AAAA.csv</b> e <b>pausar-7-dias-DD-MM-AAAA.csv</b>.</div></div>'+
+    tbw('<table class="avd-tb"><tr><th>Telefone</th><th>Tentativas '+(umDia?'hoje':'no período')+'</th><th>Motivo</th><th>Ação</th></tr>'+BLOQ.slice(0,8).concat(PAUSA.slice(0,7)).map(x=>'<tr><td class="nm">'+esc(x.f)+'</td><td>'+x.t+'</td><td>'+motivoTxt(x)+'</td><td>'+(x.tipo==='el'?pill('pausar 7 dias','#ffedd5','#c2410c'):pill('bloquear de vez','#fee2e2','#b91c1c'))+'</td></tr>').join('')+'</table>')+'</div>';
+  // 2. ranking de mailings
+  h+='<div class="avd-card"><div class="avd-ct">2 · Ranking dos mailings</div>'+
+    explica('Cada mailing é uma lista de devedores que entrou no discador. Aqui dá pra ver qual lista vira acordo e qual só queima discagem.',
+      '<b>Acordos por mil</b> é a régua principal: quantos acordos saem a cada mil discagens (a média da casa '+perTxt+' foi <b>'+pf(baseMil,1)+'</b>). <b>Atendem</b> é a chance de alguém atender. <b>Não existe</b> mostra o quanto a base está suja. <b>Melhor hora</b> é quando aquela lista mais atende.',
+      '<b>Priorizar</b>: deixar no discador no horário de pico. <b>Manter</b>: segue normal. <b>Pausar</b>: muita discagem sem acordo, trocar por outra lista. <b>Limpar antes</b>: pedir telefone atualizado ao credor ou higienizar no Cobmais antes de discar de novo.')+
+    tbw('<table class="avd-tb"><tr><th>#</th><th>Mailing</th><th>Discagens</th><th>Atendem</th><th>Não existe</th><th>Acordos</th><th>Acordos por mil</th><th>Melhor hora</th><th>Decisão</th></tr>'+
+    M.map((m,i)=>'<tr title="'+esc(m.d.p)+'"><td>'+(i+1)+'º</td><td class="nm">'+esc(m.nome||('Mailing '+m.k))+(m.nome?'<br><small style="color:#9ca3af">id '+esc(m.k)+'</small>':'')+'</td><td>'+fmtN(m.dis)+'</td>'+pctc(m.at,m.dis,'#16a34a')+pctc(m.ne,m.dis,'#dc2626')+'<td><b>'+fmtN(m.aco)+'</b></td><td><b>'+pf(m.mil,1)+'</b></td><td>'+(m.bh?esc(m.bh.h)+'h ('+pf(pc(m.bh.at,m.bh.dis),1)+'%)':'-')+'</td><td style="white-space:normal;min-width:190px">'+pill(m.d.t,m.d.bg,m.d.c)+'<br><small style="color:#6b7280">'+esc(m.d.p)+'</small></td></tr>').join('')+'</table>')+
+    (M.some(m=>!m.nome)?'<div class="avd-leg" style="padding:10px 16px">A Fastway só manda o número do mailing. Pra aparecer o nome, coloque no config.json do robô: <b>"MAILING_NOMES": {"3758": "Nome da carteira"}</b>.</div>':'')+'</div>';
+  // 3. melhor horario e regiao
+  const mxH=Math.max(1,...H.map(x=>pc(x.at,x.dis)));
+  const D=operJunta('ddd').filter(x=>x.dis>=300).sort((a,b)=>b.dis-a.dis),topD=D.slice(0,10).map(x=>x.k),horas=H.map(x=>x.k);
+  const cel=(d,hr)=>{const x=HD.find(y=>y.k===d+'|'+hr);if(!x||x.dis<20)return '<td style="color:#cbd5e1">·</td>';const p=pc(x.at,x.dis),a=Math.min(1,p/(mxH*1.4));
+    return '<td title="'+esc(dddNome(d)+' às '+hr+'h: '+fmtN(x.dis)+' discagens, '+fmtN(x.at)+' atendidas, '+fmtN(x.aco)+' acordos')+'" style="background:rgba(8,145,178,'+(0.08+a*0.8).toFixed(2)+');color:'+(a>0.55?'#fff':'#0f172a')+';text-align:center">'+pf(p,p<10?1:0)+'</td>'};
+  h+='<div class="avd-card"><div class="avd-ct">3 · Melhor horário e região pra ligar</div>'+
+    explica('Mostra em que hora do dia e em que região (DDD) as pessoas mais atendem.',
+      'Quanto maior o <b>% atendem</b>, mais vale ligar naquela hora. No mapa de calor, cada quadrado é um DDD numa hora: <b>azul forte</b> = muita gente atende, <b>clarinho</b> = pouca. Passe o mouse no quadrado pra ver os números.',
+      'Equipe completa nas horas marcadas como <b>pico</b> e pausa/lanche nas horas <b>fracas</b>. Se um DDD só atende em certo horário, peça pra Fastway programar aquela região naquela faixa.')+
+    tbw('<table class="avd-tb"><tr><th>Hora</th><th>Discagens</th><th>Atendidas</th><th>% atendem</th><th>Acordos</th><th>Acordos por mil</th><th></th></tr>'+
+    H.map(x=>'<tr><td class="nm">'+esc(x.k)+'h</td><td>'+fmtN(x.dis)+'</td><td>'+fmtN(x.at)+'</td><td>'+pf(pc(x.at,x.dis),1)+'%<span class="avd-mini"><i style="width:'+(pc(x.at,x.dis)/mxH*100).toFixed(0)+'%;background:#0891b2"></i></span></td><td>'+fmtN(x.aco)+'</td><td>'+pf(x.dis?x.aco/x.dis*1000:0,1)+'</td><td>'+(pico.includes(x.k)?pill('pico','#dcfce7','#15803d'):fraco.includes(x.k)?pill('fraco','#f1f5f9','#64748b'):'')+'</td></tr>').join('')+'</table>')+
+    (topD.length&&HD.length?'<div class="avd-ct" style="padding-top:18px">Mapa de calor: % que atende por DDD e hora</div>'+tbw('<table class="avd-tb avd-heat"><tr><th>DDD</th>'+horas.map(x=>'<th style="text-align:center">'+esc(x)+'h</th>').join('')+'<th>Melhor</th></tr>'+
+      topD.map(d=>{const bh=melhorHora(HD.filter(x=>x.k.split('|')[0]===d).map(x=>Object.assign({},x,{h:x.k.split('|')[1]})),30);return '<tr><td class="nm">'+esc(dddNome(d))+'</td>'+horas.map(hr=>cel(d,hr)).join('')+'<td><b>'+(bh?esc(bh.h)+'h':'-')+'</b></td></tr>'}).join('')+'</table>')+
+      '<div class="avd-ct" style="padding-top:18px">Por região (DDD)</div>'+tbw('<table class="avd-tb"><tr><th>DDD</th><th>Discagens</th><th>% atendem</th><th>% não existe</th><th>% caixa postal</th><th>Acordos</th></tr>'+
+      D.slice(0,15).map(x=>'<tr><td class="nm">'+esc(dddNome(x.k))+'</td><td>'+fmtN(x.dis)+'</td>'+pctc(x.at,x.dis,'#16a34a')+pctc(x.ne,x.dis,'#dc2626')+pctc(x.el,x.dis,'#64748b')+'<td>'+fmtN(x.aco)+'</td></tr>').join('')+'</table>')
+     :'<div class="avd-leg" style="padding:10px 16px">O mapa por DDD aparece depois da próxima coleta do robô novo.</div>')+'</div>';
+  // 4. operadoras (equipe)
+  h+='<div class="avd-card"><div class="avd-ct">4 · Tempo das operadoras</div>'+
+    explica('Como cada operadora usou o tempo em que esteve logada no discador.',
+      '<b>Falando</b> = em ligação. <b>Ociosa</b> = logada esperando o discador entregar alguém. <b>Pausa</b> = lanche, banheiro, etc. <b>Manual</b> = discando na mão, fora do discador. Passe o mouse na linha pra ver cada pausa.',
+      '"Faltando ligação" (mais de 40% ociosa) não é culpa dela: é base fraca, resolve com os painéis 1 e 2. "Pausa alta" e "discando na mão" (fora da Prospecção) valem conversa.')+
+    tbw('<table class="avd-tb"><tr><th>Operadora</th><th>Logada</th><th>Falando</th><th>Ociosa</th><th>Pausa</th><th>Manual</th><th>Bloqueio</th>'+(umDia?'<th>Entrou</th><th>Saiu</th>':'<th>Dias</th>')+'<th>Alerta</th></tr>'+
     O.map(o=>{const al=[];if(!prosp(o)&&pc(o.manual,o.login)>20)al.push(['discando na mão','#b45309']);if(pc(o.ocioso,o.login)>40)al.push(['faltando ligação','#64748b']);if(pc(o.pausa,o.login)>15)al.push(['pausa alta','#b91c1c']);if(o.bloqueio>600)al.push(['bloqueio','#b91c1c']);
       const tip=Object.keys(o.pausas).map(k=>k+': '+o.pausas[k].q+'x, '+hm(o.pausas[k].s)).join('\n');
-      return '<tr title="'+esc(tip)+'"><td class="nm">'+esc(nc(o.n))+'<br><small style="color:#9ca3af">'+esc(o.g)+'</small></td><td>'+hm(o.login)+'</td>'+pctc(o.fala,o.login,'#16a34a')+pctc(o.ocioso,o.login,'#64748b')+pctc(o.pausa,o.login,'#d4a937')+pctc(o.manual,o.login,'#b45309')+'<td>'+hm(o.bloqueio)+'</td>'+(umDia?'<td>'+esc(String(o.ini).slice(0,5))+'</td><td>'+esc(String(o.fim).slice(0,5))+'</td>':'<td>'+o.dias+'</td>')+'<td>'+(al.length?al.map(a=>'<span class="avd-pl" style="background:#fff7ed;color:'+a[1]+'">'+a[0]+'</span>').join(' '):'<span style="color:#16a34a">ok</span>')+'</td></tr>'}).join('')+
-    '</table><div class="avd-leg" style="padding:10px 16px">Passe o mouse na linha pra ver as pausas. "Faltando ligação" = mais de 40% ociosa: o discador não está entregando gente, não é falta de vontade dela. Modo manual alto tira a operadora do discador.</div></div>';
-  // 3. horario
-  const mxH=Math.max(1,...H.map(x=>pc(x.at,x.dis))),pico=H.slice().sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis)).slice(0,3).map(x=>x.k);
-  h+='<div class="avd-card"><div class="avd-ct">3 · Melhor horário pra ligar</div><table class="avd-tb"><tr><th>Hora</th><th>Discagens</th><th>Atendidas</th><th>% atendidas</th><th>Acordos</th><th></th></tr>'+
-    H.map(x=>'<tr><td class="nm">'+esc(x.k)+'h</td><td>'+fmtN(x.dis)+'</td><td>'+fmtN(x.at)+'</td><td>'+pf(pc(x.at,x.dis),1)+'%<span class="avd-mini"><i style="width:'+(pc(x.at,x.dis)/mxH*100).toFixed(0)+'%;background:#1e4e7e"></i></span></td><td>'+fmtN(x.aco)+'</td><td>'+(pico.includes(x.k)?'<span class="avd-pl" style="background:#dcfce7;color:#15803d">pico</span>':'')+'</td></tr>').join('')+
-    '</table><div class="avd-leg" style="padding:10px 16px">Nos horários de pico, todo mundo logado. Pausa e lanche nos horários mais fracos.</div></div>';
-  // 4. rotas
+      return '<tr title="'+esc(tip)+'"><td class="nm">'+esc(nc(o.n))+'<br><small style="color:#9ca3af">'+esc(o.g)+'</small></td><td>'+hm(o.login)+'</td>'+pctc(o.fala,o.login,'#16a34a')+pctc(o.ocioso,o.login,'#64748b')+pctc(o.pausa,o.login,'#d4a937')+pctc(o.manual,o.login,'#b45309')+'<td>'+hm(o.bloqueio)+'</td>'+(umDia?'<td>'+esc(String(o.ini).slice(0,5))+'</td><td>'+esc(String(o.fim).slice(0,5))+'</td>':'<td>'+o.dias+'</td>')+'<td>'+(al.length?al.map(a=>pill(a[0],'#fff7ed',a[1])).join(' '):'<span style="color:#16a34a">ok</span>')+'</td></tr>'}).join('')+'</table>')+'</div>';
+  // 5. rotas
   const R=operJunta('tronco').filter(r=>r.dis>=50).sort((a,b)=>b.dis-a.dis);
-  h+='<div class="avd-card"><div class="avd-ct">4 · NOVATECH x VOROS (rotas)</div><table class="avd-tb"><tr><th>Rota</th><th>Discagens</th><th>% atendidas</th><th>% não existe</th><th>% caixa postal</th><th>% muda</th><th>Custo estimado</th><th>Custo por atendida</th></tr>'+
-    R.map(r=>'<tr><td class="nm">'+esc(r.k)+'</td><td>'+fmtN(r.dis)+'</td>'+pctc(r.at,r.dis,'#16a34a')+pctc(r.ne,r.dis,'#dc2626')+pctc(r.el,r.dis,'#64748b')+pctc(r.mu,r.dis,'#b45309')+'<td>'+(r.custo?brl(r.custo):'<span style="color:#9ca3af">sem tarifa</span>')+'</td><td>'+(r.custo&&r.at?brl(r.custo/r.at):'-')+'</td></tr>').join('')+
-    '</table><div class="avd-leg" style="padding:10px 16px">Custo = tarifa cadastrada na Fastway × tempo tarifado. "Sem tarifa" quer dizer que o custo dessa rota não está cadastrado lá. Pra comparar de verdade, faça o teste de dois serviços iguais, um por rota.</div></div>';
-  // 5. operadora do celular
+  h+='<div class="avd-card"><div class="avd-ct">5 · NOVATECH x VOROS (rotas)</div>'+
+    explica('A rota é a "linha" por onde a ligação sai. Rota ruim derruba ligação ou diz que o número não existe quando existe.',
+      'Compare <b>% atendem</b> e <b>% não existe</b> entre as rotas. <b>Custo por atendida</b> = quanto custou cada ligação que chegou numa pessoa.',
+      'Se uma rota tiver muito mais "não existe" que a outra, faça o teste com dois serviços iguais, um em cada rota, por uma semana. "Sem tarifa" = custo não cadastrado na Fastway.')+
+    tbw('<table class="avd-tb"><tr><th>Rota</th><th>Discagens</th><th>% atendem</th><th>% não existe</th><th>% caixa postal</th><th>% muda</th><th>Custo estimado</th><th>Custo por atendida</th></tr>'+
+    R.map(r=>'<tr><td class="nm">'+esc(r.k)+'</td><td>'+fmtN(r.dis)+'</td>'+pctc(r.at,r.dis,'#16a34a')+pctc(r.ne,r.dis,'#dc2626')+pctc(r.el,r.dis,'#64748b')+pctc(r.mu,r.dis,'#b45309')+'<td>'+(r.custo?brl(r.custo):'<span style="color:#9ca3af">sem tarifa</span>')+'</td><td>'+(r.custo&&r.at?brl(r.custo/r.at):'-')+'</td></tr>').join('')+'</table>')+'</div>';
+  // 6. operadora do telefone
   const C=operJunta('carrier').filter(r=>r.dis>=300).sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis));
-  h+='<div class="avd-card"><div class="avd-ct">5 · Por operadora do telefone</div><table class="avd-tb"><tr><th>Operadora</th><th>Discagens</th><th>% atendidas</th><th>% não existe</th><th>% caixa postal</th></tr>'+
-    C.map(r=>'<tr><td class="nm">'+esc(r.k)+'</td><td>'+fmtN(r.dis)+'</td>'+pctc(r.at,r.dis,'#16a34a')+pctc(r.ne,r.dis,'#dc2626')+pctc(r.el,r.dis,'#64748b')+'</tr>').join('')+'</table></div>';
-  // 7. numeros pra bloquear (6 = alerta de modo manual, no resumo e na tabela 2)
-  const RU=operFilt('ruins'),m={};let ne=0,el=0;RU.forEach(x=>{ne+=x.dados.ne||0;el+=x.dados.el||0;(x.dados.top||[]).forEach(t=>{const y=m[t.f]=m[t.f]||{f:t.f,t:0,ne:0,el:0};y.t+=t.t;y.ne+=t.ne;y.el+=t.el})});
-  BLOQ=Object.values(m).sort((a,b)=>b.t-a.t);
-  h+='<div class="avd-card"><div class="avd-ct">7 · Números pra bloquear</div><div class="avd-pad"><div class="avd-leg" style="font-size:.88rem"><b>'+fmtN(ne)+'</b> números deram "não existe" e <b>'+fmtN(el)+'</b> caíram em caixa postal 3 vezes ou mais. Cadastre na blacklist (Configurações → Regras de Renitência ou Blacklist) pra parar de gastar discagem.</div>'+
-    '<button class="avd-btn" style="margin:10px 0" onclick="avd.baixarBloq()">▣ Baixar os '+fmtN(BLOQ.length)+' mais discados (CSV)</button><div class="avd-leg">A lista completa do dia fica no PC do robô, no arquivo <b>bloquear-DD-MM-AAAA.csv</b>.</div></div>'+
-    '<table class="avd-tb"><tr><th>Telefone</th><th>Tentativas</th><th>Motivo</th></tr>'+BLOQ.slice(0,15).map(x=>'<tr><td class="nm">'+esc(x.f)+'</td><td>'+x.t+'</td><td>'+(x.ne?'número não existe':'caixa postal '+x.el+'x')+'</td></tr>').join('')+'</table></div>';
+  h+='<div class="avd-card"><div class="avd-ct">6 · Por operadora do telefone do devedor</div>'+
+    explica('Vivo, Claro, TIM, Oi, fixo ou celular: de qual tipo de telefone as pessoas mais atendem.',
+      'Ordenado do que mais atende pro que menos atende.',
+      'Se um tipo quase nunca atende (ex.: fixo), dá pra pedir à Fastway pra discar ele por último ou em menos tentativas.')+
+    tbw('<table class="avd-tb"><tr><th>Operadora</th><th>Discagens</th><th>% atendem</th><th>% não existe</th><th>% caixa postal</th></tr>'+
+    C.map(r=>'<tr><td class="nm">'+esc(r.k)+'</td><td>'+fmtN(r.dis)+'</td>'+pctc(r.at,r.dis,'#16a34a')+pctc(r.ne,r.dis,'#dc2626')+pctc(r.el,r.dis,'#64748b')+'</tr>').join('')+'</table>')+'</div>';
   return h;
 }
 function visao(ls,lin,c,eq){
@@ -6247,7 +6318,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261023-1600',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261023-1700',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
