@@ -4733,6 +4733,188 @@ setInterval(()=>{const b=document.getElementById('sbQ');if(!b)return;const adm=i
 })();
 </script>
 
+<style id="edimo-trabalho-css">
+#pageTrabalho{font-family:'Inter',system-ui,sans-serif;color:#1a1f36}
+.tb-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.tb-top h2{margin:0;font-size:1.25rem;color:#0f3557;font-weight:800}.tb-top p{margin:2px 0 0;color:#6b7280;font-size:.8rem}
+.tb-top .tb-sp{flex:1}
+.tb-meta{background:#0f3557;color:#fff;padding:8px 14px;font-weight:700;font-size:.85rem}.tb-meta b{font-size:1.15rem;color:#f0c955}
+.tb-btn{border:1px solid #d6dde8;background:#fff;padding:9px 14px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.82rem;color:#0f3557}
+.tb-btn.pri{background:#0f3557;color:#fff;border-color:#0f3557}.tb-btn.ok{background:#16a34a;color:#fff;border-color:#16a34a}.tb-btn.wa{background:#25d366;color:#fff;border-color:#25d366}
+.tb-btn:hover{filter:brightness(.96)}
+.tb-grid{display:grid;grid-template-columns:minmax(320px,1fr) minmax(380px,1.35fr);gap:14px;align-items:start}
+.tb-card{background:#fff;border:1px solid #e3e8ef;padding:14px 16px;margin-bottom:14px}
+.tb-card h3{margin:0 0 10px;font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:#0f3557;font-weight:800;display:flex;align-items:center;gap:8px}
+.tb-card h3 small{text-transform:none;letter-spacing:0;color:#9ca3af;font-weight:600}
+.tb-f{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}.tb-f .full{grid-column:1/-1}
+.tb-f label{display:block;font-size:.7rem;font-weight:700;color:#6b7280;margin-bottom:3px}
+.tb-f input,.tb-f select,.tb-f textarea{width:100%;box-sizing:border-box;border:1px solid #d6dde8;padding:8px 10px;font-size:.88rem;font-family:inherit;background:#fbfcfe}
+.tb-f input:focus,.tb-f select:focus,.tb-f textarea:focus{outline:2px solid #1e4e7e33;border-color:#1e4e7e;background:#fff}
+.tb-calc{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.tb-calc div{background:#f6f9ff;border:1px solid #dbe6f5;padding:10px 12px}.tb-calc small{display:block;font-size:.68rem;font-weight:700;color:#6b7280;text-transform:uppercase}
+.tb-calc b{font-size:1.15rem;color:#0f3557}.tb-calc .v b{color:#16a34a}
+.tb-alerta{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:8px 10px;font-size:.8rem;margin-top:8px}
+.tb-passo{border:1px solid #e3e8ef;margin-bottom:8px}
+.tb-ph{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;background:#fbfcfe}
+.tb-ph i{font-style:normal;width:24px;height:24px;flex:none;display:flex;align-items:center;justify-content:center;background:#e8eef7;color:#0f3557;font-weight:800;font-size:.78rem}
+.tb-ph b{flex:1;font-size:.88rem}.tb-ph em{font-style:normal;font-size:.68rem;font-weight:800;color:#b45309;background:#fef3c7;padding:2px 7px}
+.tb-passo.feito .tb-ph i{background:#16a34a;color:#fff}.tb-passo.feito .tb-ph b{color:#16a34a}
+.tb-passo.top{border-color:#f0c955}.tb-passo.top .tb-ph{background:#fffbeb}
+.tb-pb{padding:10px 12px;border-top:1px solid #eef2f7;display:none}.tb-passo.ab .tb-pb{display:block}
+.tb-fr{background:#f8fafc;border-left:3px solid #1e4e7e;padding:9px 12px;font-size:.92rem;line-height:1.5;margin:0 0 8px}
+.tb-acts{display:flex;gap:8px;flex-wrap:wrap}
+.tb-obj{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tb-obj button{border:1px solid #d6dde8;background:#fff;padding:7px 11px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;color:#374151}
+.tb-obj button.on{background:#0f3557;color:#fff;border-color:#0f3557}
+.tb-oresp .tb-fr{border-left-color:#16a34a}.tb-oresp p{font-size:.8rem;color:#6b7280;margin:0 0 8px}
+.tb-proib p{margin:0 0 8px;font-size:.82rem}.tb-proib s{color:#b91c1c;text-decoration:none;font-weight:700}.tb-proib s:before{content:'✗ '}.tb-proib span{color:#166534;display:block}.tb-proib span:before{content:'✓ Diga: '}
+.tb-chk label{display:flex;gap:8px;align-items:center;font-size:.86rem;padding:4px 0;cursor:pointer}
+.tb-reg{width:100%;box-sizing:border-box;min-height:96px;border:1px solid #d6dde8;padding:9px 10px;font-family:inherit;font-size:.84rem;background:#f8fafc;resize:vertical}
+.tb-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0f3557;color:#fff;padding:10px 18px;font-weight:700;z-index:99999;display:none}.tb-toast.on{display:block}
+body.trab-solo .sidebar,body.trab-solo #nav{display:none!important}
+body.trab-solo .main{margin-left:0!important;padding:10px!important;max-width:none!important}
+body.trab-solo .tb-grid{grid-template-columns:1fr}
+@media (max-width:980px){.tb-grid{grid-template-columns:1fr}}
+</style>
+<script id="edimo-trabalho">
+/* ===== AREA DE TRABALHO: apoio do operador durante a ligacao no Cobmais =====
+   Ficha + calculadora + roteiro dos 7 passos (Metodo dos Campeoes) + objecoes + fechamento
+   + mensagem do boleto pro WhatsApp + texto pronto pra colar no historico do Cobmais.
+   Tudo local no navegador (nao manda nada pra lugar nenhum), sem custo de IA. */
+(function(){
+const $=id=>document.getElementById(id);
+const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=v=>{v=String(v||'').replace(/[^\d,.-]/g,'');if(v.indexOf(',')>=0)v=v.replace(/\./g,'').replace(',','.');const n=parseFloat(v);return isNaN(n)?0:n};
+const R=v=>v?v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'R$ ___';
+const p2=n=>String(n).padStart(2,'0');
+const brD=d=>p2(d.getDate())+'/'+p2(d.getMonth()+1);
+function uteis(n){const d=new Date();let k=0;while(k<n){d.setDate(d.getDate()+1);if(d.getDay()!==0&&d.getDay()!==6)k++}return d}
+const isoDe=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+const tit=n=>String(n||'').trim().toLowerCase().split(/\s+/).filter(Boolean).map(w=>['de','da','do','das','dos','e'].includes(w)?w:w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+function eu(){try{return cU?tit(String(cU.nome||'').split(/\s+/)[0]):''}catch(e){return ''}}
+function chaveLS(){try{return 'trab_'+String((cU&&(cU.login||cU.nome))||'').toLowerCase()}catch(e){return 'trab_'}}
+const VAZIO={nome:'',fone:'',credor:'',original:'',atual:'',pctEnt:'20',entrada:'',n:'',dia:'',quem:'devedor',resultado:'',retorno:'',cpfok:false,obs:'',feitos:{},chk:{},obj:''};
+let F=null,AB={5:true};
+function carrega(){try{F=Object.assign({},VAZIO,JSON.parse(localStorage.getItem(chaveLS())||'{}'))}catch(e){F=Object.assign({},VAZIO)}if(!F.dia)F.dia=isoDe(uteis(2))}
+function salva(){try{localStorage.setItem(chaveLS(),JSON.stringify(F))}catch(e){}}
+function calc(){
+  const at=num(F.atual),orig=num(F.original),pc=Math.max(0,num(F.pctEnt));
+  const ent=F.entrada?num(F.entrada):(at?Math.round(at*pc)/100:0);
+  const n=Math.max(1,parseInt(F.n,10)||1);
+  const parc=at&&ent<at?Math.round((at-ent)/n*100)/100:0;
+  const minEnt=at?Math.round(at*20)/100:0;
+  const d=F.dia?new Date(F.dia+'T12:00:00'):null;
+  return{at,orig,ent,n,parc,minEnt,dia:d?brD(d):'[dia]',diaD:d};
+}
+function vars(){const c=calc(),nome=tit(F.nome)||'[nome completo]',pri=nome.split(' ')[0];
+  return{nome,pri,cred:F.credor||'[credor]',op:eu()||'[seu nome]',atual:R(c.at),orig:R(c.orig),ent:R(c.ent),n:F.n||'[n]',parc:R(c.parc),dia:c.dia}}
+function PASSOS(v){return[
+ {t:'Abertura',f:['Alô, bom dia! Falo com o(a) '+v.nome+'?'],dica:'Fale já no primeiro segundo. Confirme a pessoa antes de falar da dívida.'},
+ {t:'Benefício antes da Advocacia',f:[v.pri+', é sobre a regularização de uma pendência no seu CPF. Consigo te ajudar a resolver hoje e tirar seu nome do SPC e do Serasa. Eu me chamo '+v.op+', sou assessor(a) jurídico(a) da Advocacia Édimo e falo em nome da '+v.cred+'.'],dica:'Primeiro o benefício, depois quem você é.'},
+ {t:'Documentação e consequência',f:['Recebemos uma documentação em seu nome, encaminhada pela '+v.cred+'. Ela está com protocolo para protesto em cartório. Estou ligando antes para resolver de forma amigável.'],dica:'Diga "documentação", nunca "cobrança".'},
+ {t:'Opções prontas',f:['Hoje a documentação está em '+v.atual+'. À vista, consigo deixar em '+v.orig+', sem juros e multa. Ou o sistema libera uma entrada de '+v.ent+' e '+v.n+' parcelas de '+v.parc+'. Como fica mais viável para você?'],dica:'À vista primeiro, depois o parcelado. Valores prontos na calculadora.'},
+ {t:'Mostrar o ganho',top:true,f:['Pagando a entrada, a gente já cancela o protocolo do cartório e pede para a '+v.cred+' retirar seu nome do SPC e do Serasa em 5 a 7 dias úteis.','No cartório não tem parcelamento: é à vista, o valor total e ainda a taxa do tabelionato.'],dica:'PASSO MAIS IMPORTANTE: aparece em 62% das ligações que fecham acordo e em nenhuma das que não fecham.'},
+ {t:'Regra do sistema',f:['O sistema me libera a entrada até '+v.dia+'. Depois disso, a documentação segue para o cartório e eu não consigo mais fazer parcelado.','Se for hoje, consigo uma entrada menor.'],dica:'O prazo e a entrada mínima de 20% são do sistema. Troque prazo por valor em vez de só negar.'},
+ {t:'Fechamento formal',f:['Vou confirmar seus dados: nome '+v.nome+', CPF _______. A ligação está sendo gravada e serve como contrato verbal, é o mesmo que um documento assinado. Depois de gerado, não consigo alterar data nem valor.','Vou te mandar o boleto pelo WhatsApp agora. Assim que pagar, me envia o comprovante por lá.'],dica:'Confirme dados, contrato verbal, boleto no WhatsApp e tabule "Acordo".'}]}
+function OBJ(v){return{
+ dinheiro:{t:'Não tenho dinheiro',f:'Entendo. Aconteceu algum imprevisto? Quanto você consegue pagar e em que dia?',d:'Considere cartão de crédito e volte ao ganho (passo 5).'},
+ entrada:{t:'Dá pra diminuir a entrada?',f:'O sistema pede no mínimo 20% de entrada. Se for hoje, consigo uma entrada menor.',d:'Alternativas previstas: entrada dividida, data do benefício ou cartão de crédito. A regra é do sistema, não sua.'},
+ reconheco:{t:'Não reconheço',f:'Entre em contato com a '+v.cred+' para confirmar e eu retorno ainda hoje ou amanhã às [hora].',d:'Contestação: é o ÚNICO caso de retorno, no mesmo dia ou no máximo amanhã.'},
+ paguei:{t:'Já paguei',f:'Me envia o comprovante pelo WhatsApp que eu confiro com a '+v.cred+' e retorno ainda hoje ou amanhã às [hora].',d:'Também é contestação: retorno no mesmo dia ou no dia seguinte.'},
+ pensar:{t:'Vou pensar / me liga depois',f:'Entendo, mas pagando a entrada a gente já cancela o protocolo e pede a retirada do seu nome do SPC e do Serasa em 5 a 7 dias úteis. O sistema me libera essa condição só até '+v.dia+'.',d:'NÃO agende retorno. Volte ao ganho (passo 5) e ao prazo do sistema (passo 6).'},
+ terceiro:{t:'Não é a pessoa',f:'É um assunto pessoal. Posso falar com '+v.nome+'? Qual o melhor horário para encontrar?',d:'Nunca fale da dívida, do valor ou do credor com terceiro.'},
+ caixa:{t:'Caixa postal',f:'Encerre assim que perceber.',d:'Nunca dite CPF, endereço ou valor sem confirmar que tem alguém na linha.'}}}
+const PROIB=[['Bolsa Família / INSS / auxílio vai ser bloqueado','O que pode acontecer é a documentação seguir para protesto em cartório e a restrição continuar no seu CPF.'],
+ ['Vamos bloquear sua conta / seu salário','O que pode acontecer é a documentação seguir para protesto em cartório e a restrição continuar no seu CPF.'],
+ ['Notificação judicial / oficial de justiça / vai ser preso','A documentação está com protocolo para protesto em cartório. Estou ligando antes para resolver de forma amigável.'],
+ ['Prazo que não existe','O sistema me libera a entrada até [dia].'],
+ ['Falar da dívida com outra pessoa','É um assunto pessoal. Posso falar com [nome]? Qual o melhor horário?']];
+function msgWA(){const v=vars(),c=calc();
+  return 'Olá, '+v.pri+'! Aqui é '+v.op+', da Advocacia Édimo, conforme combinamos agora na ligação.\n'+
+    (F.resultado==='avista'?'Segue o boleto à vista de '+v.orig+' (sem juros e multa), com vencimento em '+v.dia+'.':'Segue o boleto da entrada de '+v.ent+', com vencimento em '+v.dia+'. As demais '+v.n+' parcelas são de '+v.parc+'.')+
+    '\nAssim que pagar, me envia o comprovante por aqui. Com o pagamento, cancelamos o protocolo e pedimos a retirada do seu nome do SPC e do Serasa em 5 a 7 dias úteis.'}
+function registro(){const v=vars(),c=calc(),agora=new Date();
+  const res={acordo:'ACORDO (entrada + parcelas)',avista:'ACORDO À VISTA',sem:'SEM ACORDO',contest:'CONTESTAÇÃO',terceiro:'TERCEIRO (não falou da dívida)',caixa:'CAIXA POSTAL'}[F.resultado]||'(escolha o resultado)';
+  let t=brD(agora)+' '+p2(agora.getHours())+':'+p2(agora.getMinutes())+' - '+(F.quem==='devedor'?'Falei com o titular '+v.nome:F.quem==='terceiro'?'Atendeu terceiro':'Não houve contato')+'.\n';
+  if(F.resultado!=='terceiro'&&F.resultado!=='caixa')t+='Proposta: à vista '+v.orig+' | entrada '+v.ent+' + '+v.n+'x '+v.parc+' | entrada até '+v.dia+'.\n';
+  t+='Resultado: '+res+'.';
+  if(F.resultado==='contest'&&F.retorno)t+=' Retorno: '+F.retorno.split('-').reverse().join('/')+'.';
+  if(F.obs)t+='\nObs: '+F.obs;
+  return t;
+}
+function toast(m){let x=$('tbToast');if(!x){x=document.createElement('div');x.id='tbToast';x.className='tb-toast';document.body.appendChild(x)}x.textContent=m;x.classList.add('on');clearTimeout(x._t);x._t=setTimeout(()=>x.classList.remove('on'),1800)}
+function copiar(t){(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Copiado!')).catch(()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('Copiado!')}catch(e){}a.remove()})}
+function meusAcordos(){try{if(!cRD||!cRD.ops||!cU)return null;const o=cRD.ops.find(x=>mesmaPessoa(x.n,cU.nome)||mesmaPessoa(cU.nome,x.n));return o?o.a:0}catch(e){return null}}
+function campo(k,lb,tipo,extra){return '<div class="'+(extra||'')+'"><label>'+lb+'</label><input id="tb_'+k+'" type="'+(tipo||'text')+'" value="'+esc(F[k])+'" oninput="TB.set(\''+k+'\',this.value)"></div>'}
+function render(){
+  const el=$('pageTrabalho');if(!el)return;if(!F)carrega();
+  const v=vars(),c=calc(),ac=meusAcordos();
+  let h='<div class="tb-top"><div><h2>Área de Trabalho</h2><p>Use do lado do Cobmais durante a ligação. Fica tudo só no seu computador.</p></div><div class="tb-sp"></div>'+
+    (ac===null?'':'<div class="tb-meta">Meus acordos hoje: <b>'+ac+'</b> / meta 4</div>')+
+    '<button class="tb-btn" onclick="TB.lado()">↗ Abrir do lado do Cobmais</button><button class="tb-btn pri" onclick="TB.nova()">+ Nova ligação</button></div>';
+  h+='<div class="tb-grid"><div>';
+  // ficha
+  h+='<div class="tb-card"><h3>Ficha da ligação <small>copie do Cobmais</small></h3><div class="tb-f">'+campo('nome','Nome completo do devedor','text','full')+campo('fone','WhatsApp (com DDD)','tel')+campo('credor','Credor')+'</div></div>';
+  // calculadora
+  h+='<div class="tb-card"><h3>Calculadora <small>à vista tira juros e multa · parcelado mantém</small></h3><div class="tb-f">'+campo('original','Valor original (R$)')+campo('atual','Valor atualizado (R$)')+campo('pctEnt','Entrada (%)','number')+campo('entrada','ou entrada em R$')+campo('n','Nº de parcelas','number')+campo('dia','Entrada até','date')+'</div>'+
+    '<div class="tb-calc" id="tbCalc"></div></div>';
+  // registro
+  h+='<div class="tb-card"><h3>Registro pro Cobmais</h3><div class="tb-f"><div><label>Quem atendeu</label><select onchange="TB.set(\'quem\',this.value)">'+[['devedor','O titular'],['terceiro','Terceiro'],['ninguem','Ninguém / caixa postal']].map(o=>'<option value="'+o[0]+'"'+(F.quem===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></div>'+
+    '<div><label>Resultado</label><select onchange="TB.set(\'resultado\',this.value)"><option value="">Escolha...</option>'+[['acordo','Acordo parcelado'],['avista','Acordo à vista'],['sem','Sem acordo'],['contest','Contestação'],['terceiro','Terceiro'],['caixa','Caixa postal']].map(o=>'<option value="'+o[0]+'"'+(F.resultado===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></div>'+
+    (F.resultado==='contest'?campo('retorno','Retorno (só hoje ou amanhã)','date','full'):'')+
+    '<div class="full"><label>Observações</label><textarea rows="2" oninput="TB.set(\'obs\',this.value)">'+esc(F.obs)+'</textarea></div></div><div id="tbRegAlerta"></div>'+
+    '<textarea class="tb-reg" id="tbReg" readonly style="margin-top:10px"></textarea><div class="tb-acts" style="margin-top:8px"><button class="tb-btn pri" onclick="TB.copiaReg()">Copiar pro histórico do Cobmais</button></div></div>';
+  h+='</div><div>';
+  // roteiro
+  h+='<div class="tb-card"><h3>Roteiro · Método dos Campeões <small>clique pra abrir, marque o que já fez</small></h3><div id="tbPassos"></div></div>';
+  // objecoes
+  h+='<div class="tb-card"><h3>Objeções</h3><div class="tb-obj" id="tbObjB"></div><div class="tb-oresp" id="tbObjR"></div></div>';
+  // fechamento
+  h+='<div class="tb-card"><h3>Fechamento</h3><div class="tb-chk">'+[['dados','Confirmei nome e CPF'],['contrato','Avisei que a ligação vale como contrato verbal'],['boleto','Enviei o boleto pelo WhatsApp'],['tabular','Tabulei "Acordo"']].map(o=>'<label><input type="checkbox"'+(F.chk[o[0]]?' checked':'')+' onchange="TB.chk(\''+o[0]+'\',this.checked)"> '+o[1]+'</label>').join('')+'</div>'+
+    '<label style="display:block;font-size:.7rem;font-weight:700;color:#6b7280;margin:10px 0 3px">Mensagem do boleto</label><textarea class="tb-reg" id="tbWA" readonly></textarea><div class="tb-acts" style="margin-top:8px"><button class="tb-btn" onclick="TB.copiaWA()">Copiar mensagem</button><button class="tb-btn wa" onclick="TB.abreWA()">Abrir no WhatsApp</button></div></div>';
+  // proibidas
+  h+='<div class="tb-card tb-proib"><h3>Nunca diga</h3>'+PROIB.map(x=>'<p><s>'+x[0]+'</s><span>'+esc(x[1])+'</span></p>').join('')+'</div>';
+  h+='</div></div>';
+  el.innerHTML=h;atualiza();
+}
+// atualiza so as partes calculadas (nao perde o foco do campo que esta digitando)
+function atualiza(){
+  const v=vars(),c=calc();
+  const cb=$('tbCalc');if(cb)cb.innerHTML='<div class="v"><small>À vista (sem juros e multa)</small><b>'+R(c.orig)+'</b></div><div><small>Entrada</small><b>'+R(c.ent)+'</b></div><div><small>Parcelas</small><b>'+(F.n||'?')+'x '+R(c.parc)+'</b></div><div><small>Entrada até</small><b>'+c.dia+'</b></div>'+
+    (c.at&&c.ent&&c.ent<c.minEnt-0.01?'<div class="tb-alerta" style="grid-column:1/-1">Entrada abaixo de 20% ('+R(c.minEnt)+'). Regra do sistema: só se for hoje, ou ofereça entrada dividida, data do benefício ou cartão.</div>':'')+
+    (c.diaD&&(c.diaD-new Date())/864e5>7?'<div class="tb-alerta" style="grid-column:1/-1">O sistema libera a entrada em 2 a 5 dias. Confira essa data.</div>':'');
+  const pb=$('tbPassos');if(pb)pb.innerHTML=PASSOS(v).map((p,i)=>{const k=i+1,fe=F.feitos[k];
+    return '<div class="tb-passo'+(fe?' feito':'')+(p.top?' top':'')+(AB[k]?' ab':'')+'"><div class="tb-ph" onclick="TB.ab('+k+')"><i>'+(fe?'✓':k)+'</i><b>'+p.t+'</b>'+(p.top?'<em>MAIS IMPORTANTE</em>':'')+'</div><div class="tb-pb"><p style="margin:0 0 8px;font-size:.78rem;color:#6b7280">'+p.dica+'</p>'+p.f.map((f,j)=>'<div class="tb-fr">'+esc(f)+'</div>').join('')+
+      '<div class="tb-acts"><button class="tb-btn" onclick="TB.copiaP('+i+')">Copiar frase</button><button class="tb-btn '+(fe?'':'ok')+'" onclick="TB.feito('+k+')">'+(fe?'Desmarcar':'Feito ✓')+'</button></div></div></div>'}).join('');
+  const O=OBJ(v),ob=$('tbObjB');if(ob)ob.innerHTML=Object.keys(O).map(k=>'<button class="'+(F.obj===k?'on':'')+'" onclick="TB.obj(\''+k+'\')">'+O[k].t+'</button>').join('');
+  const orr=$('tbObjR');if(orr)orr.innerHTML=F.obj&&O[F.obj]?'<p>'+O[F.obj].d+'</p><div class="tb-fr">'+esc(O[F.obj].f)+'</div><button class="tb-btn" onclick="TB.copiaO()">Copiar resposta</button>':'<p>Toque na objeção que o devedor falou.</p>';
+  const rg=$('tbReg');if(rg)rg.value=registro();
+  const ra=$('tbRegAlerta');if(ra){let a='';if(F.resultado==='contest'&&F.retorno){const d=new Date(F.retorno+'T12:00:00'),lim=new Date();lim.setDate(lim.getDate()+1);lim.setHours(23,59,0,0);if(d>lim)a='Retorno só pode ser hoje ou amanhã.'}
+    if(F.resultado==='sem')a='Sem acordo não gera retorno: antes de encerrar, volte ao ganho (passo 5) e ao prazo do sistema (passo 6).';
+    ra.innerHTML=a?'<div class="tb-alerta">'+a+'</div>':''}
+  const wa=$('tbWA');if(wa)wa.value=msgWA();
+}
+window.TB={
+  set(k,v){F[k]=v;if(k==='entrada'&&v)F.pctEnt=F.pctEnt;salva();if(k==='resultado'){render();return}atualiza()},
+  ab(k){AB[k]=!AB[k];atualiza()},feito(k){F.feitos[k]=!F.feitos[k];if(F.feitos[k]){AB[k]=false;AB[k+1]=true}salva();atualiza()},
+  obj(k){F.obj=F.obj===k?'':k;salva();atualiza()},chk(k,v){F.chk[k]=v;salva()},
+  copiaP(i){copiar(PASSOS(vars())[i].f.join(' '))},copiaO(){const O=OBJ(vars());if(O[F.obj])copiar(O[F.obj].f)},
+  copiaReg(){copiar(registro())},copiaWA(){copiar(msgWA())},
+  abreWA(){let d=String(F.fone||'').replace(/\D/g,'');if(!d){toast('Coloque o WhatsApp na ficha');return}if(d.length<=11)d='55'+d;window.open('https://wa.me/'+d+'?text='+encodeURIComponent(msgWA()),'_blank')},
+  nova(){if(!confirm('Limpar a ficha e começar uma nova ligação?'))return;const cred=F.credor;F=Object.assign({},VAZIO,{credor:cred,dia:isoDe(uteis(2)),feitos:{},chk:{}});AB={5:true};salva();render()},
+  lado(){const w=window.open(location.pathname+'?trabalho=1','edimoTrabalho','width=560,height='+Math.min(1000,screen.availHeight||900)+',left='+Math.max(0,(screen.availWidth||1400)-580)+',top=0');if(!w)toast('Libere pop-ups pro portal')}
+};
+// menu + troca de aba
+function menu(){if($('sbW'))return;const r=$('sbR');if(!r)return;const b=document.createElement('button');b.className='sb-item';b.id='sbW';b.setAttribute('onclick',"showPage('trabalho')");b.textContent='🧰 Área de Trabalho';r.parentNode.insertBefore(b,r.nextSibling)}
+function pagina(){if($('pageTrabalho'))return;const q=$('pageQualidade');if(!q)return;const d=document.createElement('div');d.className='page';d.id='pageTrabalho';q.parentNode.insertBefore(d,q)}
+setInterval(()=>{menu();pagina()},1000);menu();pagina();
+const sp=window.showPage;
+window.showPage=function(p){sp(p);const pg=$('pageTrabalho'),sb=$('sbW');if(pg)pg.classList.toggle('active',p==='trabalho');if(sb)sb.classList.toggle('active',p==='trabalho');if(p==='trabalho'){carrega();render()}};
+// janela do lado do Cobmais: abre direto na Area de Trabalho, sem o menu
+window.addEventListener('load',()=>{if(!/[?&]trabalho=1/.test(location.search))return;let t=0;const iv=setInterval(()=>{t++;if((typeof cU!=='undefined'&&cU)||t>40){clearInterval(iv);if(typeof cU!=='undefined'&&cU){document.body.classList.add('trab-solo');pagina();showPage('trabalho')}}},250)});
+})();
+</script>
+
 <script id="edimo-icons">
 /* Troca emojis por ícones de linha (visual sóbrio) */
 (function(){
