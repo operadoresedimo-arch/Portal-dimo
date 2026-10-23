@@ -4660,7 +4660,15 @@ function dicasTV(){
   return '<div class="tv-card tv-dicas"><div class="tv-dicas-h">☀️ Até a primeira atualização · Método dos Campeões</div><div class="tv-dicas-t">'+TV_DICAS[ord][0]+'</div><div class="tv-dicas-f">'+TV_DICAS[ord][1]+'</div><div class="tv-dicas-p">A próxima dica aparece automaticamente.</div></div>';
 }
 const comTempo=(p,ms)=>Promise.race([p,new Promise((_,no)=>setTimeout(()=>no(new Error('demorou demais')),ms))]);
-const emissaoDe=csv=>{const m=String(csv).match(/(\d{2}\/\d{2}\/\d{4}) (\d{2}:\d{2})/);return m?m[2]:''};
+const emissaoInfo=csv=>{const m=String(csv).match(/(\d{2}\/\d{2}\/\d{4})[ T](\d{2}:\d{2})/);return m?{data:m[1],hora:m[2]}:{data:'',hora:''}};
+const emissaoDe=csv=>emissaoInfo(csv).hora;
+const dataHojeBR=()=>{const d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()};
+function relatorioEhDeHoje(csv,data){
+  const info=emissaoInfo(csv),hoje=dataHojeBR();
+  if(info.data)return info.data===hoje;
+  const campos=data&&data.ops?data.ops.map(o=>String(o.data||o.dia||o.date||'')).join(' '):'';
+  return campos.includes(hoje)||campos.includes(hoje.split('/').reverse().join('-'));
+}
 // Confere a cada 5 min se o robo ja trocou a planilha (rodada de ~30 min).
 // Planilha NOVA: atualiza os numeros e dispara o alerta (se o ritmo estiver baixo).
 // Seguranca: se a planilha nao mudar em 30 min, dispara do mesmo jeito (o alerta nunca fica parado).
@@ -4671,7 +4679,7 @@ async function atualizarDadosTV(abrindo){
   try{
     const csv=await comTempo(rkCSV(),60000);tvLidaEm=Date.now();
     const nova=csv&&csv!==tvUltimaPlanilha;
-    if(nova){const data=parseCSV(csv);if(data&&data.ops&&data.ops.length){tvUltimaPlanilha=csv;tvEmissao=emissaoDe(csv);tvTrocouEm=Date.now();tvAtualizadoHoje=true;cRD=data;if(typeof loadPonto==='function')await comTempo(loadPonto(),60000).catch(()=>{});}}
+    if(nova){const data=parseCSV(csv);if(data&&data.ops&&data.ops.length&&relatorioEhDeHoje(csv,data)){tvUltimaPlanilha=csv;tvEmissao=emissaoDe(csv);tvTrocouEm=Date.now();tvAtualizadoHoje=true;cRD=data;if(typeof loadPonto==='function')await comTempo(loadPonto(),60000).catch(()=>{});}}
     const venceu=Date.now()-tvUltimoAlerta>=29*60000;
     render();
     const pg=$('pageTV');
