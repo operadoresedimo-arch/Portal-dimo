@@ -4319,6 +4319,19 @@ window.addEventListener('load',()=>setTimeout(avdNav,50));
 </script>
 <style id="edimo-qualidade">
 #pageQualidade{font-family:'Inter',system-ui,sans-serif;color:#1a1f36}
+/* Avaliacao por Funcionario (admin) */
+.qa-busca{display:flex;align-items:center;gap:12px;margin:0 0 12px}.qa-busca input{flex:1;max-width:520px;border:1px solid #d6dde8;border-radius:10px;padding:11px 14px;font-size:.92rem;font-family:inherit;background:#fff}.qa-busca span{color:#6b7280;font-size:.8rem}
+.qa-row{display:grid;grid-template-columns:minmax(200px,1.3fr) 120px minmax(200px,1.4fr) 80px minmax(200px,1.3fr);gap:14px;align-items:center;padding:11px 0;border-bottom:1px solid #f0f2f6;font-size:.86rem}
+.qa-row.qa-hd{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;font-weight:700}
+.qa-row.clk{cursor:pointer}.qa-row.clk:hover{background:#f8fafc}
+.qa-n b{display:block}.qa-n small{color:#9ca3af}.qa-z{color:#9ca3af;font-style:italic}
+.qa-b{display:flex;align-items:center;gap:10px}.qa-b span{font-weight:800;min-width:42px}
+.qa-bar{flex:1;height:10px;background:#eef2f7;overflow:hidden}.qa-bar i{display:block;height:100%}
+.qa-w span{display:inline-block;background:#fef2f2;color:#b91c1c;font-weight:700;font-size:.72rem;padding:3px 8px;margin:2px 4px 2px 0}.qa-w em{color:#16a34a;font-style:normal;font-weight:700;font-size:.78rem}
+.qa-bar-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px}
+.qa-btn{border:1px solid #d6dde8;background:#fff;padding:10px 16px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.86rem}.qa-btn.pdf{background:#0f3557;color:#fff;border-color:#0f3557}
+.qa .qr{background:#fff;border:1px solid #e3e8ef;padding:24px 28px}
+
 .q-wrap{max-width:none;width:100%}
 .q-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:16px}
 .q-head h2{font-size:1.25rem;font-weight:800;margin:0;color:#0f3557}
@@ -4458,6 +4471,7 @@ window.qualOuvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(
 
 function render(){
   const el=document.getElementById('pageQualidade');if(!el)return;
+  if(isAdm()&&window.QA)return QA.render(el);
   const L=filtra(),adm=isAdm(),eu=L.findIndex(x=>souEu(x.o)),me=eu>=0?L[eu]:null,mx=Math.max(1,...L.map(x=>x.q));
   const tab=(k,t)=>'<button class="'+(PER===k?'on':'')+'" onclick="qualPer(\''+k+'\')">'+t+'</button>';
   let h='<div class="q-wrap"><div class="q-head"><div><h2>Qualidade das Liga\u00E7\u00F5es</h2><p>Quantas liga\u00E7\u00F5es suas a monitoria ouviu e o que ela tem pra te dizer sobre cada uma.</p></div><div class="q-tabs">'+tab('hoje','Hoje')+tab('semana','Semana')+tab('mes','M\u00EAs')+'</div></div>';
@@ -4477,6 +4491,7 @@ function chaveQ(){let k=localStorage.getItem('avd_chave')||'';if(!k){k=prompt('S
 window.qualCarregar=function(){
   const el=document.getElementById('pageQualidade');
   if(!isAdm()&&typeof MQ_abrir==='function')return MQ_abrir(el,'<div class="q-head"><div><h2>Qualidade das Liga\u00E7\u00F5es</h2><p>As suas liga\u00E7\u00F5es que a monitoria ouviu, o que manter e o que mudar.</p></div></div>');
+  if(isAdm()&&window.QA){QA.render(el);QA.carregar();return}
   if(DQ&&Date.now()-TQ<3*60000)return render();
   if(el&&!DQ)el.innerHTML='<div class="loading-msg">Carregando...</div>';
   const k=chaveQ();if(!k){if(el)el.innerHTML='<div class="q-card"><div class="q-vazio">Precisa da senha da monitoria pra ver.</div></div>';return}
@@ -4497,6 +4512,193 @@ window.showPage=function(p){
 };
 })();
 </script>
+<script id="edimo-avaliacao-func">
+/* ===== AVALIACAO POR FUNCIONARIO (admin): todos os funcionarios, busca por nome,
+   avaliacao geral de cada um com base em todas as ligacoes avaliadas + PDF pra imprimir.
+   Le a mesma planilha da aba Avaliacao de Discagem (sem custo de IA). */
+(function(){
+const API='https://script.google.com/macros/s/AKfycbyUX25htVlM8Fs0voi7QK3QzAlF15jYgtzehFG-oUlbP4w0S4efX_Pc7UlrAa0p1_IU/exec';
+let D=null,TS=0,PER='tudo',BUSCA='',SEL='',CARR=false;
+const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const nz=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
+const J=v=>{if(Array.isArray(v))return v;try{return JSON.parse(v||'[]')}catch(e){return[]}};
+const tit=n=>String(n||'').toLowerCase().split(/\s+/).filter(Boolean).map(w=>['de','da','do','das','dos','e'].includes(w)?w:w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+const dt=s=>{const m=String(s||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);return m?new Date(+m[3],+m[2]-1,+m[1]):null};
+const pct=(p,m)=>m?Math.round(p/m*100):null;
+const ORD=['abertura','motivo','documentacao','opcoes','ganho','sistema','insistencia','fechamento','conformidade'];
+const NOME={abertura:'Abertura',motivo:'Motivo e benefício',documentacao:'Documentação e consequência',opcoes:'Apresentou as opções',ganho:'Mostrou o ganho',sistema:'Usou a regra do sistema',insistencia:'Insistiu na negociação',fechamento:'Fechamento formal',conformidade:'Respeitou os limites'};
+const FRACO={abertura:'Abertura fraca: não confirma a pessoa no início',motivo:'Não mostra o benefício antes de se identificar',documentacao:'Não explica a documentação e o protocolo',opcoes:'Não apresenta à vista e parcelado',ganho:'Não mostra o ganho de pagar',sistema:'Não usa o prazo/regra do sistema',insistencia:'Desiste no primeiro não',fechamento:'Fecha sem formalizar o acordo',conformidade:'Passa do limite na cobrança'};
+const DICA={
+ abertura:'“Alô, bom dia! Falo com o(a) [nome completo]?” Fale no primeiro segundo e confirme a pessoa antes de falar da dívida.',
+ motivo:'“[Nome], é sobre a regularização de uma pendência no seu CPF. Consigo te ajudar a resolver hoje e tirar seu nome do SPC e do Serasa. Eu me chamo [nome], sou assessor(a) jurídico(a) da Advocacia Édimo e falo em nome da [credor].”',
+ documentacao:'“Recebemos uma documentação em seu nome, encaminhada pela [credor]. Ela está com protocolo para protesto em cartório. Estou ligando antes para resolver de forma amigável.”',
+ opcoes:'“Hoje a documentação está em R$ [atualizado]. À vista, consigo deixar em R$ [original], sem juros e multa. Ou o sistema libera uma entrada de R$ [entrada] e [n] parcelas de R$ [parcela]. Como fica mais viável para você?”',
+ ganho:'“Pagando a entrada, a gente já cancela o protocolo do cartório e pede para a [credor] retirar seu nome do SPC e do Serasa em 5 a 7 dias úteis.”',
+ sistema:'“O sistema me libera a entrada até [dia]. Depois disso, a documentação segue para o cartório e eu não consigo mais fazer parcelado.”',
+ insistencia:'“Entendo. O que te impede de resolver hoje? Quanto você consegue pagar e em que dia?” Negocie entrada, parcelas e data antes de desistir (entrada mínima de 20%).',
+ fechamento:'“A ligação está sendo gravada e serve como contrato verbal. Vou te mandar o boleto no WhatsApp agora.” Confirme nome, CPF, valor e data.',
+ conformidade:'Fale só de consequência verdadeira: cartório, restrição no CPF e prazo do sistema. Nunca ameace nem exponha a dívida a terceiros.'};
+const ALIAS={avista:'opcoes',objecao:'insistencia',escada:'insistencia',valores:'opcoes',saida:'fechamento'};
+const CHAVES={abertura:['abertura','confirm','alo','identificou a pessoa'],motivo:['benef','motivo','se identific','assessor'],documentacao:['document','protesto','cartorio','consequenc'],opcoes:['opco','opcoe','a vista','avista','parcel','valor'],ganho:['ganho','spc','serasa','retirada','limpar o nome'],sistema:['sistema','prazo','regra'],insistencia:['insist','objec','desist','negoci','primeiro nao'],fechamento:['fechamento','contrato verbal','boleto','formaliz'],conformidade:['ameac','limite','postura','terceiro']};
+const fala=(t,id)=>{t=nz(t);return (CHAVES[id]||[]).some(k=>t.indexOf(nz(k))>=0)};
+function stC(c){const s=String(c.status||c.st||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\s_-]+/g,'');
+  if(['bem','fezbem','bom','feito','sim'].includes(s))return'bem';if(['parte','emparte','parcial','parcialmente'].includes(s))return'parte';
+  if(['nao','naofez','falhou'].includes(s))return'nao';if(['na','naoseaplica','naoaplicavel','n/a'].includes(s))return'na';
+  if(c.pontos!==undefined){const r=Number(c.pontos)/(Number(c.max)||1);return r>=.75?'bem':r>=.4?'parte':'nao'}return'na'}
+const ehAc=l=>/^acordo/.test(nz(l.resultado||l.r));
+const isAdm=()=>{try{return isA()}catch(e){return false}};
+function chave(){let k=localStorage.getItem('avd_chave')||'';if(!k){k=prompt('Senha da monitoria (a mesma da aba Avaliação de Discagem):')||'';if(k)localStorage.setItem('avd_chave',k)}return k}
+function normaliza(l){
+  const cr=J(l.criterios).map(c=>{const id=ALIAS[String(c.id||'').toLowerCase()]||String(c.id||'').toLowerCase();let st=stC(c);if(id==='fechamento'&&!ehAc(l)&&st!=='bem')st='na';return{id,st,ev:c.evidencia||c.trecho||''}}).filter(c=>NOME[c.id]);
+  return Object.assign({},l,{cr,ac:J(l.acertos),er:J(l.erros),dd:dt(l.data)});
+}
+// ---- funcionarios: todos da aba Login (0/1/2) + quem aparece nas avaliacoes ----
+function mesma(a,b){try{if(typeof mesmaPessoa==='function')return mesmaPessoa(a,b)}catch(e){}const x=nz(a).split(' '),y=nz(b).split(' ');if(!x[0]||x[0]!==y[0])return false;if(x.length===1||y.length===1)return true;return x.slice(1).some(w=>w.length>2&&y.includes(w))}
+function funcionarios(){
+  const L=filtrados(),F=[];
+  try{Object.keys(allLogins||{}).forEach(n=>{const lg=String(allLogins[n]||'').trim(),pre=lg.charAt(0);if(!/[012]/.test(pre))return;F.push({n:tit(n),login:lg,pre,L:[]})})}catch(e){}
+  L.forEach(l=>{let f=F.find(x=>mesma(x.n,l.operador));if(!f){f=F.find(x=>!x.login&&nz(x.n)===nz(l.operador));if(!f){f={n:tit(l.operador),login:'',pre:'',L:[]};F.push(f)}}f.L.push(l)});
+  F.forEach(f=>{f.k=nz(f.n+' '+f.login);f.res=resumo(f.L)});
+  return F.sort((a,b)=>(b.L.length>0)-(a.L.length>0)||b.L.length-a.L.length||a.n.localeCompare(b.n));
+}
+function filtrados(){
+  const h=new Date();h.setHours(0,0,0,0);let ini=null;
+  if(PER==='hoje')ini=h;else if(PER==='semana'){ini=new Date(h);ini.setDate(h.getDate()-((h.getDay()+6)%7))}else if(PER==='mes')ini=new Date(h.getFullYear(),h.getMonth(),1);else if(PER==='30')ini=new Date(h.getTime()-29*864e5);
+  return (D||[]).filter(l=>!ini||(l.dd&&l.dd>=ini));
+}
+function resumo(L){
+  const c={};ORD.forEach(id=>c[id]={bem:0,parte:0,nao:0,na:0});
+  L.forEach(l=>l.cr.forEach(x=>c[x.id][x.st]++));
+  ORD.forEach(id=>{const x=c[id],ap=x.bem+x.parte+x.nao;x.ap=ap;x.p=ap?Math.round((x.bem+x.parte*.5)/ap*100):null});
+  const tot=ORD.reduce((s,id)=>s+(c[id].ap?c[id].bem+c[id].parte*.5:0),0),apT=ORD.reduce((s,id)=>s+c[id].ap,0);
+  const ac=L.filter(ehAc).length;
+  const tipos={};L.forEach(l=>{const t=String(l.tipo_ligacao||'outro');tipos[t]=(tipos[t]||0)+1});
+  const causas={};L.forEach(l=>{const t=String(l.causa_encerramento||'').trim();if(t)causas[t]=(causas[t]||0)+1});
+  const piores=ORD.filter(id=>c[id].ap>=2&&c[id].p<75).sort((a,b)=>c[a].p-c[b].p);
+  const fortes=ORD.filter(id=>c[id].ap>=2&&c[id].p>=75).sort((a,b)=>c[b].p-c[a].p);
+  return{c,geral:apT?Math.round(tot/apT*100):null,n:L.length,ac,sem:L.length-ac,tipos,causas,piores,fortes};
+}
+const cor=p=>p===null?'#94a3b8':p>=75?'#16a34a':p>=50?'#d97706':'#dc2626';
+const rot=p=>p===null?'sem dados':p>=75?'Bem':p>=50?'Precisa melhorar':'Crítico';
+const turno=pre=>pre==='1'?'Manhã':pre==='2'?'Tarde':pre==='0'?'Novato':'';
+const perTxt=()=>({hoje:'hoje',semana:'nesta semana',mes:'neste mês','30':'nos últimos 30 dias',tudo:'em todo o período'})[PER];
+// ---- tela: lista ----
+function render(el){
+  el=el||document.getElementById('pageQualidade');if(!el)return;
+  if(!D){el.innerHTML='<div class="loading-msg">Carregando avaliações...</div>';carregar();return}
+  if(SEL){const f=funcionarios().find(x=>x.k===SEL);if(f)return detalhe(el,f);SEL=''}
+  const tab=(k,t)=>'<button class="'+(PER===k?'on':'')+'" onclick="QA.per(\''+k+'\')">'+t+'</button>';
+  el.innerHTML='<div class="q-wrap qa"><div class="q-head"><div><h2>Avaliação por Funcionário</h2><p>Todos os funcionários. Clique em um pra ver a avaliação geral com base em todas as ligações avaliadas e gerar o PDF.</p></div><div class="q-tabs">'+tab('hoje','Hoje')+tab('semana','Semana')+tab('mes','Mês')+tab('30','30 dias')+tab('tudo','Tudo')+'</div></div>'+
+    '<div class="qa-busca"><input id="qaBusca" type="search" placeholder="Pesquisar funcionário pelo nome..." value="'+esc(BUSCA)+'" oninput="QA.busca(this.value)"><span id="qaCont"></span></div><div class="q-card" id="qaLista"></div>'+
+    '<div class="q-leg"><span style="--c:#16a34a">Bem (75% ou mais)</span><span style="--c:#d97706">Precisa melhorar (50 a 74%)</span><span style="--c:#dc2626">Crítico (abaixo de 50%)</span></div></div>';
+  lista();
+}
+function lista(){
+  const box=document.getElementById('qaLista');if(!box)return;
+  const q=nz(BUSCA),F=funcionarios().filter(f=>!q||f.k.indexOf(q)>=0);
+  const c=document.getElementById('qaCont');if(c)c.textContent=F.length+' funcionário'+(F.length===1?'':'s');
+  if(!F.length){box.innerHTML='<div class="q-vazio">Ninguém com esse nome.</div>';return}
+  box.innerHTML='<div class="qa-row qa-hd"><div>Funcionário</div><div>Ligações</div><div>Aproveitamento geral</div><div>Acordos</div><div>Precisa melhorar em</div></div>'+F.map(f=>{const r=f.res,p=r.geral;
+    return '<div class="qa-row clk" onclick="QA.abre(\''+esc(f.k).replace(/'/g,"\\'")+'\')"><div class="qa-n"><b>'+esc(f.n)+'</b><small>'+esc([f.login,turno(f.pre)].filter(Boolean).join(' · '))+'</small></div>'+
+      '<div class="qa-q">'+(r.n?'<b>'+r.n+'</b> avaliada'+(r.n>1?'s':''):'<span class="qa-z">nenhuma</span>')+'</div>'+
+      '<div class="qa-b">'+(p===null?'<span class="qa-z">sem dados '+perTxt()+'</span>':'<div class="qa-bar"><i style="width:'+p+'%;background:'+cor(p)+'"></i></div><span style="color:'+cor(p)+'">'+p+'%</span>')+'</div>'+
+      '<div class="qa-q">'+(r.n?r.ac:'-')+'</div><div class="qa-w">'+(r.piores.length?r.piores.slice(0,2).map(id=>'<span>'+NOME[id]+'</span>').join(''):r.n?'<em>tudo em dia</em>':'')+'</div></div>'}).join('');
+}
+// ---- relatorio detalhado (tela e PDF usam o mesmo conteudo) ----
+function relatorio(f){
+  const r=f.res,L=f.L.slice().sort((a,b)=>(b.dd||0)-(a.dd||0)||String(b.hora||'').localeCompare(String(a.hora||''))),T=resumo(filtrados());
+  const hoje=new Date().toLocaleDateString('pt-BR');
+  const dts=L.map(l=>l.dd).filter(Boolean),ini=dts.length?new Date(Math.min(...dts)).toLocaleDateString('pt-BR'):'-',fim=dts.length?new Date(Math.max(...dts)).toLocaleDateString('pt-BR'):'-';
+  let h='<div class="qr"><div class="qr-top"><div><small>Advocacia Édimo · Avaliação individual de ligações</small><h1>'+esc(f.n)+'</h1><p>'+esc([f.login,turno(f.pre)].filter(Boolean).join(' · '))+(f.login||f.pre?' · ':'')+'Período: '+ini+' a '+fim+' · Emitido em '+hoje+'</p></div></div>';
+  if(!r.n)return h+'<div class="qr-box">Nenhuma ligação avaliada '+perTxt()+'.</div></div>';
+  // numeros
+  h+='<div class="qr-kpis"><div><b>'+r.n+'</b><span>ligações avaliadas</span></div><div><b>'+r.ac+'</b><span>com acordo ('+Math.round(r.ac/r.n*100)+'%)</span></div><div><b>'+r.sem+'</b><span>sem acordo</span></div><div><b style="color:'+cor(r.geral)+'">'+(r.geral===null?'-':r.geral+'%')+'</b><span>aproveitamento geral · time: '+(T.geral===null?'-':T.geral+'%')+'</span></div></div>';
+  const tp=Object.keys(r.tipos).map(t=>esc(t)+': '+r.tipos[t]).join(' · ');if(tp)h+='<p class="qr-sub">Tipos de ligação: '+tp+'</p>';
+  // resumo em texto
+  const pz=r.piores.slice(0,3).map(id=>NOME[id].toLowerCase()),fz=r.fortes.slice(0,3).map(id=>NOME[id].toLowerCase());
+  h+='<div class="qr-box qr-res"><b>Resumo da avaliação</b><p>Foram avaliadas <b>'+r.n+'</b> ligações, com <b>'+r.ac+'</b> acordo'+(r.ac===1?'':'s')+'. '+(fz.length?'Os pontos mais fortes são: <b>'+fz.join(', ')+'</b>. ':'')+(pz.length?'Precisa melhorar principalmente em: <b>'+pz.join(', ')+'</b>.':'Não há ponto crítico no período.')+'</p></div>';
+  // criterios
+  h+='<h2>Desempenho em cada etapa do Método dos Campeões</h2><table class="qr-t"><thead><tr><th>Etapa</th><th>Bem</th><th>Em parte</th><th>Não fez</th><th>Não se aplica</th><th style="width:30%">Aproveitamento</th><th>Time</th><th>Situação</th></tr></thead><tbody>'+
+    ORD.map(id=>{const x=r.c[id],t=T.c[id];return '<tr><td><b>'+NOME[id]+'</b></td><td>'+x.bem+'</td><td>'+x.parte+'</td><td>'+x.nao+'</td><td>'+x.na+'</td><td>'+(x.p===null?'-':'<div class="qr-bar"><i style="width:'+x.p+'%;background:'+cor(x.p)+'"></i></div> '+x.p+'%')+'</td><td>'+(t.p===null?'-':t.p+'%')+'</td><td style="color:'+cor(x.p)+';font-weight:800">'+rot(x.p)+(x.p!==null&&t.p!==null&&x.p<t.p-10?'<br><small>abaixo do time</small>':'')+'</td></tr>'}).join('')+'</tbody></table>';
+  h+='<p class="qr-sub">Aproveitamento = Bem vale 100%, Em parte vale 50%, Não fez vale 0%. "Não se aplica" é quando a ligação não chegou nessa etapa e não conta.</p>';
+  // pontos a melhorar com exemplos
+  if(r.piores.length){h+='<h2>Pontos a melhorar (com exemplos das ligações)</h2>';
+    r.piores.forEach(id=>{const x=r.c[id];
+      const ex=[];L.forEach(l=>{l.er.forEach(e=>{const tx=nz((e.problema||'')+' '+(e.criterio||e.id||''));if(e.criterio===id||e.id===id||fala(tx,id))ex.push({l,e})});});
+      const ev=[];if(!ex.length)L.forEach(l=>l.cr.forEach(c=>{if(c.id===id&&c.st!=='bem'&&c.st!=='na'&&c.ev)ev.push({l,c})}));
+      h+='<div class="qr-box qr-err"><div class="qr-eh"><b>'+NOME[id]+'</b><span style="color:'+cor(x.p)+'">'+x.p+'% · não fez em '+x.nao+' e fez em parte em '+x.parte+' de '+x.ap+' ligações</span></div><p class="qr-pb">'+FRACO[id]+'</p>'+
+        (ex.length?ex.slice(0,3).map(o=>'<div class="qr-ex"><small>'+esc(o.l.data)+' '+esc(String(o.l.hora||'').slice(0,5))+'</small>'+(o.e.trecho?'<p><b>O que falou:</b> “'+esc(o.e.trecho)+'”</p>':'')+(o.e.problema?'<p><b>Problema:</b> '+esc(o.e.problema)+'</p>':'')+(o.e.como_contornar?'<p><b>Como contornar:</b> '+esc(o.e.como_contornar)+'</p>':'')+(o.e.frase_sugerida?'<p class="qr-fr"><b>Deveria ter dito:</b> '+esc(o.e.frase_sugerida)+'</p>':'')+'</div>').join('')
+          :ev.slice(0,3).map(o=>'<div class="qr-ex"><small>'+esc(o.l.data)+' '+esc(String(o.l.hora||'').slice(0,5))+'</small><p><b>O que aconteceu:</b> '+esc(o.c.ev)+'</p></div>').join(''))+
+        '<p class="qr-fr"><b>Como fazer (Método dos Campeões):</b> '+DICA[id]+'</p></div>'});}
+  // pontos fortes
+  if(r.fortes.length){h+='<h2>Pontos fortes</h2><div class="qr-box qr-ok">'+r.fortes.map(id=>{const ex=[];L.forEach(l=>l.ac.forEach(a=>{if(a.trecho&&(a.criterio===id||a.id===id||fala(a.ponto||'',id)))ex.push(a)}));
+      return '<p><b>'+NOME[id]+'</b> ('+r.c[id].p+'%)'+(ex[0]?': “'+esc(ex[0].trecho)+'”':'')+'</p>'}).join('')+'</div>';}
+  // ligacoes curtas
+  const cs=Object.keys(r.causas);if(cs.length){h+='<h2>Por que as ligações terminaram cedo</h2><div class="qr-box">'+cs.sort((a,b)=>r.causas[b]-r.causas[a]).map(k=>'<p>'+esc(k)+': <b>'+r.causas[k]+'</b></p>').join('')+'</div>'}
+  // plano de acao
+  h+='<h2>Plano de ação combinado</h2><div class="qr-box"><ol>'+(r.piores.length?r.piores.slice(0,3).map(id=>'<li><b>'+NOME[id]+':</b> '+DICA[id]+'</li>').join(''):'<li>Manter o padrão atual e aplicar o Método dos Campeões em todas as ligações.</li>')+'</ol>'+
+    '<p class="qr-lin">Observações: ____________________________________________________________________________</p><p class="qr-lin">_________________________________________________________________________________________</p>'+
+    '<div class="qr-ass"><div>______________________________<br>'+esc(f.n)+'</div><div>______________________________<br>Responsável</div><div>____/____/________<br>Data</div></div></div>';
+  // todas as ligacoes
+  h+='<h2>Todas as ligações avaliadas ('+L.length+')</h2>'+L.map(l=>{const fal=l.cr.filter(c=>c.st==='nao'||c.st==='parte'),ok=l.cr.filter(c=>c.st==='bem');
+    return '<div class="qr-lig"><div class="qr-lh"><b>'+esc(l.data)+' às '+esc(String(l.hora||'').slice(0,5))+'</b><span class="'+(ehAc(l)?'ac':'')+'">'+(ehAc(l)?'acordo':'sem acordo')+'</span>'+(l.tipo_ligacao?'<span>'+esc(l.tipo_ligacao)+'</span>':'')+(l.duracao?'<span>'+esc(l.duracao)+'</span>':'')+(l.etapa_alcancada?'<span>chegou até: '+esc(l.etapa_alcancada)+'</span>':'')+'</div>'+
+      (l.resumo?'<p><b>Resumo:</b> '+esc(l.resumo)+'</p>':'')+
+      (ok.length?'<p><b>Fez bem:</b> '+ok.map(c=>NOME[c.id]).join(', ')+'</p>':'')+
+      (fal.length?'<p><b>Faltou:</b> '+fal.map(c=>NOME[c.id]+(c.st==='parte'?' (em parte)':'')).join(', ')+'</p>':'')+
+      (l.causa_encerramento?'<p><b>Por que terminou:</b> '+esc(l.causa_encerramento)+(l.motivo_curta?' · '+esc(l.motivo_curta):'')+'</p>':'')+
+      (l.feedback?'<p><b>Feedback:</b> '+esc(l.feedback)+'</p>':'')+(l.melhorar?'<p class="qr-fr"><b>Melhorar:</b> '+esc(l.melhorar)+'</p>':'')+'</div>'}).join('');
+  return h+'</div>';
+}
+function detalhe(el,f){
+  el.innerHTML='<div class="q-wrap qa"><div class="qa-bar-top"><button class="qa-btn" onclick="QA.volta()">← Voltar pra lista</button><button class="qa-btn pdf" onclick="QA.pdf()">🖨 Gerar PDF / Imprimir</button></div>'+relatorio(f)+'</div>';
+  window.scrollTo(0,0);
+}
+const CSS_REL=`.qr{font-family:Inter,Arial,sans-serif;color:#1a1f36;font-size:13px;line-height:1.45}
+.qr-top{border-bottom:3px solid #0f3557;padding-bottom:10px;margin-bottom:14px}.qr-top small{color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+.qr h1{margin:4px 0;font-size:26px;color:#0f3557}.qr-top p{margin:0;color:#4b5563}
+.qr h2{font-size:16px;color:#0f3557;margin:22px 0 8px;border-left:4px solid #d4a937;padding-left:8px;page-break-after:avoid}
+.qr-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.qr-kpis div{border:1px solid #e3e8ef;border-radius:10px;padding:10px 12px}.qr-kpis b{display:block;font-size:24px}.qr-kpis span{color:#6b7280;font-size:12px}
+.qr-sub{color:#6b7280;font-size:12px;margin:8px 0}
+.qr-box{border:1px solid #e3e8ef;border-radius:10px;padding:12px 14px;margin:8px 0;page-break-inside:avoid}.qr-box p{margin:4px 0}
+.qr-res{background:#f6f9ff;border-color:#c7d7ee}.qr-ok{background:#f0fdf4;border-color:#bbf7d0}.qr-err{border-left:4px solid #dc2626}
+.qr-eh{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.qr-eh b{font-size:14px}.qr-eh span{font-weight:700;font-size:12px}
+.qr-pb{color:#b91c1c;font-weight:700}
+.qr-ex{background:#f8fafc;border-radius:8px;padding:8px 10px;margin:6px 0}.qr-ex small{color:#6b7280;font-weight:700}
+.qr-fr{background:#fffbeb;border-radius:8px;padding:6px 10px}
+.qr-t{width:100%;border-collapse:collapse;font-size:12px}.qr-t th{background:#0f3557;color:#fff;text-align:left;padding:6px}.qr-t td{border-bottom:1px solid #e5e7eb;padding:6px;vertical-align:middle}.qr-t td small{font-weight:600;color:#b91c1c}
+.qr-bar{display:inline-block;width:70%;height:9px;background:#eef2f7;border-radius:9px;overflow:hidden;vertical-align:middle}.qr-bar i{display:block;height:100%}
+.qr-lig{border:1px solid #e3e8ef;border-radius:10px;padding:8px 12px;margin:6px 0;page-break-inside:avoid}.qr-lig p{margin:3px 0}
+.qr-lh{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.qr-lh span{background:#eef2f7;border-radius:6px;padding:1px 8px;font-size:11px;font-weight:700}.qr-lh span.ac{background:#dcfce7;color:#166534}
+.qr-lin{color:#9ca3af;margin:10px 0}.qr-ass{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:34px;text-align:center;font-size:12px}
+.qr ol{margin:4px 0 8px;padding-left:20px}.qr li{margin:4px 0}
+@media print{.qr-bar,.qr-bar i,.qr-t th,.qr-res,.qr-ok,.qr-fr,.qr-ex,.qr-lh span{-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
+function pdf(){
+  const f=funcionarios().find(x=>x.k===SEL);if(!f)return;
+  const w=window.open('','_blank');if(!w){alert('O navegador bloqueou a janela. Libere pop-ups pro portal e tente de novo.');return}
+  w.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Avaliação - '+esc(f.n)+'</title><style>@page{size:A4;margin:14mm}body{margin:0}'+CSS_REL+'</style></head><body>'+relatorio(f)+'<script>setTimeout(function(){window.print()},400)<\/script></body></html>');
+  w.document.close();
+}
+async function carregar(force){
+  if(CARR)return;if(D&&!force&&Date.now()-TS<3*60000)return;
+  const k=chave();const el=document.getElementById('pageQualidade');
+  if(!k){if(el)el.innerHTML='<div class="q-card"><div class="q-vazio">Precisa da senha da monitoria pra ver.</div></div>';return}
+  CARR=true;
+  try{const j=await fetch(API+'?chave='+encodeURIComponent(k)+'&t='+Date.now()).then(r=>r.json());
+    if(!j.ok){if(/chave|senha/i.test(j.erro||''))localStorage.removeItem('avd_chave');throw new Error(j.erro||'erro')}
+    D=(j.linhas||[]).filter(l=>String(l.operador||'').trim().toUpperCase()!=='OPERADOR TESTE'&&!String(l.id||'').toUpperCase().startsWith('TESTE-')).map(normaliza);TS=Date.now();
+  }catch(e){if(el)el.innerHTML='<div class="q-card"><div class="q-vazio">Não consegui carregar as avaliações agora. Tente de novo em alguns minutos.</div></div>';CARR=false;return}
+  CARR=false;if(el&&el.classList.contains('active'))render(el);
+}
+(function(){const st=document.createElement('style');st.textContent=CSS_REL;document.head.appendChild(st)})();
+window.QA={render,carregar,
+  per(p){PER=p;render()},busca(v){BUSCA=v;lista()},
+  abre(k){SEL=k;render()},volta(){SEL='';render()},pdf};
+// nome do menu: admin ve "Avaliação por Funcionário"
+setInterval(()=>{const b=document.getElementById('sbQ');if(!b)return;const adm=isAdm(),de=adm?'Qualidade das Ligações':'Avaliação por Funcionário',pra=adm?'Avaliação por Funcionário':'Qualidade das Ligações';
+  const w=document.createTreeWalker(b,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))if(n.nodeValue.indexOf(de)>=0)n.nodeValue=n.nodeValue.replace(de,pra)},1000);
+})();
+</script>
+
 <script id="edimo-icons">
 /* Troca emojis por ícones de linha (visual sóbrio) */
 (function(){
