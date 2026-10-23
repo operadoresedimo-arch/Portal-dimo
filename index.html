@@ -168,14 +168,14 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 .tv-modo{font-weight:800;font-size:.85rem;color:#cbd5e1;display:flex;gap:12px;align-items:center}.tv-modo span{color:#64748b;font-family:monospace;font-size:1rem}
 .tv-al-txt{flex:1;font-weight:800;font-size:1rem}
 .tv-btns{display:flex;gap:6px;margin-left:auto}.tv-btns button{background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:8px;padding:7px 12px;font-weight:700;font-size:.72rem;cursor:pointer;font-family:inherit}
-.tv-grid{display:grid;grid-template-columns:400px 1fr;gap:16px;flex:1;min-height:0}
-.tv-left{background:#131520;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;border:1px solid rgba(255,255,255,.05);max-height:calc(100vh - 150px)}
+.tv-grid{display:grid;grid-template-columns:1fr;gap:16px;flex:1;min-height:0}
+.tv-left{background:#131520;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;border:1px solid rgba(255,255,255,.05);min-height:260px}
 .tv-left h2{font-size:1.4rem;font-weight:800}
 .tv-champ{display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)}
 .tv-ph{position:relative;width:100px;height:100px;border-radius:50%;border:4px solid #eab308;box-shadow:0 0 20px rgba(234,179,8,.3);background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:900;color:#eab308}
 .tv-ph i{position:absolute;bottom:-6px;right:-6px;font-style:normal;font-size:1.4rem}
 .tv-cn{font-size:1.1rem;font-weight:800;text-transform:uppercase}.tv-cv{font-size:1.4rem;font-weight:900;color:#eab308}.tv-cs{color:#94a3b8;font-size:.85rem}
-.tv-scroll{flex:1;overflow:hidden;mask-image:linear-gradient(to bottom,#000 85%,transparent)}
+.tv-scroll{flex:1;overflow:hidden;mask-image:linear-gradient(to bottom,#000 85%,transparent);max-height:310px}
 .tv-list{display:flex;flex-direction:column;gap:6px}.tv-list.anim{animation:tvsc var(--t) linear infinite}
 @keyframes tvsc{0%{transform:translateY(0)}100%{transform:translateY(calc(-50% - 3px))}}
 .tv-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:rgba(26,28,41,.8)}
@@ -184,6 +184,11 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 .tv-av{width:34px;height:34px;border-radius:50%;background:#2e334d;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#94a3b8}
 .tv-nm{flex:1;font-weight:600;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tv-ct{font-weight:800;color:#eab308}
 .tv-right{display:flex;flex-direction:column;gap:14px}
+.tv-right .tv-spot{display:none}
+.tv-left .tv-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tv-left .tv-row{min-height:54px;padding:10px 12px;font-size:1rem}
+.tv-left .tv-row:nth-child(n+17){display:none}
+.tv-mid{grid-template-columns:1fr 1fr}
 .tv-card{background:rgba(19,21,32,.85);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:18px}
 .tv-spot{display:grid;grid-template-columns:1fr 1.6fr;align-items:center}
 .tv-crown{font-size:4rem;display:flex;flex-direction:column;align-items:center;gap:8px}.tv-badge{background:#eab308;color:#000;font-weight:800;font-size:1rem;padding:5px 20px;border-radius:20px}
@@ -227,6 +232,36 @@ body.tv-full .tv-al-big{font-size:3.4rem!important}
 @keyframes tvtxt{50%{transform:scale(1.06)}}
 @keyframes tvflash{0%,100%{opacity:0}50%{opacity:1}}
 @media (max-width:1100px){.tv-grid{grid-template-columns:1fr}.tv-mid{grid-template-columns:1fr}}
+/* TV sem ranking: so numeros do time, ritmo e diagnostico, letra grande pra ler a 10 m */
+.tv-grid{display:block}
+.tv-right{display:flex;flex-direction:column;gap:18px}
+.tv-top{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}
+.tv-top .tv-tot{justify-content:center;padding:26px}
+.tv-top .tv-tot span{font-size:1.6rem}
+.tv-top .tv-tot b{font-size:clamp(4rem,7vw,7.5rem);line-height:1}
+.tv-top .tv-tot em{font-size:2rem;color:#eab308;font-weight:800}
+.tv-top .tv-streak{flex-direction:column;justify-content:center;align-items:flex-start;gap:14px;padding:26px}
+.tv-top .tv-streak span{font-size:1.6rem}
+.tv-top .tv-streak b{font-size:clamp(2.6rem,4.5vw,4.6rem);line-height:1.05}
+.tv-top .tv-streak .tv-fogo{font-size:2.4rem;letter-spacing:.1em}
+.tv-right .tv-mid{grid-template-columns:1fr 1fr;gap:18px}
+.tv-right .tv-rit{padding:24px}
+.tv-right .tv-rh{font-size:1.6rem}
+.tv-right .tv-rn{font-size:1.4rem}.tv-right .tv-rn b{font-size:clamp(3rem,5vw,5rem)}
+.tv-right .tv-rn em{font-size:1.1rem;margin-top:4px}
+.tv-right .tv-bar{height:18px;border-radius:9px}
+.tv-right .tv-rs{font-size:1.2rem}
+.tv-right .dg-card{padding:24px}
+.tv-right .dg-card .dg-h b{font-size:1.8rem}
+.tv-right .dg-card .dg-h span{font-size:1.15rem}
+.tv-right .dg-c{gap:28px;margin-top:16px}
+.tv-right .dg-col i{font-size:1.05rem}
+.tv-right .dg-col p{font-size:1.45rem;line-height:1.35;margin-bottom:12px}
+.tv-right .dg-col p em{font-size:1rem}
+.tv-foot{font-size:1.3rem}
+.tv-modo{font-size:1.05rem}.tv-pl{font-size:.95rem!important}
+@media (max-width:1100px){.tv-top,.tv-right .tv-mid{grid-template-columns:1fr}}
+
 
 /* ===== Historico de acordos (escolher o dia) ===== */
 .hist-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0;flex-wrap:wrap;position:relative}
@@ -2087,8 +2122,8 @@ body::before,body::after{display:none!important}
 .avd-melhoria-icon{font-size:1.45rem;line-height:1}
 .avd-melhoria-item b{display:block;font-size:.82rem;color:#0f3557}.avd-melhoria-item strong{display:block;font-size:.78rem;color:#b45309;margin-top:3px}.avd-melhoria-item p{font-size:.7rem;line-height:1.4;color:#374151;margin:4px 0 0}
 .tv-dicas{margin:14px 0;padding:22px 24px;background:linear-gradient(135deg,#0f3557,#1e4e7e);color:#fff;border-radius:16px;text-align:center}
-.tv-dicas-h{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:#f0c955;font-weight:800}
-.tv-dicas-t{font-size:1.45rem;font-weight:800;margin-top:12px}.tv-dicas-f{font-size:1.05rem;line-height:1.45;margin:9px auto;max-width:820px}.tv-dicas-p{font-size:.68rem;opacity:.7;margin-top:12px}
+.tv-dicas-h{font-size:1.05rem;text-transform:uppercase;letter-spacing:.1em;color:#f0c955;font-weight:800}
+.tv-dicas-t{font-size:2.6rem;font-weight:800;margin-top:12px}.tv-dicas-f{font-size:1.7rem;line-height:1.4;margin:12px auto;max-width:1200px}.tv-dicas-p{font-size:.68rem;opacity:.7;margin-top:12px}
 .avd-quality{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:4px 10px;font-size:.7rem;font-weight:800}
 .avd-quality.ok{background:#dcfce7;color:#15803d}.avd-quality.review{background:#fee2e2;color:#b91c1c}.avd-quality.na{background:#f1f5f9;color:#64748b}
 .avd-crit-status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
@@ -4638,6 +4673,20 @@ function flash(id){if(!flashEl){flashEl=document.createElement('div');flashEl.id
 function flashOff(){if(flashEl)flashEl.className='';clearTimeout(flashTm);}
 document.addEventListener('fullscreenchange',flashPai);
 // A planilha do portal é trocada pelo robô a cada 30 minutos. Releia o ranking nesse mesmo ritmo.
+let tvLeitura=null;
+// Le o Relatorio de Acordos direto do Drive. Sem reserva no link antigo: ele devolvia a planilha de ontem.
+async function tvLerDrive(){
+  const j=await fetch(RK_DRIVE+'&t='+Date.now(),{cache:'no-store'}).then(r=>r.json());
+  if(!j||!j.ok)throw new Error((j&&j.msg)||'sem arquivo');
+  const bin=atob(j.base64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
+  const wb=XLSX.read(a,{type:'array'}),csv=XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));
+  // se o Script Ponto mandar a data de modificacao do arquivo, ela vale mais que o texto da planilha
+  const md=String(j.modificado||j.atualizado||j.updated||j.mtime||j.lastUpdated||'');
+  const d=new Date(),p=n=>String(n).padStart(2,'0'),iso=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+  const hoje=!!md&&(md.indexOf(iso)===0||md.indexOf(dataHojeBR())===0);
+  const hm=md.match(/(\d{2}:\d{2})/);
+  return{csv,meta:{hoje,hora:hoje&&hm?hm[1]:''}};
+}
 let tvAtualizando=false,tvUltimaPlanilha='',tvEmissao='',tvLidaEm=0,tvTrocouEm=0,tvUltimoAlerta=0,tvDia='',tvAtualizadoHoje=false;
 const TV_DICAS=[
   ['Fale no primeiro segundo','Alô, bom dia! Falo com o(a) [nome completo]?'],
@@ -4652,20 +4701,29 @@ const TV_DICAS=[
 function tvHoje(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function tvJanela(){
   const d=new Date(),h=d.getHours(),k=tvHoje();
-  if(tvDia!==k){tvDia=k;tvAtualizadoHoje=false;tvUltimaPlanilha='';tvEmissao='';tvTrocouEm=0;tvUltimoAlerta=0;flashOff();if(h<21)cRD=null}
+  if(tvDia!==k){tvDia=k;tvLeitura=null;tvAtualizadoHoje=false;tvUltimaPlanilha='';tvEmissao='';tvTrocouEm=0;tvUltimoAlerta=0;flashOff();if(h<21)cRD=null}
   if(h>=21){tvAtualizadoHoje=false;cRD=null;tvEmissao='';tvTrocouEm=0;tvUltimaPlanilha='';flashOff()}
 }
-function dicasTV(){
+function dicasTV(semAcordo){
   const h=new Date().getHours(),ord=(h<8?0:Math.floor((h-8)/2))%TV_DICAS.length;
-  return '<div class="tv-card tv-dicas"><div class="tv-dicas-h">☀️ Até a primeira atualização · Método dos Campeões</div><div class="tv-dicas-t">'+TV_DICAS[ord][0]+'</div><div class="tv-dicas-f">'+TV_DICAS[ord][1]+'</div><div class="tv-dicas-p">A próxima dica aparece automaticamente.</div></div>';
+  return '<div class="tv-card tv-dicas"><div class="tv-dicas-h">'+(semAcordo?'☀️ Vamos pro primeiro acordo · Método dos Campeões':'☀️ Até a primeira atualização · Método dos Campeões')+'</div><div class="tv-dicas-t">'+TV_DICAS[ord][0]+'</div><div class="tv-dicas-f">'+TV_DICAS[ord][1]+'</div><div class="tv-dicas-p">A próxima dica aparece automaticamente.</div></div>';
 }
 const comTempo=(p,ms)=>Promise.race([p,new Promise((_,no)=>setTimeout(()=>no(new Error('demorou demais')),ms))]);
-const emissaoInfo=csv=>{const m=String(csv).match(/(\d{2}\/\d{2}\/\d{4})[ T](\d{2}:\d{2})/);return m?{data:m[1],hora:m[2]}:{data:'',hora:''}};
+const emissaoInfo=csv=>{const t=String(csv),re=/(\d{2}\/\d{2}\/\d{4})[ T,"]*(\d{2}:\d{2})/;
+  // prefere a linha de emissao do relatorio (nao a data de algum acordo da lista)
+  const ln=t.split('\n').find(l=>/emiss|gerad|impress/i.test(l)&&re.test(l));
+  const m=(ln||t).match(re);if(m)return{data:m[1],hora:m[2]};
+  const h=(ln||'').match(/(\d{2}:\d{2})/);return{data:'',hora:h?h[1]:''}};
 const emissaoDe=csv=>emissaoInfo(csv).hora;
 const dataHojeBR=()=>{const d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()};
-function relatorioEhDeHoje(csv,data){
+function relatorioEhDeHoje(csv,data,meta){
   const info=emissaoInfo(csv),hoje=dataHojeBR();
+  if(meta&&meta.hoje)return true;
   if(info.data)return info.data===hoje;
+  const agora=new Date(),h=agora.getHours(),mm=agora.getMinutes();
+  // O exportador do Drive às vezes omite a data e deixa apenas o horário.
+  // Depois das 08h, um arquivo emitido depois das 08h pertence ao dia atual.
+  if(info.hora){const p=info.hora.split(':').map(Number),min=p[0]*60+p[1];if(h*60+mm>=8*60&&min>=8*60)return true}
   const campos=data&&data.ops?data.ops.map(o=>String(o.data||o.dia||o.date||'')).join(' '):'';
   return campos.includes(hoje)||campos.includes(hoje.split('/').reverse().join('-'));
 }
@@ -4677,9 +4735,14 @@ async function atualizarDadosTV(abrindo){
   if(new Date().getHours()>=21)return;
   if(tvAtualizando)return; tvAtualizando=true;
   try{
-    const csv=await comTempo(rkCSV(),60000);tvLidaEm=Date.now();
+    let lido=null;
+    try{lido=await comTempo(tvLerDrive(),60000)}catch(e){tvLeitura={erro:1,em:Date.now()};throw e}
+    const csv=lido.csv;tvLidaEm=Date.now();
     const nova=csv&&csv!==tvUltimaPlanilha;
-    if(nova){const data=parseCSV(csv);if(data&&data.ops&&data.ops.length&&relatorioEhDeHoje(csv,data)){tvUltimaPlanilha=csv;tvEmissao=emissaoDe(csv);tvTrocouEm=Date.now();tvAtualizadoHoje=true;cRD=data;if(typeof loadPonto==='function')await comTempo(loadPonto(),60000).catch(()=>{});}}
+    if(nova){const data=parseCSV(csv),info=emissaoInfo(csv);
+      const hoje=data&&relatorioEhDeHoje(csv,data,lido.meta);
+      tvLeitura={em:Date.now(),data:info.data,hora:info.hora,hoje:!!hoje,semFormato:!data};
+      if(hoje){tvUltimaPlanilha=csv;tvEmissao=info.hora||lido.meta.hora||'';tvTrocouEm=Date.now();tvAtualizadoHoje=true;cRD=data;if(typeof loadPonto==='function')await comTempo(loadPonto(),60000).catch(()=>{});}}
     const venceu=Date.now()-tvUltimoAlerta>=29*60000;
     render();
     const pg=$('pageTV');
@@ -4691,7 +4754,13 @@ function statusPlanilha(){
   if(!tvLidaEm)return '<span class="tv-pl">lendo planilha...</span>';
   const hh=d=>new Date(d).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const parada=tvTrocouEm&&Date.now()-tvTrocouEm>45*60000;
-  return '<span class="tv-pl'+(parada?' tv-pl-x':'')+'">'+(parada?'⚠ planilha sem mudar desde '+hh(tvTrocouEm)+' (conferir robô)':'Planilha Cobmais '+(tvEmissao||hh(tvTrocouEm))+' · conferida '+hh(tvLidaEm))+'</span>';
+  const L=tvLeitura;
+  if(!tvAtualizadoHoje){
+    if(L&&L.erro)return '<span class="tv-pl tv-pl-x">⚠ não consegui ler o Drive agora, tentando de novo</span>';
+    if(L&&L.data&&!L.hoje)return '<span class="tv-pl tv-pl-x">Planilha do Drive ainda é de '+L.data+' '+(L.hora||'')+' · esperando a de hoje · conferida '+hh(tvLidaEm)+'</span>';
+    return '<span class="tv-pl">Esperando a primeira planilha de hoje · conferida '+hh(tvLidaEm)+'</span>';
+  }
+  return '<span class="tv-pl'+(parada?' tv-pl-x':'')+'">'+(parada?'⚠ planilha sem mudar desde '+hh(tvTrocouEm)+' (conferir robô)':'Planilha de hoje '+(tvEmissao||hh(tvTrocouEm))+' · conferida '+hh(tvLidaEm))+'</span>';
 }
 // ===== TELA =====
 let rot=0;
@@ -4703,34 +4772,26 @@ function render(){
   const g=R.m.turno?R.T[R.m.turno]:null,niv0=R.m.id==='power'&&g&&g.ops.length?g.nivel:null;
   const emAlerta=Date.now()<alertaAte,niv=niv0&&(niv0.id==='ok'||emAlerta)?niv0:null;
   pg.className='page active tv-nivel-'+(niv?niv.id:'none');
-  const ch=ops[rot%Math.min(3,Math.max(1,ops.length))]||null,pos=ops.indexOf(ch);
   let h='<div class="tv-wrap">';
   if(!cRD){
     const hora=new Date().getHours();
     if(hora>=21)h+='<div class="tv-alerta"><div class="tv-modo">🌙 Fora do horário de cobrança</div><div class="tv-al-txt">Relatório zerado para amanhã</div></div>';
     else if(!tvAtualizadoHoje)h+=dicasTV();
-  }
+  }else if(!ops.reduce((s,o)=>s+o.a,0))h+=dicasTV(true);
   // faixa de alerta
   h+='<div class="tv-alerta">';
   h+='<div class="tv-modo">'+(R.m.id==='power'?'⚡ ':R.m.id==='preview'?'👀 ':'🌙 ')+R.m.txt+'<span>'+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'</span>'+statusPlanilha()+'</div>';
   if(niv&&niv.id!=='ok')h+='<div class="tv-al-txt tv-al-big">'+niv.nome+'</div>';
   else if(niv)h+='<div class="tv-al-txt tv-al-big">NO RITMO</div>';
   h+='<div class="tv-btns"><button onclick="tvSom()">'+(somOn?'🔊 Som ligado':'🔇 Som desligado')+'</button><button onclick="tvTela()">⛶ Tela cheia</button></div></div>';
-  h+='<div class="tv-grid"><div class="tv-left"><h2>Ranking do Dia</h2>';
-  if(ops[0])h+='<div class="tv-champ"><div class="tv-ph">'+ini(ops[0].n)+'<i>👑</i></div><div class="tv-cn">'+ops[0].n+'</div><div class="tv-cv">'+fR(ops[0].v)+'</div><div class="tv-cs">'+ops[0].a+' acordos</div></div>';
-  const linhas=ops.map((o,i)=>'<div class="tv-row'+(i===0?' top':'')+'"><b>'+(i+1)+'</b><span class="tv-av">'+ini(o.n)+'</span><span class="tv-nm">'+o.n+'</span><span class="tv-ct">'+o.a+'</span></div>').join('');
-  h+='<div class="tv-scroll"><div class="tv-list'+(ops.length>8?' anim':'')+'" style="--t:'+(ops.length*3.5)+'s">'+linhas+(ops.length>8?linhas:'')+'</div></div></div>';
-  h+='<div class="tv-right">';
-  if(ch)h+='<div class="tv-card tv-spot"><div class="tv-crown">👑<div class="tv-badge">'+(pos+1)+'º Lugar</div></div><div><div class="tv-tag">👑 '+(pos+1)+'º Lugar</div><div class="tv-sn">'+ch.n+'</div><div class="tv-sv">'+ch.a+' acordo'+(ch.a===1?'':'s')+'</div><div class="tv-ss">'+fR(ch.v)+'</div></div></div>';
-  h+='<div class="tv-mid"><div class="tv-card tv-tot"><span>Total do Time Hoje</span><b>'+ta+' acordos</b><em>'+fR(tv)+'</em></div>';
-  h+='<div class="tv-card tv-pod">'+[1,0,2].map(i=>'<div><span>'+['🥇','🥈','🥉'][i]+'</span><b>'+(ops[i]?ops[i].n.split(' ')[0].toUpperCase():'-')+'</b><em>'+(ops[i]?ops[i].a+' ac.':'')+'</em></div>').join('')+'</div></div>';
-  // ritmo por turno
+  // sem nomes de operador na TV: so o resultado do time, o ritmo e o diagnostico
+  h+='<div class="tv-grid"><div class="tv-right">';
+  h+='<div class="tv-top"><div class="tv-card tv-tot"><span>Total do Time Hoje</span><b>'+ta+' acordo'+(ta===1?'':'s')+'</b><em>'+fR(tv)+'</em></div>';
+  h+='<div class="tv-card tv-streak"><span>Operadores com Acordos</span><b><em>'+ativos+'</em> de '+ops.length+' ativos</b><div class="tv-fogo">'+'🔥'.repeat(Math.min(ativos,6))+'</div></div></div>';
   h+='<div class="tv-mid">'+['manha','tarde'].map(k=>{const x=R.T[k],nv=x.nivel,pc=Math.min(100,Math.round(x.r*100)),at=R.m.turno===k;
     return '<div class="tv-card tv-rit'+(at?' atual':'')+'" style="--c:'+nv.cor+'"><div class="tv-rh"><span>'+(k==='manha'?'☀️ Manhã':'🌇 Tarde')+(at?' · agora':'')+'</span><b>'+(x.ops.length?nv.nome:'sem ponto')+'</b></div>'+
     '<div class="tv-rn"><b>'+x.feito+'</b> / '+Math.round(x.esp)+' esperados <em>meta do turno: '+x.metaFinal+'</em></div><div class="tv-bar"><i style="width:'+pc+'%"></i></div>'+
-    '<div class="tv-rs">'+x.ops.length+' operadores no ponto'+(x.falta?' · faltam <b>'+x.falta+'</b> pro ritmo':' · ritmo em dia')+'</div>'+
-    (x.ops.length?'<div class="tv-abx">'+x.ops.filter(o=>o.a<Math.floor(o.esp)).slice(0,6).map(o=>'<span>'+o.n.split(' ')[0]+' '+o.a+'/'+Math.floor(o.esp)+'</span>').join('')+'</div>':'')+'</div>'}).join('')+'</div>';
-  h+='<div class="tv-card tv-streak"><div><span>Operadores com Acordos</span><b><em>'+ativos+' de '+ops.length+'</em> ativos</b></div><div>'+'🔥'.repeat(Math.min(ativos,6))+'</div></div>';
+    '<div class="tv-rs">'+x.ops.length+' operadores no ponto'+(x.falta?' · faltam <b>'+x.falta+'</b> pro ritmo':' · ritmo em dia')+'</div></div>'}).join('')+'</div>';
   h+='</div></div><div class="tv-foot">"Quem fecha mais, aparece mais."</div></div>';
   pg.innerHTML=h;flashPai();
 }
@@ -4817,13 +4878,14 @@ const API_Q='https://script.google.com/macros/s/AKfycbyUX25htVlM8Fs0voi7QK3QzAlF
 const IGNORA=['saida'];                       // nao fazemos agendamento
 // frases CURTAS pra TV (lidas a 15-20 m): p = problema, f = faca assim
 const SL={
- abertura:{nome:'Abertura',p:'Não confirmam o devedor no início',f:'"Aqui é [nome] da Édimo. Falo com o(a) [devedor]?"'},
- motivo:{nome:'Explicação',p:'O devedor não entende a dívida',f:'Diga credor, valor e o risco de SPC em uma frase'},
- avista:{nome:'À vista primeiro',p:'Não oferecem o À VISTA primeiro',f:'Comece: "Hoje eu tiro todos os juros e a multa"'},
- objecao:{nome:'Contornar objeção',p:'Aceitam o "não tenho dinheiro" e desligam',f:'Pergunte: "Quando você recebe? Quanto consegue separar?"'},
- escada:{nome:'Escada de negociação',p:'Fazem uma proposta só e desistem',f:'Ofereça 3 opções: entrada menor, mais parcelas, data mais longa'},
+ abertura:{nome:'Abertura',p:'Não confirmam com quem estão falando',f:'"Alô, bom dia! Falo com o(a) [nome completo]?"'},
+ motivo:{nome:'Documentação',p:'Não explicam a documentação',f:'Benefício primeiro, depois a documentação e o protocolo do cartório com data'},
+ avista:{nome:'Opções',p:'Não apresentam o à vista e o parcelado',f:'"À vista sem juros e multa, ou o sistema libera entrada + parcelas. Como fica mais viável?"'},
+ objecao:{nome:'Contornar objeção',p:'Aceitam o "não tenho dinheiro" e desligam',f:'"Quanto você consegue e em que dia?"'},
+ escada:{nome:'Insistência',p:'Desistem na primeira proposta',f:'"Se for hoje, consigo uma entrada menor" (mínimo 20%)'},
  valores:{nome:'Valores claros',p:'Valores confusos e pausas longas',f:'Deixe o valor pronto na tela e fale uma vez, claro'},
- fechamento:{nome:'Fechamento do acordo',p:'Acordo fechado sem confirmar os dados',f:'Repita nome, CPF, valor e data. Boleto no WhatsApp na hora'}};
+ ganho:{nome:'Mostrar o ganho',p:'Não mostram o ganho de pagar',f:'"Pagando a entrada, cancelo o protocolo e o nome sai em 5 a 7 dias úteis"'},
+ fechamento:{nome:'Fechamento',p:'Fecham sem formalizar',f:'Confirme os dados, contrato verbal e boleto no WhatsApp agora'}};
 const $=id=>document.getElementById(id);
 const hm=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null};
 const agora=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()};
@@ -4843,30 +4905,33 @@ function analisar(D){
   const t=agora();let L=D.lig.filter(l=>{const h=hm(l.h);return h!==null&&h<=t&&h>=t-DG.JANELA_MIN});let jan='nos últimos 60 min';
   if(L.length<DG.MIN_LIG){L=D.lig.slice().sort((a,b)=>(hm(b.h)||0)-(hm(a.h)||0)).slice(0,8);jan='(as '+L.length+' mais recentes de hoje)'}
   const tot={};
-  L.forEach(l=>l.cr.forEach(c=>{
+  L.forEach(l=>(l.cr||[]).forEach(c=>{
     if(IGNORA.indexOf(c.id)>=0)return;
     if(c.id==='fechamento'&&!ehAcordo(l))return;          // sem acordo nao tem fechamento
-    const x=tot[c.id]=tot[c.id]||{p:0,m:0};x.p+=c.p;x.m+=c.m}));
+    const st=String(c.st||c.status||'').toLowerCase();
+    let v=null;
+    if(st==='na'||st==='nao_se_aplica')return;             // etapa que a ligacao nem chegou
+    if(st==='bem')v=1;else if(st==='parte')v=.5;else if(st==='nao')v=0;
+    else if(Number(c.m)>0)v=Number(c.p)/Number(c.m);
+    if(v===null)return;
+    const x=tot[c.id]=tot[c.id]||{p:0,m:0};x.p+=v;x.m+=1}));
   const crit=Object.keys(tot).filter(k=>SL[k]&&tot[k].m>0).map(k=>({id:k,pct:Math.round(tot[k].p/tot[k].m*100)})).sort((a,b)=>a.pct-b.pct);
   const acordos=L.filter(ehAcordo).length,sem=L.length-acordos;
-  const nota=L.length?Math.round(L.reduce((s,l)=>s+l.n,0)/L.length):0;
-  const po={};L.forEach(l=>{const k=nm(l.op);(po[k]=po[k]||[]).push(l.n)});
-  const piores=Object.keys(po).map(k=>({n:k,m:Math.round(po[k].reduce((a,b)=>a+b,0)/po[k].length)})).filter(x=>x.m<60).sort((a,b)=>a.m-b.m).slice(0,4);
   const hh=String(new Date().getHours()).padStart(2,'0'),hp=String(new Date().getHours()-1).padStart(2,'0');
   const F=D.funil.filter(x=>x.tipo==='total'&&[hh,hp].indexOf(String(x.hora).padStart(2,'0'))>=0).reduce((a,x)=>{['dis','op','cpc','muda'].forEach(k=>a[k]+=Number(x[k])||0);return a},{dis:0,op:0,cpc:0,muda:0});
   const itens=[];   // cada item = 1 problema + o que fazer
-  crit.filter(c=>c.pct<70).slice(0,3).forEach(c=>itens.push({tag:SL[c.id].nome+' · '+c.pct+'%',p:SL[c.id].p,f:SL[c.id].f}));
+  crit.filter(c=>c.pct<70).slice(0,3).forEach(c=>itens.push({tag:SL[c.id].nome,p:SL[c.id].p,f:SL[c.id].f}));
   if(F.dis>50&&F.muda/F.dis>.25)itens.push({tag:'Discador',p:Math.round(F.muda/F.dis*100)+'% das ligações caem em muda',f:'TI: revisar o discador, as rotas e a distribuição das chamadas'});
   if(!itens.length&&L.length&&sem/L.length>=.5)itens.push({tag:'Resultado',p:sem+' de '+L.length+' ligações sem acordo',f:'Não aceite o primeiro não: investigue e negocie'});
   const fortes=crit.filter(c=>c.pct>=80).slice(-2).map(c=>SL[c.id].nome);
-  return{jan,n:L.length,nota,acordos,sem,itens,piores,fortes};
+  return{jan,n:L.length,acordos,sem,itens,fortes};
 }
 // cartao fixo (pequeno, pra quem esta perto da TV / supervisor)
 function htmlCard(A){
-  let h='<div class="dg-h"><b>Por que os acordos estão baixos</b><span>'+A.n+' ligações avaliadas '+A.jan+' · nota média '+A.nota+' · '+A.acordos+' com acordo, '+A.sem+' sem acordo</span></div>';
+  let h='<div class="dg-h"><b>Por que os acordos estão baixos</b><span>'+A.n+' ligações avaliadas '+A.jan+' · '+A.acordos+' com acordo, '+A.sem+' sem acordo</span></div>';
   if(!A.itens.length)return h+'<div class="dg-c"><div class="dg-col"><p>Sem ligações avaliadas suficientes pra apontar o motivo.</p></div></div>';
   h+='<div class="dg-c"><div class="dg-col"><i>Motivos</i>'+A.itens.map(m=>'<p>❗ '+m.p+' <em>'+m.tag+'</em></p>').join('')+'</div>';
-  h+='<div class="dg-col"><i>O que fazer agora</i>'+A.itens.map(m=>'<p>✅ '+m.f+'</p>').join('')+(A.piores.length?'<p>👀 Supervisor: ouvir '+A.piores.map(p=>p.n).join(', ')+'</p>':'')+'</div></div>';
+  h+='<div class="dg-col"><i>O que fazer agora</i>'+A.itens.map(m=>'<p>✅ '+m.f+'</p>').join('')+'<p>👀 Supervisor: veja na aba Avaliação de Discagem quem precisa de apoio</p>'+'</div></div>';
   return h;
 }
 function cardFixo(){
