@@ -2706,6 +2706,9 @@ body .sidebar .sb-nav .sb-item{border-radius:12px!important}
 #pageComp .nx-t td small{font-size:.6rem!important}
 #pageComp .nx-t .nx-op b{font-size:.84rem!important}#pageComp .nx-t .nx-op small{font-size:.68rem!important;color:#94a3b8!important}
 #pageComp .nx-t .nx-tempo{font-size:.74rem!important}
+#pageComp .nx-t td small.ok{color:#047857!important;font-weight:800!important}
+.nx-ms{display:inline-block;border-radius:5px!important;padding:0 6px;font-weight:800;font-size:.58rem;text-transform:uppercase;border:1px solid}
+.nx-ms.ok{color:#047857;background:#ecfdf5;border-color:#a7f3d0}.nx-ms.perto{color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe}.nx-ms.abaixo{color:#b45309;background:#fffbeb;border-color:#fde68a}
 .sb-tagx{font-size:.52rem!important;padding:1px 5px!important}
 @media (max-width:1100px){.nx-kpis{grid-template-columns:repeat(2,1fr)}.nx-pg,.nx-tg,.nx-kpis.c3{grid-template-columns:1fr}.nx-tr{grid-template-columns:36px 1.6fr 1fr 1fr 70px 110px}}
 </style></head>
@@ -3454,7 +3457,7 @@ function genComp(){
   const allN=new Map();
   ms.forEach((m,mi)=>{m.ops.forEach(o=>{
     if(!allN.has(o.n))allN.set(o.n,{name:o.n,cfg:o.cfg,t:o.t,m:new Array(ms.length).fill(null)});
-    const r=allN.get(o.n);r.m[mi]={a:o.a,v:o.v};if(o.cfg)r.cfg=o.cfg;if(o.t!==undefined)r.t=o.t;if(o.t!==undefined)r.t=o.t;
+    const r=allN.get(o.n);r.m[mi]={a:o.a,v:o.v,cfg:o.cfg};if(o.cfg)r.cfg=o.cfg;if(o.t!==undefined)r.t=o.t;if(o.t!==undefined)r.t=o.t;
   });});
   // Only show operators present in the current month
   const allFiltered=[...allN.values()].filter(function(op){return op.m[nowIdx]!==null;});
@@ -3509,17 +3512,22 @@ function genComp(){
     cols.forEach(i=>{h+='<th class="'+(i===nowIdx?'cur':'')+'">'+shortPeriod(ms[i].period)+(i===nowIdx?' (atual)':'')+'</th>'});
     h+='<th>Média '+ms.length+(ms.length>1?' meses':' mês')+'</th><th>Tempo de empresa</th></tr></thead><tbody>';
     const ini=n=>String(n||'').split(/\s+/).filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
-    const cel=(d,cfg,cur)=>{if(!d)return '<td class="'+(cur?'cur':'')+'"><span class="nx-z">-</span></td>';
+    const cel=(d,cfg,cur)=>{if(d&&d.cfg)cfg=d.cfg;if(!d)return '<td class="'+(cur?'cur':'')+'"><span class="nx-z">-</span></td>';
       const m=getMeta(cfg),pct=m&&m.max>0?Math.min(100,Math.round(d.v/m.max*100)):null,cor=pct===null?'#94a3b8':pct>=100?'#10b981':pct>=60?'#22c55e':'#f59e0b';
+      const pr=m&&m.max>0?Math.round(d.v/m.max*100):null;
       return '<td class="'+(cur?'cur':'')+'">'+(showAcordos?'<b class="nx-qa">'+d.a+' acordo'+(d.a===1?'':'s')+'</b>':'')+(showValor?'<span class="nx-qv">'+fm(d.v)+'</span>':'')+
-        (pct!==null&&showValor?'<div class="nx-bar sm"><i style="width:'+pct+'%;background:'+cor+'"></i></div>'+(cur?'<small>'+(pct>=100?'100% DA META 🏆':pct+'% da meta')+'</small>':''):'')+'</td>'};
+        (pct!==null?'<div class="nx-bar sm"><i style="width:'+pct+'%;background:'+cor+'"></i></div><small class="'+(pr>=100?'ok':'')+'">'+(pr>=100?'🏆 bateu a meta ('+pr+'%)':pr+'% da meta'+(cur?' até agora':''))+'</small>':'<small class="nx-z">sem meta</small>')+'</td>'};
+    const metaTxt=cfg=>{const m=getMeta(cfg);return m&&m.max>0?'Meta '+fs(m.max):''};
     od.forEach((op,i)=>{
       const hl=mU(op.name,uN)?' hl':'';
       const tur=op.t===1?'Manhã':op.t===2?'Tarde':op.t===0?'Novato':'';
-      h+='<tr class="'+hl+'"><td class="nmcell"><div class="nx-op"><span class="nx-av s'+(i<3?' t'+(i+1):'')+'">'+ini(op.name)+'</span><div><b>'+esc(op.name)+'</b>'+(tur?'<small>'+tur+'</small>':'')+'</div></div></td>';
+      h+='<tr class="'+hl+'"><td class="nmcell"><div class="nx-op"><span class="nx-av s'+(i<3?' t'+(i+1):'')+'">'+ini(op.name)+'</span><div><b>'+esc(op.name)+'</b><small>'+[tur,metaTxt(op.cfg)].filter(Boolean).join(' · ')+'</small></div></div></td>';
       cols.forEach(mi=>{h+=cel(op.m[mi],op.cfg,mi===nowIdx)});
       let sA=0,sV=0,c=0;ms.forEach((m,mi)=>{const d=op.m[mi];if(d){sA+=d.a;sV+=d.v;c++}});
-      h+='<td>'+(showAcordos?'<b class="nx-qa">'+(c?Math.round(sA/c):0)+' acordos</b>':'')+(showValor?'<span class="nx-qv">'+fm(c?Math.round(sV*100/c)/100:0)+'</span>':'')+'</td>';
+      const mV=c?Math.round(sV*100/c)/100:0,mm=getMeta(op.cfg),mp=mm&&mm.max>0?Math.round(mV/mm.max*100):null;
+      const mst=mp===null?'':mp>=100?['ok','na meta']:mp>=85?['perto','perto da meta']:['abaixo','abaixo da meta'];
+      h+='<td>'+(showAcordos?'<b class="nx-qa">'+(c?Math.round(sA/c):0)+' acordos</b>':'')+(showValor?'<span class="nx-qv">'+fm(mV)+'</span>':'')+
+        (mp===null?'':'<div class="nx-bar sm"><i style="width:'+Math.min(100,mp)+'%;background:'+(mp>=100?'#10b981':mp>=85?'#22c55e':'#f59e0b')+'"></i></div><small><span class="nx-ms '+mst[0]+'">'+mst[1]+'</span> '+mp+'%</small>')+'</td>';
       h+='<td><span class="nx-tempo">'+tempoExtenso(op.name)+'</span></td></tr>';
     });
     h+='</tbody></table></div></div>';
