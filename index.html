@@ -4247,13 +4247,16 @@ const DICA={
   conformidade:'Fale de consequência verdadeira: cartório, restrição no CPF e prazo do sistema. Nunca ameace, invente bloqueio ou exponha a dívida a terceiros.'
 };
 function statusC(c){
-  let s=String(c.status||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\s_-]+/g,'');
+  const pts=c.pontos!==undefined?c.pontos:(c.score!==undefined?c.score:c.nota), max=c.max!==undefined?c.max:(c.maximo!==undefined?c.maximo:10);
+  if(pts!==undefined&&pts!==''&&Number.isFinite(Number(pts))&&Number(max)>0){
+    const r=Number(pts)/Number(max);return r>=.75?'bem':r>=.4?'parte':'nao';
+  }
+  let s=String(c.status||c.st||c.situacao||c.avaliacao||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\s_-]+/g,'');
   if(['bem','fezbem','bom','feito','sim'].includes(s))return'bem';
   if(['parte','emparte','parcial','parcialmente'].includes(s))return'parte';
   if(['nao','naofez','falhou'].includes(s))return'nao';
   if(['na','naoseaplica','naoaplicavel','n/a'].includes(s))return'na';
-  const p=Number(c.pontos);const m=Number(c.max)||1;
-  return c.pontos!==undefined?(p/m>=.75?'bem':p/m>=.4?'parte':'nao'):'na';
+  return'na';
 }
 const ID_ALIAS={avista:'opcoes',objecao:'insistencia',escada:'insistencia',valores:'opcoes',saida:'fechamento'};
 function idC(c){const id=String(c.id||'').toLowerCase();return ID_ALIAS[id]||id}
