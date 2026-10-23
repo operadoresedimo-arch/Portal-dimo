@@ -340,7 +340,10 @@ body.tv-full .tv-al-big{font-size:3.4rem!important}
 .dg3-ac p{margin:0;font-size:1.15rem;font-weight:800}
 .dg3-ac q{display:block;quotes:'"' '"';font-style:italic;font-weight:800;font-size:1.4rem;line-height:1.3;color:#fde68a;background:#0b1120;border-left:3px solid #f59e0b;border-radius:6px;padding:10px 14px}
 .dg3-ac.v q{color:#6ee7b7;border-left-color:#10b981}
-@media (max-width:1300px){.tv-row1,.tv-dgslot .dg-card{grid-template-columns:1fr}}
+/* a TV e desenhada em 1920x1080 e o navegador so aumenta/diminui tudo junto: nunca aparece barra de rolagem */
+#pageTV.active{overflow:hidden!important;position:relative}
+#pageTV .tv-wrap{width:1920px;height:1080px;min-height:0;box-sizing:border-box;position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden}
+body.tv-full #pageTV{overflow:hidden!important}
 /* o portal usa canto reto em tudo; a TV usa o canto arredondado do modelo */
 #pageTV .tv-card,#pageTV .tv-hd,#pageTV .dg3-l,#pageTV .dg3-r{border-radius:18px!important}
 #pageTV .tv-live,#pageTV .tv-hd-pl,#pageTV .tv-top1{border-radius:30px!important}
@@ -4940,14 +4943,23 @@ function render(){
     '<div class="tv-tu-bar"><i style="width:'+(sem?0:pc)+'%"></i></div>'+
     '<div class="tv-tu-f"><span>'+I.pessoas+x.ops.length+' operadores no ponto</span>'+(sem?'<span>'+I.relogio+(k==='tarde'?'Começa às 14h':'Começa às 8h')+'</span>':(x.falta&&nv.id!=='ok')?'<span class="tv-falta">FALTAM '+x.falta+' PRO RITMO</span>':'<span class="ok">'+I.ok+'Ritmo em dia</span>')+'</div></div>'}).join('')+'</div></div>';
   h+='<div class="tv-dgslot"></div></div></div></div>';
-  pg.innerHTML=h;flashPai();
+  pg.innerHTML=h;flashPai();tvFit();
 }
+function tvFit(){
+  const pg=$('pageTV'),w=pg&&pg.querySelector('.tv-wrap');if(!w)return;
+  const cheia=document.body.classList.contains('tv-full')||!!document.fullscreenElement;
+  const W=cheia?window.innerWidth:pg.clientWidth,H=cheia?window.innerHeight:Math.max(300,window.innerHeight-pg.getBoundingClientRect().top-8);
+  const k=Math.min(W/1920,H/1080);
+  w.style.transform='scale('+k+')';w.style.left=Math.max(0,(W-1920*k)/2)+'px';w.style.top=cheia?Math.max(0,(H-1080*k)/2)+'px':'0px';
+  pg.style.height=cheia?'100vh':(1080*k)+'px';
+}
+window.addEventListener('resize',tvFit);document.addEventListener('fullscreenchange',()=>setTimeout(tvFit,50));
 window.tvSom=function(){somOn=!somOn;localStorage.setItem('tv_som',somOn?'1':'0');if(somOn){ac();bip(660,.15,0,.2)}render()};
 // TELA CHEIA: a aba da TV sai de dentro do portal e vai direto pro <body>, e o resto da pagina some.
 // Assim nada do portal (menu lateral, outras abas) aparece por cima, e o alerta/dicas ficam por cima de tudo.
 let tvLugar=null;
-function tvFullOn(){const pg=$('pageTV');if(!pg)return;if(!tvLugar)tvLugar={pai:pg.parentNode,prox:pg.nextSibling};if(pg.parentNode!==document.body)document.body.appendChild(pg);document.body.classList.add('tv-full');flashPai()}
-function tvFullOff(){const pg=$('pageTV');document.body.classList.remove('tv-full');if(pg&&tvLugar){tvLugar.pai.insertBefore(pg,tvLugar.prox&&tvLugar.prox.parentNode===tvLugar.pai?tvLugar.prox:null);tvLugar=null}}
+function tvFullOn(){const pg=$('pageTV');if(!pg)return;if(!tvLugar)tvLugar={pai:pg.parentNode,prox:pg.nextSibling};if(pg.parentNode!==document.body)document.body.appendChild(pg);document.body.classList.add('tv-full');flashPai();tvFit()}
+function tvFullOff(){const pg=$('pageTV');document.body.classList.remove('tv-full');setTimeout(tvFit,50);if(pg&&tvLugar){tvLugar.pai.insertBefore(pg,tvLugar.prox&&tvLugar.prox.parentNode===tvLugar.pai?tvLugar.prox:null);tvLugar=null}}
 window.tvTela=function(){ac();if(document.fullscreenElement){document.exitFullscreen();return}
   const el=document.documentElement;tvFullOn();(el.requestFullscreen?el.requestFullscreen():Promise.resolve()).catch(()=>{})};
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)tvFullOff()});
@@ -5038,41 +5050,53 @@ const $=id=>document.getElementById(id);
 const hm=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null};
 const agora=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()};
 const nm=o=>String(o||'').toLowerCase().split(' ').filter(Boolean).slice(0,1).map(w=>w[0].toUpperCase()+w.slice(1)).join(' ');
-const ehAcordo=l=>String(l.r||'').toLowerCase().indexOf('acordo')===0;
+const ehAcordo=l=>String(l.r||l.resultado||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').indexOf('acordo')===0;
 let ULT=null,tmr=null,slides=[],si=0,slideTm=null;
 function chave(){return localStorage.getItem('avd_chave')||''}
 async function buscar(){
   const k=chave();if(!k)return{erro:'sem_chave'};
-  const [a,f]=await Promise.all([
-    fetch(API_Q+'?acao=recentes&chave='+encodeURIComponent(k)+'&t='+Date.now()).then(r=>r.json()).catch(()=>null),
-    fetch(API_Q+'?acao=funil&dias=1&chave='+encodeURIComponent(k)+'&t='+Date.now()).then(r=>r.json()).catch(()=>null)]);
+  const a=await fetch(API_Q+'?chave='+encodeURIComponent(k)+'&dias=1&t='+Date.now()).then(r=>r.json()).catch(()=>null);
   if(!a||!a.ok)return{erro:(a&&a.erro)||'sem_dados'};
-  return{lig:a.ligacoes||[],funil:(f&&f.ok?f.funil:[])||[]};
+  const d=new Date(),p=n=>String(n).padStart(2,'0'),hoje=p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear();
+  const lig=(a.linhas||[]).filter(l=>String(l.data||'').replace(/^'/,'').indexOf(hoje)===0&&String(l.operador||'').trim().toUpperCase()!=='OPERADOR TESTE'&&!String(l.id||'').toUpperCase().startsWith('TESTE-'));
+  return{lig};
 }
+const JS=v=>{if(Array.isArray(v))return v;try{return JSON.parse(v||'[]')}catch(e){return[]}};
+const ALIAS={avista:'opcoes',objecao:'insistencia',escada:'insistencia',valores:'opcoes',saida:'fechamento'};
+function stC(c){const s=String(c.status||c.st||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[\s_-]+/g,'');
+  if(['bem','fezbem','bom','feito','sim'].includes(s))return'bem';if(['parte','emparte','parcial','parcialmente'].includes(s))return'parte';
+  if(['nao','naofez','falhou'].includes(s))return'nao';if(['na','naoseaplica','naoaplicavel','n/a'].includes(s))return'na';
+  if(c.pontos!==undefined){const r=Number(c.pontos)/(Number(c.max)||1);return r>=.75?'bem':r>=.4?'parte':'nao'}return'na'}
+// frases da TV: genericas, sem nome de ninguem
+const TVF={
+ abertura:{tag:'Abertura',p:'a abertura foi fraca',f:'"Alô, bom dia! Falo com o(a) [nome completo]?" Fale já no primeiro segundo'},
+ motivo:{tag:'Benefício primeiro',p:'não mostraram o benefício antes da Advocacia',f:'"Consigo te ajudar a resolver hoje e tirar seu nome do SPC e do Serasa"'},
+ documentacao:{tag:'Documentação',p:'não explicaram a documentação',f:'"Recebemos uma documentação em seu nome, com protocolo para protesto em cartório"'},
+ opcoes:{tag:'Opções',p:'não apresentaram à vista e parcelado',f:'"À vista sem juros e multa, ou o sistema libera entrada + parcelas. Como fica mais viável?"'},
+ ganho:{tag:'Mostrar o ganho',p:'não mostraram o ganho de pagar',f:'"Pagando a entrada, cancelo o protocolo e o nome sai do SPC e Serasa em 5 a 7 dias úteis"'},
+ sistema:{tag:'Regra do sistema',p:'não usaram o prazo do sistema',f:'"O sistema me libera a entrada até [dia]. Se for hoje, consigo uma entrada menor"'},
+ insistencia:{tag:'Insistência',p:'desistiram no primeiro não',f:'Não aceite o primeiro não: "Quanto você consegue e em que dia?"'},
+ fechamento:{tag:'Fechamento',p:'fecharam sem formalizar',f:'"A ligação é gravada e vale como contrato verbal. Te mando o boleto no WhatsApp agora"'},
+ conformidade:{tag:'Postura',p:'passaram do limite na cobrança',f:'Fale só consequência verdadeira: cartório, restrição no CPF e prazo do sistema'}};
 function analisar(D){
-  const t=agora();let L=D.lig.filter(l=>{const h=hm(l.h);return h!==null&&h<=t&&h>=t-DG.JANELA_MIN});let jan='nos últimos 60 min';
-  if(L.length<DG.MIN_LIG){L=D.lig.slice().sort((a,b)=>(hm(b.h)||0)-(hm(a.h)||0)).slice(0,8);jan='(as '+L.length+' mais recentes de hoje)'}
-  const tot={};
-  L.forEach(l=>(l.cr||[]).forEach(c=>{
-    if(IGNORA.indexOf(c.id)>=0)return;
-    if(c.id==='fechamento'&&!ehAcordo(l))return;          // sem acordo nao tem fechamento
-    const st=String(c.st||c.status||'').toLowerCase();
-    let v=null;
-    if(st==='na'||st==='nao_se_aplica')return;             // etapa que a ligacao nem chegou
-    if(st==='bem')v=1;else if(st==='parte')v=.5;else if(st==='nao')v=0;
-    else if(Number(c.m)>0)v=Number(c.p)/Number(c.m);
-    if(v===null)return;
-    const x=tot[c.id]=tot[c.id]||{p:0,m:0};x.p+=v;x.m+=1}));
-  const crit=Object.keys(tot).filter(k=>SL[k]&&tot[k].m>0).map(k=>({id:k,pct:Math.round(tot[k].p/tot[k].m*100)})).sort((a,b)=>a.pct-b.pct);
+  const L=D.lig||[];const jan='hoje';
   const acordos=L.filter(ehAcordo).length,sem=L.length-acordos;
-  const hh=String(new Date().getHours()).padStart(2,'0'),hp=String(new Date().getHours()-1).padStart(2,'0');
-  const F=D.funil.filter(x=>x.tipo==='total'&&[hh,hp].indexOf(String(x.hora).padStart(2,'0'))>=0).reduce((a,x)=>{['dis','op','cpc','muda'].forEach(k=>a[k]+=Number(x[k])||0);return a},{dis:0,op:0,cpc:0,muda:0});
-  const itens=[];   // cada item = 1 problema + o que fazer
-  crit.filter(c=>c.pct<70).slice(0,3).forEach(c=>itens.push({tag:SL[c.id].nome,p:SL[c.id].p,f:SL[c.id].f}));
-  // discador/TI nao aparece na TV (fica so na aba Avaliacao de Discagem)
-  if(!itens.length&&L.length&&sem/L.length>=.5){itens.push({tag:'Insistência',p:sem+' de '+L.length+' ligações sem acordo',f:'Não aceite o primeiro não: "Quanto você consegue e em que dia?"'});itens.push({tag:'Mostrar o ganho',p:'',f:'"Pagando a entrada, cancelo o protocolo e o nome sai em 5 a 7 dias úteis"'})}
-  const fortes=crit.filter(c=>c.pct>=80).slice(-2).map(c=>SL[c.id].nome);
-  return{jan,n:L.length,acordos,sem,itens,fortes};
+  const tot={};
+  L.forEach(l=>JS(l.criterios||l.cr).forEach(c=>{
+    const id=ALIAS[String(c.id||'').toLowerCase()]||String(c.id||'').toLowerCase();if(!TVF[id])return;
+    if(id==='fechamento'&&!ehAcordo(l))return;
+    const st=stC(c);if(st==='na')return;
+    const x=tot[id]=tot[id]||{ap:0,falha:0};x.ap++;if(st!=='bem')x.falha++}));
+  const itens=Object.keys(tot).filter(k=>tot[k].ap>=3&&tot[k].falha/tot[k].ap>=.3)
+    .sort((a,b)=>tot[b].falha-tot[a].falha||tot[b].falha/tot[b].ap-tot[a].falha/tot[a].ap).slice(0,3)
+    .map(k=>({tag:TVF[k].tag,p:'Em '+tot[k].falha+' de '+tot[k].ap+' ligações '+TVF[k].p,f:TVF[k].f}));
+  // ligacoes que acabaram cedo: so conta quando a causa foi a abordagem (nao o discador)
+  const cedo=L.filter(l=>/operador/i.test(String(l.causa_encerramento||''))).length;
+  if(cedo>=3&&!itens.some(m=>m.tag==='Abertura'))itens.push({tag:'Abertura',p:cedo+' ligações acabaram cedo por causa da abordagem',f:TVF.abertura.f});
+  const desl=L.filter(l=>/deslig/i.test(String(l.causa_encerramento||''))).length;
+  if(desl>=3&&itens.length<3)itens.push({tag:'Primeiros segundos',p:desl+' devedores desligaram logo no início',f:TVF.motivo.f});
+  if(!itens.length&&L.length>=5&&sem/L.length>=.6)itens.push({tag:'Insistência',p:sem+' de '+L.length+' ligações terminaram sem acordo',f:TVF.insistencia.f});
+  return{jan,n:L.length,acordos,sem,itens:itens.slice(0,3),fortes:[]};
 }
 // cartao fixo da TV: so motivo + o que fazer, sem nomes e sem recado de supervisor
 function htmlCard(A){
