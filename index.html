@@ -2182,6 +2182,7 @@ body::before,body::after{display:none!important}
 .od-stl{display:flex;justify-content:space-between;gap:8px;font-size:.7rem;margin-top:5px;font-weight:600}
 .od-eq .od-stack{height:9px}.od-eq td{vertical-align:middle}
 .od-sts{white-space:normal!important}.od-st{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:700;padding:4px 9px;border-radius:8px;color:var(--c);background:var(--c8);border:1px solid var(--c30);margin:2px 0 2px 4px;white-space:nowrap}
+.od-mb small{display:block;font-size:.7rem;color:#8a8d92;margin-top:2px}
 .od-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
 .od-k{background:#fff;border:1px solid var(--bd);border-top:4px solid var(--c);border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(15,23,42,.04);transition:transform .15s}.od-k:hover{transform:translateY(-2px)}
 .od-kt{display:flex;justify-content:space-between;align-items:center;font-size:.74rem;font-weight:600;color:#6b7280}.od-kt i{display:flex;padding:6px;border-radius:8px;color:var(--c);background:var(--c12)}
@@ -4629,7 +4630,7 @@ function visaoOper0(){
   if(el)A.push(['clock','Pausar '+fmtN(el)+' números por 7 dias','Hoje','#b45309','Caixa postal 3x ou mais e ninguém atendeu. Não apaga: só dá um tempo e tenta em outro horário.'+(gP?' Gastaram <b>'+fmtN(gP)+' discagens</b>.':'')]);
   const ruins=M.filter(m=>m.d.o===3||m.d.o===2),bons=M.filter(m=>m.d.o===0);
   if(ruins.length)A.push(['layers','Limpar ou pausar '+ruins.length+' mailing'+(ruins.length>1?'s':''),'Hoje','#b45309',ruins.slice(0,3).map(m=>esc(nmM(m))+' ('+m.d.t+')').join(', ')+'.']);
-  if(bons.length)A.push(['trend','Priorizar '+bons.slice(0,2).map(m=>esc(nmM(m))).join(' e '),'Hoje','#16a34a','São os que mais viram acordo. Deixe no discador nos horários de pico.']);
+  if(bons.length)A.push(['trend','Priorizar '+bons.slice(0,2).map(m=>esc(nmM(m))).join(' e '),'Hoje','#16a34a',(semAco?'São os que mais atendem hoje. Deixe no discador nos horários de pico.':'São os que mais viram acordo. Deixe no discador nos horários de pico.')]);
   if(pico.length)A.push(['users','Equipe completa às '+pico.map(x=>x+'h').join(', '),'Escala','#484a4e','É quando mais gente atende.'+(fraco.length?' Lanche e pausa às '+fraco.map(x=>x+'h').join(' e ')+'.':'')]);
   if(manual.length)A.push(['alert','Conversar sobre modo manual','Conversar','#b91c1c',manual.length+' operadora'+(manual.length>1?'s':'')+' passaram mais de 20% do tempo discando na mão: '+manual.slice(0,4).map(o=>esc(nc(o.n))).join(', ')+(manual.length>4?'…':'')+'.']);
   if(EQ.login&&ocP>=25)A.push(['clock','Faltou ligação pra equipe','Acompanhar','#64748b',pf(ocP,0)+'% do tempo esperando o discador. É base fraca, não preguiça: limpar os mailings resolve.']);
@@ -4638,10 +4639,10 @@ function visaoOper0(){
       return '<div class="od-acao'+(f?' feito':'')+'" onclick="avd.odAcao(\''+k+'\',this)"><div class="od-at"><label><input type="checkbox"'+(f?' checked':'')+' onclick="event.preventDefault()"><b>'+(i+1)+'. '+a[1]+'</b></label><span class="od-tag" style="--c:'+a[3]+'">'+a[2]+'</span></div><div class="od-ad">'+a[4]+'</div></div>'}).join('')+'</div></div>';
   // ---- roscas
   const outros=Math.max(0,(EQ.login||0)-(EQ.fala||0)-(EQ.ocioso||0)-(EQ.pausa||0)-(EQ.manual||0));
-  const box=(c,t,v)=>'<div class="od-mb" style="--c:'+c+'"><span>'+t+'</span><b>'+v+'</b></div>';
+  const box=(c,t,v,sub)=>'<div class="od-mb" style="--c:'+c+'"><span>'+t+'</span><b>'+v+'</b>'+(sub?'<small>'+sub+'</small>':'')+'</div>',nOp=Math.max(1,O.length);
   h+='<div class="od-g2"><div class="od-card">'+odHead('pie','#d4a937','Uso do tempo da equipe','Como o tempo logado foi gasto','',odInfo('Soma do tempo logado de todas as operadoras no discador.','<b>Falando</b> = em ligação. <b>Esperando</b> = logada sem ligação chegando. <b>Manual</b> = discando na mão. <b>Pausa</b> = lanche, banheiro etc.','Muito tempo esperando = falta base boa (limpar mailing). Manual alto fora da Prospecção vale conversa.'))+
     (EQ.login?odDonut([{n:'Falando',v:EQ.fala,c:'#16a34a'},{n:'Esperando ligação',v:EQ.ocioso,c:'#d4a937'},{n:'Manual',v:EQ.manual,c:'#b91c1c'},{n:'Pausa',v:EQ.pausa,c:'#64748b'},{n:'Outros',v:outros,c:'#cbd5e1'}],pf(pc(EQ.fala,EQ.login),0)+'%','falando')+
-      '<div class="od-mbs">'+box('#16a34a','Tempo falando',hm(EQ.fala))+box('#d4a937','Tempo esperando',hm(EQ.ocioso))+'</div>':'<div class="avd-empty">Sem tempo das operadoras nesse período.</div>')+'</div>'+
+      '<div class="od-mbs">'+box('#16a34a','Falando, média por operadora',hm(EQ.fala/nOp),'equipe somada ('+nOp+' operadoras): '+hm(EQ.fala))+box('#d4a937','Esperando, média por operadora',hm(EQ.ocioso/nOp),'equipe somada: '+hm(EQ.ocioso))+'</div>':'<div class="avd-empty">Sem tempo das operadoras nesse período.</div>')+'</div>'+
     '<div class="od-card">'+odHead('phone','#484a4e','Resultado das discagens','Pra onde foram as '+fmtN(T.dis)+' discagens','',odInfo('Cada vez que o discador liga, a Fastway marca um resultado.','<b>Atendidas</b> = chegou numa pessoa. <b>Caixa postal</b> = máquina/secretária. <b>Não existe</b> = número inválido. <b>Muda</b> = ligou e ninguém falou.','Quanto maior a fatia de caixa postal e não existe, mais a base precisa de limpeza (painel de bloqueio e ranking dos mailings).'))+
     odDonut([{n:'Caixa postal',v:T.el,c:'#d4a937'},{n:'Não atende / outros',v:Math.max(0,T.dis-T.el-T.ne-T.at-(T.mu||0)),c:'#cbd5e1'},{n:'Não existe',v:T.ne,c:'#dc2626'},{n:'Muda',v:T.mu||0,c:'#b45309'},{n:'Atendidas',v:T.at,c:'#16a34a'}],pf(pc(T.at,T.dis),1)+'%','atendidas')+
     '<div class="od-mbs">'+box('#16a34a','Atendidas',fmtN(T.at))+box('#dc2626','Não existe + caixa postal',pf(pc(T.ne+T.el,T.dis),0)+'%')+'</div></div></div>';
@@ -6427,7 +6428,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261026-1130',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261026-1150',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
