@@ -2171,6 +2171,12 @@ body::before,body::after{display:none!important}
 .avd-k.clk:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,23,42,.08)}
 .avd-k.on{background:#f6f9ff;box-shadow:0 0 0 2px var(--c,#1e4e7e) inset}
 .avd-k .avd-hint{font-size:.62rem;color:#9ca3af;margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.od-hero{position:relative;overflow:hidden;background:linear-gradient(120deg,#0f3557,#1e4e7e 70%,#24598c);color:#fff;border-radius:16px;padding:20px 24px;margin-bottom:14px;border-bottom:4px solid #d4a937;box-shadow:0 4px 14px rgba(15,53,87,.18)}
+.od-hero:after{content:"";position:absolute;right:-60px;bottom:-80px;width:260px;height:260px;border-radius:50%;border:34px solid rgba(212,169,55,.12);pointer-events:none}
+.od-hero-t{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.od-hero-t span{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#d4a937}.od-hero h2{margin:4px 0 0;font-size:1.45rem;font-weight:800;color:#fff}
+.od-live{display:flex;align-items:center;gap:8px;font-size:.76rem;color:#dbe6f0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);padding:6px 10px;border-radius:10px}.od-live i{width:9px;height:9px;border-radius:50%;background:#22c55e;animation:odpulse 1.6s infinite}
+@keyframes odpulse{0%,100%{opacity:1}50%{opacity:.35}}
+.od-hero p{position:relative;z-index:1;margin:12px 0 0;font-size:.92rem;line-height:1.7;color:#dbe6f0;max-width:980px}.od-hero b{color:#fff}.od-hero b.g{color:#e9c45c}.od-hero b.v{color:#4ade80}.od-hero b.r{color:#fca5a5}
 .od-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
 .od-k{background:#fff;border:1px solid var(--bd);border-top:4px solid var(--c);border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(15,23,42,.04);transition:transform .15s}.od-k:hover{transform:translateY(-2px)}
 .od-kt{display:flex;justify-content:space-between;align-items:center;font-size:.74rem;font-weight:600;color:#6b7280}.od-kt i{display:flex;padding:6px;border-radius:8px;color:var(--c);background:var(--c12)}
@@ -4532,10 +4538,11 @@ const explica=(oque,ler,fazer)=>'<div class="avd-exp"><div><b>O que é:</b> '+oq
 const pill=(t,bg,c)=>'<span class="avd-pl" style="background:'+bg+';color:'+c+'">'+t+'</span>';
 const tbw=h=>'<div style="overflow-x:auto">'+h+'</div>';
 function melhorHora(lista,min){const ok=lista.filter(x=>x.dis>=min);if(!ok.length)return null;return ok.sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis))[0]}
-function decideMail(m,base){const at=pc(m.at,m.dis),ne=pc(m.ne,m.dis),mil=m.dis?m.aco/m.dis*1000:0;
+function decideMail(m,base,semAco,baseAt){const at=pc(m.at,m.dis),ne=pc(m.ne,m.dis),mil=m.dis?m.aco/m.dis*1000:0;
   if(m.dis<500)return {o:4,t:'pouco discado',bg:'#f1f5f9',c:'#64748b',p:'Menos de 500 discagens: ainda não dá pra julgar.'};
   if(ne>=15)return {o:3,t:'limpar antes',bg:'#fee2e2',c:'#b91c1c',p:pf(ne,0)+'% dos números não existem. Pedir telefone atualizado ao credor ou higienizar no Cobmais.'};
   if(at<1.5)return {o:3,t:'limpar antes',bg:'#fee2e2',c:'#b91c1c',p:'Só '+pf(at,1)+'% atende. A base está gastando discagem à toa.'};
+  if(semAco){if(at>=baseAt*1.3)return {o:0,t:'priorizar',bg:'#dcfce7',c:'#15803d',p:pf(at,1)+'% atendem (média da casa: '+pf(baseAt,1)+'%).'};return {o:1,t:'manter',bg:'#fef3c7',c:'#b45309',p:'Dentro da média de atendimento da casa.'}}
   if(m.aco>=2&&mil>=base*1.3)return {o:0,t:'priorizar',bg:'#dcfce7',c:'#15803d',p:'Rende '+pf(mil,1)+' acordos a cada mil discagens (média da casa: '+pf(base,1)+').'};
   if(m.aco===0&&m.dis>=3000)return {o:2,t:'pausar',bg:'#ffedd5',c:'#c2410c',p:fmtN(m.dis)+' discagens e nenhum acordo. Pausar e trocar por um mailing melhor.'};
   return {o:1,t:'manter',bg:'#fef3c7',c:'#b45309',p:'Dentro da média da casa.'}}
@@ -4585,16 +4592,21 @@ function visaoOper0(){
     (d.topPausa||[]).forEach(t=>{const y=mp[t.f]=mp[t.f]||{f:t.f,t:0,tipo:'el',el:0};y.t+=t.t;y.el=Math.max(y.el,t.el||0)})});
   BLOQ=Object.values(mb).sort((a,b)=>b.t-a.t);PAUSA=Object.values(mp).filter(x=>!mb[x.f]).sort((a,b)=>b.t-a.t);
   const baseMil=T.aco/T.dis*1000,HM=operJunta('hm'),HD=operJunta('hd');
-  const M=operJunta('mailing').filter(m=>m.k!=='0'&&m.dis>=200).map(m=>{const d=decideMail(m,baseMil),bh=melhorHora(HM.filter(x=>x.k.split('|')[0]===m.k).map(x=>Object.assign({},x,{h:x.k.split('|')[1]})),40);return Object.assign(m,{d,mil:m.aco/m.dis*1000,bh})})
-    .sort((a,b)=>a.d.o-b.d.o||b.mil-a.mil||pc(b.at,b.dis)-pc(a.at,a.dis));
-  const Hok=H.filter(x=>x.dis>=200),pico=Hok.slice().sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis)).slice(0,3).map(x=>x.k),fraco=Hok.slice().sort((a,b)=>pc(a.at,a.dis)-pc(b.at,b.dis)).slice(0,2).map(x=>x.k);
+  const semAco=!T.aco;
+  const M=operJunta('mailing').filter(m=>m.k!=='0'&&m.dis>=200).map(m=>{const d=decideMail(m,baseMil,semAco,pc(T.at,T.dis)),bh=melhorHora(HM.filter(x=>x.k.split('|')[0]===m.k).map(x=>Object.assign({},x,{h:x.k.split('|')[1]})),40);return Object.assign(m,{d,mil:m.aco/m.dis*1000,bh})})
+    .sort((a,b)=>a.d.o-b.d.o||(semAco?0:b.mil-a.mil)||pc(b.at,b.dis)-pc(a.at,a.dis));
+  const medH=(()=>{const v=H.map(x=>x.dis).sort((a,b)=>a-b);return v.length?v[Math.floor(v.length/2)]:0})(),Hok=H.filter(x=>x.dis>=Math.max(200,medH*0.3)),pico=Hok.slice().sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis)).slice(0,Hok.length>=6?3:Hok.length>=3?1:0).map(x=>x.k),fraco=Hok.length>=5?Hok.filter(x=>!pico.includes(x.k)).sort((a,b)=>pc(a.at,a.dis)-pc(b.at,b.dis)).slice(0,2).map(x=>x.k):[];
   const nmM=m=>m.nome||('Mailing '+m.k);
   // ---- KPIs
   const ocP=EQ.login?pc(EQ.ocioso,EQ.login):0;
   const K=[['phone','#1e4e7e','Discagens',fmtN(T.dis),umDia?'no dia':dias+' dias'],['user','#16a34a','Atendidas',pf(pc(T.at,T.dis),1)+'%',fmtN(T.at)+' ligações com pessoa'],
     ['clock','#d4a937','Caixa postal',pf(pc(T.el,T.dis),0)+'%',fmtN(T.el)+' discagens'],['x','#dc2626','Não existe',pf(pc(T.ne,T.dis),0)+'%',fmtN(T.ne)+' discagens'],
-    ['ok','#0f3557','Acordos',fmtN(T.aco),pf(baseMil,1)+' a cada mil discagens'],['alert','#b45309','Equipe esperando',EQ.login?pf(ocP,0)+'%':'-','do tempo logado sem ligação']];
-  let h='<div class="od-kpis">'+K.map(k=>'<div class="od-k" style="--c:'+k[1]+'"><div class="od-kt"><span>'+k[2]+'</span><i>'+odi(k[0],16)+'</i></div><div class="od-kv">'+k[3]+'</div><div class="od-ks">'+k[4]+'</div></div>').join('')+'</div>';
+    ['ok','#0f3557','Acordos',semAco?'-':fmtN(T.aco),semAco?'não vem marcado na Fastway':pf(baseMil,1)+' a cada mil discagens'],['alert','#b45309','Equipe esperando',EQ.login?pf(ocP,0)+'%':'-','do tempo logado sem ligação']];
+  const atuz=operFilt('hora').map(x=>x.atualizado||'').filter(Boolean).sort().pop()||'';
+  let h='<div class="od-hero"><div class="od-hero-t"><div><span>'+(umDia?'Resumo do dia '+esc(datas[0]):'Resumo de '+dias+' dias')+'</span><h2>Diagnóstico geral da operação</h2></div>'+(atuz?'<div class="od-live"><i></i>Atualizado '+esc(atuz)+'</div>':'')+'</div>'+
+    '<p>De <b class="g">'+fmtN(T.dis)+' discagens</b>, só <b class="v">'+fmtN(T.at)+' ('+pf(pc(T.at,T.dis),1)+'%)</b> chegaram numa pessoa. <b class="r">'+pf(pc(T.el,T.dis),0)+'% caíram em caixa postal</b> e <b class="r">'+pf(pc(T.ne,T.dis),0)+'% eram número que não existe</b>. '+(semAco?'Os acordos ainda não aparecem aqui porque a Fastway não recebe essa marcação (vão vir do Cobmais).':'Saíram <b class="g">'+fmtN(T.aco)+' acordos</b> ('+pf(baseMil,1)+' a cada mil discagens).')+
+    (EQ.login?' A equipe passou <b>'+pf(pc(EQ.fala,EQ.login),0)+'%</b> do tempo falando, <b>'+pf(ocP,0)+'%</b> esperando ligação e <b>'+pf(pc(EQ.pausa,EQ.login),0)+'%</b> em pausa.'+(ocP>=25?' <b class="g">O gargalo é a base, não a equipe.</b>':''):'')+'</p></div>';
+  h+='<div class="od-kpis">'+K.map(k=>'<div class="od-k" style="--c:'+k[1]+'"><div class="od-kt"><span>'+k[2]+'</span><i>'+odi(k[0],16)+'</i></div><div class="od-kv">'+k[3]+'</div><div class="od-ks">'+k[4]+'</div></div>').join('')+'</div>';
   // ---- plano de acao
   const A=[];
   if(ne+ncl)A.push(['ban','Bloquear '+fmtN(ne+ncl)+' números','Imediato','#dc2626',fmtN(ne)+' não existem e '+fmtN(ncl)+' não conhecem o cliente.'+(gB?' Gastaram <b>'+fmtN(gB)+' discagens</b> '+perTxt+'.':'')+' Baixe a lista no painel de bloqueio.']);
@@ -4602,7 +4614,7 @@ function visaoOper0(){
   const ruins=M.filter(m=>m.d.o===3||m.d.o===2),bons=M.filter(m=>m.d.o===0);
   if(ruins.length)A.push(['layers','Limpar ou pausar '+ruins.length+' mailing'+(ruins.length>1?'s':''),'Hoje','#b45309',ruins.slice(0,3).map(m=>esc(nmM(m))+' ('+m.d.t+')').join(', ')+'.']);
   if(bons.length)A.push(['trend','Priorizar '+bons.slice(0,2).map(m=>esc(nmM(m))).join(' e '),'Hoje','#16a34a','São os que mais viram acordo. Deixe no discador nos horários de pico.']);
-  if(pico.length)A.push(['users','Equipe completa às '+pico.map(x=>x+'h').join(', '),'Escala','#1e4e7e','É quando mais gente atende. Lanche e pausa às '+fraco.map(x=>x+'h').join(' e ')+'.']);
+  if(pico.length)A.push(['users','Equipe completa às '+pico.map(x=>x+'h').join(', '),'Escala','#1e4e7e','É quando mais gente atende.'+(fraco.length?' Lanche e pausa às '+fraco.map(x=>x+'h').join(' e ')+'.':'')]);
   if(manual.length)A.push(['alert','Conversar sobre modo manual','Conversar','#b91c1c',manual.length+' operadora'+(manual.length>1?'s':'')+' passaram mais de 20% do tempo discando na mão: '+manual.slice(0,4).map(o=>esc(nc(o.n))).join(', ')+(manual.length>4?'…':'')+'.']);
   if(EQ.login&&ocP>=25)A.push(['clock','Faltou ligação pra equipe','Acompanhar','#64748b',pf(ocP,0)+'% do tempo esperando o discador. É base fraca, não preguiça: limpar os mailings resolve.']);
   h+='<div class="od-card od-plano">'+odHead('shield','#dc2626','O que fazer agora','Ações tiradas dos números '+perTxt+'. Clique pra marcar como feito.','<span class="od-badge">'+A.length+' ações</span>')+
@@ -4619,18 +4631,18 @@ function visaoOper0(){
     '<div class="od-mbs">'+box('#16a34a','Atendidas',fmtN(T.at))+box('#dc2626','Não existe + caixa postal',pf(pc(T.ne+T.el,T.dis),0)+'%')+'</div></div></div>';
   // ---- ranking de mailings
   const cont=v=>M.filter(m=>m.d.t===v).length;
-  h+='<div class="od-card">'+odHead('layers','#1e4e7e','Ranking e saúde dos mailings','Qual lista vira acordo e qual só queima discagem · média da casa: <b>'+pf(baseMil,1)+'</b> acordos por mil',
+  h+='<div class="od-card">'+odHead('layers','#1e4e7e','Ranking e saúde dos mailings',(semAco?'Ordenado por % que atende (média da casa: <b>'+pf(pc(T.at,T.dis),1)+'%</b>). Acordo por mailing entra quando cruzarmos com o Cobmais.':'Qual lista vira acordo e qual só queima discagem · média da casa: <b>'+pf(baseMil,1)+'</b> acordos por mil'),
       '<div class="od-busca">'+odi('search',15)+'<input id="odBuscaM" placeholder="Buscar mailing..." oninput="avd.odBusca()"></div>'+odBtn('m','all','Todos',1,'#d4a937')+odBtn('m','priorizar','Priorizar ('+cont('priorizar')+')',0,'#16a34a')+odBtn('m','manter','Manter ('+cont('manter')+')',0,'#b45309')+odBtn('m','pausar','Pausar ('+cont('pausar')+')',0,'#c2410c')+odBtn('m','limpar antes','Limpar antes ('+cont('limpar antes')+')',0,'#dc2626'),
       odInfo('Cada mailing é uma lista de devedores que entrou no discador.','<b>Acordos por mil</b> é a régua principal (quantos acordos a cada mil discagens). <b>Atendem</b> = chance de alguém atender. <b>Não existe</b> = quanto a base está suja. <b>Melhor hora</b> = quando aquela lista mais atende.','<b>Priorizar</b>: no discador no pico. <b>Manter</b>: normal. <b>Pausar</b>: muita discagem sem acordo. <b>Limpar antes</b>: pedir telefone novo ao credor ou higienizar no Cobmais.'))+
     tbw('<table class="od-tb"><tr><th>#</th><th>Mailing</th><th>Discagens</th><th>Atendem</th><th>Não existe</th><th>Acordos</th><th>Por mil</th><th>Melhor hora</th><th>Decisão</th></tr>'+
-    M.map((m,i)=>'<tr data-odf="m" data-v="'+m.d.t+'" data-n="'+esc(nmM(m).toLowerCase()+' '+m.k)+'"><td class="od-pos">'+(i+1)+'º</td><td class="nm">'+esc(nmM(m))+(m.nome?'<small>id '+esc(m.k)+'</small>':'')+'</td><td>'+fmtN(m.dis)+'</td><td><b>'+pf(pc(m.at,m.dis),1)+'%</b>'+odBar(m.at,m.dis*Math.max(.01,Math.max(...M.map(x=>pc(x.at,x.dis)))/100),'#16a34a')+'</td><td><b style="color:'+(pc(m.ne,m.dis)>=15?'#dc2626':'inherit')+'">'+pf(pc(m.ne,m.dis),1)+'%</b>'+odBar(m.ne,m.dis*.3,'#dc2626')+'</td><td><b>'+fmtN(m.aco)+'</b></td><td><b>'+pf(m.mil,1)+'</b></td><td>'+(m.bh?esc(m.bh.h)+'h <small>'+pf(pc(m.bh.at,m.bh.dis),1)+'%</small>':'-')+'</td><td class="od-dec">'+pill(m.d.t,m.d.bg,m.d.c)+'<small>'+esc(m.d.p)+'</small></td></tr>').join('')+'</table>')+
+    M.map((m,i)=>'<tr data-odf="m" data-v="'+m.d.t+'" data-n="'+esc(nmM(m).toLowerCase()+' '+m.k)+'"><td class="od-pos">'+(i+1)+'º</td><td class="nm">'+esc(nmM(m))+(m.nome?'<small>id '+esc(m.k)+'</small>':'')+'</td><td>'+fmtN(m.dis)+'</td><td><b>'+pf(pc(m.at,m.dis),1)+'%</b>'+odBar(m.at,m.dis*Math.max(.01,Math.max(...M.map(x=>pc(x.at,x.dis)))/100),'#16a34a')+'</td><td><b style="color:'+(pc(m.ne,m.dis)>=15?'#dc2626':'inherit')+'">'+pf(pc(m.ne,m.dis),1)+'%</b>'+odBar(m.ne,m.dis*.3,'#dc2626')+'</td>'+(semAco?'<td>-</td><td>-</td>':'<td><b>'+fmtN(m.aco)+'</b></td><td><b>'+pf(m.mil,1)+'</b></td>')+'<td>'+(m.bh?esc(m.bh.h)+'h <small>'+pf(pc(m.bh.at,m.bh.dis),1)+'%</small>':'-')+'</td><td class="od-dec">'+pill(m.d.t,m.d.bg,m.d.c)+'<small>'+esc(m.d.p)+'</small></td></tr>').join('')+'</table>')+
     (M.some(m=>!m.nome)?'<div class="od-nota">A Fastway só manda o número do mailing. Pra aparecer o nome, coloque no config.json do robô: <b>"MAILING_NOMES": {"3758": "Nome da carteira"}</b>.</div>':'')+'</div>';
   // ---- horario + DDD
   const D=operJunta('ddd').filter(x=>x.dis>=300).sort((a,b)=>b.dis-a.dis),topD=D.slice(0,10).map(x=>x.k),horas=H.map(x=>x.k),mxH=Math.max(1,...H.map(x=>pc(x.at,x.dis)));
   const pk=Hok.slice().sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis))[0];
   h+='<div class="od-g2"><div class="od-card">'+odHead('trend','#1e4e7e','Atendimento por horário','% das discagens que chegaram numa pessoa, hora a hora','',odInfo('Mostra em que hora do dia as pessoas mais atendem.','Cada ponto é uma hora. Os pontos <b style="color:#b8901f">dourados</b> são os 3 horários de pico. Passe o mouse no ponto pra ver os números. Horas com menos de 200 discagens ficam fora pra não distorcer.','Equipe completa nos picos; lanche e pausa nas horas fracas.'))+
     odLinha(Hok.map(x=>({k:x.k,y:pc(x.at,x.dis),dis:x.dis,aco:x.aco})),pico)+
-    (pk?'<div class="od-call">'+odi('alert',16)+'<span><b>Pico às '+pk.k+'h:</b> '+pf(pc(pk.at,pk.dis),1)+'% atendem. Equipe completa às '+pico.map(x=>x+'h').join(', ')+'; pausa às '+fraco.map(x=>x+'h').join(' e ')+'.</span></div>':'')+'</div>'+
+    (pk&&Hok.length<3?'<div class="od-call">'+odi('alert',16)+'<span><b>Ainda é cedo pra apontar o pico:</b> só '+Hok.length+' hora'+(Hok.length>1?'s':'')+' com volume de verdade. Depois das 11h o gráfico já mostra a tendência do dia.</span></div>':pk?'<div class="od-call">'+odi('alert',16)+'<span><b>Pico às '+pk.k+'h:</b> '+pf(pc(pk.at,pk.dis),1)+'% atendem. Equipe completa às '+pico.map(x=>x+'h').join(', ')+(fraco.length?'; pausa às '+fraco.map(x=>x+'h').join(' e '):'')+'.'+(Hok.length<5?' Com poucas horas no dia, esse pico ainda pode mudar.':'')+'</span></div>':'')+'</div>'+
     '<div class="od-card">'+odHead('pin','#16a34a','Desempenho por DDD / região','Onde mais atende e onde a base está mais suja','',odInfo('Resultado das discagens agrupado pelo DDD do telefone.','<b>Atendem</b> = chance de alguém atender. <b>Não existe</b> = base suja naquela região. <b>Melhor hora</b> = quando aquele DDD mais atende.','Se um DDD só atende num horário, peça pra Fastway programar aquela região naquela faixa.'))+
     (D.length?'<div class="od-ddds">'+D.slice(0,15).map(x=>{const bh=melhorHora(HD.filter(y=>y.k.split('|')[0]===x.k).map(y=>Object.assign({},y,{h:y.k.split('|')[1]})),30);
       return '<div class="od-ddd"><div><b>'+esc(dddNome(x.k))+'</b><small>'+fmtN(x.dis)+' discagens'+(bh?' · melhor às <b>'+esc(bh.h)+'h</b> ('+pf(pc(bh.at,bh.dis),1)+'%)':'')+'</small></div><div class="od-dn"><span style="color:#16a34a">'+pf(pc(x.at,x.dis),1)+'%<small>atendem</small></span><span style="color:'+(pc(x.ne,x.dis)>=15?'#dc2626':'#64748b')+'">'+pf(pc(x.ne,x.dis),0)+'%<small>não existe</small></span></div></div>'}).join('')+'</div>'
@@ -6394,7 +6406,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261023-1800',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261026-1030',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
