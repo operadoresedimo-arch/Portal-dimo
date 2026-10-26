@@ -3277,7 +3277,7 @@ function renderR(data){
   // cabecalho (date-header: o historico coloca os botoes Hoje / Escolher dia aqui dentro)
   h+='<div class="nx-head date-header"><div class="nx-head-l"><div class="nx-tt"><h2>Acordos do Dia</h2><span class="nx-live'+(hist?' hist':'')+'"><i></i>'+(hist?'Histórico':'Ao vivo')+' · '+esc(date||new Date().toLocaleDateString('pt-BR'))+'</span></div>'+
      '<p>Édimo Debarba Junior <b>·</b> Última sincronização às <strong>'+agora+'</strong></p></div>'+
-     '<div class="nx-busca"><input id="nxBusca" type="search" placeholder="Buscar operador..." value="'+esc(window.NXB||'')+'" oninput="nxBusca(this.value)"></div></div>';
+     (window.MODO?window.MODO.widget('acordos'):'')+'<div class="nx-busca"><input id="nxBusca" type="search" placeholder="Buscar operador..." value="'+esc(window.NXB||'')+'" oninput="nxBusca(this.value)"></div></div>';
   // indicadores
   h+='<div class="nx-kpis">';
   h+='<div class="nx-kpi k-g"><div class="nx-kh"><span>Acordos totais</span><i class="nx-ic">📋</i></div><div class="nx-kv">'+ta+'</div><p>Acordos fechados '+(hist?'no dia':'hoje')+'</p></div>';
@@ -4529,7 +4529,7 @@ function diagMail(m){const at=pc(m.at,m.dis),ne=pc(m.ne,m.dis);
   if(at>=4||m.aco>=3)return '<span class="avd-pl" style="background:#dcfce7;color:#15803d">mailing bom</span>';
   return '<span class="avd-pl" style="background:#fef3c7;color:#b45309">médio</span>'}
 function operOps(){const m={};operFilt('operadores').forEach(x=>(x.dados||[]).forEach(o=>{const t=m[o.k]=m[o.k]||{k:o.k,n:o.n,g:o.g,ini:o.ini,fim:o.fim,dias:0,pausas:{}};t.dias++;
-  ['login','fala','ocioso','pausa','manual','bloqueio'].forEach(c=>t[c]=(t[c]||0)+(o[c]||0));if(o.ini&&o.ini<t.ini)t.ini=o.ini;if(o.fim&&o.fim>t.fim)t.fim=o.fim;
+  ['login','fala','ocioso','pausa','manual','manual_lib','bloqueio'].forEach(c=>t[c]=(t[c]||0)+(o[c]||0));if(o.ini&&o.ini<t.ini)t.ini=o.ini;if(o.fim&&o.fim>t.fim)t.fim=o.fim;
   (o.pausas||[]).forEach(p=>{const q=t.pausas[p.k]=t.pausas[p.k]||{q:0,s:0};q.q+=p.q;q.s+=p.s})}));return Object.values(m)}
 let BLOQ=[],PAUSA=[];
 const UF_DDD={11:'SP',12:'SP',13:'SP',14:'SP',15:'SP',16:'SP',17:'SP',18:'SP',19:'SP',21:'RJ',22:'RJ',24:'RJ',27:'ES',28:'ES',31:'MG',32:'MG',33:'MG',34:'MG',35:'MG',37:'MG',38:'MG',41:'PR',42:'PR',43:'PR',44:'PR',45:'PR',46:'PR',47:'SC',48:'SC',49:'SC',51:'RS',53:'RS',54:'RS',55:'RS',61:'DF',62:'GO',64:'GO',63:'TO',65:'MT',66:'MT',67:'MS',68:'AC',69:'RO',71:'BA',73:'BA',74:'BA',75:'BA',77:'BA',79:'SE',81:'PE',87:'PE',82:'AL',83:'PB',84:'RN',85:'CE',88:'CE',86:'PI',89:'PI',91:'PA',93:'PA',94:'PA',92:'AM',97:'AM',95:'RR',96:'AP',98:'MA',99:'MA'};
@@ -4601,8 +4601,9 @@ function visaoOper0(){
   const H=operJunta('hora').sort((a,b)=>a.k.localeCompare(b.k)),T=H.reduce((s,x)=>{['dis','at','ne','el','mu','na','op','aco','custo'].forEach(c=>s[c]=(s[c]||0)+(x[c]||0));return s},{});
   if(!T.dis)return '<div class="avd-card"><div class="avd-empty">Sem dados da operação nesse período. Troque o filtro de data lá em cima.</div></div>';
   const datas=[...new Set(operFilt('hora').map(x=>x.data))],dias=datas.length,umDia=dias===1,perTxt=umDia?'no dia':'nos '+dias+' dias do filtro',chaveDia=datas.sort().join(',');
-  const O=operOps().sort((a,b)=>pc(b.manual,b.login)-pc(a.manual,a.login)),EQ=O.reduce((s,o)=>{['login','fala','ocioso','pausa','manual'].forEach(c=>s[c]=(s[c]||0)+(o[c]||0));return s},{});
-  const prosp=o=>/prospec/i.test(o.g||''),manual=O.filter(o=>!prosp(o)&&pc(o.manual,o.login)>20);
+  const mEf=o=>Math.max(0,(o.manual||0)-(o.manual_lib||0));   // manual que conta: tira o tempo em que o admin liberou o MANUAL (retrabalho de ficha)
+  const O=operOps().sort((a,b)=>pc(mEf(b),b.login)-pc(mEf(a),a.login)),EQ=O.reduce((s,o)=>{['login','fala','ocioso','pausa','manual'].forEach(c=>s[c]=(s[c]||0)+(o[c]||0));return s},{});
+  const prosp=o=>/prospec/i.test(o.g||''),manual=O.filter(o=>!prosp(o)&&pc(mEf(o),o.login)>20);
   const RU=operFilt('ruins'),mb={},mp={};let ne=0,ncl=0,el=0,gB=0,gP=0,novo=false;
   RU.forEach(x=>{const d=x.dados||{};if(d.v>=2)novo=true;ne+=d.ne||0;ncl+=d.nc||0;el+=d.el||0;gB+=d.gastoBloq||0;gP+=d.gastoPausa||0;
     (d.top||[]).forEach(t=>{const tipo=t.tipo||(t.ne?'ne':'el');const alvo=tipo==='el'?mp:mb;const y=alvo[t.f]=alvo[t.f]||{f:t.f,t:0,tipo,el:0};y.t+=t.t;y.el=Math.max(y.el,t.el||0)});
@@ -4676,19 +4677,22 @@ function visaoOper0(){
     '<div class="od-big3"><div style="--c:#dc2626"><b>'+fmtN(ne)+'</b>não existem</div><div style="--c:#b91c1c"><b>'+fmtN(ncl)+'</b>não conhecem o cliente'+(novo?'':'<small>aparece na próxima coleta</small>')+'</div><div style="--c:#c2410c"><b>'+fmtN(el)+'</b>caixa postal 3x+</div></div>'+
     tbw('<table class="od-tb"><tr><th>Telefone</th><th>Tentativas '+(umDia?'hoje':'no período')+'</th><th>Motivo</th><th>Ação</th></tr>'+BLOQ.slice(0,6).concat(PAUSA.slice(0,6)).map(x=>'<tr><td class="nm">'+esc(x.f)+'</td><td>'+x.t+'</td><td>'+motivoTxt(x)+'</td><td>'+(x.tipo==='el'?pill('pausar 7 dias','#ffedd5','#c2410c'):pill('bloquear de vez','#fee2e2','#b91c1c'))+'</td></tr>').join('')+'</table>')+'</div>';
   // ---- equipe
-  const alerta=o=>{const al=[];if(!prosp(o)&&pc(o.manual,o.login)>20)al.push(['discando na mão','#b91c1c','manual']);if(pc(o.ocioso,o.login)>40)al.push(['faltando ligação','#64748b','ocioso']);if(pc(o.pausa,o.login)>15)al.push(['pausa alta','#b45309','pausa']);if(o.bloqueio>600)al.push(['bloqueio','#b91c1c','bloq']);return al};
+  const alerta=o=>{const al=[];if(!prosp(o)&&pc(mEf(o),o.login)>20)al.push(['discando na mão','#b91c1c','manual']);if(pc(o.ocioso,o.login)>40)al.push(['faltando ligação','#64748b','ocioso']);if(pc(o.pausa,o.login)>15)al.push(['pausa alta','#b45309','pausa']);if(o.bloqueio>600)al.push(['bloqueio','#b91c1c','bloq']);return al};
   const nAl=O.filter(o=>alerta(o).length).length;
   h+='<div class="od-card">'+odHead('users','#d4a937','Tempo das operadoras','Barra = como cada uma usou o tempo logado'+(manual.length?' · <span class="od-badge" style="margin-left:4px">'+manual.length+' discando na mão</span>':''),
-      odBtn('o','all','Todas ('+O.length+')',1,'#d4a937')+odBtn('o','alerta','Em alerta ('+nAl+')',0,'#dc2626')+odBtn('o','ok','Regular ('+(O.length-nAl)+')',0,'#16a34a'),
-      odInfo('Como cada operadora usou o tempo em que esteve logada no discador.','Barra: <b style="color:#16a34a">verde</b> falando, <b style="color:#b8901f">dourado</b> esperando ligação, <b style="color:#b91c1c">vermelho</b> manual, <b style="color:#64748b">cinza</b> pausa. Passe o mouse na linha pra ver cada pausa.','"Faltando ligação" (40%+ esperando) não é culpa dela: é base fraca. "Discando na mão" (fora da Prospecção) e "pausa alta" valem conversa.'))+
-    '<div class="od-leg"><span><i style="background:#16a34a"></i>Falando</span><span><i style="background:#d4a937"></i>Esperando</span><span><i style="background:#b91c1c"></i>Manual</span><span><i style="background:#8a8d92"></i>Pausa</span></div>'+
+      (umDia&&datas[0]===new Date().toLocaleDateString('pt-BR')&&window.MODO?window.MODO.widget('oper'):'')+odBtn('o','all','Todas ('+O.length+')',1,'#d4a937')+odBtn('o','alerta','Em alerta ('+nAl+')',0,'#dc2626')+odBtn('o','ok','Regular ('+(O.length-nAl)+')',0,'#16a34a'),
+      odInfo('Como cada operadora usou o tempo em que esteve logada no discador.','Barra: <b style="color:#16a34a">verde</b> falando, <b style="color:#b8901f">dourado</b> esperando ligação, <b style="color:#b91c1c">vermelho</b> manual, <b style="color:#64748b">cinza</b> pausa. Passe o mouse na linha pra ver cada pausa.','"Faltando ligação" (40%+ esperando) não é culpa dela: é base fraca. "Discando na mão" (fora da Prospecção) e "pausa alta" valem conversa. Quando for retrabalhar ficha, troque o discador pra <b>Manual</b> no botão acima: o manual desse período fica em <b style="color:#a86a6a">rosa</b> (liberado) e não gera alerta.'))+
+    (()=>{const lib=O.reduce((s2,o)=>s2+(o.manual_lib||0),0),hoje=umDia&&datas[0]===new Date().toLocaleDateString('pt-BR'),F=hoje&&window.MODO?window.MODO.faixasHoje():[],hh=window.MODO?window.MODO.hhmm:()=>'';
+      if(!lib&&!F.length)return '';
+      return '<div class="od-md">'+odi('alert',16)+'<span><b>Modo manual liberado'+(F.length?' hoje: '+F.map(f=>hh(f[0])+(isFinite(f[1])&&f[1]<Date.now()?' às '+hh(f[1]):' até agora')).join(', '):'')+'.</b> O manual feito nesse período é retrabalho de ficha e <b>não conta</b> como "discando na mão"'+(lib?' (equipe somada: '+hm(lib)+' liberado).':'. Entra no cálculo na próxima rodada do robô.')+'</span></div>'})()+
+    '<div class="od-leg"><span><i style="background:#16a34a"></i>Falando</span><span><i style="background:#d4a937"></i>Esperando</span><span><i style="background:#b91c1c"></i>Manual</span><span><i style="background:#d9a5a5"></i>Manual liberado</span><span><i style="background:#8a8d92"></i>Pausa</span></div>'+
     tbw('<table class="od-tb od-eq"><tr><th>Operadora</th><th>Turno</th><th>Logada</th><th style="min-width:300px">Uso do tempo</th>'+(umDia?'<th>Entrou · Saiu</th>':'<th>Dias</th>')+'<th>Situação</th></tr>'+
     O.map(o=>{const al=alerta(o),tip=Object.keys(o.pausas).map(k=>k+': '+o.pausas[k].q+'x, '+hm(o.pausas[k].s)).join('\n'),L=o.login||1,seg=(v,c,n)=>v>0?'<i style="width:'+pc(v,L).toFixed(1)+'%;background:'+c+'" title="'+n+': '+pf(pc(v,L),0)+'%"></i>':'';
       const tur=/prospec/i.test(o.g)?'Prospecção':/manh/i.test(o.g)?'Manhã':/tard/i.test(o.g)?'Tarde':/novat/i.test(o.g)?'Novatos':esc(o.g||'-');
       const st=al.length?al.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+a[0]+'</span>').join(''):'<span class="od-st" style="--c:#16a34a">'+odi('ok',12)+'regular</span>';
       return '<tr data-odf="o" data-v="'+(al.length?'alerta':'ok')+'" title="'+esc(tip)+'"><td class="nm"><span class="od-ui">'+odi('users',15)+'</span>'+esc(nc(o.n))+'</td><td>'+tur+'</td><td><b>'+hm(o.login)+'</b></td>'+
-        '<td><div class="od-stack">'+seg(o.fala,'#16a34a','Falando')+seg(o.ocioso,'#d4a937','Esperando')+seg(o.manual,'#b91c1c','Manual')+seg(o.pausa,'#8a8d92','Pausa')+'</div>'+
-        '<div class="od-stl"><span style="color:#16a34a">'+pf(pc(o.fala,L),0)+'% falando</span><span style="color:#b8901f">'+pf(pc(o.ocioso,L),0)+'% esperando</span><span style="color:#b91c1c">'+pf(pc(o.manual,L),0)+'% manual</span><span style="color:#6b6e73">'+pf(pc(o.pausa,L),0)+'% pausa</span></div></td>'+
+        '<td><div class="od-stack">'+seg(o.fala,'#16a34a','Falando')+seg(o.ocioso,'#d4a937','Esperando')+seg(mEf(o),'#b91c1c','Manual')+seg(o.manual_lib||0,'#d9a5a5','Manual liberado (retrabalho)')+seg(o.pausa,'#8a8d92','Pausa')+'</div>'+
+        '<div class="od-stl"><span style="color:#16a34a">'+pf(pc(o.fala,L),0)+'% falando</span><span style="color:#b8901f">'+pf(pc(o.ocioso,L),0)+'% esperando</span><span style="color:#b91c1c">'+pf(pc(mEf(o),L),0)+'% manual'+(o.manual_lib>=60?' <small style="color:#a86a6a">+'+pf(pc(o.manual_lib,L),0)+'% liberado</small>':'')+'</span><span style="color:#6b6e73">'+pf(pc(o.pausa,L),0)+'% pausa</span></div></td>'+
         (umDia?'<td>'+esc(String(o.ini).slice(0,5))+' · '+esc(String(o.fim).slice(0,5))+'</td>':'<td>'+o.dias+'</td>')+'<td class="od-sts">'+st+'</td></tr>'}).join('')+'</table>')+'</div>';
   // ---- rotas + operadora do telefone
   const R=operJunta('tronco').filter(r=>r.dis>=50).sort((a,b)=>b.dis-a.dis),C=operJunta('carrier').filter(r=>r.dis>=300).sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis));
@@ -5598,6 +5602,88 @@ window.MQ_abre=function(i){ABR[i]=!ABR[i];render()};
 window.MQ_ouvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(fr){fr.remove();b.textContent='\u25B6 Ouvir a liga\u00E7\u00E3o';return}fr=document.createElement('iframe');fr.src=b.getAttribute('data-src');fr.allow='autoplay';w.appendChild(fr);b.textContent='\u25A0 Fechar \u00E1udio'};
 })();
 </script>
+<script id="edimo-modo">
+/* ===== MODO DO DISCADOR (Manual / Preview / Power) =====
+   O admin troca no Acordos do Dia ou no Tempo das operadoras (Avaliação de Discagem).
+   Vale até o fim do turno (14h / 20h) e depois volta pro horário: manhã 08-09 PREVIEW, 09-14 POWER | tarde 14-15 PREVIEW, 15-20 POWER.
+   Fica salvo na planilha da monitoria (aba "Modo"): a TV, o robô e o painel enxergam o mesmo modo. */
+(function(){
+const API_M='https://script.google.com/macros/s/AKfycbyUX25htVlM8Fs0voi7QK3QzAlF15jYgtzehFG-oUlbP4w0S4efX_Pc7UlrAa0p1_IU/exec';
+const NOME={manual:'Manual',preview:'Preview',power:'Power'},DESC={manual:'retrabalho de ficha',preview:'conferência dos acordos',power:'discador automático'};
+let EST=null;try{EST=JSON.parse(localStorage.getItem('modo_disc')||'null')}catch(e){}
+const esc_=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hhmm=ms=>{const d=new Date(ms);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+function pelaHora(t){if(t>=480&&t<540)return'preview';if(t>=540&&t<840)return'power';if(t>=840&&t<900)return'preview';if(t>=900&&t<1200)return'power';return'fora'}
+function atual(){const d=new Date(),t=d.getHours()*60+d.getMinutes();
+  if(EST&&EST.modo&&EST.modo!=='auto'&&EST.ate&&Date.now()<EST.ate)return{id:EST.modo,trocado:true,por:EST.por||'',desde:EST.desde||0,ate:EST.ate};
+  return{id:pelaHora(t),trocado:false}}
+const ouvintes=[];
+function avisa(){document.querySelectorAll('.md-sw').forEach(el=>{el.outerHTML=widget(el.getAttribute('data-ctx'))});ouvintes.forEach(f=>{try{f()}catch(e){}})}
+function guarda(j){EST={modo:j.modo,por:j.por,desde:j.desde,ate:j.ate,log:j.log||[]};try{localStorage.setItem('modo_disc',JSON.stringify(EST))}catch(e){}}
+let antes='';
+function ler(){return fetch(API_M+'?acao=modo&t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{if(!j||!j.ok)return;guarda(j);const k=JSON.stringify([j.modo,j.ate,(j.log||[]).length]);if(k!==antes){antes=k;avisa()}}).catch(()=>{})}
+function admin(){return typeof isA==='function'&&isA()}
+function trocar(m){
+  if(!admin())return;
+  const a=atual();if(a.trocado&&a.id===m)m='auto';                 // clicar de novo no que já está escolhido volta pro horário
+  let k=localStorage.getItem('avd_chave')||'';
+  if(!k){k=prompt('Senha da monitoria (a mesma da aba Avaliação de Discagem):')||'';if(!k)return;localStorage.setItem('avd_chave',k)}
+  const por=(typeof cU!=='undefined'&&cU&&cU.nome)||'';
+  // muda na tela na hora; a planilha confirma logo depois
+  const t=new Date(),min=t.getHours()*60+t.getMinutes(),fim=min<840?840:min<1200?1200:1439,log=(EST&&EST.log)||[];
+  EST=m==='auto'?{modo:'auto',log:log}:{modo:m,por:por,desde:Date.now(),ate:Date.now()+(fim-min)*60000-t.getSeconds()*1000,log:log};avisa();
+  fetch(API_M+'?acao=modo_set&modo='+m+'&por='+encodeURIComponent(por)+'&chave='+encodeURIComponent(k)+'&t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(j=>{
+    if(!j||!j.ok){if(/chave/.test((j&&j.erro)||''))localStorage.removeItem('avd_chave');alert('Não consegui trocar o modo: '+((j&&j.erro)||'sem resposta')+'.\nSe for a primeira vez, publique a nova versão do Apps Script da monitoria.');return ler()}
+    guarda(j);antes=JSON.stringify([j.modo,j.ate,(j.log||[]).length]);avisa()}).catch(()=>{alert('Sem conexão com a planilha. Tente de novo.');ler()})}
+function status(a){
+  if(a.trocado)return (a.por?esc_(String(a.por).split(' ')[0])+' trocou':'Trocado')+' às '+hhmm(a.desde)+' · volta ao horário às '+hhmm(a.ate)+(admin()?' · <a onclick="MODO.trocar(\'auto\')">voltar agora</a>':'');
+  return a.id==='fora'?'Fora do horário de cobrança':'Pelo horário do turno';
+}
+function widget(ctx){
+  const a=atual();
+  if(!admin())return '<div class="md-sw ro" data-ctx="'+esc_(ctx||'')+'"><span class="md-lb">Discador</span><span class="md-chip m-'+a.id+'"><i></i>'+(NOME[a.id]||'Fora do horário')+'</span></div>';
+  return '<div class="md-sw" data-ctx="'+esc_(ctx||'')+'"><div class="md-top"><span class="md-lb">Discador</span><div class="md-seg">'+
+    ['manual','preview','power'].map(m=>'<button class="m-'+m+(a.id===m?' on':'')+'" title="'+DESC[m]+'" onclick="MODO.trocar(\''+m+'\')"><i></i>'+NOME[m]+'</button>').join('')+
+    '</div></div><small class="md-st">'+status(a)+'</small></div>';
+}
+// periodos em MANUAL hoje (pro painel avisar que o manual foi liberado)
+function faixasHoje(){const L=((EST&&EST.log)||[]).slice().sort((x,y)=>x.ts-y.ts),out=[];
+  L.forEach((x,i)=>{if(x.modo!=='manual')return;const fim=Math.min(L[i+1]?L[i+1].ts:Infinity,x.ate||Infinity);out.push([x.ts,fim])});return out}
+window.MODO={atual,widget,trocar,ler,faixasHoje,nome:id=>NOME[id]||'',desc:id=>DESC[id]||'',ouvir:f=>ouvintes.push(f),hhmm};
+ler();setInterval(ler,60000);
+let virou='';setInterval(()=>{const k=JSON.stringify(atual());if(k!==virou){virou=k;avisa()}},30000);   // virou o turno: volta pro horario sozinho
+})();
+</script>
+<style>
+.md-sw{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.md-top{display:flex;align-items:center;gap:8px}
+.md-lb{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#6b6e73}
+.md-seg{display:inline-flex;background:#f4f1ea;border:1px solid #e6dfcf;border-radius:10px;padding:3px;gap:2px}
+.md-seg button{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:#484a4e;font:inherit;font-size:.85rem;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s}
+.md-seg button:hover{background:#fff}
+.md-seg button i,.md-chip i{width:8px;height:8px;border-radius:50%;background:#b8bbc0;display:inline-block}
+.md-seg button.m-manual i,.md-chip.m-manual i{background:#b91c1c}.md-seg button.m-preview i,.md-chip.m-preview i{background:#D4A937}.md-seg button.m-power i,.md-chip.m-power i{background:#16a34a}
+.md-seg button.on{background:#D4A937;color:#2f3135;box-shadow:0 1px 3px rgba(72,74,78,.25)}
+.md-seg button.on.m-preview i{background:#fff}
+.md-seg button.on.m-manual{background:#484a4e;color:#fff}
+.md-seg button.on.m-manual i{background:#f87171}
+.md-st{font-size:.75rem;color:#6b6e73}.md-st a{color:#8a6d12;font-weight:700;cursor:pointer;text-decoration:underline}
+.md-chip{display:inline-flex;align-items:center;gap:6px;background:#f4f1ea;border:1px solid #e6dfcf;color:#484a4e;font-size:.82rem;font-weight:800;padding:4px 10px;border-radius:20px}
+.md-sw.ro{flex-direction:row;align-items:center;gap:8px}
+.od-hr .md-sw{margin-right:10px}
+.od-md{display:flex;align-items:flex-start;gap:8px;background:#f4f1ea;border:1px solid #e6dfcf;border-left:4px solid #484a4e;border-radius:10px;padding:9px 12px;margin:0 0 12px;font-size:.88rem;color:#2f3135}
+.od-md svg{flex-shrink:0;margin-top:2px;color:#b8901f}
+/* TV */
+.tv-hd-md{display:flex;flex-direction:column;border-left:1px solid #334155;padding-left:20px}
+.tv-hd-md small{font-size:.85rem;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.tv-hd-md b{font-size:1.7rem;font-weight:900;display:flex;align-items:center;gap:10px;line-height:1.1}
+.tv-hd-md b i{width:12px;height:12px;border-radius:50%;background:#64748b}
+.tv-hd-md em{font-style:normal;font-size:.8rem;color:#94a3b8;font-weight:700}
+.tv-hd-md.m-power b{color:#34d399}.tv-hd-md.m-power b i{background:#10b981;animation:tvping 1.6s infinite}
+.tv-hd-md.m-preview b{color:#f5b91f}.tv-hd-md.m-preview b i{background:#f5b91f}
+.tv-hd-md.m-manual b{color:#f87171}.tv-hd-md.m-manual b i{background:#ef4444;animation:tvping 1.6s infinite}
+#pageTV .tv-hd-md b i{border-radius:50%!important}
+</style>
 <script id="edimo-tv">
 /* ===== RANKING TV + ALERTA DE RITMO (aba so do admin) =====
    Meta: 4 acordos por operador em 5h40 de trabalho, contando da ENTRADA no ponto.
@@ -5614,11 +5700,11 @@ const agoraMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.g
 const fR=v=>'R$ '+Math.round(v||0).toLocaleString('pt-BR');
 const ini=n=>{const p=String(n||'').split(' ').filter(Boolean);return((p[0]||'?')[0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase()};
 function modo(t){
-  if(t>=480&&t<540)return{id:'preview',turno:'manha',txt:'MODO PREVIEW · Manhã (conferência dos acordos)'};
-  if(t>=540&&t<840)return{id:'power',turno:'manha',txt:'MODO POWER · Manhã'};
-  if(t>=840&&t<900)return{id:'preview',turno:'tarde',txt:'MODO PREVIEW · Tarde (conferência dos acordos)'};
-  if(t>=900&&t<1200)return{id:'power',turno:'tarde',txt:'MODO POWER · Tarde'};
-  return{id:'fora',turno:null,txt:'Fora do horário de cobrança'};
+  // o modo vem do botao do admin (MODO); sem troca, segue o horario: PREVIEW 08-09 e 14-15, POWER 09-14 e 15-20
+  const tur=t>=480&&t<840?'manha':t>=840&&t<1200?'tarde':null;
+  if(!tur)return{id:'fora',turno:null,txt:'Fora do horário de cobrança'};
+  const a=window.MODO?window.MODO.atual():{id:(t>=480&&t<540)||(t>=840&&t<900)?'preview':'power'},id=a.id==='fora'?'power':a.id;
+  return{id,turno:tur,trocado:!!a.trocado,txt:'MODO '+id.toUpperCase()+' · '+(tur==='manha'?'Manhã':'Tarde')+(id==='manual'?' (retrabalho de ficha)':id==='preview'?' (conferência dos acordos)':'')};
 }
 function loginDe(n){try{const k=Object.keys(allLogins||{}).find(x=>mesmaPessoa(n,x));return k?String(allLogins[k]||''):''}catch(e){return ''}}
 // monta o ritmo de cada turno
@@ -5794,7 +5880,8 @@ function render(){
   // ===== layout "wallboard" (modelo aprovado pelo Jonathan) =====
   const I=TVI,dataTxt=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).toUpperCase();
   const turnoTxt=R.m.turno==='manha'?'MANHÃ':R.m.turno==='tarde'?'TARDE':'FORA DO HORÁRIO';
-  h+='<div class="tv-alerta tv-hd"><div class="tv-hd-l"><span class="tv-live'+(R.m.id==='power'?'':' off')+'"><i></i>'+(R.m.id==='power'?'AO VIVO':R.m.id==='preview'?'PRÉVIA':'PAUSA')+'</span><div class="tv-hd-tu"><small>Turno atual</small><b>'+turnoTxt+'</b></div></div>';
+  h+='<div class="tv-alerta tv-hd"><div class="tv-hd-l"><span class="tv-live'+(R.m.id==='power'?'':' off')+'"><i></i>'+(R.m.id==='power'?'AO VIVO':R.m.id==='preview'?'PRÉVIA':R.m.id==='manual'?'MANUAL':'PAUSA')+'</span><div class="tv-hd-tu"><small>Turno atual</small><b>'+turnoTxt+'</b></div>'+
+     (R.m.turno?'<div class="tv-hd-md m-'+R.m.id+'"><small>Discador</small><b><i></i>'+R.m.id.toUpperCase()+'</b><em>'+(R.m.id==='manual'?'retrabalho de ficha':R.m.id==='preview'?'conferência dos acordos':'discador automático')+'</em></div>':'')+'</div>';
   h+=niv?'<div class="tv-al-txt tv-al-big">'+(niv.id==='ok'?'NO RITMO':niv.nome)+'</div>':'<div class="tv-hd-pl">'+I.planilha+statusPlanilha()+'</div>';
   h+='<div class="tv-hd-r"><div class="tv-clk"><b id="tvRelogio">'+new Date().toLocaleTimeString('pt-BR')+'</b><small>'+dataTxt+'</small></div>'+
      '<div class="tv-btns"><button title="Som" onclick="tvSom()">'+(somOn?I.som:I.mudo)+'</button><button title="Tela cheia" onclick="tvTela()">'+I.cheia+'</button></div></div></div>';
@@ -5841,7 +5928,7 @@ window.tvTela=function(){ac();if(document.fullscreenElement){document.exitFullsc
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)tvFullOff()});
 window.tvTeste=function(n){tocar(n);flash(n);alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300)};   // no Console: tvTeste('baixo'|'muito'|'extremo')
 setInterval(()=>{const c=document.getElementById('tvRelogio');if(c)c.textContent=new Date().toLocaleTimeString('pt-BR')},1000);
-setInterval(render,30000);(function vira(){setTimeout(()=>{render();vira()},300000-Date.now()%300000+500)})();setInterval(()=>atualizarDadosTV(false),5*60000);
+setInterval(render,30000);if(window.MODO)window.MODO.ouvir(()=>{render()});(function vira(){setTimeout(()=>{render();vira()},300000-Date.now()%300000+500)})();setInterval(()=>atualizarDadosTV(false),5*60000);
 setInterval(()=>{const ok=typeof isA==='function'&&isA();const s=$('sbTV');if(s)s.style.display=ok?'flex':'none'},1000);
 const sp=window.showPage;
 window.showPage=function(p){sp(p);const pg=$('pageTV'),sb=$('sbTV');if(pg)pg.classList.toggle('active',p==='tv');if(sb)sb.classList.toggle('active',p==='tv');
