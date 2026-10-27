@@ -4293,7 +4293,7 @@ function filtrosHTML(){return '<div class="avd-fil"><select id="avdPer" onchange
 function telaSenha(msg){root().innerHTML=cabec()+'<div class="avd-login"><div class="avd-ic">🔐</div><h3>Área do supervisor</h3><p>Digite a senha da avaliação de discagem</p><input class="avd-in" type="password" id="avdSenha" placeholder="Senha" onkeydown="if(event.key===\'Enter\')avd.entrar()"><button class="avd-btn" onclick="avd.entrar()">Entrar</button><p style="color:#ef4444;margin-top:10px">'+(msg||'')+'</p></div>'}
 
 async function carregar(forcar){
-  if(typeof isA==='function'&&!isA()){root().innerHTML='<div class="avd-empty">Área restrita ao administrador.</div>';return}
+  if(window.pode?!pode('avaliacao'):(typeof isA==='function'&&!isA())){root().innerHTML='<div class="avd-empty">Área restrita.</div>';return}
   if(DADOS&&!forcar&&Date.now()-TS<60000){OP?detalhe(encodeURIComponent(OP)):render();return}
   if(API.indexOf('COLE')===0){DEMO_MODE=true;DADOS=DEMO.map(l=>Object.assign({},l));render();return}
   if(!CHAVE){telaSenha();return}
@@ -4963,7 +4963,7 @@ async function eqBusca(dia){if(EQ.busy||!CHAVE)return;EQ.busy=true;
   catch(e){}finally{EQ.busy=false}
   const w=document.getElementById('eqWrap');if(w)w.innerHTML=eqHTML(dia)}
 function eqHTML(dia){
-  if(!(typeof isA==='function'&&isA()))return '';
+  if(!(window.pode?pode('equipe'):(typeof isA==='function'&&isA())))return '';
   dia=/^\d{2}\/\d{2}\/\d{4}$/.test(String(dia||''))?dia:new Date().toLocaleDateString('pt-BR');
   if(!CHAVE)return '<div class="nx-card"><div class="nx-ch"><div><h3>Equipe no discador</h3><p>Abra a Avaliação de Discagem uma vez e entre com a chave pra liberar este painel.</p></div></div></div>';
   if(EQ.dia!==dia||Date.now()-EQ.ms>5*60000)setTimeout(()=>eqBusca(dia),0);
@@ -5065,7 +5065,7 @@ window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,e
 // atualiza sozinho a cada 3 min enquanto a aba estiver aberta (sem fechar ligação que estiver ouvindo)
 setInterval(()=>{const pg=$('pageAvaliacao');if(!pg||!pg.classList.contains('active')||!DADOS||DEMO_MODE||!CHAVE)return;
   if([].some.call(document.querySelectorAll('.avd-lig-b'),b=>b.style.display==='block'))return;carregar(true)},180000);
-function avdNav(){const ok=typeof isA==='function'&&isA();const t=$('tabA');if(t)t.style.display=ok?'':'none';const s=$('sbA');if(s)s.style.display=ok?'flex':'none'}
+function avdNav(){const ok=window.pode?pode('avaliacao'):(typeof isA==='function'&&isA());const t=$('tabA');if(t)t.style.display=ok?'':'none';const s=$('sbA');if(s)s.style.display=ok?'flex':'none'}
 if(typeof setupUI==='function'){const _su=setupUI;window.setupUI=setupUI=function(){_su.apply(this,arguments);avdNav()}}
 window.addEventListener('load',()=>setTimeout(avdNav,50));
 })();
@@ -5253,7 +5253,7 @@ window.qualCarregar=function(){
 };
 // BLOQUEIO: enquanto LIBERADO=false, so admin ve a Qualidade das Ligacoes. Pra liberar pros operadores, troque pra true.
 const LIBERADO=true;
-const bloqueado=()=>!LIBERADO&&!isAdm();
+const bloqueado=()=>(!LIBERADO&&!isAdm())||(!isAdm()&&window.pode&&!pode('qualidade'));
 setInterval(()=>{const b=document.getElementById('sbQ');if(b)b.style.display=(bloqueado()||(typeof isA==='function'&&isA()))?'none':''},800); // admin usa o perfil do operador na Avaliação de Discagem
 const sp=window.showPage;
 window.showPage=function(p){
@@ -6279,7 +6279,7 @@ document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement
 window.tvTeste=function(n){tocar(n);flash(n);alertaAte=Date.now()+TV.ALERTA_SEG*1000;clearTimeout(alertaTm);alertaTm=setTimeout(render,TV.ALERTA_SEG*1000+300)};   // no Console: tvTeste('baixo'|'muito'|'extremo')
 setInterval(()=>{const c=document.getElementById('tvRelogio');if(c)c.textContent=new Date().toLocaleTimeString('pt-BR')},1000);
 setInterval(render,30000);if(window.MODO)window.MODO.ouvir(()=>{render()});(function vira(){setTimeout(()=>{render();vira()},300000-Date.now()%300000+500)})();setInterval(()=>atualizarDadosTV(false),5*60000);
-setInterval(()=>{const ok=typeof isA==='function'&&isA();const s=$('sbTV');if(s)s.style.display=ok?'flex':'none'},1000);
+setInterval(()=>{const ok=window.pode?pode('tv'):(typeof isA==='function'&&isA());const s=$('sbTV');if(s)s.style.display=ok?'flex':'none'},1000);
 const sp=window.showPage;
 window.showPage=function(p){sp(p);const pg=$('pageTV'),sb=$('sbTV');if(pg)pg.classList.toggle('active',p==='tv');if(sb)sb.classList.toggle('active',p==='tv');
   if(p==='tv'){ac();render();atualizarDadosTV(true)}else{flashOff();if(document.fullscreenElement)document.exitFullscreen();tvFullOff()}};
@@ -6866,11 +6866,109 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1850',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1900',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
-</script><script id="edimo-ordenar">
+</script><script id="edimo-config">
+/* ===== CONFIGURACOES (admin): perfil de cada pessoa (Operador / Prospeccao / Lider / Admin) e o que cada perfil ve.
+   Fica salvo na planilha da monitoria (aba "Config"). O perfil escolhido aqui vale MAIS que o da planilha do servidor. */
+(function(){
+const API_CFG='https://script.google.com/macros/s/AKfycbyUX25htVlM8Fs0voi7QK3QzAlF15jYgtzehFG-oUlbP4w0S4efX_Pc7UlrAa0p1_IU/exec';
+const PERFIS=[['operador','Operador','#484a4e'],['prospeccao','Prospecção','#0891b2'],['lider','Líder','#b8901f'],['admin','Admin','#8B1A1A']];
+const NOMEP={};PERFIS.forEach(p=>NOMEP[p[0]]=p[1]);
+const TELAS=[['ranking','Acompanhamento do Dia','sbR'],['trabalho','Área de Trabalho','sbW'],['comparativo','Comparativo','sbC'],['treinamentos','Treinamentos','sbT'],['qualidade','Qualidade das Ligações (só as próprias)','sbQ'],['prosp','Prospecção','sbP'],['avaliacao','Avaliação de Discagem','sbA'],['tv','Dashboard TV','sbTV']];
+const PAINEIS=[['equipe','Equipe no discador (tempo, pausas e ao vivo)','dentro do Acompanhamento do Dia']];
+const BASE=['ranking','trabalho','comparativo','treinamentos','qualidade','prosp'];
+const PADRAO={operador:BASE.slice(),prospeccao:BASE.slice(),lider:BASE.slice()};
+let CFG=null;try{CFG=JSON.parse(localStorage.getItem('edimo_cfg')||'null')}catch(e){}
+if(!CFG||typeof CFG!=='object')CFG={perfis:{},perm:{}};CFG.perfis=CFG.perfis||{};CFG.perm=CFG.perm||{};
+const $=i=>document.getElementById(i);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nz=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+const chaveP=(login,nome)=>String(login||nome||'').trim().toLowerCase().replace(/^\d+\./,'');
+function dePlanilha(p){p=nz(p);if(p==='admin'||p==='administrador')return 'admin';if(/lider/.test(p))return 'lider';if(/prosp/.test(p))return 'prospeccao';return 'operador'}
+// ---- aplica o perfil efetivo no usuario logado ----
+function aplica(){if(typeof cU==='undefined'||!cU)return;if(cU.perfilPlanilha===undefined)cU.perfilPlanilha=cU.perfil||'';
+  const ov=CFG.perfis[chaveP(cU.login,cU.nome)],ef=ov||dePlanilha(cU.perfilPlanilha);cU.papel=ef;cU.perfil=ef==='admin'?'admin':'colaborador'}
+function pode(t){if(typeof cU==='undefined'||!cU)return false;if(!cU.papel)aplica();if(cU.papel==='admin')return true;if(t==='config')return false;
+  const L=Array.isArray(CFG.perm[cU.papel])?CFG.perm[cU.papel]:(PADRAO[cU.papel]||PADRAO.operador);return L.indexOf(t)>=0}
+window.pode=pode;window.EDIMO_PAPEL=()=>(typeof cU!=='undefined'&&cU&&cU.papel)||'';
+const _su=window.setupUI;window.setupUI=function(){aplica();return _su.apply(this,arguments)};
+if(typeof cU!=='undefined'&&cU)aplica();
+async function buscaCfg(){try{const j=await fetch(API_CFG+'?acao=config&t='+Date.now()).then(r=>r.json());if(!j||!j.ok)return;
+    const novo=j.config&&typeof j.config==='object'?j.config:{perfis:{},perm:{}};novo.perfis=novo.perfis||{};novo.perm=novo.perm||{};
+    const antes=typeof cU!=='undefined'&&cU?cU.perfil+'|'+cU.papel:'';CFG=novo;localStorage.setItem('edimo_cfg',JSON.stringify(CFG));
+    if(typeof cU!=='undefined'&&cU){aplica();if(antes&&antes!==cU.perfil+'|'+cU.papel)location.reload()}}catch(e){}}
+buscaCfg();setInterval(buscaCfg,5*60000);
+// ---- menu e trava das telas ----
+function montar(){if(!$('sbCfg')){const sair=[...document.querySelectorAll('.sb-nav .sb-item')].find(b=>/abrirSenha/.test(b.getAttribute('onclick')||''));if(sair){const b=document.createElement('button');b.className='sb-item';b.id='sbCfg';b.style.display='none';b.setAttribute('onclick',"showPage('config')");b.textContent='⚙️ Configurações';sair.parentNode.insertBefore(b,sair)}}
+  if(!$('pageConfig')){const m=document.querySelector('.main');if(m){const p=document.createElement('div');p.className='page';p.id='pageConfig';m.appendChild(p)}}}
+montar();
+setInterval(()=>{montar();if(typeof cU==='undefined'||!cU)return;
+  [['ranking','sbR'],['trabalho','sbW'],['comparativo','sbC'],['treinamentos','sbT'],['prosp','sbP']].forEach(x=>{const b=$(x[1]);if(b)b.style.display=pode(x[0])?'':'none'});
+  const c=$('sbCfg');if(c)c.style.display=pode('config')?'':'none'},600);
+const _sp=window.showPage;
+window.showPage=function(p){montar();
+  if(typeof cU!=='undefined'&&cU&&!pode(p)){const ok=['ranking','trabalho','comparativo','treinamentos','qualidade','prosp','avaliacao','tv'].find(pode);if(!ok)return;p=ok}
+  _sp(p);const pg=$('pageConfig'),sb=$('sbCfg');if(pg)pg.classList.toggle('active',p==='config');if(sb)sb.classList.toggle('active',p==='config');if(p==='config')abrir()};
+// ---- tela de configuracao ----
+let PESSOAS=null,ED=null,FIL='todos',BUSCA='',MSG='';
+function csv(r){const c=[];let s='',q=false;for(const ch of r){if(ch==='"')q=!q;else if(ch===','&&!q){c.push(s.trim());s=''}else s+=ch}c.push(s.trim());return c}
+async function abrir(){if(!pode('config'))return;ED=ED||JSON.parse(JSON.stringify(CFG));render();
+  if(!PESSOAS){try{const t=await fetch(SH+'&t='+Date.now()).then(r=>r.text()),R=t.split('\n').map(csv);
+      PESSOAS=R.slice(1).filter(r=>r.length>=4&&r[0]).map(r=>({nome:r[0].trim(),login:(r[1]||'').trim(),pl:dePlanilha(r[4]||''),plTxt:(r[4]||'colaborador').trim()}))
+        .map(p=>Object.assign(p,{k:chaveP(p.login,p.nome)})).sort((a,b)=>a.nome.localeCompare(b.nome))}catch(e){PESSOAS=[]}render()}}
+const tit=n=>String(n||'').toLowerCase().split(/\s+/).filter(Boolean).map(w=>['de','da','do','das','dos','e'].includes(w)?w:w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+function efetivo(p){return ED.perfis[p.k]||p.pl}
+function sujo(){return JSON.stringify(ED)!==JSON.stringify(CFG)}
+function render(){const el=$('pageConfig');if(!el||!el.classList.contains('active'))return;
+  const P=PESSOAS||[],eu=typeof cU!=='undefined'&&cU?chaveP(cU.login,cU.nome):'';
+  const cont={todos:P.length,alterados:P.filter(p=>ED.perfis[p.k]).length};PERFIS.forEach(x=>cont[x[0]]=P.filter(p=>efetivo(p)===x[0]).length);
+  const fil=(k,t)=>'<button class="'+(FIL===k?'on':'')+'" onclick="CFGP.fil(\''+k+'\')">'+t+' ('+(cont[k]||0)+')</button>';
+  let h='<div class="cf"><div class="cf-hd"><div><h2>Configurações</h2><p>Perfil de cada pessoa e o que cada perfil pode ver no portal. O que você escolher aqui vale mais que a planilha do servidor.</p></div>'+
+    '<div class="cf-save'+(sujo()?' on':'')+'"><span>'+(MSG?esc(MSG):sujo()?'Tem alteração sem salvar':'Tudo salvo')+'</span><button onclick="CFGP.desfazer()"'+(sujo()?'':' disabled')+'>Desfazer</button><button class="pri" onclick="CFGP.salvar()"'+(sujo()?'':' disabled')+'>Salvar</button></div></div>';
+  // permissoes
+  const linha=(id,nome,sub)=>'<tr><td class="nm" style="text-align:left"><b>'+esc(nome)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</td>'+PERFIS.map(x=>{if(x[0]==='admin')return '<td><input type="checkbox" checked disabled title="Admin vê tudo"></td>';
+      const L=Array.isArray(ED.perm[x[0]])?ED.perm[x[0]]:PADRAO[x[0]];return '<td><input type="checkbox"'+(L.indexOf(id)>=0?' checked':'')+' onchange="CFGP.perm(\''+x[0]+'\',\''+id+'\',this.checked)"></td>'}).join('')+'</tr>';
+  h+='<div class="nx-card"><div class="nx-ch"><div><h3>O que cada perfil vê</h3><p>Marque o que aparece no menu de cada perfil. Admin sempre vê tudo, inclusive esta tela.</p></div></div>'+
+    '<div style="overflow-x:auto"><table class="od-tb cf-perm" data-noord><tr><th style="text-align:left">Tela / painel</th>'+PERFIS.map(x=>'<th><span class="cf-pf" style="--c:'+x[2]+'">'+x[1]+'</span></th>').join('')+'</tr>'+
+    '<tr class="cf-sep"><td colspan="5">Telas do menu</td></tr>'+TELAS.map(t=>linha(t[0],t[1])).join('')+
+    '<tr class="cf-sep"><td colspan="5">Painéis dentro das telas</td></tr>'+PAINEIS.map(t=>linha(t[0],t[1],t[2])).join('')+'</table></div></div>';
+  // pessoas
+  const q=nz(BUSCA),L=P.filter(p=>(FIL==='todos'||(FIL==='alterados'?ED.perfis[p.k]:efetivo(p)===FIL))&&(!q||nz(p.nome+' '+p.login).indexOf(q)>=0));
+  h+='<div class="nx-card"><div class="nx-ch"><div><h3>Quem é quem</h3><p>"Seguir planilha" usa o perfil que vem do servidor. Escolhendo outro, o portal passa a usar o daqui.</p></div><div class="eq-tabs">'+fil('todos','Todos')+PERFIS.map(x=>fil(x[0],x[1])).join('')+fil('alterados','Alterados')+'</div></div>'+
+    '<div class="cf-busca"><input type="search" placeholder="Buscar pelo nome ou login..." value="'+esc(BUSCA)+'" oninput="CFGP.busca(this.value)"></div>'+
+    (!PESSOAS?'<div class="avd-empty">Carregando a lista de pessoas...</div>':'<div style="overflow-x:auto"><table class="od-tb cf-pes" data-noord><tr><th style="text-align:left">Nome</th><th style="text-align:left">Login</th><th>Na planilha</th><th style="min-width:200px">No portal</th></tr>'+
+    L.map(p=>{const ov=ED.perfis[p.k],me=p.k===eu;
+      return '<tr'+(ov?' class="alt"':'')+'><td class="nm" style="text-align:left"><b>'+esc(tit(p.nome))+'</b>'+(me?'<small>você</small>':'')+'</td><td style="text-align:left"><small>'+esc(p.login||'-')+'</small></td><td><span class="cf-pf" style="--c:'+PERFIS.find(x=>x[0]===p.pl)[2]+'">'+esc(NOMEP[p.pl])+'</span></td>'+
+        '<td><select onchange="CFGP.pessoa(\''+esc(p.k)+'\',this.value)"'+(me?' disabled title="Você não pode tirar o seu próprio admin"':'')+'><option value="">Seguir planilha ('+esc(NOMEP[p.pl])+')</option>'+PERFIS.map(x=>'<option value="'+x[0]+'"'+(ov===x[0]?' selected':'')+'>'+x[1]+'</option>').join('')+'</select>'+(ov?'<span class="cf-alt">alterado</span>':'')+'</td></tr>'}).join('')+'</table>'+(L.length?'':'<div class="avd-empty">Ninguém nesse filtro.</div>')+'</div>')+'</div></div>';
+  el.innerHTML=h}
+function chaveMon(){let k=localStorage.getItem('avd_chave')||'';if(!k){k=prompt('Senha da monitoria (a mesma da Avaliação de Discagem):')||'';if(k)localStorage.setItem('avd_chave',k)}return k}
+window.CFGP={
+  fil(k){FIL=k;render()},busca(v){BUSCA=v;const y=window.scrollY;render();const i=document.querySelector('.cf-busca input');if(i){i.focus();i.setSelectionRange(v.length,v.length)}window.scrollTo(0,y)},
+  pessoa(k,v){if(v)ED.perfis[k]=v;else delete ED.perfis[k];MSG='';render()},
+  perm(pf,id,on){const L=Array.isArray(ED.perm[pf])?ED.perm[pf].slice():PADRAO[pf].slice();const i=L.indexOf(id);if(on&&i<0)L.push(id);if(!on&&i>=0)L.splice(i,1);ED.perm[pf]=L;MSG='';render()},
+  desfazer(){ED=JSON.parse(JSON.stringify(CFG));MSG='';render()},
+  async salvar(){const k=chaveMon();if(!k)return;MSG='Salvando...';render();
+    try{const j=await fetch(API_CFG,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({chave:k,tipo:'config',config:ED})}).then(r=>r.json());
+      if(!j||!j.ok){if(/chave/i.test(j&&j.erro||''))localStorage.removeItem('avd_chave');throw new Error(j&&j.erro||'sem resposta (publique o Apps Script novo)')}
+      CFG=JSON.parse(JSON.stringify(ED));localStorage.setItem('edimo_cfg',JSON.stringify(CFG));MSG='Salvo! Vale pra todo mundo no próximo acesso (ou em até 5 min).'}
+    catch(e){MSG='Não salvou: '+e.message}render()}};
+})();
+</script>
+<style id="edimo-config-css">
+#pageConfig .cf{max-width:1180px}.cf-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}.cf-hd h2{margin:0;font-size:1.5rem;color:#2f3135;font-weight:800}.cf-hd p{margin:4px 0 0;color:#6b7280;font-size:.85rem;max-width:620px}
+.cf-save{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e2e8f0;border-radius:14px!important;padding:8px 10px 8px 14px;position:sticky;top:10px;z-index:5}.cf-save span{font-size:.78rem;color:#6b7280;font-weight:600}.cf-save.on{border-color:#d4a937;box-shadow:0 4px 16px rgba(212,169,55,.18)}.cf-save.on span{color:#b8901f}
+.cf-save button{border:1px solid #e2e8f0;background:#fff;color:#484a4e;font-weight:700;font-size:.8rem;padding:8px 14px;border-radius:10px!important;cursor:pointer;font-family:inherit}.cf-save button.pri{background:#2f3135;border-color:#2f3135;color:#fff}.cf-save button.pri:not([disabled]){background:#d4a937;border-color:#d4a937;color:#2f3135}.cf-save button[disabled]{opacity:.45;cursor:default}
+.cf-pf{display:inline-block;font-size:.7rem;font-weight:800;padding:3px 9px;border-radius:99px!important;color:var(--c);background:color-mix(in srgb,var(--c) 10%,#fff);border:1px solid color-mix(in srgb,var(--c) 30%,#fff)}
+.cf-perm td,.cf-perm th{text-align:center!important}.cf-perm td.nm{text-align:left!important}.cf-perm input{width:18px;height:18px;accent-color:#d4a937;cursor:pointer}.cf-perm input[disabled]{cursor:default;opacity:.5}.cf-sep td{background:#f8fafc;font-size:.66rem!important;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;font-weight:800;text-align:left!important;padding:6px 8px!important}
+.cf-busca input{width:100%;box-sizing:border-box;border:1px solid #e2e8f0;background:#f8fafc;border-radius:12px!important;padding:10px 14px;font-size:.85rem;font-family:inherit;margin-bottom:8px}
+.cf-pes select{border:1px solid #e2e8f0;border-radius:10px!important;padding:7px 10px;font-family:inherit;font-size:.8rem;background:#fff;color:#2f3135;min-width:190px}.cf-pes tr.alt td{background:#fffbeb}.cf-alt{display:inline-block;margin-left:8px;font-size:.66rem;font-weight:800;color:#b8901f;text-transform:uppercase}
+.cf-pes td small,.cf-perm td small{display:block;font-size:.7rem;color:#9ca3af}
+</style>
+
+<script id="edimo-ordenar">
 /* Ordenar e pesquisar em qualquer tabela do portal:
    - escolha Crescente/Decrescente (vira a preferência pra todo o portal)
    - clique no título da coluna pra ordenar por ela (clicar de novo inverte)
