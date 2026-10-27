@@ -2169,7 +2169,15 @@ body::before,body::after{display:none!important}
 .avd-kl{font-size:.74rem;font-weight:600;color:#374151;margin-top:2px}.avd-ks{font-size:.68rem;color:var(--mu);margin-top:2px}
 .avd-k.clk{cursor:pointer;transition:transform .12s,box-shadow .12s}
 .avd-k.clk:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,23,42,.08)}
-.avd-k.on{background:#f6f9ff;box-shadow:0 0 0 2px var(--c,#1e4e7e) inset}
+.avd-k.on{background:#fbf7ec;box-shadow:0 0 0 2px var(--c,#484a4e) inset}
+.avd-kpis.g3{grid-template-columns:minmax(170px,1fr) 3fr 2fr;align-items:stretch}.avd-kpis.g3.g2{grid-template-columns:minmax(170px,1fr) 3fr}
+.avd-grp{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:10px 8px 8px;box-shadow:0 1px 4px rgba(15,23,42,.04);display:flex;flex-direction:column}
+.avd-gt{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#8a8d92;padding:0 10px 6px}
+.avd-gi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:1}.avd-gi.n2{grid-template-columns:repeat(2,minmax(0,1fr))}.avd-gi.n1{grid-template-columns:1fr}
+.avd-k.sub{border:0!important;box-shadow:none!important;border-radius:10px!important;padding:8px 12px;position:relative}
+.avd-k.sub+.avd-k.sub:before{content:'';position:absolute;left:0;top:10%;bottom:10%;width:1px;background:#eef1f5}
+.avd-k.sub.clk:hover{transform:none;background:#faf8f3}
+.avd-k.sub.on{background:#fbf7ec;box-shadow:0 0 0 2px var(--c,#484a4e) inset!important}
 .avd-k .avd-hint{font-size:.62rem;color:#9ca3af;margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
 .od-hero{position:relative;overflow:hidden;background:linear-gradient(120deg,#2f3135,#484a4e 70%,#5a5c60);color:#fff;border-radius:16px;padding:20px 24px;margin-bottom:14px;border-bottom:4px solid #d4a937;box-shadow:0 4px 14px rgba(47,49,53,.18)}
 .od-hero:after{content:"";position:absolute;right:-60px;bottom:-80px;width:260px;height:260px;border-radius:50%;border:34px solid rgba(212,169,55,.12);pointer-events:none}
@@ -2347,7 +2355,8 @@ body::before,body::after{display:none!important}
 .avd-action-item b{font-size:.75rem}
 .avd-action-item small{display:block;color:var(--mu);margin-top:2px}
 @media(max-width:700px){.avd-actions{grid-template-columns:1fr}.avd-filter-more{display:grid;grid-template-columns:1fr 1fr}.avd-filter-more label{grid-column:span 2}}
-@media(max-width:600px){.avd-head{padding:16px}.avd-kpis{grid-template-columns:1fr 1fr}.avd-r .avd-vs{display:none}}
+@media(max-width:1100px){.avd-kpis.g3,.avd-kpis.g3.g2{grid-template-columns:1fr}}
+@media(max-width:600px){.avd-head{padding:16px}.avd-kpis{grid-template-columns:1fr 1fr}.avd-kpis.g3,.avd-kpis.g3.g2{grid-template-columns:1fr}.avd-gi{grid-template-columns:1fr 1fr}.avd-k.sub+.avd-k.sub:before{display:none}.avd-r .avd-vs{display:none}}
 </style>
 <style id="login-mobile">
 /* Login no visual do mobile */
@@ -4351,7 +4360,8 @@ function cm(ls){const m={};ls.forEach(l=>l.criterios.forEach(c=>{const id=idC(c)
 function ader(ls){const v=Object.values(cm(ls)||{}).filter(x=>x.max).map(x=>x.pct);return med(v)}
 function qualidade(p){return p>=75?'ok':p>0?'review':'na'}
 function qualidadeTxt(p){return p>=75?'Bem':p>0?'Precisa revisar':'Sem dados'}
-function kpi(c,v,l,s,vw){const at=vw==='rank'?VIEW==='':VIEW===vw;return '<div class="avd-k'+(vw?' clk'+(at?' on':''):'')+'" style="--c:'+c+'"'+(vw?' onclick="avd.ver(\''+vw+'\')"':'')+'><div class="avd-kv">'+v+'</div><div class="avd-kl">'+l+'</div>'+(s?'<div class="avd-ks">'+s+'</div>':'')+(vw?'<div class="avd-hint">'+(vw==='rank'?(at?'ranking de qualidade':'clique pra voltar ao ranking'):(at?'clique pra voltar ao ranking':'clique pra detalhar'))+'</div>':'')+'</div>'}
+function kpiGrupo(t,itens){return '<div class="avd-grp"><div class="avd-gt">'+t+'</div><div class="avd-gi n'+itens.length+'">'+itens.join('')+'</div></div>'}
+function kpi(c,v,l,s,vw,sub){const at=vw==='rank'?VIEW==='':VIEW===vw;return '<div class="avd-k'+(sub?' sub':'')+(vw?' clk'+(at?' on':''):'')+'" style="--c:'+c+'"'+(vw?' onclick="avd.ver(\''+vw+'\')"':'')+'><div class="avd-kv">'+v+'</div><div class="avd-kl">'+l+'</div>'+(s?'<div class="avd-ks">'+s+'</div>':'')+(vw?'<div class="avd-hint">'+(vw==='rank'?(at?'ranking de qualidade':'clique pra voltar ao ranking'):(at?'clique pra voltar ao ranking':'clique pra detalhar'))+'</div>':'')+'</div>'}
 let VIEW='',CRIT='',AVD_TAB='todos';
 function guardarFiltros(){
   const ids=['avdPer','avdDia','avdIni','avdFim','avdHIni','avdHFim','avdGrp','avdOp','avdTipo','avdRes','avdCrit'];
@@ -4392,12 +4402,16 @@ function render(preservar){
   const fr=Object.values(c).sort((a,b)=>a.pct-b.pct)[0];
   const ops={};ls.forEach(l=>(ops[l.operador]=ops[l.operador]||[]).push(l));
   const lin=Object.keys(ops).map(op=>{const a=ops[op],n=ader(a),f=Object.values(cm(a)).filter(x=>x.max).sort((x,y)=>x.pct-y.pct)[0];return{op,a,n,g:a[0].grupo,res:a.filter(temRes).length/a.length*100,f,pend:a.filter(l=>!l.feedback_dado).length}}).sort((x,y)=>y.n-x.n);
-  let h='<div class="avd-kpis">'+
-    kpi('#1e4e7e',ls.length,'Ligações avaliadas',lin.length+' operadores','rank')+
-    kpi('#d4a937',eq.toFixed(0)+'%','Aderência média da equipe','status dos critérios','nota')+
-    kpi('#16a34a',(ls.length?(ls.filter(temRes).length/ls.length*100).toFixed(0):0)+'%','Saíram com acordo','','res')+
-    kpi('#dc2626','<span style="font-size:1rem">'+(fr?esc(fr.fraco||fr.nome):'-')+'</span>','Principal erro da equipe',fr?fr.pct.toFixed(0)+'% de aproveitamento':'','erro')+
-    (FUNIL?(()=>{const t=funilTot(funilFilt().filter(x=>x.tipo==='total'));return kpi('#484a4e',fmtN(t.dis),'Discagens no período',fmtN(t.atd)+' atendidas · '+fmtN(t.aco)+' acordos','funil')})():'')+(OPER&&OPER.length?(()=>{const H=operJunta('hora'),d=H.reduce((s,x)=>s+(x.dis||0),0),a=H.reduce((s,x)=>s+(x.at||0),0);return kpi('#d4a937',d?pc(a,d).toFixed(1).replace('.',',')+'%':'-','Operação do discador',d?fmtN(d)+' discagens · mailing, rotas, horários e tempos':'sem dados no período','oper')})():'')+'</div>';
+  const kDisc=[];
+  if(FUNIL){const t=funilTot(funilFilt().filter(x=>x.tipo==='total'));kDisc.push(kpi('#484a4e',fmtN(t.dis),'Discagens no período',fmtN(t.atd)+' atendidas · '+fmtN(t.aco)+' acordos','funil',1))}
+  if(OPER&&OPER.length){const H=operJunta('hora'),d=H.reduce((s,x)=>s+(x.dis||0),0),a=H.reduce((s,x)=>s+(x.at||0),0);kDisc.push(kpi('#d4a937',d?pc(a,d).toFixed(1).replace('.',',')+'%':'-','Operação do discador',d?fmtN(d)+' discagens · mailing, rotas, horários e tempos':'sem dados no período','oper',1))}
+  let h='<div class="avd-kpis g3'+(kDisc.length?'':' g2')+'">'+
+    kpi('#484a4e',ls.length,'Ligações avaliadas',lin.length+' operadores','rank')+
+    kpiGrupo('Qualidade das ligações',[
+      kpi('#d4a937',eq.toFixed(0)+'%','Aderência média da equipe','status dos critérios','nota',1),
+      kpi('#16a34a',(ls.length?(ls.filter(temRes).length/ls.length*100).toFixed(0):0)+'%','Saíram com acordo','das ligações ouvidas','res',1),
+      kpi('#dc2626','<span style="font-size:1rem">'+(fr?esc(fr.fraco||fr.nome):'-')+'</span>','Principal erro da equipe',fr?fr.pct.toFixed(0)+'% de aproveitamento':'','erro',1)])+
+    (kDisc.length?kpiGrupo('Discador',kDisc):'')+'</div>';
   if(VIEW){$('avdBody').innerHTML=h+tabsHTML()+(VIEW==='funil'||VIEW==='oper'?'':acaoHoje(ls))+visao(ls,lin,c,eq);return}
   h+=tabsHTML()+acaoHoje(ls);
   h+='<div class="avd-card"><div class="avd-ct">Ranking de qualidade</div>';
@@ -4626,14 +4640,15 @@ function visaoOper0(){
   const ocP=EQ.login?pc(EQ.ocioso,EQ.login):0;
   const K=[['phone','#484a4e','Discagens',fmtN(T.dis),umDia?'no dia':dias+' dias'],['user','#16a34a','Atendidas',pf(pc(T.at,T.dis),1)+'%',fmtN(T.at)+' ligações com pessoa'],
     ['clock','#d4a937','Caixa postal',pf(pc(T.el,T.dis),0)+'%',fmtN(T.el)+' discagens'],['x','#dc2626','Não existe',pf(pc(T.ne,T.dis),0)+'%',fmtN(T.ne)+' discagens'],
-    ['ok','#2f3135','Acordos',semAco?'-':fmtN(T.aco),semAco?'não vem marcado na Fastway':pf(baseMil,1)+' a cada mil discagens'],['alert','#b45309','Equipe esperando',EQ.login?pf(ocP,0)+'%':'-','do tempo logado sem ligação']];
+    ['ok','#2f3135','Acordos',semAco?'-':fmtN(T.aco),semAco?'não vem marcado na Fastway':pf(baseMil,baseMil<1?2:1)+' a cada mil discagens'],['alert','#b45309','Equipe esperando',EQ.login?pf(ocP,0)+'%':'-','do tempo logado sem ligação']];
   // Acordos: a Fastway nao recebe a marcacao; o total do dia vem do Cobmais (mesma planilha do Acordos do Dia)
   const hojeBR=new Date().toLocaleDateString('pt-BR'),cobOk=umDia&&datas[0]===hojeBR&&typeof cRD!=='undefined'&&cRD&&cRD.ops&&!(window.rankHistAtivo&&window.rankHistAtivo());
   const acoCob=cobOk?cRD.ops.filter(o=>!/rob/i.test(o.n)).reduce((s2,o)=>s2+(o.a||0),0):null;
   if(semAco&&acoCob!==null)K[4]=['ok','#2f3135','Acordos',fmtN(acoCob),acoCob?pf(acoCob/T.dis*1000,2)+' a cada mil discagens · Cobmais':'nenhum ainda hoje · Cobmais'];
-  const atuz=operFilt('hora').map(x=>x.atualizado||'').filter(Boolean).sort().pop()||'';
+  const atMs=t=>{const m=String(t).match(/(\d{2})\/(\d{2})\/(\d{4}),? (\d{1,2}):(\d{2})/);if(m)return new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]).getTime();const d=new Date(t);return isNaN(d)?0:d.getTime()};
+  const atuMs=Math.max(0,...operFilt('hora').map(x=>atMs(x.atualizado||''))),atuz=atuMs?new Date(atuMs).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(',',' às'):'';
   let h='<div class="od-hero"><div class="od-hero-t"><div><span>'+(umDia?'Resumo do dia '+esc(datas[0]):'Resumo de '+dias+' dias')+'</span><h2>Diagnóstico geral da operação</h2></div>'+(atuz?'<div class="od-live"><i></i>Atualizado '+esc(atuz)+'</div>':'')+'</div>'+
-    '<p>De <b class="g">'+fmtN(T.dis)+' discagens</b>, só <b class="v">'+fmtN(T.at)+' ('+pf(pc(T.at,T.dis),1)+'%)</b> chegaram numa pessoa. <b class="r">'+pf(pc(T.el,T.dis),0)+'% caíram em caixa postal</b> e <b class="r">'+pf(pc(T.ne,T.dis),0)+'% eram número que não existe</b>. '+(semAco?(acoCob!==null?'Pelo Cobmais saíram <b class="g">'+fmtN(acoCob)+' acordo'+(acoCob===1?'':'s')+'</b> hoje'+(acoCob?' ('+pf(acoCob/T.dis*1000,2)+' a cada mil discagens)':'')+'. Por mailing e por horário ainda não dá: falta cruzar com o Relatório de Pagamentos Detalhado.':'Os acordos ainda não aparecem aqui porque a Fastway não recebe essa marcação (vão vir do Cobmais).'):'Saíram <b class="g">'+fmtN(T.aco)+' acordos</b> ('+pf(baseMil,1)+' a cada mil discagens).')+
+    '<p>De <b class="g">'+fmtN(T.dis)+' discagens</b>, só <b class="v">'+fmtN(T.at)+' ('+pf(pc(T.at,T.dis),1)+'%)</b> chegaram numa pessoa. <b class="r">'+pf(pc(T.el,T.dis),0)+'% caíram em caixa postal</b> e <b class="r">'+pf(pc(T.ne,T.dis),0)+'% eram número que não existe</b>. '+(semAco?(acoCob!==null?'Pelo Cobmais saíram <b class="g">'+fmtN(acoCob)+' acordo'+(acoCob===1?'':'s')+'</b> hoje'+(acoCob?' ('+pf(acoCob/T.dis*1000,2)+' a cada mil discagens)':'')+'. Por mailing e por horário ainda não dá: falta cruzar com o Relatório de Pagamentos Detalhado.':'Os acordos ainda não aparecem aqui porque a Fastway não recebe essa marcação (vão vir do Cobmais).'):'Saíram <b class="g">'+fmtN(T.aco)+' acordos</b> ('+pf(baseMil,baseMil<1?2:1)+' a cada mil discagens).')+
     (EQ.login?' A equipe passou <b>'+pf(pc(EQ.fala,EQ.login),0)+'%</b> do tempo falando, <b>'+pf(ocP,0)+'%</b> esperando ligação e <b>'+pf(pc(EQ.pausa,EQ.login),0)+'%</b> em pausa.'+(ocP>=25?' <b class="g">O gargalo é a base, não a equipe.</b>':''):'')+'</p></div>';
   h+='<div class="od-kpis">'+K.map(k=>'<div class="od-k" style="--c:'+k[1]+'"><div class="od-kt"><span>'+k[2]+'</span><i>'+odi(k[0],16)+'</i></div><div class="od-kv">'+k[3]+'</div><div class="od-ks">'+k[4]+'</div></div>').join('')+'</div>';
   // ---- dinheiro que entrou (coletor Cobmais: so totais, sem CPF) ----
@@ -4669,7 +4684,7 @@ function visaoOper0(){
     '<div class="od-mbs">'+box('#16a34a','Atendidas',fmtN(T.at))+box('#dc2626','Não existe + caixa postal',pf(pc(T.ne+T.el,T.dis),0)+'%')+'</div></div></div>';
   // ---- ranking de mailings
   const cont=v=>M.filter(m=>m.d.t===v).length;
-  h+='<div class="od-card">'+odHead('layers','#484a4e','Ranking e saúde dos mailings',(semAco?'Ordenado por % que atende (média da casa: <b>'+pf(pc(T.at,T.dis),1)+'%</b>). Acordo por mailing entra quando cruzarmos com o Cobmais.':'Qual lista vira acordo e qual só queima discagem · média da casa: <b>'+pf(baseMil,1)+'</b> acordos por mil'),
+  h+='<div class="od-card">'+odHead('layers','#484a4e','Ranking e saúde dos mailings',(semAco?'Ordenado por % que atende (média da casa: <b>'+pf(pc(T.at,T.dis),1)+'%</b>). Acordo por mailing entra quando cruzarmos com o Cobmais.':'Qual lista vira acordo e qual só queima discagem · média da casa: <b>'+pf(baseMil,baseMil<1?2:1)+'</b> acordos por mil'),
       '<div class="od-busca">'+odi('search',15)+'<input id="odBuscaM" placeholder="Buscar mailing..." oninput="avd.odBusca()"></div>'+odBtn('m','all','Todos',1,'#d4a937')+odBtn('m','priorizar','Priorizar ('+cont('priorizar')+')',0,'#16a34a')+odBtn('m','manter','Manter ('+cont('manter')+')',0,'#b45309')+odBtn('m','pausar','Pausar ('+cont('pausar')+')',0,'#c2410c')+odBtn('m','limpar antes','Limpar antes ('+cont('limpar antes')+')',0,'#dc2626'),
       odInfo('Cada mailing é uma lista de devedores que entrou no discador.','<b>Acordos por mil</b> é a régua principal (quantos acordos a cada mil discagens). <b>Atendem</b> = chance de alguém atender. <b>Não existe</b> = quanto a base está suja. <b>Melhor hora</b> = quando aquela lista mais atende.','<b>Priorizar</b>: no discador no pico. <b>Manter</b>: normal. <b>Pausar</b>: muita discagem sem acordo. <b>Limpar antes</b>: pedir telefone novo ao credor ou higienizar no Cobmais.'))+
     tbw('<table class="od-tb"><tr><th>#</th><th>Mailing</th><th>Discagens</th><th>Atendem</th><th>Não existe</th><th>Acordos</th><th>Por mil</th><th>Melhor hora</th><th>Decisão</th></tr>'+
