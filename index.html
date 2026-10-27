@@ -2800,7 +2800,7 @@ body .sidebar .sb-nav .sb-item.active{background:#fff!important}
 .nx-tc2 table{width:100%;border-collapse:collapse;font-size:.72rem}.nx-tc2 th{color:#94a3b8;font-weight:700;text-align:right;padding:5px 4px;font-size:.62rem;text-transform:uppercase}.nx-tc2 th:first-child,.nx-tc2 td:first-child{text-align:left}
 .nx-tc2 td{text-align:right;padding:6px 4px;border-top:1px solid #f1f5f9;color:#334155}.nx-tc2 tr.cur td{font-weight:800;background:color-mix(in srgb,var(--c) 10%,#fff)}
 .nx-insight{margin-top:16px;background:#eff6ff;border:1px solid #dbeafe;border-radius:12px!important;padding:12px 16px;font-size:.78rem;color:#1e3a8a}
-.nx-mxc{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.nx-mxc span{font-size:.72rem;color:#64748b}
+.nx-mxc{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.nx-mxr{margin:-6px 0 14px}.nx-mxr #compSearch{flex:1;min-width:240px}.nx-mxr span{margin-left:6px}.nx-mxc span{font-size:.72rem;color:#64748b}
 .nx-mxc .sort-btn{border:1px solid #e2e8f0;background:#fff;border-radius:9px!important;padding:6px 11px;font-size:.74rem;font-weight:600;color:#475569;cursor:pointer;font-family:inherit}.nx-mxc .sort-btn.active{border-color:#8b1d24;color:#8b1d24}
 .nx-tw{overflow-x:auto;margin:0 -22px -20px}
 .nx-t{width:100%;border-collapse:collapse;font-size:.8rem}
@@ -3643,18 +3643,18 @@ function genComp(){
     const showValor=compViewMode==='all'||compViewMode==='valor';
     const cols=ms.map((m,i)=>i).filter(i=>showAll||compMonthFilter===String(i));
     const sb=(k,t)=>'<button class="sort-btn'+(compSortBy===k?' active':'')+'" onclick="setSort(\''+k+'\',this)">'+t+'</button>';
-    h+='<div class="nx-card nx-mx"><div class="nx-ch"><div><h3>Desempenho por Operador '+(ms.length>=3?'(Trimestre)':'')+'</h3><p>Comparativo de cada operador entre '+ms.map(m=>shortPeriod(m.period)).join(', ').replace(/, ([^,]*)$/,' e $1')+'</p></div>'+
-       '<div class="nx-mxc"><input id="compSearch" type="search" placeholder="Buscar por nome..." value="'+esc(window.NXCB||'')+'" oninput="window.NXCB=this.value;filterCompTable()"><span>Ordenar:</span>'+sb('valor','Valor')+sb('acordos','Acordos')+sb('nome','Nome')+'</div></div>';
+    h+='<div class="nx-card nx-mx"><div class="nx-ch"><div><h3>Desempenho por Operador '+(ms.length>=3?'(Trimestre)':'')+'</h3><p>Comparativo de cada operador entre '+ms.map(m=>shortPeriod(m.period)).join(', ').replace(/, ([^,]*)$/,' e $1')+'</p></div></div>'+
+       '<div class="nx-mxc nx-mxr"><input id="compSearch" type="search" placeholder="Buscar por nome..." value="'+esc(window.NXCB||'')+'" oninput="window.NXCB=this.value;filterCompTable()"><span>Ordenar:</span>'+sb('valor','Valor')+sb('acordos','Acordos')+sb('nome','Nome')+'</div>';
     h+='<div class="nx-tw"><table class="comp-table nx-t"><thead><tr><th>Operador</th>';
     cols.forEach(i=>{h+='<th class="'+(i===nowIdx?'cur':'')+'">'+shortPeriod(ms[i].period)+(i===nowIdx?' (atual)':'')+'</th>'});
     h+='<th>Média '+ms.length+(ms.length>1?' meses':' mês')+'</th><th>Tempo de empresa</th></tr></thead><tbody>';
     const ini=n=>String(n||'').split(/\s+/).filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
     const semMeta=(d,cfg)=>(d&&d.t===0)||/novat|experi/i.test(String(cfg||''));
     const metaDe=(d,cfg)=>{if(semMeta(d,cfg))return null;const m=getMeta(cfg);return m&&m.max>0?m:null};
-    const cel=(d,cfg,cur)=>{if(d&&d.cfg)cfg=d.cfg;if(d&&semMeta(d,cfg))return '<td class="'+(cur?'cur':'')+'">'+(showAcordos?'<b class="nx-qa">'+d.a+' acordo'+(d.a===1?'':'s')+'</b>':'')+(showValor?'<span class="nx-qv">'+fm(d.v)+'</span>':'')+'<small class="nx-z">em experiência · sem meta</small></td>';if(!d)return '<td class="'+(cur?'cur':'')+'"><span class="nx-z">-</span></td>';
+    const cel=(d,cfg,cur)=>{if(d&&d.cfg)cfg=d.cfg;const dv=' data-v="'+(d?(compSortBy==='acordos'?d.a:d.v):'')+'"';if(d&&semMeta(d,cfg))return '<td class="'+(cur?'cur':'')+'"'+dv+'>'+(showAcordos?'<b class="nx-qa">'+d.a+' acordo'+(d.a===1?'':'s')+'</b>':'')+(showValor?'<span class="nx-qv">'+fm(d.v)+'</span>':'')+'<small class="nx-z">em experiência · sem meta</small></td>';if(!d)return '<td class="'+(cur?'cur':'')+'"><span class="nx-z">-</span></td>';
       const m=getMeta(cfg),pct=m&&m.max>0?Math.min(100,Math.round(d.v/m.max*100)):null,cor=pct===null?'#94a3b8':pct>=100?'#10b981':pct>=60?'#22c55e':'#f59e0b';
       const pr=m&&m.max>0?Math.round(d.v/m.max*100):null;
-      return '<td class="'+(cur?'cur':'')+'">'+(showAcordos?'<b class="nx-qa">'+d.a+' acordo'+(d.a===1?'':'s')+'</b>':'')+(showValor?'<span class="nx-qv">'+fm(d.v)+'</span>':'')+
+      return '<td class="'+(cur?'cur':'')+'"'+dv+'>'+(showAcordos?'<b class="nx-qa">'+d.a+' acordo'+(d.a===1?'':'s')+'</b>':'')+(showValor?'<span class="nx-qv">'+fm(d.v)+'</span>':'')+
         (pct!==null?'<div class="nx-bar sm"><i style="width:'+pct+'%;background:'+cor+'"></i></div><small class="'+(pr>=100?'ok':'')+'">'+(pr>=100?'🏆 bateu a meta ('+pr+'%)':pr+'% da meta'+(cur?' até agora':''))+'</small>':'<small class="nx-z">sem meta</small>')+'</td>'};
     const metaTxt=(cfg,t)=>{if(t===0||/novat|experi/i.test(String(cfg||'')))return 'Em experiência · sem meta';const m=getMeta(cfg);return m&&m.max>0?'Meta '+fs(m.max):''};
     od.forEach((op,i)=>{
@@ -3668,7 +3668,7 @@ function genComp(){
       let pS=0,pN=0;ms.forEach((m,mi)=>{const d=op.m[mi];if(!d)return;const mt=metaDe(d,d.cfg||op.cfg);if(mt){pS+=d.v/mt.max*100;pN++}});
       const mp=op.t===0||!pN?null:Math.round(pS/pN);
       const mst=mp===null?'':mp>=100?['ok','na meta']:mp>=85?['perto','perto da meta']:['abaixo','abaixo da meta'];
-      h+='<td>'+(showAcordos?'<b class="nx-qa">'+(c?Math.round(sA/c):0)+' acordos</b>':'')+(showValor?'<span class="nx-qv">'+fm(mV)+'</span>':'')+
+      h+='<td data-v="'+(compSortBy==='acordos'?(c?sA/c:0):mV)+'">'+(showAcordos?'<b class="nx-qa">'+(c?Math.round(sA/c):0)+' acordos</b>':'')+(showValor?'<span class="nx-qv">'+fm(mV)+'</span>':'')+
         (mp===null?'':'<div class="nx-bar sm"><i style="width:'+Math.min(100,mp)+'%;background:'+(mp>=100?'#10b981':mp>=85?'#22c55e':'#f59e0b')+'"></i></div><small><span class="nx-ms '+mst[0]+'">'+mst[1]+'</span> '+mp+'%</small>')+'</td>';
       h+='<td><span class="nx-tempo">'+tempoExtenso(op.name)+'</span></td></tr>';
     });
@@ -6668,7 +6668,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1230',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1300',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
@@ -6686,7 +6686,8 @@ setInterval(function(){if(S)badge()},60000);
   function valor(el){
     if(!el)return null;if(el.dataset&&el.dataset.v!==undefined){const n=parseFloat(el.dataset.v);return isNaN(n)?el.dataset.v:n}
     const t=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim();if(!t||t==='-'||t==='—')return null;
-    let m=t.match(/^(\d+)h(\d{1,2})\b/);if(m)return +m[1]*3600+ +m[2]*60;
+    let m=t.match(/^(?:(\d+)\s*anos?)?(?:\s*e\s*)?(?:(\d+)\s*(?:m[eê]s|meses))?(?:(\d+)\s*dias?)?$/i);if(m&&(m[1]||m[2]||m[3]))return (+m[1]||0)*12+(+m[2]||0)+(+m[3]||0)/30;
+    m=t.match(/^(\d+)h(\d{1,2})\b/);if(m)return +m[1]*3600+ +m[2]*60;
     m=t.match(/^(\d+)m(\d{1,2})s/);if(m)return +m[1]*60+ +m[2];
     m=t.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);if(m)return m[3]!==undefined?+m[1]*3600+ +m[2]*60+ +m[3]:+m[1]*60+ +m[2];
     m=t.match(/^(?:R\$\s*)?(-?[\d.]*\d(?:,\d+)?)/);if(m){const n=parseFloat(m[1].replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'));if(!isNaN(n))return n}
@@ -6705,7 +6706,7 @@ setInterval(function(){if(S)badge()},60000);
       const todos=tabs.map(t=>{const h=t.querySelector('thead tr')||[...t.rows].find(r=>r.querySelector('th'));return h?[...h.cells]:[]});
       let ok=true,fix=[];
       const linhas=()=>{const L=[];tabs.forEach(t=>[...t.rows].forEach(r=>{if(r.querySelector('th'))return;if([...r.cells].some(c=>c.colSpan>1)){fix.push(r);return}L.push(r)}));return L};
-      const L0=linhas();if(L0.length<2)return;
+      const L0=linhas();if(L0.length<4)return;
       // linha com colspan no meio = tabela com detalhe embutido: nao mexe
       if(fix.some(r=>r.nextElementSibling&&!r.nextElementSibling.querySelector('th')&&![...r.nextElementSibling.cells].some(c=>c.colSpan>1)))ok=false;
       if(!ok)return;fix=[];
@@ -6741,18 +6742,16 @@ setInterval(function(){if(S)badge()},60000);
     u.k=chave(u);const sv=salvo(u.k),def=u.tb.dataset||{};
     u.s=ST[u.k]||{q:'',col:sv&&sv.col!==undefined?sv.col:(def.ordCol!==undefined?+def.ordCol:-1),dir:(sv&&sv.dir)||prefDir()||def.ordDir||'desc'};ST[u.k]=u.s;
     const guarda=()=>localStorage.setItem('ed_ord_'+u.k,JSON.stringify({col:u.s.col,dir:u.s.dir}));
-    u.todos.forEach(hs=>hs.forEach((h,i)=>{if(!h.textContent.trim())return;h.classList.add('ed-th');h.title='Ordenar por '+h.textContent.trim().toLowerCase();
+    u.todos.forEach(hs=>hs.forEach((h,i)=>{if(!h.textContent.trim())return;h.classList.add('ed-th');h.title='Ordenar por '+h.textContent.trim().toLowerCase()+' (1 clique: crescente, 2 cliques: decrescente)';
       h.addEventListener('click',e=>{e.stopPropagation();if(u.s.col===i)u.s.dir=u.s.dir==='asc'?'desc':'asc';else{u.s.col=i;u.s.dir='asc'}guarda();aplicar(u)})}));
     // barra: pesquisa + crescente/decrescente
-    const card=u.ancora.closest('.od-card,.avd-card,.page,body');const temBusca=card&&card.querySelector('.od-busca input:not(.ed-qi),.qa-busca input');
-    const nL=u.linhas().length,bar=document.createElement('div');bar.className='ed-ob';
-    bar.innerHTML=(!temBusca&&nL>=6?'<label class="ed-q"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input class="ed-qi" type="text" placeholder="Pesquisar pelo nome"></label>':'')+
-      '<span class="ed-l">Ordem</span><button type="button" data-dir="asc">↑ Crescente</button><button type="button" data-dir="desc">↓ Decrescente</button><span class="ed-h">clique no título da coluna: 1x crescente, 2x decrescente</span><span class="ed-n"></span>';
-    const qi=bar.querySelector('input');if(qi){qi.value=u.s.q;qi.addEventListener('input',()=>{u.s.q=qi.value;aplicar(u)})}
-    bar.querySelectorAll('[data-dir]').forEach(b=>b.addEventListener('click',()=>{u.s.dir=b.dataset.dir;localStorage.setItem('ed_ord_dir',u.s.dir);
-      if(u.s.col<0){const d=def.ordCol!==undefined?+def.ordCol:u.heads.findIndex((h,i)=>i>0&&!/^#?$/.test(h.textContent.trim())&&numerica(u,i));u.s.col=d<0?0:d}guarda();aplicar(u)}));
-    const slot=card&&card.querySelector('.ed-slot:empty');
-    if(slot)slot.appendChild(bar);else u.ancora.parentNode.insertBefore(bar,u.ancora);
+    const card=u.ancora.closest('.od-card,.avd-card,.page,body');const temBusca=card&&card.querySelector('.od-busca input:not(.ed-qi),.qa-busca input,input[type=search]:not(.ed-qi),#compSearch');
+    const nL=u.linhas().length;let bar=null;
+    if(!temBusca&&nL>=6){bar=document.createElement('div');bar.className='ed-ob';
+      bar.innerHTML='<label class="ed-q"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input class="ed-qi" type="text" placeholder="Pesquisar pelo nome"></label><span class="ed-n"></span>';
+      const qi=bar.querySelector('input');qi.value=u.s.q;qi.addEventListener('input',()=>{u.s.q=qi.value;aplicar(u)});
+      const slot=card&&card.querySelector('.ed-slot:empty');
+      if(slot)slot.appendChild(bar);else u.ancora.parentNode.insertBefore(bar,u.ancora);}
     u.bar=bar;
     if(u.s.col>=0||u.s.q)aplicar(u);else u.todos.flat().forEach(h=>{if(!h.querySelector('.ed-ar')&&h.classList.contains('ed-th')){const a=document.createElement('span');a.className='ed-ar';a.textContent='↕';h.appendChild(a)}});
   }
