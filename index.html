@@ -2196,6 +2196,12 @@ body::before,body::after{display:none!important}
 .od-kt{display:flex;justify-content:space-between;align-items:center;font-size:.74rem;font-weight:600;color:#6b7280}.od-kt i{display:flex;padding:6px;border-radius:8px;color:var(--c);background:var(--c12)}
 .od-kv{font-size:1.6rem;font-weight:800;letter-spacing:-.02em;color:var(--tx);margin-top:10px}.od-ks{font-size:.72rem;color:#9ca3af;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .od-card{background:#fff;border:1px solid var(--bd);border-radius:16px;box-shadow:0 1px 4px rgba(15,23,42,.04);margin-bottom:14px;padding:18px 20px;overflow:hidden;min-width:0}
+.eq-tabs{display:flex;background:#f1f5f9;border-radius:12px!important;padding:3px;gap:2px}.eq-tabs button{border:0;background:transparent;padding:8px 14px;border-radius:9px!important;font-size:.78rem;font-weight:700;color:#64748b;cursor:pointer;font-family:inherit}.eq-tabs button.on{background:#fff;color:#2f3135;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.eq-ks{display:flex;gap:10px;margin-bottom:14px}.eq-k{flex:1 1 0;min-width:0;text-align:left;background:#fff;border:1px solid #e2e8f0;border-top:3px solid var(--c);border-radius:14px!important;padding:12px 14px;cursor:pointer;font-family:inherit;transition:box-shadow .15s,transform .15s}.eq-k:hover{box-shadow:0 4px 14px rgba(15,23,42,.08);transform:translateY(-1px)}.eq-k.on{background:var(--c8);border-color:var(--c30);border-top-color:var(--c);box-shadow:0 0 0 2px var(--c30)}.eq-k.fix{cursor:default}.eq-k.fix:hover{transform:none;box-shadow:none}
+.eq-k span{display:block;font-size:.72rem;font-weight:700;color:#64748b}.eq-k b{display:block;font-size:1.6rem;font-weight:800;color:var(--c);line-height:1.15;margin:2px 0}.eq-k small{display:block;font-size:.68rem;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eq-tb td.nm b{display:block;font-weight:700}.eq-tb td.nm small,.eq-tb td small{display:block;font-size:.68rem;color:#9ca3af;font-weight:500}.eq-pz div{display:flex;justify-content:flex-end;gap:6px;font-size:.72rem;white-space:nowrap}.eq-pz span{color:#9ca3af}.eq-pz b{font-weight:700;color:#2f3135}
+.eq-dica{margin-left:auto;color:#9ca3af;font-size:.7rem}.eq-ponte{display:flex;align-items:center;gap:12px;color:#484a4e}.eq-ponte span{flex:1;font-size:.86rem}
+@media(max-width:900px){.eq-ks{flex-wrap:wrap}.eq-k{flex:1 1 30%}}
 .od-strip{display:flex;gap:2px;flex-wrap:nowrap}.od-strip i{display:inline-block;width:9px;height:18px;flex:0 0 9px}
 .od-g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.od-g2>.od-card{margin-bottom:14px}
 .od-hd{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.od-hl{display:flex;align-items:center;gap:12px}.od-hr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -2864,7 +2870,7 @@ body .sidebar .sb-nav .sb-item{border-radius:12px!important}
 </div></div>
 <div class="nav" id="nav"><div class="nav-inner">
 <div class="nav-brand">⚖️ ÉDIMO</div>
-<button class="nav-tab active" id="tabR" onclick="showPage('ranking')">📊 Acordos do Dia</button>
+<button class="nav-tab active" id="tabR" onclick="showPage('ranking')">📊 Acompanhamento do Dia</button>
 <button class="nav-tab" id="tabC" onclick="showPage('comparativo')">📈 Comparativo</button>
 <button class="nav-tab" id="tabT" onclick="showPage('treinamentos')">🎓 Treinamentos</button>
 <button class="nav-tab" id="tabA" onclick="showPage('avaliacao')" style="display:none">🎧 Avaliação</button>
@@ -2888,7 +2894,7 @@ body .sidebar .sb-nav .sb-item{border-radius:12px!important}
 <div class="sb-month-sub">Acompanhamento de desempenho</div>
 </div>
 <nav class="sb-nav">
-<button class="sb-item" id="sbR" onclick="showPage('ranking')">🏆 Acordos do Dia</button>
+<button class="sb-item" id="sbR" onclick="showPage('ranking')">🏆 Acompanhamento do Dia</button>
 <button class="sb-item active" id="sbC" onclick="showPage('comparativo')">📊 Comparativo</button>
 <button class="sb-item" id="sbT" onclick="showPage('treinamentos')">🎓 Treinamentos</button>
 <button class="sb-item" id="sbQ" onclick="showPage('qualidade')">⭐ Qualidade das Ligações</button>
@@ -3297,9 +3303,9 @@ async function startApp(){showNav();showPage('ranking');const h=window.location.
 // sem acordo ainda no dia: mantem o cabecalho (com o botao do discador e o Hoje/Escolher dia) e avisa
 function rankSemAcordos(){const pg=document.getElementById('pageRanking');if(!pg)return;
   const hd=new Date().toLocaleDateString('pt-BR'),hr=new Date().toLocaleTimeString('pt-BR').slice(0,5);
-  pg.innerHTML='<div class="loading-msg" id="rankLoading" style="display:none"></div><div class="nx"><div class="nx-head date-header"><div class="nx-head-l"><div class="nx-tt"><h2>Acordos do Dia</h2><span class="nx-live"><i></i>Ao vivo · '+hd+'</span></div>'+
+  pg.innerHTML='<div class="loading-msg" id="rankLoading" style="display:none"></div><div class="nx"><div class="nx-head date-header"><div class="nx-head-l"><div class="nx-tt"><h2>Acompanhamento do Dia</h2><span class="nx-live"><i></i>Ao vivo · '+hd+'</span></div>'+
     '<p>Édimo Debarba Junior <b>·</b> Última leitura às <strong>'+hr+'</strong></p></div>'+(window.MODO?window.MODO.widget('acordos'):'')+'</div>'+
-    '<div class="nx-vazio"><b>Nenhum acordo ainda hoje</b><span>Última leitura do Cobmais às '+hr+'. A tela atualiza sozinha quando sair o primeiro acordo.</span></div></div>';
+    '<div class="nx-vazio"><b>Nenhum acordo ainda hoje</b><span>Última leitura do Cobmais às '+hr+'. A tela atualiza sozinha quando sair o primeiro acordo.</span></div><div id="eqWrap">'+(window.EQUIPE?window.EQUIPE.html(''):'')+'</div></div>';
   if(window.histBarra)window.histBarra()}
 async function loadDrive(){const rl0=document.getElementById('rankLoading');if(rl0)rl0.style.display='block';try{await loadPonto();const csv=await rkCSV();const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{rankSemAcordos()}}catch(e){const rl=document.getElementById('rankLoading');if(rl){rl.style.display='block';rl.innerHTML='Erro ao carregar.'}}}
 
@@ -3348,7 +3354,7 @@ function renderR(data){
   const agora=new Date().toLocaleTimeString('pt-BR');
   let h='<div class="nx">';
   // cabecalho (date-header: o historico coloca os botoes Hoje / Escolher dia aqui dentro)
-  h+='<div class="nx-head date-header"><div class="nx-head-l"><div class="nx-tt"><h2>Acordos do Dia</h2><span class="nx-live'+(hist?' hist':'')+'"><i></i>'+(hist?'Histórico':'Ao vivo')+' · '+esc(date||new Date().toLocaleDateString('pt-BR'))+'</span></div>'+
+  h+='<div class="nx-head date-header"><div class="nx-head-l"><div class="nx-tt"><h2>Acompanhamento do Dia</h2><span class="nx-live'+(hist?' hist':'')+'"><i></i>'+(hist?'Histórico':'Ao vivo')+' · '+esc(date||new Date().toLocaleDateString('pt-BR'))+'</span></div>'+
      '<p>Édimo Debarba Junior <b>·</b> Última sincronização às <strong>'+agora+'</strong></p></div>'+
      (window.MODO?window.MODO.widget('acordos'):'')+'<div class="nx-busca"><input id="nxBusca" type="search" placeholder="Buscar operador..." value="'+esc(window.NXB||'')+'" oninput="nxBusca(this.value)"></div></div>';
   // indicadores
@@ -3384,6 +3390,7 @@ function renderR(data){
       '<div><span class="nx-ac'+(o.a?'':' z')+'">'+o.a+'</span></div><div class="nx-vl">'+(o.v>0?fm(o.v):'<span>R$ 0</span>')+'</div></div>';
   });
   h+='<div class="nx-vazio" id="nxVazio" style="display:none">Nenhum operador nesse filtro.</div></div>';
+  h+='<div id="eqWrap">'+(window.EQUIPE?window.EQUIPE.html(hist?date:''):'')+'</div>';
   h+='<div class="dash-footer"><div class="brand-ft">ÉDIMO</div>Soluções em Cobranças</div></div>';
   document.getElementById('pageRanking').innerHTML=h;toolbar.style.display='flex';updateFaltaAlert();nxAplica();
 }
@@ -4641,7 +4648,7 @@ function visaoFunil(){
 // ===== OPERACAO DO DISCADOR (dados do robo via relatorios v2 da Fastway) =====
 const pf=(v,d)=>Number(v||0).toFixed(d).replace('.',',');
 const brl=v=>'R$ '+(Math.round(v*100)/100).toFixed(2).replace('.',',');
-function operFilt(b){return (OPER||[]).filter(x=>x.bloco===b&&x.dados&&noPer(x.data))}
+function operFilt(b){return (OPER||[]).filter(x=>x.bloco===b&&x.dados&&(EQ_MODE||noPer(x.data)))}
 function operJunta(b){const m={};operFilt(b).forEach(x=>(x.dados||[]).forEach(r=>{const t=m[r.k]=m[r.k]||{k:r.k};Object.keys(r).forEach(c=>{if(c!=='k'&&typeof r[c]==='number')t[c]=(t[c]||0)+r[c];else if(c!=='k'&&typeof r[c]==='string'&&!t[c])t[c]=r[c]})}));return Object.values(m)}
 const hm=s=>{s=Math.round(s||0);const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h+'h'+String(m).padStart(2,'0')};
 const pctc=(v,t,cor)=>'<td>'+pf(pc(v,t),pc(v,t)<10?1:0)+'%'+mini(pc(v,t),cor)+'</td>';
@@ -4870,27 +4877,7 @@ function visaoOper0(){
       odInfo('Telefones que o discador ficou ligando sem chance de falar com o devedor.','<b>Bloquear de vez</b> = não existe, ou quem atendeu não conhece o cliente. <b>Pausar 7 dias</b> = caixa postal 3x ou mais: pode ser celular desligado, então não apaga.','Baixe as duas listas e cadastre na Fastway (Configurações → Blacklist; a de pausa em Regras de Renitência). Os botões baixam a lista completa do período filtrado, pronta pra importar. A tabela abaixo mostra só os mais discados.'))+
     '<div class="od-big3"><div style="--c:#dc2626"><b>'+fmtN(ne)+'</b>não existem</div><div style="--c:#b91c1c"><b>'+fmtN(ncl)+'</b>não conhecem o cliente'+(novo?'':'<small>aparece na próxima coleta</small>')+'</div><div style="--c:#c2410c"><b>'+fmtN(el)+'</b>caixa postal 3x+</div></div>'+
     tbw('<table class="od-tb"><tr><th>Telefone</th><th>Tentativas '+(umDia?'hoje':'no período')+'</th><th>Motivo</th><th>Ação</th></tr>'+BLOQ.slice(0,6).concat(PAUSA.slice(0,6)).map(x=>'<tr><td class="nm">'+esc(x.f)+'</td><td>'+x.t+'</td><td>'+motivoTxt(x)+'</td><td>'+(x.tipo==='el'?pill('pausar 7 dias','#ffedd5','#c2410c'):pill('bloquear de vez','#fee2e2','#b91c1c'))+'</td></tr>').join('')+'</table>')+'</div>';
-  // ---- equipe
-  const alerta=o=>{const al=[];if(!prosp(o)&&pc(mEf(o),o.login)>20)al.push(['discando na mão','#b91c1c','manual']);if(pc(o.ocioso,o.login)>40)al.push(['faltando ligação','#64748b','ocioso']);if(pc(o.pausa,o.login)>15)al.push(['pausa alta','#b45309','pausa']);if(o.bloqueio>600)al.push(['bloqueio','#b91c1c','bloq']);const pz=PZ[nkey(o.n)];if(pz&&pz.estDias)al.push([umDia?'lanche estourado':'lanche estourado '+pz.estDias+'x','#dc2626','lanche']);return al};
-  const TP=operTempos(),PZ=operPausas(),temTP=Object.keys(TP).length>0,nLan=O.filter(o=>(PZ[nkey(o.n)]||{}).estDias).length;
-  const nAl=O.filter(o=>alerta(o).length).length;
-  h+='<div class="od-card">'+odHead('users','#d4a937','Tempo das operadoras','Barra = como cada uma usou o tempo logado'+(manual.length?' · <span class="od-badge" style="margin-left:4px">'+manual.length+' discando na mão</span>':''),
-      (umDia&&datas[0]===new Date().toLocaleDateString('pt-BR')&&window.MODO?window.MODO.widget('oper'):'')+odBtn('o','all','Todas ('+O.length+')',1,'#d4a937')+odBtn('o','alerta','Em alerta ('+nAl+')',0,'#dc2626')+odBtn('o','ok','Regular ('+(O.length-nAl)+')',0,'#16a34a')+(nLan?odBtn('o','lanche','Lanche estourado ('+nLan+')',0,'#dc2626'):''),
-      odInfo('Como cada operadora usou o tempo em que esteve logada no discador.','Barra: <b style="color:#16a34a">verde</b> falando, <b style="color:#b8901f">dourado</b> esperando ligação, <b style="color:#b91c1c">vermelho</b> manual, <b style="color:#64748b">cinza</b> pausa. Passe o mouse na linha pra ver cada pausa.','"Faltando ligação" (40%+ esperando) não é culpa dela: é base fraca. "Discando na mão" (fora da Prospecção) e "pausa alta" valem conversa. Quando for retrabalhar ficha, troque o discador pra <b>Manual</b> no botão acima: o manual desse período fica em <b style="color:#a86a6a">rosa</b> (liberado) e não gera alerta.'))+
-    (()=>{const lib=O.reduce((s2,o)=>s2+(o.manual_lib||0),0),hoje=umDia&&datas[0]===new Date().toLocaleDateString('pt-BR'),F=hoje&&window.MODO?window.MODO.faixasHoje():[],hh=window.MODO?window.MODO.hhmm:()=>'';
-      if(!lib&&!F.length)return '';
-      return '<div class="od-md">'+odi('alert',16)+'<span><b>Modo manual liberado'+(F.length?' hoje: '+F.map(f=>hh(f[0])+(isFinite(f[1])&&f[1]<Date.now()?' às '+hh(f[1]):' até agora')).join(', '):'')+'.</b> O manual feito nesse período é retrabalho de ficha e <b>não conta</b> como "discando na mão"'+(lib?' (equipe somada: '+hm(lib)+' liberado).':'. Entra no cálculo na próxima rodada do robô.')+'</span></div>'})()+
-    '<div class="od-leg"><span><i style="background:#16a34a"></i>Falando</span><span><i style="background:#d4a937"></i>Esperando</span><span><i style="background:#b91c1c"></i>Manual</span><span><i style="background:#d9a5a5"></i>Manual liberado</span><span><i style="background:#8a8d92"></i>Pausa</span></div>'+
-    tbw('<table class="od-tb od-eq"><tr><th>Operadora</th><th>Turno</th><th>Logada</th>'+(temTP?'<th>Atendidas</th><th>TMA</th>':'')+'<th style="min-width:300px">Uso do tempo</th>'+(umDia?'<th>Entrou · Saiu</th>':'<th>Dias</th>')+'<th>Situação</th></tr>'+
-    O.map(o=>{const al=alerta(o),tip=Object.keys(o.pausas).map(k=>k+': '+o.pausas[k].q+'x, '+hm(o.pausas[k].s)).join('\n'),L=o.login||1,seg=(v,c,n)=>v>0?'<i style="width:'+pc(v,L).toFixed(1)+'%;background:'+c+'" title="'+n+': '+pf(pc(v,L),0)+'%"></i>':'';
-      const tur=/prospec/i.test(o.g)?'Prospecção':/manh/i.test(o.g)?'Manhã':/tard/i.test(o.g)?'Tarde':/novat/i.test(o.g)?'Novatos':esc(o.g||'-');
-      const st=al.length?al.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+a[0]+'</span>').join(''):'<span class="od-st" style="--c:#16a34a">'+odi('ok',12)+'regular</span>';
-      const tp=TP[nkey(o.n)];
-      return '<tr data-odf="o" data-v="'+(al.length?'alerta':'ok')+'" data-v2="'+al.map(x=>x[2]).join(' ')+'" title="'+esc(tip)+'"><td class="nm"><span class="od-ui">'+odi('users',15)+'</span>'+esc(nc(o.n))+'</td><td>'+tur+'</td><td><b>'+hm(o.login)+'</b></td>'+(temTP?(tp?'<td>'+fmtN(tp.at)+'</td><td data-v="'+tp.tma.toFixed(0)+'">'+mmss(tp.tma)+'</td>':'<td>-</td><td>-</td>'):'')+
-        '<td><div class="od-stack">'+seg(o.fala,'#16a34a','Falando')+seg(o.ocioso,'#d4a937','Esperando')+seg(mEf(o),'#b91c1c','Manual')+seg(o.manual_lib||0,'#d9a5a5','Manual liberado (retrabalho)')+seg(o.pausa,'#8a8d92','Pausa')+'</div>'+
-        '<div class="od-stl"><span style="color:#16a34a">'+pf(pc(o.fala,L),0)+'% falando</span><span style="color:#b8901f">'+pf(pc(o.ocioso,L),0)+'% esperando</span><span style="color:#b91c1c">'+pf(pc(mEf(o),L),0)+'% manual'+(o.manual_lib>=60?' <small style="color:#a86a6a">+'+pf(pc(o.manual_lib,L),0)+'% liberado</small>':'')+'</span><span style="color:#6b6e73">'+pf(pc(o.pausa,L),0)+'% pausa</span></div></td>'+
-        (umDia?'<td>'+esc(String(o.ini).slice(0,5))+' · '+esc(String(o.fim).slice(0,5))+'</td>':'<td>'+o.dias+'</td>')+'<td class="od-sts">'+st+'</td></tr>'}).join('')+'</table>')+'</div>';
-  h+=odPausas(umDia)+odPresenca();
+  h+='<div class="od-card eq-ponte">'+odi('users',18)+'<span><b>Tempo, pausas e presença das operadoras</b> agora ficam juntos no <b>Acompanhamento do Dia</b>.</span><button class="od-dl" onclick="showPage(\'ranking\')">Abrir</button></div>';
   // ---- rotas + operadora do telefone
   const R=operJunta('tronco').filter(r=>r.dis>=50).sort((a,b)=>b.dis-a.dis),C=operJunta('carrier').filter(r=>r.dis>=300).sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis));
   h+='<div class="od-g2"><div class="od-card">'+odHead('signal','#2f3135','NOVATECH x VOROS (rotas)','A "linha" por onde a ligação sai','',odInfo('Rota ruim derruba ligação ou diz que o número não existe quando existe.','Compare <b>atendem</b> e <b>não existe</b> entre as rotas. <b>Custo por atendida</b> = quanto custou cada ligação que chegou numa pessoa.','Se uma rota tiver muito mais "não existe", faça o teste com dois serviços iguais, um em cada rota, por uma semana. "Sem tarifa" = custo não cadastrado na Fastway.'))+
@@ -4940,7 +4927,84 @@ function visao(ls,lin,c,eq){
   }
   return h;
 }
-window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,errFiltro,errCrit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao};
+// ===== EQUIPE NO DISCADOR (vai no Acompanhamento do Dia): tempo, TMA, pausas e presenca num lugar so =====
+let EQ_MODE=false;const EQ={dia:'',dados:null,ms:0,busy:false,tab:'hoje',f:'all'};
+function eqNomes(lista){const c={};lista.forEach(n=>{const k=nc(n);c[k]=(c[k]||0)+1});
+  return n=>{const k=nc(n);if(c[k]<2)return k;const w=String(n).trim().split(/\s+/);return k+' '+w[w.length-1].charAt(0).toUpperCase()+w[w.length-1].slice(1).toLowerCase()}}
+function eqCom(f){const sv=OPER;OPER=EQ.dados||[];EQ_MODE=true;try{return f()}finally{OPER=sv;EQ_MODE=false}}
+async function eqBusca(dia){if(EQ.busy||!CHAVE)return;EQ.busy=true;
+  try{const [,mm,aa]=dia.split('/'),ini='01/'+mm+'/'+aa;
+    const r=await fetch(API+'?chave='+encodeURIComponent(CHAVE)+'&acao=operacao&dias=40&blocos=operadores,tempos,pausas,mes_ops&datas='+encodeURIComponent(dia+','+ini)+'&t='+Date.now()),j=await r.json();
+    if(j&&j.ok){EQ.dados=(j.operacao||[]).filter(x=>x.bloco==='mes_ops'?x.data===ini:(x.data===dia&&/^(operadores|tempos|pausas)$/.test(x.bloco)));EQ.dia=dia;EQ.ms=Date.now()}}
+  catch(e){}finally{EQ.busy=false}
+  const w=document.getElementById('eqWrap');if(w)w.innerHTML=eqHTML(dia)}
+function eqHTML(dia){
+  if(!(typeof isA==='function'&&isA()))return '';
+  dia=/^\d{2}\/\d{2}\/\d{4}$/.test(String(dia||''))?dia:new Date().toLocaleDateString('pt-BR');
+  if(!CHAVE)return '<div class="nx-card"><div class="nx-ch"><div><h3>Equipe no discador</h3><p>Abra a Avaliação de Discagem uma vez e entre com a chave pra liberar este painel.</p></div></div></div>';
+  if(EQ.dia!==dia||Date.now()-EQ.ms>5*60000)setTimeout(()=>eqBusca(dia),0);
+  if(EQ.dia!==dia||!EQ.dados)return '<div class="nx-card"><div class="nx-ch"><div><h3>Equipe no discador</h3><p>Buscando tempo, pausas e presença na Fastway...</p></div></div></div>';
+  return odVars(eqCom(()=>eqMonta(dia)))}
+function eqMonta(dia){
+  const hoje=dia===new Date().toLocaleDateString('pt-BR');
+  const O=operOps(),TP=operTempos(),PZ=operPausas(),MO=(EQ.dados||[]).find(x=>x.bloco==='mes_ops');
+  const atu=(EQ.dados||[]).filter(x=>x.bloco==='operadores').map(x=>String(x.atualizado||'')).sort().pop()||'';
+  const tab=(k,t)=>'<button class="'+(EQ.tab===k?'on':'')+'" onclick="avd.eqTab(\''+k+'\')">'+t+'</button>';
+  let h='<div class="nx-card eq"><div class="nx-ch"><div><h3>Equipe no discador</h3><p>Tempo, atendimento, pausas e presença de cada operadora · Fastway'+(atu?' · atualizado '+esc(atu.slice(-8,-3)):'')+'</p></div><div class="eq-tabs">'+tab('hoje',hoje?'Hoje':'No dia '+esc(dia.slice(0,5)))+tab('mes','Presença no mês')+'</div></div>';
+  if(EQ.tab==='mes'){h+=MO?eqMes(MO):'<div class="avd-empty">A presença do mês aparece depois da próxima coleta do robô.</div>';return h+'</div>'}
+  if(!O.length)return h+'<div class="avd-empty">Ainda sem dados da Fastway '+(hoje?'hoje':'nesse dia')+'.</div></div>';
+  const prosp=o=>/prospec/i.test(o.g||''),mEf=o=>Math.max(0,(o.manual||0)-(o.manual_lib||0)),nome=eqNomes(O.map(o=>o.n));
+  const R=O.map(o=>{const k=nkey(o.n),tp=TP[k],pz=PZ[k],tags=[],al=[];
+    if(!prosp(o)&&pc(mEf(o),o.login)>20){al.push(['discando na mão','#b91c1c']);tags.push('manual')}
+    if(pz&&pz.estDias){al.push(['lanche estourado','#dc2626']);tags.push('lanche')}
+    if(pc(o.pausa,o.login)>15){al.push(['pausa alta','#b45309']);tags.push('pausa')}
+    if(o.bloqueio>600){al.push(['bloqueio','#b91c1c']);tags.push('bloq')}
+    if(pc(o.ocioso,o.login)>40){al.push(['faltando ligação','#64748b']);tags.push('ocioso')}
+    if(hoje&&pz&&pz.aberta){tags.push('agora')}
+    if(al.some(a=>a[1]!=='#64748b'))tags.push('alerta');
+    return {o,tp,pz,al,tags,peso:al.filter(a=>a[1]!=='#64748b').length}}).sort((a,b)=>b.peso-a.peso||b.o.login-a.o.login);
+  const n=t=>R.filter(r=>r.tags.includes(t)).length,at=R.reduce((s,r)=>s+(r.tp?r.tp.at:0),0),tma=at?R.reduce((s,r)=>s+(r.tp?r.tp.tma*r.tp.at:0),0)/at:0;
+  const K=[['all','#484a4e','Logadas',R.length,hoje?'hoje no discador':'no dia'],['alerta','#dc2626','Em alerta',n('alerta'),'precisam de conversa'],['lanche','#dc2626','Lanche estourado',n('lanche'),'passou de 20 min'],['manual','#b91c1c','Discando na mão',n('manual'),'mais de 20% no manual']];
+  if(hoje)K.push(['agora','#b45309','Em pausa agora',n('agora'),'na última coleta']);
+  K.push([null,'#16a34a','Atendidas',fmtN(at),'TMA da equipe '+mmss(tma)]);
+  const f=EQ.f;
+  h+='<div class="eq-ks">'+K.map(k=>k[0]?'<button class="eq-k'+(f===k[0]?' on':'')+'" style="--c:'+k[1]+'" onclick="avd.eqFiltro(\''+k[0]+'\')"><span>'+k[2]+'</span><b>'+k[3]+'</b><small>'+k[4]+'</small></button>':'<div class="eq-k fix" style="--c:'+k[1]+'"><span>'+k[2]+'</span><b>'+k[3]+'</b><small>'+k[4]+'</small></div>').join('')+'</div>';
+  // manual liberado
+  const lib=O.reduce((s,o)=>s+(o.manual_lib||0),0),FX=hoje&&window.MODO?window.MODO.faixasHoje():[],hh=window.MODO?window.MODO.hhmm:()=>'';
+  if(lib||FX.length)h+='<div class="od-md">'+odi('alert',16)+'<span><b>Manual liberado'+(FX.length?' hoje: '+FX.map(x=>hh(x[0])+(isFinite(x[1])&&x[1]<Date.now()?' às '+hh(x[1]):' até agora')).join(', '):'')+'.</b> Esse período é retrabalho de ficha e não conta como "discando na mão".</span></div>';
+  h+='<div class="od-leg"><span><i style="background:#16a34a"></i>Falando</span><span><i style="background:#d4a937"></i>Esperando ligação</span><span><i style="background:#b91c1c"></i>Manual</span><span><i style="background:#d9a5a5"></i>Manual liberado</span><span><i style="background:#8a8d92"></i>Pausa</span><span class="eq-dica">Passe o mouse na linha pra ver cada pausa com horário</span></div>';
+  const pzTxt=(pz,k,rot)=>pz&&pz.tot[k][0]?'<div><span>'+rot+'</span><b>'+pz.tot[k][0]+'x · '+mmss(pz.tot[k][1])+'</b></div>':'';
+  h+='<div style="overflow-x:auto"><table class="od-tb od-eq eq-tb"><tr><th style="text-align:left">Operadora</th><th>Entrou · Saiu</th><th>Logada</th><th>Atendidas</th><th>TMA</th><th style="min-width:230px">Uso do tempo</th><th>Lanche</th><th>Outras pausas</th><th>Situação</th></tr>'+
+    R.map(r=>{const o=r.o,pz=r.pz,tp=r.tp,L=o.login||1,seg=(v,c,t)=>v>0?'<i style="width:'+pc(v,L).toFixed(1)+'%;background:'+c+'" title="'+t+': '+pf(pc(v,L),0)+'%"></i>':'';
+      const tur=prosp(o)?'Prospecção':/manh/i.test(o.g)?'Manhã':/tard/i.test(o.g)?'Tarde':/novat/i.test(o.g)?'Novatos':esc(o.g||'');
+      const d1=pz?Object.values(pz.dias)[0]||{}:{},lan=pz&&pz.tot.lanche[0]?pz.tot.lanche[1]:0;
+      const lanH=lan?'<td data-v="'+lan+'"><b style="color:'+(pz.estDias?'#dc2626':'#16a34a')+'">'+mmss(lan)+'</b><small>'+(d1.ini?'saiu '+esc(d1.ini):'')+(pz.estDias?(d1.ini?' · ':'')+'+'+mmss(lan-20*60):'')+'</small></td>':'<td data-v="0"><small>ainda não</small></td>';
+      const outras=pz?pzTxt(pz,'banheiro','Banheiro')+pzTxt(pz,'cafe','Café')+pzTxt(pz,'outra','Outras')+pzTxt(pz,'bloq','Bloqueio'):'';
+      const ag=hoje&&pz&&pz.aberta?'<span class="od-st" style="--c:#b45309">'+odi('clock',12)+'em pausa desde '+esc(pz.aberta[1])+'</span>':'';
+      const st=(r.al.length?r.al.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+a[0]+'</span>').join(''):ag?'':'<span class="od-st" style="--c:#16a34a">'+odi('ok',12)+'regular</span>')+ag;
+      const tip=pz?pz.lista.join('\n'):'';
+      return '<tr data-eq="'+r.tags.join(' ')+'" title="'+esc(tip)+'"><td class="nm" style="text-align:left"><b>'+esc(nome(o.n))+'</b><small>'+tur+'</small></td><td>'+esc(String(o.ini).slice(0,5))+' · '+esc(String(o.fim).slice(0,5))+'</td><td data-v="'+o.login+'"><b>'+hm(o.login)+'</b></td>'+
+        '<td>'+(tp?fmtN(tp.at):'-')+'</td><td data-v="'+(tp&&tp.at?tp.tma.toFixed(0):0)+'">'+(tp&&tp.at?mmss(tp.tma):'-')+'</td>'+
+        '<td data-v="'+pc(o.fala,L).toFixed(1)+'"><div class="od-stack">'+seg(o.fala,'#16a34a','Falando')+seg(o.ocioso,'#d4a937','Esperando')+seg(mEf(o),'#b91c1c','Manual')+seg(o.manual_lib||0,'#d9a5a5','Manual liberado')+seg(o.pausa,'#8a8d92','Pausa')+'</div>'+
+        '<div class="od-stl"><span style="color:#16a34a">'+pf(pc(o.fala,L),0)+'% falando</span><span style="color:#b8901f">'+pf(pc(o.ocioso,L),0)+'% esperando</span><span style="color:#b91c1c">'+pf(pc(mEf(o),L),0)+'% manual</span><span style="color:#6b6e73">'+pf(pc(o.pausa,L),0)+'% pausa</span></div></td>'+
+        lanH+'<td class="eq-pz">'+(outras||'<small>-</small>')+'</td><td class="od-sts">'+st+'</td></tr>'}).join('')+'</table></div>'+
+    '<div class="nx-vazio" id="eqVazio" style="display:none">Ninguém nesse filtro.</div>';
+  setTimeout(eqAplica,0);
+  return h+'</div>'}
+function eqMes(X){const D=X.dados.dias||[],O=(X.dados.ops||[]).slice(),nome=eqNomes(O.map(o=>o.n));
+  const tur=g=>/prospec/i.test(g)?'Prospecção':/manh/i.test(g)?'Manhã':/tard/i.test(g)?'Tarde':/novat/i.test(g)?'Novatos':/confer/i.test(g)?'Conferência':esc(g||'');
+  const R=O.map(o=>{const v=Object.values(o.d),s=i=>v.reduce((a,x)=>a+(x[i]||0),0),lg=s(0);return {o,nd:v.length,lg,fala:s(1),pausa:s(2),oc:s(3)}}).filter(r=>r.lg>=600).sort((a,b)=>b.nd-a.nd||b.lg-a.lg);
+  const mxD=Math.max(...R.map(r=>r.nd)),mes=String(X.dados.mes||'').split('-').reverse().join('/');
+  return '<div class="od-leg"><span><i style="background:#16a34a"></i>Logou (mais forte = mais horas)</span><span><i style="background:#f5b5b5"></i>Não logou num dia com operação</span><span class="eq-dica">'+D.length+' dias com operação em '+esc(mes)+' · atualiza de 3 em 3 horas</span></div>'+
+    '<div style="overflow-x:auto"><table class="od-tb eq-tb"><tr><th style="text-align:left">Operadora</th><th>Dias</th><th>Média logada</th><th>Falando</th><th>Pausa</th><th>Esperando</th><th style="text-align:left">Dia a dia</th></tr>'+R.map(r=>{const o=r.o;
+      const strip=D.map(d=>{const x=o.d[d];if(!x)return '<i style="background:#f5b5b5" title="dia '+d+': não logou"></i>';const a=Math.min(1,x[0]/21600);return '<i style="background:rgba(22,163,74,'+(0.3+a*0.7).toFixed(2)+')" title="dia '+d+': entrou '+esc(x[5]||'-')+' · logada '+hm(x[0])+'"></i>'}).join('');
+      return '<tr><td class="nm" style="text-align:left"><b>'+esc(nome(o.n))+'</b><small>'+tur(o.g)+'</small></td><td data-v="'+r.nd+'"><b style="color:'+(r.nd<mxD-2?'#dc2626':'inherit')+'">'+r.nd+'</b><small> de '+D.length+'</small></td><td data-v="'+(r.lg/r.nd)+'">'+hm(r.lg/r.nd)+'</td><td>'+pf(pc(r.fala,r.lg),0)+'%</td><td style="color:'+(pc(r.pausa,r.lg)>15?'#b45309':'inherit')+'">'+pf(pc(r.pausa,r.lg),0)+'%</td><td>'+pf(pc(r.oc,r.lg),0)+'%</td><td data-v="'+r.nd+'" style="text-align:left"><div class="od-strip">'+strip+'</div></td></tr>'}).join('')+'</table></div>'}
+function eqAplica(){let v=0;document.querySelectorAll('.eq-tb tr[data-eq]').forEach(tr=>{const ok=EQ.f==='all'||(' '+tr.dataset.eq+' ').indexOf(' '+EQ.f+' ')>=0;tr.style.display=ok?'':'none';if(ok)v++});const z=document.getElementById('eqVazio');if(z)z.style.display=v||EQ.tab!=='hoje'?'none':'block'}
+function eqRedesenha(){const w=document.getElementById('eqWrap');if(w)w.innerHTML=eqHTML(EQ.dia)}
+function eqTab(k){EQ.tab=k;eqRedesenha()}
+function eqFiltro(k){EQ.f=EQ.f===k?'all':k;document.querySelectorAll('.eq-k[onclick]').forEach(b=>b.classList.toggle('on',b.getAttribute('onclick').indexOf("'"+EQ.f+"'")>0));eqAplica()}
+window.EQUIPE={html:eqHTML};
+window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,errFiltro,errCrit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao,eqTab,eqFiltro};
 // atualiza sozinho a cada 3 min enquanto a aba estiver aberta (sem fechar ligação que estiver ouvindo)
 setInterval(()=>{const pg=$('pageAvaliacao');if(!pg||!pg.classList.contains('active')||!DADOS||DEMO_MODE||!CHAVE)return;
   if([].some.call(document.querySelectorAll('.avd-lig-b'),b=>b.style.display==='block'))return;carregar(true)},180000);
@@ -5817,7 +5881,7 @@ window.MQ_ouvir=function(b){var w=b.parentNode,fr=w.querySelector('iframe');if(f
 </script>
 <script id="edimo-modo">
 /* ===== MODO DO DISCADOR (Manual / Preview / Power) =====
-   O admin troca no Acordos do Dia ou no Tempo das operadoras (Avaliação de Discagem).
+   O admin troca no Acompanhamento do Dia.
    Vale até o fim do turno (14h / 20h) e depois volta pro horário: manhã 08-09 PREVIEW, 09-14 POWER | tarde 14-15 PREVIEW, 15-20 POWER.
    Fica salvo na planilha da monitoria (aba "Modo"): a TV, o robô e o painel enxergam o mesmo modo. */
 (function(){
@@ -6730,7 +6794,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1710',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1730',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();

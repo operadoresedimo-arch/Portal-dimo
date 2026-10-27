@@ -1,4 +1,4 @@
-const CACHE = 'portal-edimo-live-v20261027-1710';
+const CACHE = 'portal-edimo-live-v20261027-1730';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
