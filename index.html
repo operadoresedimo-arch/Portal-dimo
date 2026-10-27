@@ -2196,6 +2196,11 @@ body::before,body::after{display:none!important}
 .od-kt{display:flex;justify-content:space-between;align-items:center;font-size:.74rem;font-weight:600;color:#6b7280}.od-kt i{display:flex;padding:6px;border-radius:8px;color:var(--c);background:var(--c12)}
 .od-kv{font-size:1.6rem;font-weight:800;letter-spacing:-.02em;color:var(--tx);margin-top:10px}.od-ks{font-size:.72rem;color:#9ca3af;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .od-card{background:#fff;border:1px solid var(--bd);border-radius:16px;box-shadow:0 1px 4px rgba(15,23,42,.04);margin-bottom:14px;padding:18px 20px;overflow:hidden;min-width:0}
+.eq-live{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 12px;padding:9px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px!important;font-size:.78rem}.eq-live b{color:#2f3135}.eq-live span{display:inline-flex;align-items:center;gap:5px;color:#475569;font-weight:600}.eq-live span i{width:8px;height:8px;border-radius:99px!important;background:var(--c)}
+.eq-lv{color:#15803d!important;font-weight:800!important;margin-right:4px}.eq-lv i{background:#16a34a!important;animation:eqpulse 1.6s infinite}.eq-live.velho .eq-lv{color:#9ca3af!important}.eq-live.velho .eq-lv i{background:#9ca3af!important;animation:none}
+@keyframes eqpulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.5)}70%{box-shadow:0 0 0 7px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+.eq-ag{text-align:left!important;white-space:nowrap}.eq-now{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;color:var(--c)}.eq-now i{width:8px;height:8px;border-radius:99px!important;background:var(--c)}
+.eq-tm{display:block;font-variant-numeric:tabular-nums;font-size:.95rem;font-weight:800;color:#2f3135;margin-top:1px}.eq-tm.quase{color:#d97706}.eq-tm.estourou{color:#dc2626}.eq-off{font-size:.72rem;color:#9ca3af}
 .eq-tabs{display:flex;background:#f1f5f9;border-radius:12px!important;padding:3px;gap:2px}.eq-tabs button{border:0;background:transparent;padding:8px 14px;border-radius:9px!important;font-size:.78rem;font-weight:700;color:#64748b;cursor:pointer;font-family:inherit}.eq-tabs button.on{background:#fff;color:#2f3135;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .eq-ks{display:flex;gap:10px;margin-bottom:14px}.eq-k{flex:1 1 0;min-width:0;text-align:left;background:#fff;border:1px solid #e2e8f0;border-top:3px solid var(--c);border-radius:14px!important;padding:12px 14px;cursor:pointer;font-family:inherit;transition:box-shadow .15s,transform .15s}.eq-k:hover{box-shadow:0 4px 14px rgba(15,23,42,.08);transform:translateY(-1px)}.eq-k.on{background:var(--c8);border-color:var(--c30);border-top-color:var(--c);box-shadow:0 0 0 2px var(--c30)}.eq-k.fix{cursor:default}.eq-k.fix:hover{transform:none;box-shadow:none}
 .eq-k span{display:block;font-size:.72rem;font-weight:700;color:#64748b}.eq-k b{display:block;font-size:1.6rem;font-weight:800;color:var(--c);line-height:1.15;margin:2px 0}.eq-k small{display:block;font-size:.68rem;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -4782,6 +4787,21 @@ function odPresenca(){const X=operUlt('mes_ops');if(!X||!X.dados||!(X.dados.ops|
     tbw('<table class="od-tb"><tr><th>Operadora</th><th>Turno</th><th>Dias</th><th>Média logada</th><th>Falando</th><th>Pausa</th><th>Esperando</th><th style="text-align:left">Dias do mês</th></tr>'+R.map(r=>{const o=r.o;
       const strip=D.map(d=>{const x=o.d[d];if(!x)return '<i style="background:#f5b5b5" title="'+d+': não logou"></i>';const a=Math.min(1,x[0]/21600);return '<i style="background:rgba(22,163,74,'+(0.3+a*0.7).toFixed(2)+')" title="'+d+': entrou '+esc(x[5]||'-')+' · logada '+hm(x[0])+'"></i>'}).join('');
       return '<tr><td class="nm">'+esc(nc(o.n))+'</td><td>'+tur(o.g)+'</td><td data-v="'+r.nd+'"><b style="color:'+(r.nd<mxD-2?'#dc2626':'inherit')+'">'+r.nd+'</b><small> de '+D.length+'</small></td><td data-v="'+(r.lg/r.nd)+'">'+hm(r.lg/r.nd)+'</td><td>'+pf(pc(r.fala,r.lg),0)+'%</td><td style="color:'+(pc(r.pausa,r.lg)>15?'#b45309':'inherit')+'">'+pf(pc(r.pausa,r.lg),0)+'%</td><td>'+pf(pc(r.oc,r.lg),0)+'%</td><td data-v="'+r.nd+'" style="text-align:left"><div class="od-strip">'+strip+'</div></td></tr>'}).join('')+'</table>')+'</div>'}
+// ---- mailings no discador agora (robo --aovivo, API antiga FMI) ----
+function avHoje(){const hj=new Date().toLocaleDateString('pt-BR'),x=(OPER||[]).find(b=>b.bloco==='aovivo'&&b.data===hj);return x&&x.dados&&x.dados.ts?x.dados:null}
+function mailSit(m){const p=m.reg?m.trab/m.reg*100:0,at=/ATIVO|EXECU/i.test(m.st);
+  if(!at)return {o:3,t:String(m.st||'-').toLowerCase(),bg:'#f1f5f9',c:'#64748b',p};
+  if(p>=95||(!m.virg&&m.reg&&m.esg/m.reg>=0.9))return {o:0,t:'acabando',bg:'#fee2e2',c:'#b91c1c',p};
+  if(p>=80)return {o:1,t:'no fim',bg:'#ffedd5',c:'#c2410c',p};
+  return {o:2,t:'rodando',bg:'#dcfce7',c:'#15803d',p}}
+function odMailVivo(){const av=avHoje();if(!av||!(av.mailings||[]).length)return '';
+  const L=av.mailings.map(m=>Object.assign({},m,{s:mailSit(m)})).sort((a,b)=>a.s.o-b.s.o||b.reg-a.reg),ac=L.filter(m=>m.s.o===0).length;
+  const SV=(av.servicos||[]).filter(s=>s.modo&&s.modo!=='PABX');
+  const sv=SV.map(s=>'<span class="od-badge" style="background:#f8fafc;color:#484a4e;border-color:#e2e8f0">'+esc(s.n)+' · '+esc(String(s.modo||'').toLowerCase())+(s.ag?' '+esc(s.ag):'')+(s.nec?' · '+s.and+' de '+s.nec+' ligações':'')+'</span>').join('');
+  return '<div class="od-card">'+odHead('layers','#d4a937','Mailings no discador agora','Quanto falta de cada lista ativa na Fastway · atualizado '+esc(av.hora),sv+(ac?'<span class="od-badge">'+ac+' acabando</span>':''),
+      odInfo('As listas que estão carregadas no discador neste momento (dado ao vivo da Fastway, de 2 em 2 min).','<b>Trabalhado</b> = quanto da lista já foi discado até o fim das tentativas. <b>Virgens</b> = registros que ainda não foram discados nenhuma vez. <b>Esgotados</b> = já usaram todas as tentativas.','<b>Acabando</b>: importe a próxima base agora, antes da equipe ficar esperando ligação. <b>No fim</b>: deixe a próxima base pronta.'))+
+    tbw('<table class="od-tb"><tr><th>Mailing</th><th>Situação</th><th>Registros</th><th style="min-width:160px">Trabalhado</th><th>Virgens</th><th>Atendidos</th><th>Esgotados</th><th>Conversão</th><th>Importado</th></tr>'+
+    L.map(m=>'<tr><td class="nm">'+esc(m.nome||('Mailing '+m.id))+'<small>id '+esc(m.id)+'</small></td><td>'+pill(m.s.t,m.s.bg,m.s.c)+'</td><td>'+fmtN(m.reg)+'</td><td data-v="'+m.s.p.toFixed(1)+'"><b>'+pf(m.s.p,0)+'%</b>'+odBar(m.trab,m.reg||1,m.s.o===0?'#dc2626':m.s.o===1?'#c2410c':'#16a34a')+'</td><td>'+fmtN(m.virg)+'</td><td>'+fmtN(m.atd)+'</td><td>'+fmtN(m.esg)+'</td><td>'+fmtN(m.conv)+'</td><td>'+esc(String(m.imp||'').slice(8,10)+'/'+String(m.imp||'').slice(5,7)+' '+String(m.imp||'').slice(11,16))+'</td></tr>').join('')+'</table>')+'</div>'}
 function visaoOper(){return odVars(visaoOper0())}
 function visaoOper0(){
   if(!OPER||!OPER.length)return '<div class="avd-card"><div class="avd-empty">Ainda sem dados da operação. Troque o avaliacao.js, publique o Apps Script novo e rode <b>node avaliacao.js --operacao</b> (depois ele coleta sozinho a cada rodada).</div></div>';
@@ -4832,6 +4852,7 @@ function visaoOper0(){
   if(el)A.push(['clock','Pausar '+fmtN(el)+' números por 7 dias','Hoje','#b45309','Caixa postal 3x ou mais e ninguém atendeu. Não apaga: só dá um tempo e tenta em outro horário.'+(gP?' Gastaram <b>'+fmtN(gP)+' discagens</b>.':'')]);
   const ruins=M.filter(m=>m.d.o===3||m.d.o===2),bons=M.filter(m=>m.d.o===0);
   if(ruins.length)A.push(['layers','Limpar ou pausar '+ruins.length+' mailing'+(ruins.length>1?'s':''),'Hoje','#b45309',ruins.slice(0,3).map(m=>esc(nmM(m))+' ('+m.d.t+')').join(', ')+'.']);
+  {const av=avHoje();(av&&av.mailings||[]).map(m=>Object.assign({},m,{s:mailSit(m)})).filter(m=>m.s.o===0).forEach(m=>A.push(['layers','Mailing acabando: '+esc(m.nome||m.id),'Agora','#dc2626',pf(m.s.p,0)+'% trabalhado e '+fmtN(m.virg)+' virgens. Importe a próxima base antes da equipe ficar esperando.']))}
   if(bons.length)A.push(['trend','Priorizar '+bons.slice(0,2).map(m=>esc(nmM(m))).join(' e '),'Hoje','#16a34a',(semAco?'São os que mais atendem hoje. Deixe no discador nos horários de pico.':'São os que mais viram acordo. Deixe no discador nos horários de pico.')]);
   if(pico.length)A.push(['users','Equipe completa às '+pico.map(x=>x+'h').join(', '),'Escala','#484a4e','É quando mais gente atende.'+(fraco.length?' Lanche e pausa às '+fraco.map(x=>x+'h').join(' e ')+'.':'')]);
   if(manual.length)A.push(['alert','Conversar sobre modo manual','Conversar','#b91c1c',manual.length+' operadora'+(manual.length>1?'s':'')+' passaram mais de 20% do tempo discando na mão: '+manual.slice(0,4).map(o=>esc(nc(o.n))).join(', ')+(manual.length>4?'…':'')+'.']);
@@ -4856,6 +4877,7 @@ function visaoOper0(){
     tbw('<table class="od-tb"><tr><th>#</th><th>Mailing</th><th>Discagens</th><th>Atendem</th><th>Não existe</th><th>Acordos</th><th>Por mil</th><th>Melhor hora</th><th>Decisão</th></tr>'+
     M.map((m,i)=>'<tr data-odf="m" data-v="'+m.d.t+'" data-n="'+esc(nmM(m).toLowerCase()+' '+m.k)+'"><td class="od-pos">'+(i+1)+'º</td><td class="nm">'+esc(nmM(m))+(m.nome?'<small>id '+esc(m.k)+'</small>':'')+'</td><td>'+fmtN(m.dis)+'</td><td><b>'+pf(pc(m.at,m.dis),1)+'%</b>'+odBar(m.at,m.dis*Math.max(.01,Math.max(...M.map(x=>pc(x.at,x.dis)))/100),'#16a34a')+'</td><td><b style="color:'+(pc(m.ne,m.dis)>=15?'#dc2626':'inherit')+'">'+pf(pc(m.ne,m.dis),1)+'%</b>'+odBar(m.ne,m.dis*.3,'#dc2626')+'</td>'+(semAco?'<td>-</td><td>-</td>':'<td><b>'+fmtN(m.aco)+'</b></td><td><b>'+pf(m.mil,1)+'</b></td>')+'<td>'+(m.bh?esc(m.bh.h)+'h <small>'+pf(pc(m.bh.at,m.bh.dis),1)+'%</small>':'-')+'</td><td class="od-dec">'+pill(m.d.t,m.d.bg,m.d.c)+'<small>'+esc(m.d.p)+'</small></td></tr>').join('')+'</table>')+
     (M.some(m=>!m.nome)?'<div class="od-nota">A Fastway só manda o número do mailing. Pra aparecer o nome, coloque no config.json do robô: <b>"MAILING_NOMES": {"3758": "Nome da carteira"}</b>.</div>':'')+'</div>';
+  h+=odMailVivo();
   // ---- horario + DDD
   const D=operJunta('ddd').filter(x=>x.dis>=300).sort((a,b)=>b.dis-a.dis),topD=D.slice(0,10).map(x=>x.k),horas=H.map(x=>x.k),mxH=Math.max(1,...H.map(x=>pc(x.at,x.dis)));
   const pk=Hok.slice().sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis))[0];
@@ -4935,8 +4957,8 @@ function eqNomes(lista){const c={};lista.forEach(n=>{const k=nc(n);c[k]=(c[k]||0
 function eqCom(f){const sv=OPER;OPER=EQ.dados||[];EQ_MODE=true;try{return f()}finally{OPER=sv;EQ_MODE=false}}
 async function eqBusca(dia){if(EQ.busy||!CHAVE)return;EQ.busy=true;
   try{const [,mm,aa]=dia.split('/'),ini='01/'+mm+'/'+aa;
-    const r=await fetch(API+'?chave='+encodeURIComponent(CHAVE)+'&acao=operacao&dias=40&blocos=operadores,tempos,pausas,mes_ops&datas='+encodeURIComponent(dia+','+ini)+'&t='+Date.now()),j=await r.json();
-    if(j&&j.ok){EQ.dados=(j.operacao||[]).filter(x=>x.bloco==='mes_ops'?x.data===ini:(x.data===dia&&/^(operadores|tempos|pausas)$/.test(x.bloco)));EQ.dia=dia;EQ.ms=Date.now()}}
+    const r=await fetch(API+'?chave='+encodeURIComponent(CHAVE)+'&acao=operacao&dias=40&blocos=operadores,tempos,pausas,mes_ops,aovivo&datas='+encodeURIComponent(dia+','+ini)+'&t='+Date.now()),j=await r.json();
+    if(j&&j.ok){EQ.dados=(j.operacao||[]).filter(x=>x.bloco==='mes_ops'?x.data===ini:(x.data===dia&&/^(operadores|tempos|pausas|aovivo)$/.test(x.bloco)));EQ.dia=dia;EQ.ms=Date.now()}}
   catch(e){}finally{EQ.busy=false}
   const w=document.getElementById('eqWrap');if(w)w.innerHTML=eqHTML(dia)}
 function eqHTML(dia){
@@ -4946,6 +4968,34 @@ function eqHTML(dia){
   if(EQ.dia!==dia||Date.now()-EQ.ms>5*60000)setTimeout(()=>eqBusca(dia),0);
   if(EQ.dia!==dia||!EQ.dados)return '<div class="nx-card"><div class="nx-ch"><div><h3>Equipe no discador</h3><p>Buscando tempo, pausas e presença na Fastway...</p></div></div></div>';
   return odVars(eqCom(()=>eqMonta(dia)))}
+// ---- ao vivo (robo --aovivo de 2 em 2 min): status de cada operadora agora, com cronometro ----
+function eqAV(){const x=(EQ.dados||[]).find(b=>b.bloco==='aovivo');return x&&x.dados&&x.dados.ts?x.dados:null}
+function eqSt(o){const st=String(o.st||'').toUpperCase();
+  if(o.pz||/PAUSA/.test(st)){const tp=tipoPausa(o.pz||st),nm=tp==='lanche'?'Lanche':tp==='banheiro'?'Banheiro':tp==='cafe'?'Café':String(o.pz||'pausa').toLowerCase();return {t:'Pausa · '+nm,c:'#b45309',k:'pausa',lim:tp==='lanche'?LANCHE_LIM:(o.pzMax||900)}}
+  if(/TABULA/.test(st))return {t:'Tabulando',c:'#64748b',k:'tab',lim:120};
+  if(/MANUAL/.test(st)||o.man)return {t:'Discando na mão',c:'#b91c1c',k:'manual',lim:0};
+  if(/BLOQ/.test(st))return {t:'Bloqueada',c:'#dc2626',k:'bloq',lim:0};
+  if(/ATEND|FALAND|CONVERS|LIGA|DAC|OCUPAD/.test(st))return {t:'Falando',c:'#16a34a',k:'fala',lim:0};
+  if(/LIVRE|DISPON|AGUARD|OCIOS|ESPERA|PRONT/.test(st))return {t:'Esperando ligação',c:'#b8901f',k:'espera',lim:0};
+  return {t:st?st.charAt(0)+st.slice(1).toLowerCase():'-',c:'#64748b',k:'outro',lim:0}}
+function eqAVmapa(av){const m={};(av&&av.ops||[]).forEach(o=>{m[nkey(o.n)]=o;if(o.lg)m['@'+String(o.lg).toLowerCase()]=o});return m}
+function eqCel(o,av){if(!o)return '<span class="eq-off">fora agora</span>';const s=eqSt(o),t0=av.ts-(o.s||0)*1000;
+  return '<span class="eq-now" style="--c:'+s.c+'"><i></i>'+esc(s.t)+'</span><b class="eq-tm" data-t0="'+t0+'" data-lim="'+(s.lim||0)+'"></b>'}
+function eqFaixa(av){if(!av)return '';const velho=Date.now()-av.ts>10*60000,c={};(av.ops||[]).forEach(o=>{const k=eqSt(o).k;c[k]=(c[k]||0)+1});
+  const it=[['fala','#16a34a','falando'],['espera','#b8901f','esperando ligação'],['pausa','#b45309','em pausa'],['tab','#64748b','tabulando'],['manual','#b91c1c','na mão'],['bloq','#dc2626','bloqueada']].filter(x=>c[x[0]]);
+  return '<div class="eq-live'+(velho?' velho':'')+'" id="eqLive"><span class="eq-lv"><i></i>'+(velho?'Ao vivo parado desde '+esc(av.hora):'Agora · '+esc(av.hora))+'</span><b>'+(av.ops||[]).length+' logadas</b>'+it.map(x=>'<span style="--c:'+x[1]+'"><i></i>'+c[x[0]]+' '+x[2]+'</span>').join('')+'</div>'}
+function eqTick(){const n=Date.now();document.querySelectorAll('.eq-tm[data-t0]').forEach(el=>{const s=Math.max(0,Math.round((n-+el.dataset.t0)/1000)),lim=+el.dataset.lim||0;
+  el.textContent=s>=3600?Math.floor(s/3600)+'h'+String(Math.floor(s%3600/60)).padStart(2,'0'):Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+  el.classList.toggle('quase',lim>0&&s>=lim*0.85&&s<=lim);el.classList.toggle('estourou',lim>0&&s>lim)})}
+setInterval(eqTick,1000);
+async function eqAVbusca(){const w=document.getElementById('eqWrap');if(!w||!w.offsetParent||!CHAVE||!EQ.dados)return;const hoje=new Date().toLocaleDateString('pt-BR');if(EQ.dia!==hoje)return;
+  try{const j=await fetch(API+'?chave='+encodeURIComponent(CHAVE)+'&acao=operacao&dias=2&blocos=aovivo&datas='+encodeURIComponent(hoje)+'&t='+Date.now()).then(r=>r.json());
+    const x=(j&&j.ok?j.operacao:[]).find(b=>b.bloco==='aovivo'&&b.data===hoje);if(!x)return;
+    EQ.dados=EQ.dados.filter(b=>b.bloco!=='aovivo').concat([x]);eqPinta()}catch(e){}}
+setInterval(eqAVbusca,60000);
+function eqPinta(){const av=eqAV();if(!av)return;const M=eqAVmapa(av);
+  document.querySelectorAll('.eq-tb td.eq-ag').forEach(td=>{const o=M[td.dataset.k]||M['@'+td.dataset.lg];td.innerHTML=eqCel(o,av);const tr=td.parentNode,tg=(tr.dataset.eq||'').split(' ').filter(t=>t&&t!=='agora');if(o&&eqSt(o).k==='pausa')tg.push('agora');tr.dataset.eq=tg.join(' ')});
+  const f=document.getElementById('eqLive');if(f)f.outerHTML=eqFaixa(av);eqTick();eqAplica()}
 function eqMonta(dia){
   const hoje=dia===new Date().toLocaleDateString('pt-BR');
   const O=operOps(),TP=operTempos(),PZ=operPausas(),MO=(EQ.dados||[]).find(x=>x.bloco==='mes_ops');
@@ -4955,42 +5005,45 @@ function eqMonta(dia){
   if(EQ.tab==='mes'){h+=MO?eqMes(MO):'<div class="avd-empty">A presença do mês aparece depois da próxima coleta do robô.</div>';return h+'</div>'}
   if(!O.length)return h+'<div class="avd-empty">Ainda sem dados da Fastway '+(hoje?'hoje':'nesse dia')+'.</div></div>';
   const prosp=o=>/prospec/i.test(o.g||''),mEf=o=>Math.max(0,(o.manual||0)-(o.manual_lib||0)),nome=eqNomes(O.map(o=>o.n));
+  const AV=hoje?eqAV():null,AVM=eqAVmapa(AV),avDe=o=>AVM[nkey(o.n)]||AVM['@'+String(o.k||'').toLowerCase()];
   const R=O.map(o=>{const k=nkey(o.n),tp=TP[k],pz=PZ[k],tags=[],al=[];
     if(!prosp(o)&&pc(mEf(o),o.login)>20){al.push(['discando na mão','#b91c1c']);tags.push('manual')}
     if(pz&&pz.estDias){al.push(['lanche estourado','#dc2626']);tags.push('lanche')}
     if(pc(o.pausa,o.login)>15){al.push(['pausa alta','#b45309']);tags.push('pausa')}
     if(o.bloqueio>600){al.push(['bloqueio','#b91c1c']);tags.push('bloq')}
     if(pc(o.ocioso,o.login)>40){al.push(['faltando ligação','#64748b']);tags.push('ocioso')}
-    if(hoje&&pz&&pz.aberta){tags.push('agora')}
+    if(hoje&&(AV?(avDe(o)&&eqSt(avDe(o)).k==='pausa'):(pz&&pz.aberta))){tags.push('agora')}
+    {const v=AV&&avDe(o);if(v){const z=eqSt(v),seg=(Date.now()-(AV.ts-(v.s||0)*1000))/1000;if(z.k==='pausa'&&z.lim&&seg>z.lim){al.unshift([z.t.replace('Pausa · ','')+' estourado agora','#dc2626']);if(!tags.includes('alerta'))tags.push('alerta');if(/Lanche/.test(z.t)&&!tags.includes('lanche'))tags.push('lanche')}}}
     if(al.some(a=>a[1]!=='#64748b'))tags.push('alerta');
     return {o,tp,pz,al,tags,peso:al.filter(a=>a[1]!=='#64748b').length}}).sort((a,b)=>b.peso-a.peso||b.o.login-a.o.login);
   const n=t=>R.filter(r=>r.tags.includes(t)).length,at=R.reduce((s,r)=>s+(r.tp?r.tp.at:0),0),tma=at?R.reduce((s,r)=>s+(r.tp?r.tp.tma*r.tp.at:0),0)/at:0;
   const K=[['all','#484a4e','Logadas',R.length,hoje?'hoje no discador':'no dia'],['alerta','#dc2626','Em alerta',n('alerta'),'precisam de conversa'],['lanche','#dc2626','Lanche estourado',n('lanche'),'passou de 20 min'],['manual','#b91c1c','Discando na mão',n('manual'),'mais de 20% no manual']];
-  if(hoje)K.push(['agora','#b45309','Em pausa agora',n('agora'),'na última coleta']);
+  if(hoje)K.push(['agora','#b45309','Em pausa agora',n('agora'),AV?'ao vivo · '+esc(AV.hora):'na última coleta']);
   K.push([null,'#16a34a','Atendidas',fmtN(at),'TMA da equipe '+mmss(tma)]);
   const f=EQ.f;
   h+='<div class="eq-ks">'+K.map(k=>k[0]?'<button class="eq-k'+(f===k[0]?' on':'')+'" style="--c:'+k[1]+'" onclick="avd.eqFiltro(\''+k[0]+'\')"><span>'+k[2]+'</span><b>'+k[3]+'</b><small>'+k[4]+'</small></button>':'<div class="eq-k fix" style="--c:'+k[1]+'"><span>'+k[2]+'</span><b>'+k[3]+'</b><small>'+k[4]+'</small></div>').join('')+'</div>';
+  h+=eqFaixa(AV);
   // manual liberado
   const lib=O.reduce((s,o)=>s+(o.manual_lib||0),0),FX=hoje&&window.MODO?window.MODO.faixasHoje():[],hh=window.MODO?window.MODO.hhmm:()=>'';
   if(lib||FX.length)h+='<div class="od-md">'+odi('alert',16)+'<span><b>Manual liberado'+(FX.length?' hoje: '+FX.map(x=>hh(x[0])+(isFinite(x[1])&&x[1]<Date.now()?' às '+hh(x[1]):' até agora')).join(', '):'')+'.</b> Esse período é retrabalho de ficha e não conta como "discando na mão".</span></div>';
   h+='<div class="od-leg"><span><i style="background:#16a34a"></i>Falando</span><span><i style="background:#d4a937"></i>Esperando ligação</span><span><i style="background:#b91c1c"></i>Manual</span><span><i style="background:#d9a5a5"></i>Manual liberado</span><span><i style="background:#8a8d92"></i>Pausa</span><span class="eq-dica">Passe o mouse na linha pra ver cada pausa com horário</span></div>';
   const pzTxt=(pz,k,rot)=>pz&&pz.tot[k][0]?'<div><span>'+rot+'</span><b>'+pz.tot[k][0]+'x · '+mmss(pz.tot[k][1])+'</b></div>':'';
-  h+='<div style="overflow-x:auto"><table class="od-tb od-eq eq-tb"><tr><th style="text-align:left">Operadora</th><th>Entrou · Saiu</th><th>Logada</th><th>Atendidas</th><th>TMA</th><th style="min-width:230px">Uso do tempo</th><th>Lanche</th><th>Outras pausas</th><th>Situação</th></tr>'+
+  h+='<div style="overflow-x:auto"><table class="od-tb od-eq eq-tb"><tr><th style="text-align:left">Operadora</th>'+(AV?'<th style="text-align:left">Agora</th>':'')+'<th>Entrou · Saiu</th><th>Logada</th><th>Atendidas</th><th>TMA</th><th style="min-width:230px">Uso do tempo</th><th>Lanche</th><th>Outras pausas</th><th>Situação</th></tr>'+
     R.map(r=>{const o=r.o,pz=r.pz,tp=r.tp,L=o.login||1,seg=(v,c,t)=>v>0?'<i style="width:'+pc(v,L).toFixed(1)+'%;background:'+c+'" title="'+t+': '+pf(pc(v,L),0)+'%"></i>':'';
       const tur=prosp(o)?'Prospecção':/manh/i.test(o.g)?'Manhã':/tard/i.test(o.g)?'Tarde':/novat/i.test(o.g)?'Novatos':esc(o.g||'');
       const d1=pz?Object.values(pz.dias)[0]||{}:{},lan=pz&&pz.tot.lanche[0]?pz.tot.lanche[1]:0;
       const lanH=lan?'<td data-v="'+lan+'"><b style="color:'+(pz.estDias?'#dc2626':'#16a34a')+'">'+mmss(lan)+'</b><small>'+(d1.ini?'saiu '+esc(d1.ini):'')+(pz.estDias?(d1.ini?' · ':'')+'+'+mmss(lan-20*60):'')+'</small></td>':'<td data-v="0"><small>ainda não</small></td>';
       const outras=pz?pzTxt(pz,'banheiro','Banheiro')+pzTxt(pz,'cafe','Café')+pzTxt(pz,'outra','Outras')+pzTxt(pz,'bloq','Bloqueio'):'';
-      const ag=hoje&&pz&&pz.aberta?'<span class="od-st" style="--c:#b45309">'+odi('clock',12)+'em pausa desde '+esc(pz.aberta[1])+'</span>':'';
+      const ag=!AV&&hoje&&pz&&pz.aberta?'<span class="od-st" style="--c:#b45309">'+odi('clock',12)+'em pausa desde '+esc(pz.aberta[1])+'</span>':'';
       const st=(r.al.length?r.al.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+a[0]+'</span>').join(''):ag?'':'<span class="od-st" style="--c:#16a34a">'+odi('ok',12)+'regular</span>')+ag;
       const tip=pz?pz.lista.join('\n'):'';
-      return '<tr data-eq="'+r.tags.join(' ')+'" title="'+esc(tip)+'"><td class="nm" style="text-align:left"><b>'+esc(nome(o.n))+'</b><small>'+tur+'</small></td><td>'+esc(String(o.ini).slice(0,5))+' · '+esc(String(o.fim).slice(0,5))+'</td><td data-v="'+o.login+'"><b>'+hm(o.login)+'</b></td>'+
+      return '<tr data-eq="'+r.tags.join(' ')+'" title="'+esc(tip)+'"><td class="nm" style="text-align:left"><b>'+esc(nome(o.n))+'</b><small>'+tur+'</small></td>'+(AV?'<td class="eq-ag" data-k="'+esc(nkey(o.n))+'" data-lg="'+esc(String(o.k||'').toLowerCase())+'">'+eqCel(avDe(o),AV)+'</td>':'')+'<td>'+esc(String(o.ini).slice(0,5))+' · '+esc(String(o.fim).slice(0,5))+'</td><td data-v="'+o.login+'"><b>'+hm(o.login)+'</b></td>'+
         '<td>'+(tp?fmtN(tp.at):'-')+'</td><td data-v="'+(tp&&tp.at?tp.tma.toFixed(0):0)+'">'+(tp&&tp.at?mmss(tp.tma):'-')+'</td>'+
         '<td data-v="'+pc(o.fala,L).toFixed(1)+'"><div class="od-stack">'+seg(o.fala,'#16a34a','Falando')+seg(o.ocioso,'#d4a937','Esperando')+seg(mEf(o),'#b91c1c','Manual')+seg(o.manual_lib||0,'#d9a5a5','Manual liberado')+seg(o.pausa,'#8a8d92','Pausa')+'</div>'+
         '<div class="od-stl"><span style="color:#16a34a">'+pf(pc(o.fala,L),0)+'% falando</span><span style="color:#b8901f">'+pf(pc(o.ocioso,L),0)+'% esperando</span><span style="color:#b91c1c">'+pf(pc(mEf(o),L),0)+'% manual</span><span style="color:#6b6e73">'+pf(pc(o.pausa,L),0)+'% pausa</span></div></td>'+
         lanH+'<td class="eq-pz">'+(outras||'<small>-</small>')+'</td><td class="od-sts">'+st+'</td></tr>'}).join('')+'</table></div>'+
     '<div class="nx-vazio" id="eqVazio" style="display:none">Ninguém nesse filtro.</div>';
-  setTimeout(eqAplica,0);
+  setTimeout(()=>{eqTick();eqAplica()},0);
   return h+'</div>'}
 function eqMes(X){const D=X.dados.dias||[],O=(X.dados.ops||[]).slice(),nome=eqNomes(O.map(o=>o.n));
   const tur=g=>/prospec/i.test(g)?'Prospecção':/manh/i.test(g)?'Manhã':/tard/i.test(g)?'Tarde':/novat/i.test(g)?'Novatos':/confer/i.test(g)?'Conferência':esc(g||'');
@@ -6811,7 +6864,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1745',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1800',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
