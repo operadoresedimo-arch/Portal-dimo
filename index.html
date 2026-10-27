@@ -4545,11 +4545,12 @@ function insightsComFallback(ls){
 function detalhe(opEnc){
   const op=decodeURIComponent(opEnc);OP=op;
   const todos=filt(),a=todos.filter(l=>l.operador===op).sort((x,y)=>dt(y.data)-dt(x.data)||String(y.hora).localeCompare(String(x.hora)));
+  PDFF={op,a:a.map(l=>l.id),t:todos.map(l=>l.id)};
   const eq=ader(todos),n=ader(a);
   const rk={};todos.forEach(l=>(rk[l.operador]=rk[l.operador]||[]).push(l.nota));
   const rank=Object.keys(rk).map(o=>[o,med(rk[o])]).sort((x,y)=>y[1]-x[1]),pos=rank.findIndex(r=>r[0]===op)+1;
   const co=cm(a),ce=cm(todos),ins=insightsComFallback(a),ac=top(ins.ac.map(x=>({acertos:[x]})),'acertos'),er=top(ins.er.map(x=>({erros:[x]})),'erros'),nm=esc(nc(op));
-  let h='<div class="avd-prof"><div class="avd-av">'+esc(ini(op))+'</div><div><h2>'+nm+(a[0]&&a[0].grupo==='novato'?' <span class="avd-tag">novato</span>':'')+'</h2><p>'+esc(op)+'</p></div><div class="avd-prof-actions"><button class="avd-back" onclick="avd.exportarExcel(\'operador\',\''+esc(op).replace(/'/g,'&#39;')+'\')">▣ Excel</button><button class="avd-back" onclick="avd.exportarPDF(\'operador\',\''+esc(op).replace(/'/g,'&#39;')+'\')">▤ PDF</button><button class="avd-back" onclick="avd.render()">← Voltar</button></div></div>';
+  let h='<div class="avd-prof"><div class="avd-av">'+esc(ini(op))+'</div><div><h2>'+nm+(a[0]&&a[0].grupo==='novato'?' <span class="avd-tag">novato</span>':'')+'</h2><p>'+esc(op)+'</p></div><div class="avd-prof-actions"><button class="avd-back" onclick="avd.exportarExcel(\'operador\',\''+esc(op).replace(/'/g,'&#39;')+'\')">▣ Excel</button><button class="avd-back" title="Avaliação individual pra imprimir e assinar (mesmo modelo da Avaliação por Funcionário)" onclick="avd.pdfFunc()">▤ PDF do funcionário</button><button class="avd-back" onclick="avd.render()">← Voltar</button></div></div>';
   h+='<div class="avd-kpis">'+kpi('#d4a937',n.toFixed(0)+'%','Aderência média',vs(n,eq)+' ('+eq.toFixed(0)+'%)')+kpi('#1e4e7e',pos+'º','Posição por aderência','de '+rank.length+' operadores')+kpi('#16a34a',a.length,'Ligações ouvidas',a.filter(temRes).length+' com acordo')+kpi('#b45309',a.filter(l=>!l.feedback_dado).length,'Feedback pendente')+'</div>';
   h+='<div class="avd-card"><div class="avd-ct">Critério a critério · '+nm+' x equipe</div><div class="avd-pad"><div class="avd-leg">Percentual de aderência entre 0 e 100%, calculado somente nas ligações em que o critério se aplicava</div>'+
    Object.keys(ce).map(id=>{const c=ce[id],o=co[id]?co[id]:{pct:0,max:0},opPct=Math.round(o.pct||0),eqPct=Math.round(c.pct||0);return '<div class="avd-crit-status"><span><b>'+esc(c.nome)+'</b><br><small>Operador: <b>'+opPct+'%</b> · '+(o.max||0)+' avaliada'+(o.max===1?'':'s')+' | Equipe: <b>'+eqPct+'%</b> · '+(c.max||0)+' avaliada'+(c.max===1?'':'s')+'</small><div class="avd-pctrow"><div class="avd-pctmeta"><span>Operador</span><b>'+opPct+'%</b></div><div class="avd-pctbar"><i style="width:'+opPct+'%"></i></div><div class="avd-pctmeta" style="margin-top:4px"><span>Equipe</span><b>'+eqPct+'%</b></div><div class="avd-pctbar team"><i style="width:'+eqPct+'%"></i></div></div></span><span class="avd-quality '+qualidade(opPct)+'">'+qualidadeTxt(opPct)+'</span></div>'}).join('')+'</div></div>';
@@ -5004,7 +5005,8 @@ function eqRedesenha(){const w=document.getElementById('eqWrap');if(w)w.innerHTM
 function eqTab(k){EQ.tab=k;eqRedesenha()}
 function eqFiltro(k){EQ.f=EQ.f===k?'all':k;document.querySelectorAll('.eq-k[onclick]').forEach(b=>b.classList.toggle('on',b.getAttribute('onclick').indexOf("'"+EQ.f+"'")>0));eqAplica()}
 window.EQUIPE={html:eqHTML};
-window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,errFiltro,errCrit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao,eqTab,eqFiltro};
+let PDFF=null;function pdfFunc(){if(!PDFF)return;if(!window.QA||!window.QA.pdfIds){sT('O modelo do PDF ainda não carregou. Tente de novo em alguns segundos.');return}window.QA.pdfIds(PDFF.op,PDFF.a,PDFF.t)}
+window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,errFiltro,errCrit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao,eqTab,eqFiltro,pdfFunc};
 // atualiza sozinho a cada 3 min enquanto a aba estiver aberta (sem fechar ligação que estiver ouvindo)
 setInterval(()=>{const pg=$('pageAvaliacao');if(!pg||!pg.classList.contains('active')||!DADOS||DEMO_MODE||!CHAVE)return;
   if([].some.call(document.querySelectorAll('.avd-lig-b'),b=>b.style.display==='block'))return;carregar(true)},180000);
@@ -5197,7 +5199,7 @@ window.qualCarregar=function(){
 // BLOQUEIO: enquanto LIBERADO=false, so admin ve a Qualidade das Ligacoes. Pra liberar pros operadores, troque pra true.
 const LIBERADO=true;
 const bloqueado=()=>!LIBERADO&&!isAdm();
-setInterval(()=>{const b=document.getElementById('sbQ');if(b)b.style.display=bloqueado()?'none':''},800);
+setInterval(()=>{const b=document.getElementById('sbQ');if(b)b.style.display=(bloqueado()||(typeof isA==='function'&&isA()))?'none':''},800); // admin usa o perfil do operador na Avaliação de Discagem
 const sp=window.showPage;
 window.showPage=function(p){
   if(p==='qualidade'&&bloqueado())return;
@@ -5374,7 +5376,7 @@ function relatorio(f){
 
 function curto(t,n){t=String(t||'').replace(/\s+/g,' ').trim();return t.length>n?t.slice(0,n-1)+'…':t}
 function relatorioPdf(f){
-  const r=f.res,L=f.L.slice().sort((a,b)=>(b.dd||0)-(a.dd||0)),T=resumo(filtrados());
+  const r=f.res,L=f.L.slice().sort((a,b)=>(b.dd||0)-(a.dd||0)),T=f.T||resumo(filtrados());
   const dts=L.map(l=>l.dd).filter(Boolean),ini=dts.length?new Date(Math.min(...dts)).toLocaleDateString('pt-BR'):'-',fim=dts.length?new Date(Math.max(...dts)).toLocaleDateString('pt-BR'):'-';
   let h='<div class="qr pdf"><div class="qr-top"><div><small>Advocacia Édimo · Avaliação individual de ligações</small><h1>'+esc(f.n)+'</h1><p>'+esc([f.login,turno(f.pre)].filter(Boolean).join(' · '))+' · Período: '+ini+' a '+fim+' · Emitido em '+new Date().toLocaleDateString('pt-BR')+'</p></div></div>';
   if(!r.n)return h+'<div class="qr-box">Nenhuma ligação avaliada '+perTxt()+'.</div></div>';
@@ -5420,6 +5422,21 @@ const CSS_REL=`.qr{font-family:Inter,Arial,sans-serif;color:#1a1f36;font-size:13
 function pdf(){
   const f=funcionarios().find(x=>x.k===SEL);if(!f)return;
   const w=window.open('','_blank');if(!w){alert('O navegador bloqueou a janela. Libere pop-ups pro portal e tente de novo.');return}
+  escrevePdf(w,f);
+}
+// PDF do funcionario a partir do perfil na Avaliacao de Discagem: mesmas ligacoes do filtro de la, mesmo modelo
+async function pdfIds(op,idsOp,idsTodos){
+  const w=window.open('','_blank');if(!w){alert('O navegador bloqueou a janela. Libere pop-ups pro portal e tente de novo.');return}
+  w.document.write('<p style="font-family:sans-serif;padding:24px;color:#484a4e">Gerando o PDF de '+esc(tit(op))+'...</p>');
+  if(!D)await carregar(true);
+  if(!D){w.document.body.innerHTML='<p style="font-family:sans-serif;padding:24px">Não consegui carregar as avaliações agora. Tente de novo.</p>';return}
+  const idOf=x=>String(x==null?'':x).replace(/^'/,''),so=new Set(idsOp.map(idOf)),tt=new Set(idsTodos.map(idOf));
+  const L=D.filter(l=>so.has(idOf(l.id))),TT=D.filter(l=>tt.has(idOf(l.id)));
+  const F=[];try{Object.keys(allLogins||{}).forEach(n=>{const lg=String(allLogins[n]||'').trim(),pre=lg.charAt(0);if(/[012]/.test(pre))F.push({n:tit(n),login:lg,pre})})}catch(e){}
+  const d=dono(F,op),f={n:d?d.n:tit(op),login:d?d.login:'',pre:d?d.pre:'',L,fw:{},res:resumo(L),T:resumo(TT)};
+  w.document.open();escrevePdf(w,f);
+}
+function escrevePdf(w,f){
   w.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Avaliação - '+esc(f.n)+'</title><style>@page{size:A4;margin:11mm 12mm}body{margin:0}'+CSS_REL+'.qr.pdf{font-size:11.5px;line-height:1.38}.qr.pdf h1{font-size:22px}.qr.pdf h2{font-size:14px;margin:14px 0 6px}.qr.pdf .qr-box{padding:8px 12px;margin:6px 0}.qr.pdf .qr-kpis b{font-size:20px}.qr.pdf .qr-t td,.qr.pdf .qr-t th{padding:4px 6px}.qr.pdf .qr-ass{margin-top:26px}</style></head><body>'+relatorioPdf(f)+'<script>setTimeout(function(){window.print()},400)<\/script></body></html>');
   w.document.close();
 }
@@ -5437,7 +5454,7 @@ async function carregar(force){
 (function(){const st=document.createElement('style');st.textContent=CSS_REL;document.head.appendChild(st)})();
 window.QA={render,carregar,
   per(p){PER=p;render()},busca(v){BUSCA=v;lista()},
-  abre(k){SEL=k;render()},volta(){SEL='';render()},pdf};
+  abre(k){SEL=k;render()},volta(){SEL='';render()},pdf,pdfIds};
 // nome do menu: admin ve "Avaliação por Funcionário"
 setInterval(()=>{const b=document.getElementById('sbQ');if(!b)return;const adm=isAdm(),de=adm?'Qualidade das Ligações':'Avaliação por Funcionário',pra=adm?'Avaliação por Funcionário':'Qualidade das Ligações';
   const w=document.createTreeWalker(b,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))if(n.nodeValue.indexOf(de)>=0)n.nodeValue=n.nodeValue.replace(de,pra)},1000);
@@ -6794,7 +6811,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1730',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1745',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
