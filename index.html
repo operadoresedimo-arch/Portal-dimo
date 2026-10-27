@@ -2196,6 +2196,7 @@ body::before,body::after{display:none!important}
 .od-kt{display:flex;justify-content:space-between;align-items:center;font-size:.74rem;font-weight:600;color:#6b7280}.od-kt i{display:flex;padding:6px;border-radius:8px;color:var(--c);background:var(--c12)}
 .od-kv{font-size:1.6rem;font-weight:800;letter-spacing:-.02em;color:var(--tx);margin-top:10px}.od-ks{font-size:.72rem;color:#9ca3af;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .od-card{background:#fff;border:1px solid var(--bd);border-radius:16px;box-shadow:0 1px 4px rgba(15,23,42,.04);margin-bottom:14px;padding:18px 20px;overflow:hidden;min-width:0}
+.od-strip{display:flex;gap:2px;flex-wrap:nowrap}.od-strip i{display:inline-block;width:9px;height:18px;flex:0 0 9px}
 .od-g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.od-g2>.od-card{margin-bottom:14px}
 .od-hd{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.od-hl{display:flex;align-items:center;gap:12px}.od-hr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .od-ic{display:flex;padding:9px;border-radius:12px;color:var(--c);background:var(--c12);border:1px solid var(--c22)}
@@ -4716,6 +4717,59 @@ function odAcao(k,el){const c=localStorage.getItem(k)==='1';localStorage.setItem
 const odBtn=(g,val,txt,on,cor)=>'<button class="od-fb'+(on?' on':'')+'" style="--c:'+(cor||'#484a4e')+'" data-odg="'+g+'" data-val="'+val+'" onclick="avd.odFiltra(\''+g+'\',\''+val+'\',this)">'+txt+'</button>';
 const odBar=(v,t,c)=>'<div class="od-bar"><i style="width:'+Math.max(2,Math.min(100,pc(v,t))).toFixed(1)+'%;background:'+c+'"></i></div>';
 const odVars=h=>h.replace(/--c:(#[0-9a-fA-F]{6})/g,(m,x)=>{const r=parseInt(x.slice(1,3),16),g=parseInt(x.slice(3,5),16),b=parseInt(x.slice(5,7),16);return '--c:'+x+['10','12','14','20','22','25','30','5','55','70','8'].map(a=>';--c'+a+':rgba('+r+','+g+','+b+','+(a/100)+')').join('')});
+// ===== EXTRAS FASTWAY: TMA, pausas (lanche 20 min), ritmo de meia hora, mes por dia e presenca =====
+const LANCHE_LIM=20*60; // lanche = 20 min
+const nkey=s=>String(s||'').replace(/\s*\[-?\d+\]\s*$/,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().trim();
+const mmss=s=>{s=Math.round(s||0);const m=Math.floor(s/60),x=s%60;return m>=60?hm(s):!m?x+'s':m+'min'+(x?String(x).padStart(2,'0'):'')};
+function operUlt(b){const L=(OPER||[]).filter(x=>x.bloco===b&&x.dados);if(!L.length)return null;const dk=d=>String(d).split('/').reverse().join('');return L.sort((a,b2)=>dk(b2.data).localeCompare(dk(a.data)))[0]}
+function tipoPausa(t){t=String(t||'').toUpperCase();return /^BLOQUEIO/.test(t)?'bloq':/LANCHE|INTERVALO/.test(t)?'lanche':/BANHEIRO/.test(t)?'banheiro':/CAF/.test(t)?'cafe':'outra'}
+function operTempos(){const m={};operFilt('tempos').forEach(x=>(x.dados||[]).forEach(o=>{const k=nkey(o.n),t=m[k]=m[k]||{at:0,tmaS:0,tmoS:0,dias:0};t.dias++;t.at+=o.at||0;t.tmaS+=(o.tma||0)*(o.at||0);t.tmoS+=(o.tmo||0)*(o.at||0)}));
+  Object.values(m).forEach(t=>{t.tma=t.at?t.tmaS/t.at:0;t.tmo=t.at?t.tmoS/t.at:0});return m}
+function operPausas(){const m={};operFilt('pausas').forEach(x=>(x.dados||[]).forEach(o=>{const k=nkey(o.n),t=m[k]=m[k]||{n:o.n,dias:{},tot:{lanche:[0,0],banheiro:[0,0],cafe:[0,0],outra:[0,0],bloq:[0,0]},estDias:0,aberta:null,lista:[]};
+  const d=t.dias[x.data]=t.dias[x.data]||{lanche:0,ini:''};
+  (o.p||[]).forEach(p=>{const tp=tipoPausa(p[0]);t.tot[tp][0]++;t.tot[tp][1]+=p[2]||0;if(tp==='lanche'){d.lanche+=p[2]||0;if(!d.ini)d.ini=p[1]}if(p[3])t.aberta=p;t.lista.push((Object.keys(t.dias).length>1?x.data.slice(0,5)+' ':'')+p[1]+' '+String(p[0]).toLowerCase()+' '+mmss(p[2])+(p[3]?' (em andamento)':''))})}));
+  Object.values(m).forEach(t=>{t.estDias=Object.values(t.dias).filter(d=>d.lanche>LANCHE_LIM).length;t.nd=Object.keys(t.dias).length});return m}
+function odBarras(pts,fy){if(!pts.length)return '';const W=620,H=210,L=40,R=10,Tp=12,B=30,mx=Math.max(1,...pts.map(p=>p.y))*1.12,bw=(W-L-R)/pts.length;
+  const Y=v=>Tp+(H-Tp-B)*(1-v/mx);let g='';for(let i=0;i<=4;i++){const v=mx*i/4;g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#eef1f5" stroke-dasharray="3 3"/><text x="'+(L-6)+'" y="'+(Y(v)+4)+'" text-anchor="end" class="od-ax">'+fy(v)+'</text>'}
+  const pula=Math.ceil(pts.length/14);
+  return '<svg viewBox="0 0 '+W+' '+H+'" class="od-line">'+g+pts.map((p,i)=>{const x=L+i*bw+bw*.15,w=bw*.7,y=Y(p.y);
+    return '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+Math.max(0,Y(0)-y).toFixed(1)+'" fill="'+(p.hl?'#d4a937':'#484a4e')+'" opacity="'+(p.hl===false?.35:1)+'"><title>'+esc(p.tip)+'</title></rect>'+(i%pula===0?'<text x="'+(x+w/2).toFixed(1)+'" y="'+(H-10)+'" text-anchor="middle" class="od-ax">'+esc(p.k)+'</text>':'')}).join('')+'</svg>'}
+function odRitmoMes(umDia,datas){
+  const box=(c,t,v,sub)=>'<div class="od-mb" style="--c:'+c+'"><span>'+t+'</span><b>'+v+'</b>'+(sub?'<small>'+sub+'</small>':'')+'</div>';
+  const RT=umDia?(operFilt('ritmo').find(x=>x.data===datas[0])||{}).dados||[]:[];
+  const NM=operUlt('ns_mes'),MD=NM?NM.dados:[];
+  if(!RT.length&&!MD.length)return '';
+  let a='',b='';
+  if(RT.length){const at=RT.reduce((s,x)=>s+x.at,0),tma=at?RT.reduce((s,x)=>s+x.tma*x.at,0)/at:0,man=RT.reduce((s,x)=>s+x.man,0),fal=RT.reduce((s,x)=>s+x.fal,0),top=RT.slice().sort((x,y)=>y.at-x.at)[0];
+    a='<div class="od-card">'+odHead('clock','#484a4e','Ritmo do dia','Ligações atendidas de meia em meia hora','',odInfo('Quantas ligações chegaram numa operadora em cada meia hora (dado direto da Fastway).','Barra <b style="color:#b8901f">dourada</b> = meia hora mais forte. Passe o mouse pra ver o TMA (tempo médio de atendimento) e as ligações manuais.','Queda forte no meio do turno costuma ser pausa todo mundo junta ou mailing acabando.'))+
+      odBarras(RT.map(x=>({k:x.k,y:x.at,hl:x===top,tip:x.k+': '+fmtN(x.at)+' atendidas · TMA '+mmss(x.tma)+' · '+fmtN(x.man)+' manuais'})),v=>fmtN(v))+
+      '<div class="od-mbs">'+box('#16a34a','Atendidas no dia',fmtN(at),'pico às '+esc(top.k)+' ('+fmtN(top.at)+')')+box('#d4a937','TMA',mmss(tma),'tempo médio por ligação')+box('#b91c1c','Ligações manuais',fmtN(man),'discadas na mão')+box('#484a4e','Tempo falado',hm(fal),'equipe somada')+'</div></div>'}
+  if(MD.length){const sel=new Set(datas),at=MD.reduce((s,x)=>s+x.at,0),tma=at?MD.reduce((s,x)=>s+x.tma*x.at,0)/at:0,best=MD.slice().sort((x,y)=>y.at-x.at)[0],mesN=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'][(+String(MD[0].d).split('/')[1]||1)-1];
+    b='<div class="od-card">'+odHead('trend','#d4a937','Mês de '+mesN+' até agora','Ligações atendidas por dia','',odInfo('Atendidas de cada dia do mês, direto da Fastway (atualiza de 3 em 3 horas).','Barras <b style="color:#b8901f">douradas</b> = dias do filtro lá em cima. Passe o mouse pra ver TMA e manuais do dia.','Compare o mesmo dia da semana: se caiu muito, olhe mailing e escala daquele dia.'))+
+      odBarras(MD.map(x=>({k:String(x.d).slice(0,2),y:x.at,hl:sel.has(x.d)?true:(sel.size&&MD.some(y=>sel.has(y.d))?false:undefined),tip:x.d+': '+fmtN(x.at)+' atendidas · TMA '+mmss(x.tma)+' · '+fmtN(x.man)+' manuais'})),v=>fmtN(v))+
+      '<div class="od-mbs">'+box('#16a34a','Média por dia',fmtN(at/MD.length),MD.length+' dias com operação')+box('#d4a937','Melhor dia',esc(String(best.d).slice(0,5)),fmtN(best.at)+' atendidas')+box('#484a4e','TMA do mês',mmss(tma),'tempo médio por ligação')+box('#484a4e','Total no mês',fmtN(at),'atendidas')+'</div></div>'}
+  return a&&b?'<div class="od-g2">'+a+b+'</div>':(a||b)}
+function odPausas(umDia){const P=operPausas(),L=Object.values(P).filter(t=>t.lista.length);if(!L.length)return '';
+  const est=L.filter(t=>t.estDias).length,agora=L.filter(t=>t.aberta).length;
+  L.sort((a,b)=>b.estDias-a.estDias||b.tot.lanche[1]-a.tot.lanche[1]);
+  const cel=(t,k)=>t.tot[k][0]?'<td data-v="'+t.tot[k][1]+'"><b>'+mmss(t.tot[k][1])+'</b><small> '+t.tot[k][0]+'x</small></td>':'<td data-v="0">-</td>';
+  return '<div class="od-card">'+odHead('clock','#b45309',umDia?'Pausas do dia':'Pausas no período','Cada pausa da Fastway com hora e duração · lanche é de <b>20 min</b>',odBtn('pz','all','Todas ('+L.length+')',1,'#d4a937')+odBtn('pz','est','Lanche estourado ('+est+')',0,'#dc2626')+(umDia?odBtn('pz','agora','Em pausa agora ('+agora+')',0,'#b45309'):''),
+      odInfo('Todas as pausas registradas na Fastway (lanche, banheiro, café e outras), com o horário de cada uma.','<b>Lanche</b> fica vermelho quando passa de 20 min. Passe o mouse na linha pra ver a lista de pausas com horário. "Em pausa agora" vale pra última coleta do robô (de 30 em 30 min).','Lanche estourado repetido vale conversa. Muita pausa de banheiro curta seguida também.'))+
+    tbw('<table class="od-tb"><tr><th>Operadora</th><th>Lanche</th><th>Banheiro</th><th>Café</th><th>Outras</th><th>Total</th><th>Situação</th></tr>'+L.map(t=>{
+      const tot=['lanche','banheiro','cafe','outra'].reduce((s,k)=>s+t.tot[k][1],0),d1=Object.values(t.dias)[0]||{};
+      const lan=t.tot.lanche[0]?(umDia?'<td data-v="'+t.tot.lanche[1]+'"><b style="color:'+(t.estDias?'#dc2626':'#16a34a')+'">'+mmss(t.tot.lanche[1])+'</b><small> às '+esc(d1.ini||'-')+(t.estDias?' · +'+mmss(t.tot.lanche[1]-20*60):'')+'</small></td>':'<td data-v="'+t.estDias+'"><b style="color:'+(t.estDias?'#dc2626':'#16a34a')+'">'+(t.estDias?'estourou '+t.estDias+'x':'ok')+'</b><small> média '+mmss(t.tot.lanche[1]/Math.max(1,t.nd))+'</small></td>'):'<td data-v="0">-</td>';
+      const st=[];if(t.estDias)st.push(['lanche estourado','#dc2626']);if(umDia&&t.aberta)st.push(['em pausa: '+String(t.aberta[0]).toLowerCase()+' desde '+t.aberta[1],'#b45309']);
+      return '<tr data-odf="pz" data-v="'+(t.estDias?'est':'ok')+'" data-v2="'+(t.aberta&&umDia?'agora':'')+'" title="'+esc(t.lista.join('\n'))+'"><td class="nm">'+esc(nc(t.n))+'</td>'+lan+cel(t,'banheiro')+cel(t,'cafe')+cel(t,'outra')+'<td data-v="'+tot+'"><b>'+mmss(tot)+'</b></td><td class="od-sts">'+(st.length?st.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+esc(a[0])+'</span>').join(''):'<span class="od-st" style="--c:#16a34a">'+odi('ok',12)+'regular</span>')+'</td></tr>'}).join('')+'</table>')+'</div>'}
+function odPresenca(){const X=operUlt('mes_ops');if(!X||!X.dados||!(X.dados.ops||[]).length)return '';const D=X.dados.dias||[],O=X.dados.ops.slice();
+  const tur=g=>/prospec/i.test(g)?'Prospecção':/manh/i.test(g)?'Manhã':/tard/i.test(g)?'Tarde':/novat/i.test(g)?'Novatos':/confer/i.test(g)?'Conferência':esc(g||'-');
+  const mes=String(X.dados.mes||'').split('-').reverse().join('/');
+  const R=O.map(o=>{const v=Object.values(o.d),s=i=>v.reduce((a,x)=>a+(x[i]||0),0),lg=s(0);return {o,nd:v.length,lg,fala:s(1),pausa:s(2),oc:s(3)}}).filter(r=>r.lg>=600).sort((a,b)=>b.nd-a.nd||b.lg-a.lg);
+  const mxD=Math.max(...R.map(r=>r.nd));
+  return '<div class="od-card">'+odHead('users','#484a4e','Presença e tempo no mês','Cada quadradinho é um dia com operação em '+esc(mes)+' (dado direto da Fastway, atualiza de 3 em 3 horas)','',
+      odInfo('Quantos dias cada operadora logou no discador no mês e como usou o tempo.','Quadradinho <b style="color:#16a34a">verde</b> = logou (mais forte = mais horas). <b style="color:#dc2626">Vermelho</b> = não logou num dia em que a operação rodou. Passe o mouse pra ver hora de entrada e tempo logado.','Vermelho no meio do mês sem atestado é falta. Média logada baixa = saiu cedo ou entrou tarde.'))+
+    tbw('<table class="od-tb"><tr><th>Operadora</th><th>Turno</th><th>Dias</th><th>Média logada</th><th>Falando</th><th>Pausa</th><th>Esperando</th><th style="text-align:left">Dias do mês</th></tr>'+R.map(r=>{const o=r.o;
+      const strip=D.map(d=>{const x=o.d[d];if(!x)return '<i style="background:#f5b5b5" title="'+d+': não logou"></i>';const a=Math.min(1,x[0]/21600);return '<i style="background:rgba(22,163,74,'+(0.3+a*0.7).toFixed(2)+')" title="'+d+': entrou '+esc(x[5]||'-')+' · logada '+hm(x[0])+'"></i>'}).join('');
+      return '<tr><td class="nm">'+esc(nc(o.n))+'</td><td>'+tur(o.g)+'</td><td data-v="'+r.nd+'"><b style="color:'+(r.nd<mxD-2?'#dc2626':'inherit')+'">'+r.nd+'</b><small> de '+D.length+'</small></td><td data-v="'+(r.lg/r.nd)+'">'+hm(r.lg/r.nd)+'</td><td>'+pf(pc(r.fala,r.lg),0)+'%</td><td style="color:'+(pc(r.pausa,r.lg)>15?'#b45309':'inherit')+'">'+pf(pc(r.pausa,r.lg),0)+'%</td><td>'+pf(pc(r.oc,r.lg),0)+'%</td><td data-v="'+r.nd+'" style="text-align:left"><div class="od-strip">'+strip+'</div></td></tr>'}).join('')+'</table>')+'</div>'}
 function visaoOper(){return odVars(visaoOper0())}
 function visaoOper0(){
   if(!OPER||!OPER.length)return '<div class="avd-card"><div class="avd-empty">Ainda sem dados da operação. Troque o avaliacao.js, publique o Apps Script novo e rode <b>node avaliacao.js --operacao</b> (depois ele coleta sozinho a cada rodada).</div></div>';
@@ -4805,6 +4859,7 @@ function visaoOper0(){
       return '<td title="'+esc(dddNome(d)+' às '+hr+'h: '+fmtN(x.dis)+' discagens, '+fmtN(x.at)+' atendidas, '+fmtN(x.aco)+' acordos')+'" style="background:rgba(212,169,55,'+(0.08+a*0.85).toFixed(2)+');color:#2f3135">'+pf(p,p<10?1:0)+'</td>'};
     h+='<div class="od-card">'+odHead('signal','#484a4e','Mapa de calor: DDD x hora','Cada quadrado = % que atende naquele DDD e naquela hora · azul forte = muita gente atende','','')+
       tbw('<table class="od-tb od-heat"><tr><th>DDD</th>'+horas.map(x=>'<th>'+esc(x)+'h</th>').join('')+'</tr>'+topD.map(d=>'<tr><td class="nm">'+esc(dddNome(d))+'</td>'+horas.map(hr=>cel(d,hr)).join('')+'</tr>').join('')+'</table>')+'</div>'}
+  h+=odRitmoMes(umDia,datas);
   // ---- bloqueio
   h+='<div class="od-card">'+odHead('ban','#dc2626','Lista segura de bloqueio','Número que alguém atendeu de verdade nunca entra aqui',
       '<button class="od-dl" onclick="avd.baixarBloq()">'+odi('down',15)+' Baixar lista completa: bloquear de vez ('+fmtN(ne+ncl)+')</button><button class="od-dl" style="--c:#c2410c" onclick="avd.baixarBloq(\'pausa\')">'+odi('down',15)+' Baixar lista completa: pausar 7 dias ('+fmtN(el)+')</button>',
@@ -4812,23 +4867,26 @@ function visaoOper0(){
     '<div class="od-big3"><div style="--c:#dc2626"><b>'+fmtN(ne)+'</b>não existem</div><div style="--c:#b91c1c"><b>'+fmtN(ncl)+'</b>não conhecem o cliente'+(novo?'':'<small>aparece na próxima coleta</small>')+'</div><div style="--c:#c2410c"><b>'+fmtN(el)+'</b>caixa postal 3x+</div></div>'+
     tbw('<table class="od-tb"><tr><th>Telefone</th><th>Tentativas '+(umDia?'hoje':'no período')+'</th><th>Motivo</th><th>Ação</th></tr>'+BLOQ.slice(0,6).concat(PAUSA.slice(0,6)).map(x=>'<tr><td class="nm">'+esc(x.f)+'</td><td>'+x.t+'</td><td>'+motivoTxt(x)+'</td><td>'+(x.tipo==='el'?pill('pausar 7 dias','#ffedd5','#c2410c'):pill('bloquear de vez','#fee2e2','#b91c1c'))+'</td></tr>').join('')+'</table>')+'</div>';
   // ---- equipe
-  const alerta=o=>{const al=[];if(!prosp(o)&&pc(mEf(o),o.login)>20)al.push(['discando na mão','#b91c1c','manual']);if(pc(o.ocioso,o.login)>40)al.push(['faltando ligação','#64748b','ocioso']);if(pc(o.pausa,o.login)>15)al.push(['pausa alta','#b45309','pausa']);if(o.bloqueio>600)al.push(['bloqueio','#b91c1c','bloq']);return al};
+  const alerta=o=>{const al=[];if(!prosp(o)&&pc(mEf(o),o.login)>20)al.push(['discando na mão','#b91c1c','manual']);if(pc(o.ocioso,o.login)>40)al.push(['faltando ligação','#64748b','ocioso']);if(pc(o.pausa,o.login)>15)al.push(['pausa alta','#b45309','pausa']);if(o.bloqueio>600)al.push(['bloqueio','#b91c1c','bloq']);const pz=PZ[nkey(o.n)];if(pz&&pz.estDias)al.push([umDia?'lanche estourado':'lanche estourado '+pz.estDias+'x','#dc2626','lanche']);return al};
+  const TP=operTempos(),PZ=operPausas(),temTP=Object.keys(TP).length>0,nLan=O.filter(o=>(PZ[nkey(o.n)]||{}).estDias).length;
   const nAl=O.filter(o=>alerta(o).length).length;
   h+='<div class="od-card">'+odHead('users','#d4a937','Tempo das operadoras','Barra = como cada uma usou o tempo logado'+(manual.length?' · <span class="od-badge" style="margin-left:4px">'+manual.length+' discando na mão</span>':''),
-      (umDia&&datas[0]===new Date().toLocaleDateString('pt-BR')&&window.MODO?window.MODO.widget('oper'):'')+odBtn('o','all','Todas ('+O.length+')',1,'#d4a937')+odBtn('o','alerta','Em alerta ('+nAl+')',0,'#dc2626')+odBtn('o','ok','Regular ('+(O.length-nAl)+')',0,'#16a34a'),
+      (umDia&&datas[0]===new Date().toLocaleDateString('pt-BR')&&window.MODO?window.MODO.widget('oper'):'')+odBtn('o','all','Todas ('+O.length+')',1,'#d4a937')+odBtn('o','alerta','Em alerta ('+nAl+')',0,'#dc2626')+odBtn('o','ok','Regular ('+(O.length-nAl)+')',0,'#16a34a')+(nLan?odBtn('o','lanche','Lanche estourado ('+nLan+')',0,'#dc2626'):''),
       odInfo('Como cada operadora usou o tempo em que esteve logada no discador.','Barra: <b style="color:#16a34a">verde</b> falando, <b style="color:#b8901f">dourado</b> esperando ligação, <b style="color:#b91c1c">vermelho</b> manual, <b style="color:#64748b">cinza</b> pausa. Passe o mouse na linha pra ver cada pausa.','"Faltando ligação" (40%+ esperando) não é culpa dela: é base fraca. "Discando na mão" (fora da Prospecção) e "pausa alta" valem conversa. Quando for retrabalhar ficha, troque o discador pra <b>Manual</b> no botão acima: o manual desse período fica em <b style="color:#a86a6a">rosa</b> (liberado) e não gera alerta.'))+
     (()=>{const lib=O.reduce((s2,o)=>s2+(o.manual_lib||0),0),hoje=umDia&&datas[0]===new Date().toLocaleDateString('pt-BR'),F=hoje&&window.MODO?window.MODO.faixasHoje():[],hh=window.MODO?window.MODO.hhmm:()=>'';
       if(!lib&&!F.length)return '';
       return '<div class="od-md">'+odi('alert',16)+'<span><b>Modo manual liberado'+(F.length?' hoje: '+F.map(f=>hh(f[0])+(isFinite(f[1])&&f[1]<Date.now()?' às '+hh(f[1]):' até agora')).join(', '):'')+'.</b> O manual feito nesse período é retrabalho de ficha e <b>não conta</b> como "discando na mão"'+(lib?' (equipe somada: '+hm(lib)+' liberado).':'. Entra no cálculo na próxima rodada do robô.')+'</span></div>'})()+
     '<div class="od-leg"><span><i style="background:#16a34a"></i>Falando</span><span><i style="background:#d4a937"></i>Esperando</span><span><i style="background:#b91c1c"></i>Manual</span><span><i style="background:#d9a5a5"></i>Manual liberado</span><span><i style="background:#8a8d92"></i>Pausa</span></div>'+
-    tbw('<table class="od-tb od-eq"><tr><th>Operadora</th><th>Turno</th><th>Logada</th><th style="min-width:300px">Uso do tempo</th>'+(umDia?'<th>Entrou · Saiu</th>':'<th>Dias</th>')+'<th>Situação</th></tr>'+
+    tbw('<table class="od-tb od-eq"><tr><th>Operadora</th><th>Turno</th><th>Logada</th>'+(temTP?'<th>Atendidas</th><th>TMA</th>':'')+'<th style="min-width:300px">Uso do tempo</th>'+(umDia?'<th>Entrou · Saiu</th>':'<th>Dias</th>')+'<th>Situação</th></tr>'+
     O.map(o=>{const al=alerta(o),tip=Object.keys(o.pausas).map(k=>k+': '+o.pausas[k].q+'x, '+hm(o.pausas[k].s)).join('\n'),L=o.login||1,seg=(v,c,n)=>v>0?'<i style="width:'+pc(v,L).toFixed(1)+'%;background:'+c+'" title="'+n+': '+pf(pc(v,L),0)+'%"></i>':'';
       const tur=/prospec/i.test(o.g)?'Prospecção':/manh/i.test(o.g)?'Manhã':/tard/i.test(o.g)?'Tarde':/novat/i.test(o.g)?'Novatos':esc(o.g||'-');
       const st=al.length?al.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+a[0]+'</span>').join(''):'<span class="od-st" style="--c:#16a34a">'+odi('ok',12)+'regular</span>';
-      return '<tr data-odf="o" data-v="'+(al.length?'alerta':'ok')+'" title="'+esc(tip)+'"><td class="nm"><span class="od-ui">'+odi('users',15)+'</span>'+esc(nc(o.n))+'</td><td>'+tur+'</td><td><b>'+hm(o.login)+'</b></td>'+
+      const tp=TP[nkey(o.n)];
+      return '<tr data-odf="o" data-v="'+(al.length?'alerta':'ok')+'" data-v2="'+al.map(x=>x[2]).join(' ')+'" title="'+esc(tip)+'"><td class="nm"><span class="od-ui">'+odi('users',15)+'</span>'+esc(nc(o.n))+'</td><td>'+tur+'</td><td><b>'+hm(o.login)+'</b></td>'+(temTP?(tp?'<td>'+fmtN(tp.at)+'</td><td data-v="'+tp.tma.toFixed(0)+'">'+mmss(tp.tma)+'</td>':'<td>-</td><td>-</td>'):'')+
         '<td><div class="od-stack">'+seg(o.fala,'#16a34a','Falando')+seg(o.ocioso,'#d4a937','Esperando')+seg(mEf(o),'#b91c1c','Manual')+seg(o.manual_lib||0,'#d9a5a5','Manual liberado (retrabalho)')+seg(o.pausa,'#8a8d92','Pausa')+'</div>'+
         '<div class="od-stl"><span style="color:#16a34a">'+pf(pc(o.fala,L),0)+'% falando</span><span style="color:#b8901f">'+pf(pc(o.ocioso,L),0)+'% esperando</span><span style="color:#b91c1c">'+pf(pc(mEf(o),L),0)+'% manual'+(o.manual_lib>=60?' <small style="color:#a86a6a">+'+pf(pc(o.manual_lib,L),0)+'% liberado</small>':'')+'</span><span style="color:#6b6e73">'+pf(pc(o.pausa,L),0)+'% pausa</span></div></td>'+
         (umDia?'<td>'+esc(String(o.ini).slice(0,5))+' · '+esc(String(o.fim).slice(0,5))+'</td>':'<td>'+o.dias+'</td>')+'<td class="od-sts">'+st+'</td></tr>'}).join('')+'</table>')+'</div>';
+  h+=odPausas(umDia)+odPresenca();
   // ---- rotas + operadora do telefone
   const R=operJunta('tronco').filter(r=>r.dis>=50).sort((a,b)=>b.dis-a.dis),C=operJunta('carrier').filter(r=>r.dis>=300).sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis));
   h+='<div class="od-g2"><div class="od-card">'+odHead('signal','#2f3135','NOVATECH x VOROS (rotas)','A "linha" por onde a ligação sai','',odInfo('Rota ruim derruba ligação ou diz que o número não existe quando existe.','Compare <b>atendem</b> e <b>não existe</b> entre as rotas. <b>Custo por atendida</b> = quanto custou cada ligação que chegou numa pessoa.','Se uma rota tiver muito mais "não existe", faça o teste com dois serviços iguais, um em cada rota, por uma semana. "Sem tarifa" = custo não cadastrado na Fastway.'))+
@@ -6668,7 +6726,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1300',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1700',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
