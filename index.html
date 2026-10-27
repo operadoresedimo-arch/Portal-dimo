@@ -3228,7 +3228,14 @@ async function loadEntradas(){
 setInterval(async function(){try{await loadPonto();updateFaltaAlert();if(cRD&&document.getElementById('pageRanking')&&document.getElementById('pageRanking').offsetParent){const y=window.scrollY,mc=document.querySelector('.main,.content,main');const my=mc?mc.scrollTop:0;renderR(cRD);window.scrollTo(0,y);if(mc)mc.scrollTop=my}}catch(e){}},300000); // ponto atualiza a cada 5 min
 async function startApp(){showNav();showPage('ranking');const h=window.location.hash;if(h&&h.startsWith('#d=')){try{const j=LZString.decompressFromEncodedURIComponent(h.substring(3));if(j){cRD=JSON.parse(j);renderR(cRD);loadEntradas().then(function(){renderR(cRD)});loadCompDrive();return}}catch(e){}}await loadDrive();await loadEntradas();if(cRD)renderR(cRD);loadCompDrive();}
 
-async function loadDrive(){const rl0=document.getElementById('rankLoading');if(rl0)rl0.style.display='block';try{await loadPonto();const csv=await rkCSV();const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{document.getElementById('rankLoading').innerHTML='Nenhum dado encontrado.'}}catch(e){document.getElementById('rankLoading').innerHTML='Erro ao carregar.'}}
+// sem acordo ainda no dia: mantem o cabecalho (com o botao do discador e o Hoje/Escolher dia) e avisa
+function rankSemAcordos(){const pg=document.getElementById('pageRanking');if(!pg)return;
+  const hd=new Date().toLocaleDateString('pt-BR'),hr=new Date().toLocaleTimeString('pt-BR').slice(0,5);
+  pg.innerHTML='<div class="loading-msg" id="rankLoading" style="display:none"></div><div class="nx"><div class="nx-head date-header"><div class="nx-head-l"><div class="nx-tt"><h2>Acordos do Dia</h2><span class="nx-live"><i></i>Ao vivo · '+hd+'</span></div>'+
+    '<p>Édimo Debarba Junior <b>·</b> Última leitura às <strong>'+hr+'</strong></p></div>'+(window.MODO?window.MODO.widget('acordos'):'')+'</div>'+
+    '<div class="nx-vazio"><b>Nenhum acordo ainda hoje</b><span>Última leitura do Cobmais às '+hr+'. A tela atualiza sozinha quando sair o primeiro acordo.</span></div></div>';
+  if(window.histBarra)window.histBarra()}
+async function loadDrive(){const rl0=document.getElementById('rankLoading');if(rl0)rl0.style.display='block';try{await loadPonto();const csv=await rkCSV();const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{rankSemAcordos()}}catch(e){const rl=document.getElementById('rankLoading');if(rl){rl.style.display='block';rl.innerHTML='Erro ao carregar.'}}}
 
 function showNav(){document.getElementById('nav').style.display='block'}
 function showPage(p){
@@ -3447,7 +3454,7 @@ var compRefreshBusy=false;
 async function atualizarComissoesSilencioso(){
   if(compRefreshBusy||document.hidden)return;
   compRefreshBusy=true;var y=window.scrollY;
-  try{try{const d=parseCSV(await rkCSV());if(d&&d.ops.length>0){cRD=d;const pr=document.getElementById('pageRanking');if(pr&&pr.offsetParent){const mc=document.querySelector('.main,.content,main');const my=mc?mc.scrollTop:0;renderR(cRD);window.scrollTo(0,y);if(mc)mc.scrollTop=my}}}catch(e){}
+  try{try{const d=parseCSV(await rkCSV());if(d&&!d.ops.length&&document.querySelector('#pageRanking .nx-vazio')&&!(window.rankHistAtivo&&window.rankHistAtivo()))rankSemAcordos();if(d&&d.ops.length>0){cRD=d;const pr=document.getElementById('pageRanking');if(pr&&pr.offsetParent){const mc=document.querySelector('.main,.content,main');const my=mc?mc.scrollTop:0;renderR(cRD);window.scrollTo(0,y);if(mc)mc.scrollTop=my}}}catch(e){}
   await loadCompDrive();window.scrollTo(0,y)}finally{compRefreshBusy=false}
 }
 setInterval(atualizarComissoesSilencioso,300000); // atualiza Drive a cada 5 min sem voltar ao inicio
@@ -4629,6 +4636,15 @@ function visaoOper0(){
     '<p>De <b class="g">'+fmtN(T.dis)+' discagens</b>, só <b class="v">'+fmtN(T.at)+' ('+pf(pc(T.at,T.dis),1)+'%)</b> chegaram numa pessoa. <b class="r">'+pf(pc(T.el,T.dis),0)+'% caíram em caixa postal</b> e <b class="r">'+pf(pc(T.ne,T.dis),0)+'% eram número que não existe</b>. '+(semAco?(acoCob!==null?'Pelo Cobmais saíram <b class="g">'+fmtN(acoCob)+' acordo'+(acoCob===1?'':'s')+'</b> hoje'+(acoCob?' ('+pf(acoCob/T.dis*1000,2)+' a cada mil discagens)':'')+'. Por mailing e por horário ainda não dá: falta cruzar com o Relatório de Pagamentos Detalhado.':'Os acordos ainda não aparecem aqui porque a Fastway não recebe essa marcação (vão vir do Cobmais).'):'Saíram <b class="g">'+fmtN(T.aco)+' acordos</b> ('+pf(baseMil,1)+' a cada mil discagens).')+
     (EQ.login?' A equipe passou <b>'+pf(pc(EQ.fala,EQ.login),0)+'%</b> do tempo falando, <b>'+pf(ocP,0)+'%</b> esperando ligação e <b>'+pf(pc(EQ.pausa,EQ.login),0)+'%</b> em pausa.'+(ocP>=25?' <b class="g">O gargalo é a base, não a equipe.</b>':''):'')+'</p></div>';
   h+='<div class="od-kpis">'+K.map(k=>'<div class="od-k" style="--c:'+k[1]+'"><div class="od-kt"><span>'+k[2]+'</span><i>'+odi(k[0],16)+'</i></div><div class="od-kv">'+k[3]+'</div><div class="od-ks">'+k[4]+'</div></div>').join('')+'</div>';
+  // ---- dinheiro que entrou (coletor Cobmais: so totais, sem CPF) ----
+  const CB=operFilt('cobmais_pag');
+  if(CB.length){const S=CB.reduce((s2,x)=>{const d=x.dados||{};['qtd','valor','principal','honorarios','multa','juros'].forEach(c=>s2[c]=(s2[c]||0)+(d[c]||0));Object.keys(d.forma||{}).forEach(f=>{const y=s2.forma[f]=s2.forma[f]||{q:0,v:0};y.q+=d.forma[f].q;y.v+=d.forma[f].v});if(d.atualizado&&d.atualizado>s2.at)s2.at=d.atualizado;return s2},{forma:{},at:''});
+    const F=Object.keys(S.forma).map(k=>Object.assign({k},S.forma[k])).sort((a,b)=>b.v-a.v),mxF=Math.max(1,...F.map(x=>x.v));
+    const bx=(c,t,v,sub)=>'<div class="od-mb" style="--c:'+c+'"><span>'+t+'</span><b>'+v+'</b>'+(sub?'<small>'+sub+'</small>':'')+'</div>';
+    h+='<div class="od-card">'+odHead('ok','#16a34a','Dinheiro que entrou (Cobmais)','Pagamentos processados '+(umDia?'no dia':'nos '+dias+' dias'),S.at?'<span class="od-badge">atualizado '+esc(String(S.at).slice(-8,-3))+'</span>':'',
+      odInfo('Pagamentos que caíram no Cobmais (boleto, Pix, cartão), puxados pela API de hora em hora.','<b>Recebido</b> = tudo que o devedor pagou. <b>Honorários</b> = a parte que fica com a Édimo (receita). O resto é repasse pro credor.','Compare com a meta do dia: a receita real é a linha de honorários, não o valor recebido.'))+
+      '<div class="od-mbs">'+bx('#16a34a','Recebido',brl(S.valor||0),fmtN(S.qtd||0)+' pagamento'+(S.qtd===1?'':'s'))+bx('#d4a937','Honorários (receita Édimo)',brl(S.honorarios||0),S.valor?pf(S.honorarios/S.valor*100,1)+'% do recebido':'')+bx('#484a4e','Repasse ao credor',brl(Math.max(0,(S.valor||0)-(S.honorarios||0))),'principal + multa + juros')+bx('#484a4e','Ticket médio',S.qtd?brl(S.valor/S.qtd):'-','por pagamento')+'</div>'+
+      (F.length?'<div class="od-pad">'+F.map(r=>'<div class="od-cr"><span>'+esc(r.k)+'<small>'+fmtN(r.q)+' pagamento'+(r.q===1?'':'s')+'</small></span><div class="od-bar big"><i style="width:'+Math.max(2,r.v/mxF*100).toFixed(0)+'%;background:#d4a937"></i></div><b>'+brl(r.v)+'</b></div>').join('')+'</div>':'')+'</div>'}
   // ---- plano de acao
   const A=[];
   if(ne+ncl)A.push(['ban','Bloquear '+fmtN(ne+ncl)+' números','Imediato','#dc2626',fmtN(ne)+' não existem e '+fmtN(ncl)+' não conhecem o cliente.'+(gB?' Gastaram <b>'+fmtN(gB)+' discagens</b> '+perTxt+'.':'')+' Baixe a lista no painel de bloqueio.']);
@@ -5662,20 +5678,19 @@ let virou='';setInterval(()=>{const k=JSON.stringify(atual());if(k!==virou){viro
 .md-sw{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .md-top{display:flex;align-items:center;gap:8px}
 .md-lb{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#6b6e73}
-.md-seg{display:inline-flex;background:#f4f1ea;border:1px solid #e6dfcf;border-radius:10px;padding:3px;gap:2px}
-.md-seg button{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:#484a4e;font:inherit;font-size:.85rem;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s}
-.md-seg button:hover{background:#fff}
-.md-seg button i,.md-chip i{width:8px;height:8px;border-radius:50%;background:#b8bbc0;display:inline-block}
-.md-seg button.m-manual i,.md-chip.m-manual i{background:#b91c1c}.md-seg button.m-preview i,.md-chip.m-preview i{background:#D4A937}.md-seg button.m-power i,.md-chip.m-power i{background:#16a34a}
-.md-seg button.on{background:#D4A937;color:#2f3135;box-shadow:0 1px 3px rgba(72,74,78,.25)}
-.md-seg button.on.m-preview i{background:#fff}
-.md-seg button.on.m-manual{background:#484a4e;color:#fff}
-.md-seg button.on.m-manual i{background:#f87171}
+.md-seg{display:inline-flex;gap:6px;flex-wrap:wrap}
+.md-seg button{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#334155;border:1px solid #e2e8f0;border-radius:12px!important;font-family:inherit;font-size:.76rem;font-weight:700;padding:8px 14px;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.md-seg button:hover{border-color:#cbd5e1;background:#f8fafc}
+.md-seg button i,.md-chip i{width:8px;height:8px;border-radius:50%!important;background:#b8bbc0;display:inline-block}
+.md-seg button.m-manual i,.md-chip.m-manual i{background:#b91c1c}.md-seg button.m-preview i,.md-chip.m-preview i{background:#D4A937}.md-seg button.m-power i,.md-chip.m-power i{background:#059669}
+.md-seg button.on.m-manual{background:#484a4e;color:#fff;border-color:#484a4e}.md-seg button.on.m-manual i{background:#f87171}
+.md-seg button.on.m-preview{background:#D4A937;color:#2f3135;border-color:#D4A937}.md-seg button.on.m-preview i{background:#fff}
+.md-seg button.on.m-power{background:#059669;color:#fff;border-color:#059669}.md-seg button.on.m-power i{background:#fff}
 .md-st{font-size:.75rem;color:#6b6e73}.md-st a{color:#8a6d12;font-weight:700;cursor:pointer;text-decoration:underline}
-.md-chip{display:inline-flex;align-items:center;gap:6px;background:#f4f1ea;border:1px solid #e6dfcf;color:#484a4e;font-size:.82rem;font-weight:800;padding:4px 10px;border-radius:20px}
+.md-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #e2e8f0;color:#334155;font-size:.76rem;font-weight:700;padding:6px 12px;border-radius:12px!important}
 .md-sw.ro{flex-direction:row;align-items:center;gap:8px}
 .od-hr .md-sw{margin-right:10px}
-.od-md{display:flex;align-items:flex-start;gap:8px;background:#f4f1ea;border:1px solid #e6dfcf;border-left:4px solid #484a4e;border-radius:10px;padding:9px 12px;margin:0 0 12px;font-size:.88rem;color:#2f3135}
+.od-md{display:flex;align-items:flex-start;gap:8px;background:#f4f1ea;border:1px solid #e6dfcf;border-left:4px solid #484a4e;border-radius:12px!important;padding:9px 12px;margin:0 0 12px;font-size:.88rem;color:#2f3135}
 .od-md svg{flex-shrink:0;margin-top:2px;color:#b8901f}
 /* TV */
 .tv-hd-md{display:flex;flex-direction:column;border-left:1px solid #334155;padding-left:20px}
@@ -5687,6 +5702,8 @@ let virou='';setInterval(()=>{const k=JSON.stringify(atual());if(k!==virou){viro
 .tv-hd-md.m-preview b{color:#f5b91f}.tv-hd-md.m-preview b i{background:#f5b91f}
 .tv-hd-md.m-manual b{color:#f87171}.tv-hd-md.m-manual b i{background:#ef4444;animation:tvping 1.6s infinite}
 #pageTV .tv-hd-md b i{border-radius:50%!important}
+.nx-vazio{background:#fff;border:1px solid #e2e8f0;border-radius:16px!important;padding:34px 20px;text-align:center;color:#64748b;display:flex;flex-direction:column;gap:6px;align-items:center}
+.nx-vazio b{font-size:1.05rem;color:#334155}.nx-vazio span{font-size:.85rem}
 </style>
 <script id="edimo-tv">
 /* ===== RANKING TV + ALERTA DE RITMO (aba so do admin) =====
@@ -5974,6 +5991,7 @@ function calHtml(){
   return h+'</div><div class="hc-leg"><i></i> dia com fechamento salvo</div></div>';
 }
 function redesenha(){const b=document.querySelector('#pageRanking .hist-bar');if(b)b.remove();barra()}
+window.histBarra=barra;
 window.histCal=function(e){if(e)e.stopPropagation();calAberto=!calAberto;if(calAberto){const r=rankDia||hoje();calMes=new Date(+r.slice(0,4),+r.slice(5,7)-1,1)}redesenha()};
 window.histMes=function(n){calMes=new Date(calMes.getFullYear(),calMes.getMonth()+n,1);redesenha()};
 window.histEscolhe=function(iso){calAberto=false;histDia(iso)};
