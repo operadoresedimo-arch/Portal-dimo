@@ -2453,15 +2453,17 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 .comp-table th,.comp-table td{padding:7px 8px!important}
 #pageAvaliacao{max-width:none!important;width:100%}
 /* Avaliacao no padrao do painel do discador */
+@media(max-width:760px){.avd-kg{flex-wrap:wrap}.avd-kgc{flex-basis:100%!important}}
+@media(max-width:1100px){.avd-m{padding:6px 7px}.avd-m .od-kt i{display:none}.avd-m .avd-hint{display:none}.avd-kgc{padding:8px 6px 6px}}
+.avd-m .od-kv{font-size:clamp(1.15rem,1.6vw,1.6rem)!important;margin-top:4px!important}.avd-m .od-kv.txt{font-size:clamp(.85rem,1vw,1.05rem)!important}.avd-m .od-kt{font-size:clamp(.64rem,.75vw,.74rem)}.avd-m .od-kt i{padding:4px}.avd-m .od-ks{font-size:.68rem;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.avd-m .avd-hint{font-size:.58rem!important;padding-top:4px!important}
 .avd-fbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}.avd-fbl{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#8a8d92;margin-right:4px}
 .avd-fbar .od-fb,.avd-cbt .od-fb,#pageAvaliacao .od-fb{border-radius:10px!important}
-.avd-kg{display:grid;grid-template-columns:minmax(190px,1fr) 3fr 2fr;gap:12px;margin-bottom:14px;align-items:stretch}.avd-kg.g2{grid-template-columns:minmax(190px,1fr) 3fr}
-.avd-kg.erro{grid-template-columns:minmax(260px,1fr) minmax(0,2fr)}
-.avd-kgc{background:#fff;border:1px solid var(--bd);border-top:4px solid var(--c);border-radius:14px!important;padding:12px 10px 10px;box-shadow:0 1px 4px rgba(15,23,42,.04);display:flex;flex-direction:column}
-.avd-kgt{display:flex;align-items:center;gap:8px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;padding:0 6px 8px}
+.avd-kg{display:flex;flex-wrap:nowrap;gap:10px;margin-bottom:14px;align-items:stretch}.avd-kgc{min-width:0}
+.avd-kgc{background:#fff;border:1px solid var(--bd);border-top:4px solid var(--c);border-radius:14px!important;padding:10px 8px 8px;box-shadow:0 1px 4px rgba(15,23,42,.04);display:flex;flex-direction:column}
+.avd-kgt{display:flex;align-items:center;gap:8px;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;padding:0 6px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .od-ic.sm{padding:5px;border-radius:8px!important}
 .avd-kgi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:1}.avd-kgi.n2{grid-template-columns:repeat(2,minmax(0,1fr))}.avd-kgi.n1{grid-template-columns:1fr}
-.avd-m{position:relative;padding:10px 12px;border-radius:10px!important;transition:background .15s;display:flex;flex-direction:column}
+.avd-m{position:relative;padding:8px 10px;min-width:0;border-radius:10px!important;transition:background .15s;display:flex;flex-direction:column}
 .avd-m+.avd-m:before{content:'';position:absolute;left:-3px;top:12%;bottom:12%;width:1px;background:#eef1f5}
 .avd-m.clk{cursor:pointer}.avd-m.clk:hover{background:#faf8f3}
 .avd-m.on{background:#fbf7ec;box-shadow:0 0 0 2px var(--c) inset}
@@ -2488,7 +2490,7 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 .avd-econt{font-size:.74rem;color:#9ca3af;margin:0 0 6px}.avd-econt b{color:#2f3135}
 .avd-err-grid.um{grid-template-columns:1fr}
 @media(max-width:700px){.avd-etb{flex-direction:column;align-items:stretch}.avd-efil{max-width:none}}
-@media(max-width:1100px){.avd-kg,.avd-kg.g2{grid-template-columns:1fr}.avd-plg{grid-template-columns:1fr}.avd-oper-grid,.avd-err-grid{grid-template-columns:1fr}}
+@media(max-width:1100px){.avd-plg{grid-template-columns:1fr}.avd-oper-grid,.avd-err-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.avd-acs{grid-template-columns:1fr}.avd-kgi,.avd-kgi.n2{grid-template-columns:1fr 1fr}.avd-m+.avd-m:before{display:none}.avd-crs .od-cr span{width:130px}}
 
 .app-with-sidebar .main{max-width:none!important;width:auto!important}
@@ -4441,7 +4443,7 @@ const pctCel=p=>'<div class="avd-pc"><div class="od-bar"><i style="width:'+Math.
 const stPill=(rev,txt)=>'<span class="od-st" style="--c:'+(rev?'#b91c1c':'#16a34a')+'">'+odi(rev?'alert':'ok',13)+' '+(txt||(rev?'revisar':'bem'))+'</span>';
 const opCel=o=>'<span class="od-ui">'+odi('user',15)+'</span><span class="nm">'+esc(nc(o.op))+'</span>'+(o.g==='novato'?' <span class="avd-tag">novato</span>':'');
 function avM(ic,c,tit,v,sub,vw,txt){const at=vw==='rank'?VIEW==='':VIEW===vw;return '<div class="avd-m'+(vw?' clk':'')+(at&&vw?' on':'')+'" style="--c:'+c+'"'+(vw?' onclick="avd.ver(\''+vw+'\')"':'')+'><div class="od-kt"><span>'+tit+'</span><i>'+odi(ic,16)+'</i></div><div class="od-kv'+(txt?' txt':'')+'">'+v+'</div><div class="od-ks">'+sub+'</div>'+(vw?'<div class="avd-hint">'+(at?(vw==='rank'?'vendo o ranking':'clique pra voltar'):'clique pra detalhar')+'</div>':'')+'</div>'}
-function avGrupo(ic,c,t,itens){return '<div class="avd-kgc" style="--c:'+c+'"><div class="avd-kgt"><span class="od-ic sm">'+odi(ic,14)+'</span>'+t+'</div><div class="avd-kgi n'+itens.length+'">'+itens.join('')+'</div></div>'}
+function avGrupo(ic,c,t,itens){return '<div class="avd-kgc" style="--c:'+c+';flex:'+itens.length+' 1 0"><div class="avd-kgt"><span class="od-ic sm">'+odi(ic,14)+'</span>'+t+'</div><div class="avd-kgi n'+itens.length+'">'+itens.join('')+'</div></div>'}
 function cardResultado(T,N){
   return '<div class="od-card">'+odHead('phone','#16a34a','Resultado das ligações ouvidas',N+' ligaç'+(N===1?'ão avaliada':'ões avaliadas')+' pela IA','',odInfo('Como terminou cada ligação que a IA ouviu.','<b>Acordo feito</b> = fechou na ligação. <b>Retorno</b> = ficou de ligar de novo. <b>Perdido</b> = encerrou sem acordo nem retorno.','Fatia vermelha grande = abrir as ligações perdidas e ver em qual critério a operadora travou.'))+
     (N?odDonut([{n:'Acordo feito',v:T.a,c:AV_COR.a},{n:'Retorno agendado',v:T.r,c:AV_COR.r},{n:'Perdido (sem acordo)',v:T.s,c:AV_COR.s}],pf(pc(T.a,N),0)+'%','com acordo')+
@@ -6656,7 +6658,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1045',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1100',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
