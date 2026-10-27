@@ -2202,6 +2202,7 @@ body::before,body::after{display:none!important}
 .eq-ag{text-align:left!important;white-space:nowrap}.eq-now{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;color:var(--c)}.eq-now i{width:8px;height:8px;border-radius:99px!important;background:var(--c)}
 .eq-tm{display:block;font-variant-numeric:tabular-nums;font-size:.95rem;font-weight:800;color:#2f3135;margin-top:1px}.eq-tm.quase{color:#d97706}.eq-tm.estourou{color:#dc2626}.eq-off{font-size:.72rem;color:#9ca3af}
 #sbR,#sbR *{font-size:.74rem!important;line-height:1.15!important;letter-spacing:-.015em;white-space:normal!important;word-break:normal!important;overflow-wrap:normal!important}
+.cu-dl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;padding:10px 12px;background:#fdf8f0;border:1px solid #f1e3c2;border-radius:12px}.cu-dl>span{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:800;color:#2f3135}.cu-dl label{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;color:#6b7280;font-weight:700}.cu-dl input{border:1px solid #e2e8f0;border-radius:8px;padding:6px 8px;font-family:inherit;font-size:.8rem;color:#2f3135;background:#fff}.cu-dl small{color:#9ca3af;font-size:.7rem;margin-left:auto}
 .cu{border-color:#fecaca}.cu-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.cu-esq h3{margin:8px 0 2px;font-size:1.15rem;color:#2f3135}.cu-esq p{margin:0;font-size:.84rem;color:#6b7280;max-width:640px}
 .cu-tag{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:800;color:var(--c);background:var(--c10);border:1px solid var(--c30);padding:4px 10px;border-radius:99px}
 .cu-big{text-align:right}.cu-big b{display:block;font-size:2.6rem;line-height:1;font-weight:900;color:var(--c);font-variant-numeric:tabular-nums}.cu-big span{font-size:.74rem;color:#9ca3af;font-weight:700}
@@ -4816,6 +4817,24 @@ function curtasDados(){const L=operFilt('curtas'),tot={n:0,c:0,na:0,oc:0,ne:0,el
     (d.rota||[]).forEach(r=>{const y=rota[r.k]=rota[r.k]||{k:r.k,n:0,c:0};y.n+=r.n;y.c+=r.c});(d.orig||[]).forEach(r=>{const y=orig[r.k]=orig[r.k]||{k:r.k,n:0,c:0,mx:0};y.n+=r.n;y.c+=r.c;y.mx=Math.max(y.mx,r.n)})});
   return {tot,rota:Object.values(rota).sort((a,b)=>b.n-a.n),orig:Object.values(orig).sort((a,b)=>b.n-a.n),dias:dias.sort((a,b)=>dt(a.d)-dt(b.d)),campo,tem:L.length>0}}
 function cortar(n,c,alvo){const a=alvo/100;return Math.max(0,Math.ceil((c-a*n)/(1-a)))}
+function curtasDias(){const dk=d=>String(d).split('/').reverse().join('-');return (OPER||[]).filter(x=>x.bloco==='curtas'&&x.dados&&x.dados.tot).map(x=>dk(x.data)).sort()}
+function curtasDL(){const L=curtasDias();if(!L.length)return '';const ult=L[L.length-1],d7=new Date(ult+'T12:00:00');d7.setDate(d7.getDate()-6);const ini=L.find(x=>x>=d7.toISOString().slice(0,10))||L[0];
+  return '<div class="cu-dl"><span>'+odi('down',15)+' Baixar relatório</span><label>De <input type="date" id="cuDe" value="'+ini+'" min="'+L[0]+'" max="'+ult+'"></label><label>Até <input type="date" id="cuAte" value="'+ult+'" min="'+L[0]+'" max="'+ult+'"></label><button class="od-dl" onclick="avd.baixarCurtas()">'+odi('down',15)+' Excel</button><small>'+L.length+' dia'+(L.length>1?'s':'')+' com dado ('+L[0].split('-').reverse().join('/')+' a '+ult.split('-').reverse().join('/')+')</small></div>'}
+function baixarCurtas(){const de=(document.getElementById('cuDe')||{}).value,ate=(document.getElementById('cuAte')||{}).value;if(!de||!ate){sT('Escolha as datas');return}
+  const a=de<=ate?de:ate,b=de<=ate?ate:de,dk=d=>String(d).split('/').reverse().join('-');
+  const B=(OPER||[]).filter(x=>x.bloco==='curtas'&&x.dados&&x.dados.tot&&dk(x.data)>=a&&dk(x.data)<=b).sort((x,y)=>dk(x.data).localeCompare(dk(y.data)));
+  if(!B.length){sT('Sem dado de chamadas curtas nesse período');return}
+  const P=(c,n)=>n?Math.round(c/n*1000)/10:0,res=[],rot=[],hor=[],num=[];
+  B.forEach(x=>{const d=x.dados,t=d.tot,q=P(t.c,t.n),bl=t.n>CNPJ_LIM&&q>=CURTA_LIM;
+    res.push({'Data':x.data,'Chamadas':t.n,'Curtas':t.c,'% curtas':q,'Não atende':t.na||0,'Caixa postal':t.el||0,'Ocupado':t.oc||0,'Não existe / falha':(t.ne||0)+(t.ou||0),'Atendida até 6s':t.a6||0,'Atendida mais de 6s':t.n-t.c,'Passou de 10.000 no CNPJ':t.n>CNPJ_LIM?'sim':'não','Situação pela regra':bl?'SERIA BLOQUEADA':'ok','Cortar pra ficar abaixo de 85%':cortar(t.n,t.c,CURTA_LIM),'Cortar pra chegar em 70%':cortar(t.n,t.c,CURTA_REC)});
+    (d.rota||[]).forEach(r=>rot.push({'Data':x.data,'Rota':r.k,'Chamadas':r.n,'Curtas':r.c,'% curtas':P(r.c,r.n),'Não atende':r.na||0,'Caixa postal':r.el||0,'Ocupado':r.oc||0,'Não existe / falha':(r.ne||0)+(r.ou||0),'Atendida até 6s':r.a6||0}));
+    (d.hora||[]).forEach(r=>hor.push({'Data':x.data,'Hora':r.k+'h','Chamadas':r.n,'Curtas':r.c,'% curtas':P(r.c,r.n)}));
+    (d.orig||[]).forEach(r=>num.push({'Data':x.data,'Número de origem':r.k,'Chamadas':r.n,'Curtas':r.c,'% curtas':P(r.c,r.n),'Situação pela regra':r.n>NUM_LIM&&P(r.c,r.n)>=CURTA_LIM?'SERIA BLOQUEADO':r.n>NUM_LIM?'volume alto':'ok'}))});
+  const wb=XLSX.utils.book_new(),add=(L,n,w)=>{const ws=XLSX.utils.json_to_sheet(L);ws['!cols']=w.map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,n)};
+  add(res,'Resumo por dia',[12,10,10,9,11,12,9,15,14,17,22,20,26,22]);add(rot,'Por rota',[12,14,10,10,9,11,12,9,15,14]);add(hor,'Por hora',[12,7,10,10,9]);
+  if(num.length)add(num,'Por número',[12,16,10,10,9,20]);
+  add([{'Regra':'A partir de 12/11/2026: mais de 10.000 chamadas no CNPJ ou mais de 1.000 num número no mesmo dia, com 85% ou mais curtas = 15 dias sem poder ligar (receber continua).'},{'Regra':'Curta = não atendida, ocupada, com falha, caixa postal ou atendida em até 6 segundos.'},{'Regra':'Recomendado pela NovaTech: ficar abaixo de 70% de curtas.'}],'Regra',[120]);
+  const f=s=>s.split('-').reverse().join('-');XLSX.writeFile(wb,'chamadas-curtas_'+f(a)+(a!==b?'_a_'+f(b):'')+'.xlsx');sT('Relatório baixado: '+B.length+' dia'+(B.length>1?'s':''))}
 function odCurtas(umDia){const D=curtasDados();if(!D.tem||!D.tot.n)return '';
   const T=D.tot,nd=Math.max(1,D.dias.length),p=pc(T.c,T.n),med=T.n/nd,risco=D.dias.filter(x=>x.n>CNPJ_LIM&&pc(x.c,x.n)>=CURTA_LIM).length;
   const hoje=new Date();hoje.setHours(0,0,0,0);const falta=Math.round((CURTA_INICIO-hoje)/864e5);
@@ -4826,7 +4845,7 @@ function odCurtas(umDia){const D=curtasDados();if(!D.tem||!D.tot.n)return '';
   let h='<div class="od-card cu"><div class="cu-top"><div class="cu-esq"><div class="cu-tag" style="--c:'+(risco?'#dc2626':'#16a34a')+'">'+(risco?odi('alert',14)+(nd===1?(D.dias[0].d===new Date().toLocaleDateString('pt-BR')?'Hoje a Édimo seria bloqueada':'Nesse dia a Édimo seria bloqueada'):'Seria bloqueada em '+risco+' de '+nd+' dias'):odi('ok',14)+'Dentro da regra')+'</div>'+
     '<h3>Regra das chamadas curtas</h3><p>Vale a partir de <b>12/11</b>'+(falta>0?' · faltam <b>'+falta+' dias</b>':'')+'. Mais de 10.000 chamadas no CNPJ (ou 1.000 num número) com 85% ou mais curtas no dia = <b>15 dias sem poder ligar</b>.</p></div>'+
     '<div class="cu-big" style="--c:'+cor+'"><b>'+pf(p,1)+'%</b><span>curtas '+(nd===1?'no dia':'nos '+nd+' dias')+'</span></div></div>'+
-    '<div class="cu-gauge"><div class="cu-bar"><i style="width:'+Math.min(100,p).toFixed(1)+'%;background:'+cor+'"></i><em style="left:'+CURTA_REC+'%"><span>70% recomendado</span></em><em class="lim" style="left:'+CURTA_LIM+'%"><span>85% bloqueia</span></em></div></div>'+
+    '<div class="cu-gauge"><div class="cu-bar"><i style="width:'+Math.min(100,p).toFixed(1)+'%;background:'+cor+'"></i><em style="left:'+CURTA_REC+'%"><span>70% recomendado</span></em><em class="lim" style="left:'+CURTA_LIM+'%"><span>85% bloqueia</span></em></div></div>'+curtasDL()+
     '<div class="od-mbs">'+box('#484a4e','Chamadas por dia',fmtN(med),'limite do CNPJ: 10.000 ('+pf(med/CNPJ_LIM,1)+'x)')+box(cor,'Curtas por dia',fmtN(T.c/nd),pf(p,1)+'% do total')+
       box('#dc2626','Cortar pra sair do bloqueio',c85?fmtN(c85)+' /dia':'nada',c85?pf(c85/(T.c/nd)*100,0)+'% das curtas (abaixo de 85%)':'já está abaixo de 85%')+box('#d97706','Cortar pra meta de 70%',c70?fmtN(c70)+' /dia':'nada',c70?pf(c70/(T.c/nd)*100,0)+'% das curtas':'já está abaixo de 70%')+'</div>'+
     '<div class="cu-sec">De onde vêm as curtas</div><div class="cu-mix">'+seg.filter(x=>x[1]>0).map(x=>'<i style="width:'+pc(x[1],T.n).toFixed(2)+'%;background:'+x[2]+'" title="'+x[0]+': '+fmtN(x[1])+' ('+pf(pc(x[1],T.n),1)+'%)"></i>').join('')+'</div>'+
@@ -5100,7 +5119,7 @@ function eqTab(k){EQ.tab=k;eqRedesenha()}
 function eqFiltro(k){EQ.f=EQ.f===k?'all':k;document.querySelectorAll('.eq-k[onclick]').forEach(b=>b.classList.toggle('on',b.getAttribute('onclick').indexOf("'"+EQ.f+"'")>0));eqAplica()}
 window.EQUIPE={html:eqHTML};
 let PDFF=null;function pdfFunc(){if(!PDFF)return;if(!window.QA||!window.QA.pdfIds){sT('O modelo do PDF ainda não carregou. Tente de novo em alguns segundos.');return}window.QA.pdfIds(PDFF.op,PDFF.a,PDFF.t)}
-window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,errFiltro,errCrit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao,eqTab,eqFiltro,pdfFunc};
+window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,errFiltro,errCrit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao,eqTab,eqFiltro,pdfFunc,baixarCurtas};
 // atualiza sozinho a cada 3 min enquanto a aba estiver aberta (sem fechar ligação que estiver ouvindo)
 setInterval(()=>{const pg=$('pageAvaliacao');if(!pg||!pg.classList.contains('active')||!DADOS||DEMO_MODE||!CHAVE)return;
   if([].some.call(document.querySelectorAll('.avd-lig-b'),b=>b.style.display==='block'))return;carregar(true)},180000);
@@ -6906,7 +6925,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1940',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1955',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
