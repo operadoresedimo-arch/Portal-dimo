@@ -5710,6 +5710,7 @@ function arruma(){
   let foot=nav.querySelector('.sb-foot');if(!foot){foot=document.createElement('div');foot.className='sb-foot'}
   nav.querySelectorAll(':scope>.sb-item').forEach(b=>{if(!b.id&&/senha|sair/i.test(b.textContent)){if(/sair/i.test(b.textContent)){b.classList.add('sair');const t=[...b.childNodes].find(n=>n.nodeType===3&&/Sair/.test(n.nodeValue));if(t&&!/Sistema/.test(t.nodeValue))t.nodeValue=t.nodeValue.replace('Sair','Sair do Sistema')}foot.appendChild(b)}});
   nav.appendChild(foot);
+  {const cf=document.getElementById('sbCfg'),sr=foot.querySelector('.sb-item.sair');if(cf&&sr&&cf.nextSibling!==sr)foot.insertBefore(cf,sr)}
   SEC.forEach(([id,t])=>{const b=document.getElementById(id);if(!b)return;let l=nav.querySelector('.sb-sec[data-s="'+id+'"]');if(!l){l=document.createElement('div');l.className='sb-sec';l.dataset.s=id;l.textContent=t}
     if(b.previousSibling!==l)nav.insertBefore(l,b)});
   // esconde o titulo se o grupo todo estiver escondido (operador nao ve as abas de admin)
@@ -6866,7 +6867,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1900',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1915',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
@@ -6902,7 +6903,7 @@ async function buscaCfg(){try{const j=await fetch(API_CFG+'?acao=config&t='+Date
     if(typeof cU!=='undefined'&&cU){aplica();if(antes&&antes!==cU.perfil+'|'+cU.papel)location.reload()}}catch(e){}}
 buscaCfg();setInterval(buscaCfg,5*60000);
 // ---- menu e trava das telas ----
-function montar(){if(!$('sbCfg')){const sair=[...document.querySelectorAll('.sb-nav .sb-item')].find(b=>/abrirSenha/.test(b.getAttribute('onclick')||''));if(sair){const b=document.createElement('button');b.className='sb-item';b.id='sbCfg';b.style.display='none';b.setAttribute('onclick',"showPage('config')");b.textContent='⚙️ Configurações';sair.parentNode.insertBefore(b,sair)}}
+function montar(){if(!$('sbCfg')){const sair=[...document.querySelectorAll('.sb-nav .sb-item')].find(b=>/abrirSenha/.test(b.getAttribute('onclick')||''));if(sair){const b=document.createElement('button');b.className='sb-item';b.id='sbCfg';b.style.display='none';b.setAttribute('onclick',"showPage('config')");b.innerHTML='<svg class="ic ic-gear" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>Configurações';sair.parentNode.insertBefore(b,sair.nextSibling)}}
   if(!$('pageConfig')){const m=document.querySelector('.main');if(m){const p=document.createElement('div');p.className='page';p.id='pageConfig';m.appendChild(p)}}}
 montar();
 setInterval(()=>{montar();if(typeof cU==='undefined'||!cU)return;
