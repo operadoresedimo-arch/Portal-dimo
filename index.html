@@ -2479,6 +2479,15 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 .avd-cbt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 #pageAvaliacao .avd-tag{background:#fdf3d7;color:#8a6a12;border-radius:20px!important}
 .avd-err-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.avd-err-col{min-width:0;overflow-x:auto}.avd-err-col .od-tb{font-size:.74rem}.avd-err-col .od-tb th{padding:8px 5px;font-size:.58rem;white-space:normal}.avd-err-col .od-tb td{padding:8px 5px}.avd-err-col .avd-pc .od-bar{width:52px;min-width:52px}.avd-err-col .avd-pc{gap:4px}.avd-err-col .avd-pc b{min-width:34px}.avd-err-col .od-st{font-size:.62rem;padding:3px 6px}
+.avd-etb{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+.avd-ebusca{flex:1;min-width:220px}.avd-ebusca input{width:100%!important;border-radius:10px!important;padding:9px 12px 9px 34px!important;font-size:.84rem!important}
+.avd-eord{display:flex;align-items:center;gap:6px}.avd-eord span{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#8a8d92;margin-right:2px}
+.avd-efil{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border:1px solid #e9d9a6;background:#fdf8f0;color:#5f4b10;border-radius:10px!important;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer;max-width:420px}
+.avd-efil b{color:#2f3135;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.avd-efil:hover,.avd-efil.on{background:#d4a937;border-color:#d4a937;color:#fff}.avd-efil:hover b,.avd-efil.on b{color:#fff}.avd-ecv{font-size:.62rem}
+.avd-epop{flex-wrap:wrap;background:#fdf8f0;border:1px solid #f0dfa8;border-radius:12px!important;padding:12px;margin:-4px 0 12px}.avd-epop-t{width:100%;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#8a6a12;margin-bottom:2px}
+.avd-econt{font-size:.74rem;color:#9ca3af;margin:0 0 6px}.avd-econt b{color:#2f3135}
+.avd-err-grid.um{grid-template-columns:1fr}
+@media(max-width:700px){.avd-etb{flex-direction:column;align-items:stretch}.avd-efil{max-width:none}}
 @media(max-width:1100px){.avd-kg,.avd-kg.g2{grid-template-columns:1fr}.avd-plg{grid-template-columns:1fr}.avd-oper-grid,.avd-err-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.avd-acs{grid-template-columns:1fr}.avd-kgi,.avd-kgi.n2{grid-template-columns:1fr 1fr}.avd-m+.avd-m:before{display:none}.avd-crs .od-cr span{width:130px}}
 
@@ -4448,6 +4457,21 @@ function cardRanking(lin){
     odInfo('Operadoras ordenadas pela aderência (quanto seguiram o roteiro nas ligações ouvidas).','<b>Aderência</b> = % dos critérios bem feitos. <b>Barra</b> = acordo, retorno ou perdido. <b>Ponto fraco</b> = critério com pior resultado dela.','Clique na operadora pra abrir as ligações e dar o feedback. Comece por quem está em <b>revisar</b> com feedback pendente.'))+
     (L.length?legRes+'<div class="avd-sx"><table class="od-tb od-eq"><tr><th style="width:34px">#</th><th style="text-align:left">Operadora</th><th>Ouvidas</th><th>Aderência</th><th style="text-align:left;min-width:260px">Resultado das ligações</th><th style="text-align:left">Ponto fraco</th><th>Situação</th></tr>'+
     L.map((o,i)=>'<tr class="lk" data-odf="q" data-v="'+(o.rev?'rev':'bem')+'" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><td class="od-pos">'+(i+1)+'º</td><td style="text-align:left">'+opCel(o)+'</td><td><b>'+o.a.length+'</b></td><td>'+pctCel(o.n)+'</td><td style="text-align:left">'+stackRes(o.t,o.a.length)+'</td><td style="text-align:left;white-space:normal">'+(o.f?'<span class="avd-pf">'+esc(o.f.fraco||o.f.nome)+'</span>':'<span class="od-hz">-</span>')+'</td><td class="od-sts">'+stPill(o.rev)+(o.pend?'<span class="od-st" style="--c:#b45309">'+o.pend+' feedback'+(o.pend>1?'s':'')+'</span>':'')+'</td></tr>').join('')+'</table></div>':'<div class="avd-empty">Nenhuma ligação avaliada nesse período.</div>')+'</div>'}
+let ERR_Q='',ERR_ORD='asc',ERR_FOPEN=false,ERR_L=[];
+const semAc=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function errGrid(){
+  const q=semAc(ERR_Q).trim();
+  const L=ERR_L.filter(o=>!q||semAc(nc(o.op)).indexOf(q)>=0||semAc(o.op).indexOf(q)>=0).slice().sort((x,y)=>ERR_ORD==='asc'?(x.pct-y.pct||y.fal-x.fal):(y.pct-x.pct||x.fal-y.fal));
+  if(!L.length)return '<div class="avd-empty">Nenhuma operadora encontrada'+(q?' com "'+esc(ERR_Q)+'"':'')+'.</div>';
+  const corte=Math.ceil(L.length/2),partes=[L.slice(0,corte),L.slice(corte)].filter(x=>x.length);
+  const th='<tr><th style="text-align:left">Operadora</th><th>Avaliadas</th><th>Não fez</th><th>Aproveitamento</th><th>Situação</th></tr>';
+  const row=o=>'<tr class="lk" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><td style="text-align:left">'+opCel(o)+'</td><td><b>'+o.mx+'</b></td><td>'+(o.fal?'<b style="color:#dc2626">'+o.fal+'</b>':'<span class="od-hz">0</span>')+'</td><td>'+pctCel(o.pct)+'</td><td>'+stPill(o.pct<75,o.pct<75?(o.pct<40?'treinar':'melhorar'):'bem')+'</td></tr>';
+  return odVars('<div class="avd-econt">Mostrando <b>'+L.length+'</b> de '+ERR_L.length+' operadora'+(ERR_L.length===1?'':'s')+' · '+(ERR_ORD==='asc'?'menor aproveitamento primeiro':'maior aproveitamento primeiro')+'</div><div class="avd-err-grid'+(partes.length===1?' um':'')+'">'+partes.map(pt=>'<div class="avd-err-col"><table class="od-tb od-eq">'+th+pt.map(row).join('')+'</table></div>').join('')+'</div>');
+}
+function errBusca(v){ERR_Q=v;const el=$('avdErrLista');if(el)el.innerHTML=errGrid()}
+function errOrd(o){ERR_ORD=o;render()}
+function errFiltro(){ERR_FOPEN=!ERR_FOPEN;render()}
+function errCrit(k){CRIT=k;ERR_FOPEN=false;render()}
 function render(preservar){
   if(preservar===undefined)preservar=true;
   const antes={};if(preservar)['avdPer','avdDia','avdIni','avdFim','avdHIni','avdHFim','avdGrp','avdOp','avdTipo','avdRes','avdCrit'].forEach(id=>{const e=$(id);if(e)antes[id]=e.value});const antesFalhas=preservar&&$('avdFalhas')&&$('avdFalhas').checked;
@@ -4829,16 +4853,20 @@ function visao(ls,lin,c,eq){
     const ids=Object.keys(c).filter(k=>c[k].max).sort((a,b)=>c[a].pct-c[b].pct);const id=CRIT&&c[CRIT]?CRIT:ids[0];if(!id)return '<div class="od-card"><div class="avd-empty">Sem critérios avaliados nesse filtro.</div></div>';
     const L=lin.map(o=>{let p=0,mx=0,fal=0;o.a.forEach(l=>{const k=(l.criterios||[]).find(x=>idC(x)===id);if(k){const s=statusC(k);if(s!=='na'){mx++;p+=s==='bem'?1:s==='parte'?.5:0;if(s==='nao')fal++}}});return Object.assign({},o,{pct:mx?p/mx*100:0,fal,mx})}).filter(o=>o.mx).sort((x,y)=>x.pct-y.pct);
     const rv=L.filter(o=>o.pct<75).length;
-    h+='<div class="od-card">'+odHead('alert','#dc2626','Quem mais precisa treinar: '+esc(CFRACO[id]||c[id].nome||id),'Aproveitamento da equipe nesse critério: <b style="color:'+corPct(c[id].pct)+'">'+pf(c[id].pct,0)+'%</b>'+(rv?' · <span class="od-badge">'+rv+' pra revisar</span>':''),'',odInfo('Mostra só esse critério, operadora por operadora.','<b>Aproveitamento</b> = quanto ela fez bem esse ponto nas ligações em que ele se aplicava. "Não se aplica" não conta contra.','Troque o critério nos botões. Comece o feedback por quem está no topo (vermelho).'))+
-      '<div class="avd-cbt">'+ids.map(k=>'<button class="od-fb'+(k===id?' on':'')+'" style="--c:'+corPct(c[k].pct)+'" onclick="avd.crit(\''+k+'\')">'+esc(CFRACO[k]||c[k].nome||k)+' · '+pf(c[k].pct,0)+'%</button>').join('')+'</div>'+
-      (function(){const corte=Math.ceil(L.length/2),partes=[L.slice(0,corte),L.slice(corte)];
-        const th='<tr><th style="text-align:left">Operadora</th><th>Avaliadas</th><th>Não fez</th><th>Aproveitamento</th><th>Situação</th></tr>';
-        const tbl=parte=>'<div class="avd-err-col"><table class="od-tb od-eq">'+th+parte.map(o=>tr(o,['e',o.pct<75?'rev':'bem'],['<b>'+o.mx+'</b>',o.fal?'<b style="color:#dc2626">'+o.fal+'</b>':'<span class="od-hz">0</span>',pctCel(o.pct),stPill(o.pct<75,o.pct<75?(o.pct<40?'treinar':'melhorar'):'bem')])).join('')+'</table></div>';
-        return '<div class="avd-err-grid">'+partes.map(tbl).join('')+'</div>';})()+'</div>';
+    ERR_L=L;
+    const nomeCrit=esc(CFRACO[id]||c[id].nome||id);
+    h+='<div class="od-card">'+odHead('alert','#dc2626','Quem mais precisa treinar: '+nomeCrit,'Aproveitamento da equipe nesse critério: <b style="color:'+corPct(c[id].pct)+'">'+pf(c[id].pct,0)+'%</b>'+(rv?' · <span class="od-badge">'+rv+' pra revisar</span>':''),'',odInfo('Mostra só esse critério, operadora por operadora.','<b>Aproveitamento</b> = quanto ela fez bem esse ponto nas ligações em que ele se aplicava. "Não se aplica" não conta contra.','Use o botão <b>Filtro</b> pra trocar o critério. Comece o feedback por quem tem o menor aproveitamento.'))+
+      '<div class="avd-etb">'+
+        '<div class="od-busca avd-ebusca">'+odi('search',15)+'<input id="avdErrQ" type="text" placeholder="Pesquisar operadora pelo nome" value="'+esc(ERR_Q)+'" oninput="avd.errBusca(this.value)"></div>'+
+        '<div class="avd-eord"><span>Ordem</span><button class="od-fb'+(ERR_ORD==='asc'?' on':'')+'" style="--c:#484a4e" onclick="avd.errOrd(\'asc\')" title="Do menor pro maior aproveitamento">↑ Crescente</button><button class="od-fb'+(ERR_ORD==='desc'?' on':'')+'" style="--c:#484a4e" onclick="avd.errOrd(\'desc\')" title="Do maior pro menor aproveitamento">↓ Decrescente</button></div>'+
+        '<button class="avd-efil'+(ERR_FOPEN?' on':'')+'" onclick="avd.errFiltro()">'+odi('layers',15)+' Filtro: <b>'+nomeCrit+'</b> <span class="avd-ecv">'+(ERR_FOPEN?'▲':'▼')+'</span></button>'+
+      '</div>'+
+      '<div class="avd-cbt avd-epop" style="display:'+(ERR_FOPEN?'flex':'none')+'"><div class="avd-epop-t">Escolha o critério</div>'+ids.map(k=>'<button class="od-fb'+(k===id?' on':'')+'" style="--c:'+corPct(c[k].pct)+'" onclick="avd.errCrit(\''+k+'\')">'+esc(CFRACO[k]||c[k].nome||k)+' · '+pf(c[k].pct,0)+'%</button>').join('')+'</div>'+
+      '<div id="avdErrLista">'+errGrid()+'</div></div>';
   }
   return h;
 }
-window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao};
+window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,errBusca,errOrd,errFiltro,errCrit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao};
 // atualiza sozinho a cada 3 min enquanto a aba estiver aberta (sem fechar ligação que estiver ouvindo)
 setInterval(()=>{const pg=$('pageAvaliacao');if(!pg||!pg.classList.contains('active')||!DADOS||DEMO_MODE||!CHAVE)return;
   if([].some.call(document.querySelectorAll('.avd-lig-b'),b=>b.style.display==='block'))return;carregar(true)},180000);
@@ -6628,7 +6656,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1030',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1045',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
