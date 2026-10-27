@@ -2452,6 +2452,21 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 .comp-table{width:100%!important}
 .comp-table th,.comp-table td{padding:7px 8px!important}
 #pageAvaliacao{max-width:none!important;width:100%}
+
+/* ordenar/pesquisar tabelas */
+.ed-ob{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.ed-slot{flex:1;min-width:280px}.ed-slot .ed-ob{margin:0}
+.ed-q{flex:1;min-width:200px;position:relative;display:flex;align-items:center;color:#9ca3af}.ed-q svg{position:absolute;left:11px}
+.ed-q input{width:100%;padding:8px 12px 8px 34px;border:1px solid #e3e8ef;border-radius:10px!important;font:inherit;font-size:.82rem;background:#f8fafc;color:#1a1f36}.ed-q input:focus{outline:2px solid #d4a937;border-color:transparent;background:#fff}
+.ed-l{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#8a8d92}
+.ed-ob button{padding:7px 12px;border-radius:9px!important;border:1px solid #e3e8ef;background:#f8fafc;color:#6b7280;font:inherit;font-size:.76rem;font-weight:700;cursor:pointer}.ed-ob button.on{background:#484a4e;border-color:#484a4e;color:#fff}
+.ed-h{font-size:.7rem;color:#9ca3af}.ed-n{font-size:.72rem;font-weight:700;color:#2f3135}
+th.ed-th{cursor:pointer;user-select:none;white-space:nowrap}th.ed-th:hover{color:#2f3135!important}th.ed-on{color:#a8841f!important}
+.ed-ar{margin-left:4px;font-size:.6rem;opacity:.45}th.ed-on .ed-ar,.ed-on .ed-ar{opacity:1}
+.qa-row.qa-hd>div.ed-th{cursor:pointer;user-select:none}.qa-row.qa-hd>div.ed-on{color:#a8841f}
+.ed-hide{display:none!important}
+.avd-card>.ed-ob{padding:4px 16px 0}
+@media(max-width:700px){.ed-h{display:none}}
 /* Avaliacao no padrao do painel do discador */
 @media(max-width:760px){.avd-kg{flex-wrap:wrap}.avd-kgc{flex-basis:100%!important}}
 @media(max-width:1100px){.avd-m{padding:6px 7px}.avd-m .od-kt i{display:none}.avd-m .avd-hint{display:none}.avd-kgc{padding:8px 6px 6px}}
@@ -4457,21 +4472,18 @@ function cardRanking(lin){
   const L=lin.map(o=>Object.assign({},o,{t:contaRes(o.a),rev:o.a.some(temFalha)})),nr=L.filter(o=>o.rev).length;
   return '<div class="od-card">'+odHead('users','#d4a937','Ranking de qualidade','Barra = como terminaram as ligações ouvidas de cada operadora'+(nr?' · <span class="od-badge">'+nr+' pra revisar</span>':''),odBtn('q','all','Todas ('+L.length+')',true,'#d4a937')+odBtn('q','rev','Revisar ('+nr+')',false,'#dc2626')+odBtn('q','bem','Bem ('+(L.length-nr)+')',false,'#16a34a'),
     odInfo('Operadoras ordenadas pela aderência (quanto seguiram o roteiro nas ligações ouvidas).','<b>Aderência</b> = % dos critérios bem feitos. <b>Barra</b> = acordo, retorno ou perdido. <b>Ponto fraco</b> = critério com pior resultado dela.','Clique na operadora pra abrir as ligações e dar o feedback. Comece por quem está em <b>revisar</b> com feedback pendente.'))+
-    (L.length?legRes+'<div class="avd-sx"><table class="od-tb od-eq"><tr><th style="width:34px">#</th><th style="text-align:left">Operadora</th><th>Ouvidas</th><th>Aderência</th><th style="text-align:left;min-width:260px">Resultado das ligações</th><th style="text-align:left">Ponto fraco</th><th>Situação</th></tr>'+
-    L.map((o,i)=>'<tr class="lk" data-odf="q" data-v="'+(o.rev?'rev':'bem')+'" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><td class="od-pos">'+(i+1)+'º</td><td style="text-align:left">'+opCel(o)+'</td><td><b>'+o.a.length+'</b></td><td>'+pctCel(o.n)+'</td><td style="text-align:left">'+stackRes(o.t,o.a.length)+'</td><td style="text-align:left;white-space:normal">'+(o.f?'<span class="avd-pf">'+esc(o.f.fraco||o.f.nome)+'</span>':'<span class="od-hz">-</span>')+'</td><td class="od-sts">'+stPill(o.rev)+(o.pend?'<span class="od-st" style="--c:#b45309">'+o.pend+' feedback'+(o.pend>1?'s':'')+'</span>':'')+'</td></tr>').join('')+'</table></div>':'<div class="avd-empty">Nenhuma ligação avaliada nesse período.</div>')+'</div>'}
-let ERR_Q='',ERR_ORD='asc',ERR_FOPEN=false,ERR_L=[];
+    (L.length?legRes+'<div class="avd-sx"><table class="od-tb od-eq" data-ord-col="3"><tr><th style="width:34px">#</th><th style="text-align:left">Operadora</th><th>Ouvidas</th><th>Aderência</th><th style="text-align:left;min-width:260px">Resultado das ligações</th><th style="text-align:left">Ponto fraco</th><th>Situação</th></tr>'+
+    L.map((o,i)=>'<tr class="lk" data-odf="q" data-v="'+(o.rev?'rev':'bem')+'" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><td class="od-pos">'+(i+1)+'º</td><td style="text-align:left">'+opCel(o)+'</td><td><b>'+o.a.length+'</b></td><td data-v="'+o.n.toFixed(2)+'">'+pctCel(o.n)+'</td><td style="text-align:left" data-v="'+pc(o.t.a,o.a.length).toFixed(2)+'">'+stackRes(o.t,o.a.length)+'</td><td style="text-align:left;white-space:normal">'+(o.f?'<span class="avd-pf">'+esc(o.f.fraco||o.f.nome)+'</span>':'<span class="od-hz">-</span>')+'</td><td class="od-sts" data-v="'+((o.rev?10:0)+o.pend)+'">'+stPill(o.rev)+(o.pend?'<span class="od-st" style="--c:#b45309">'+o.pend+' feedback'+(o.pend>1?'s':'')+'</span>':'')+'</td></tr>').join('')+'</table></div>':'<div class="avd-empty">Nenhuma ligação avaliada nesse período.</div>')+'</div>'}
+let ERR_FOPEN=false,ERR_L=[];
 const semAc=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 function errGrid(){
-  const q=semAc(ERR_Q).trim();
-  const L=ERR_L.filter(o=>!q||semAc(nc(o.op)).indexOf(q)>=0||semAc(o.op).indexOf(q)>=0).slice().sort((x,y)=>ERR_ORD==='asc'?(x.pct-y.pct||y.fal-x.fal):(y.pct-x.pct||x.fal-y.fal));
-  if(!L.length)return '<div class="avd-empty">Nenhuma operadora encontrada'+(q?' com "'+esc(ERR_Q)+'"':'')+'.</div>';
+  const L=ERR_L.slice().sort((x,y)=>x.pct-y.pct||y.fal-x.fal);
+  if(!L.length)return '<div class="avd-empty">Nenhuma operadora nesse critério.</div>';
   const corte=Math.ceil(L.length/2),partes=[L.slice(0,corte),L.slice(corte)].filter(x=>x.length);
   const th='<tr><th style="text-align:left">Operadora</th><th>Avaliadas</th><th>Não fez</th><th>Aproveitamento</th><th>Situação</th></tr>';
-  const row=o=>'<tr class="lk" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><td style="text-align:left">'+opCel(o)+'</td><td><b>'+o.mx+'</b></td><td>'+(o.fal?'<b style="color:#dc2626">'+o.fal+'</b>':'<span class="od-hz">0</span>')+'</td><td>'+pctCel(o.pct)+'</td><td>'+stPill(o.pct<75,o.pct<75?(o.pct<40?'treinar':'melhorar'):'bem')+'</td></tr>';
-  return odVars('<div class="avd-econt">Mostrando <b>'+L.length+'</b> de '+ERR_L.length+' operadora'+(ERR_L.length===1?'':'s')+' · '+(ERR_ORD==='asc'?'menor aproveitamento primeiro':'maior aproveitamento primeiro')+'</div><div class="avd-err-grid'+(partes.length===1?' um':'')+'">'+partes.map(pt=>'<div class="avd-err-col"><table class="od-tb od-eq">'+th+pt.map(row).join('')+'</table></div>').join('')+'</div>');
+  const row=o=>'<tr class="lk" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><td style="text-align:left">'+opCel(o)+'</td><td><b>'+o.mx+'</b></td><td>'+(o.fal?'<b style="color:#dc2626">'+o.fal+'</b>':'<span class="od-hz">0</span>')+'</td><td data-v="'+o.pct.toFixed(2)+'">'+pctCel(o.pct)+'</td><td data-v="'+(o.pct<40?3:o.pct<75?2:1)+'">'+stPill(o.pct<75,o.pct<75?(o.pct<40?'treinar':'melhorar'):'bem')+'</td></tr>';
+  return odVars('<div class="avd-err-grid'+(partes.length===1?' um':'')+'">'+partes.map(pt=>'<div class="avd-err-col"><table class="od-tb od-eq" data-ord-col="3" data-ord-dir="asc">'+th+pt.map(row).join('')+'</table></div>').join('')+'</div>');
 }
-function errBusca(v){ERR_Q=v;const el=$('avdErrLista');if(el)el.innerHTML=errGrid()}
-function errOrd(o){ERR_ORD=o;render()}
 function errFiltro(){ERR_FOPEN=!ERR_FOPEN;render()}
 function errCrit(k){CRIT=k;ERR_FOPEN=false;render()}
 function render(preservar){
@@ -4604,8 +4616,8 @@ function visaoRotas(rs){
 function visaoFunil(){
   const rs=funilFilt();if(!rs.length)return '<div class="avd-card"><div class="avd-empty">Ainda sem dados do funil nesse período. O robô manda a cada rodada de 30 min.</div></div>';
   const T=funilTot(rs.filter(x=>x.tipo==='total'));
-  const et=[['Discagens',T.dis,'#64748b'],['Atendidas por pessoa',T.atd,'#1e4e7e'],['Falaram com operador',T.op,'#0ea5e9'],['Contato com o devedor',T.cpc,'#d4a937'],['Acordos',T.aco,'#16a34a']];
-  let h='<div class="avd-card"><div class="avd-ct">Funil da discagem</div><table class="avd-tb"><tr><th>Etapa</th><th>Quantidade</th><th>% da etapa anterior</th><th>% das discagens</th></tr>'+
+  const et=[['Discagens',T.dis,'#64748b'],['Atendidas por pessoa',T.atd,'#484a4e'],['Falaram com operador',T.op,'#b8901f'],['Contato com o devedor',T.cpc,'#d4a937'],['Acordos',T.aco,'#16a34a']];
+  let h='<div class="avd-card"><div class="avd-ct">Funil da discagem</div><table class="avd-tb" data-noord="1"><tr><th>Etapa</th><th>Quantidade</th><th>% da etapa anterior</th><th>% das discagens</th></tr>'+
     et.map((e,i)=>'<tr><td class="nm">'+e[0]+'</td><td><b>'+fmtN(e[1])+'</b></td><td>'+(i?pc(e[1],et[i-1][1]).toFixed(1)+'%'+mini(pc(e[1],et[i-1][1]),e[2]):'-')+'</td><td>'+pc(e[1],T.dis).toFixed(2)+'%</td></tr>').join('')+'</table>'+
     '<div class="avd-leg" style="padding-top:10px">Das discagens, <b>'+pc(T.ele,T.dis).toFixed(0)+'%</b> caíram em caixa postal ou máquina e <b>'+pc(T.muda,T.dis).toFixed(0)+'%</b> foram ligação muda. Dos atendimentos com operador, <b>'+pc(T.nc,T.op).toFixed(0)+'%</b> foram "não conhece o cliente" (número errado).</div></div>';
   h+=melhoriaDiscador(T);
@@ -4858,9 +4870,7 @@ function visao(ls,lin,c,eq){
     ERR_L=L;
     const nomeCrit=esc(CFRACO[id]||c[id].nome||id);
     h+='<div class="od-card">'+odHead('alert','#dc2626','Quem mais precisa treinar: '+nomeCrit,'Aproveitamento da equipe nesse critério: <b style="color:'+corPct(c[id].pct)+'">'+pf(c[id].pct,0)+'%</b>'+(rv?' · <span class="od-badge">'+rv+' pra revisar</span>':''),'',odInfo('Mostra só esse critério, operadora por operadora.','<b>Aproveitamento</b> = quanto ela fez bem esse ponto nas ligações em que ele se aplicava. "Não se aplica" não conta contra.','Use o botão <b>Filtro</b> pra trocar o critério. Comece o feedback por quem tem o menor aproveitamento.'))+
-      '<div class="avd-etb">'+
-        '<div class="od-busca avd-ebusca">'+odi('search',15)+'<input id="avdErrQ" type="text" placeholder="Pesquisar operadora pelo nome" value="'+esc(ERR_Q)+'" oninput="avd.errBusca(this.value)"></div>'+
-        '<div class="avd-eord"><span>Ordem</span><button class="od-fb'+(ERR_ORD==='asc'?' on':'')+'" style="--c:#484a4e" onclick="avd.errOrd(\'asc\')" title="Do menor pro maior aproveitamento">↑ Crescente</button><button class="od-fb'+(ERR_ORD==='desc'?' on':'')+'" style="--c:#484a4e" onclick="avd.errOrd(\'desc\')" title="Do maior pro menor aproveitamento">↓ Decrescente</button></div>'+
+      '<div class="avd-etb"><div class="ed-slot"></div>'+
         '<button class="avd-efil'+(ERR_FOPEN?' on':'')+'" onclick="avd.errFiltro()">'+odi('layers',15)+' Filtro: <b>'+nomeCrit+'</b> <span class="avd-ecv">'+(ERR_FOPEN?'▲':'▼')+'</span></button>'+
       '</div>'+
       '<div class="avd-cbt avd-epop" style="display:'+(ERR_FOPEN?'flex':'none')+'"><div class="avd-epop-t">Escolha o critério</div>'+ids.map(k=>'<button class="od-fb'+(k===id?' on':'')+'" style="--c:'+corPct(c[k].pct)+'" onclick="avd.errCrit(\''+k+'\')">'+esc(CFRACO[k]||c[k].nome||k)+' · '+pf(c[k].pct,0)+'%</button>').join('')+'</div>'+
@@ -4868,7 +4878,7 @@ function visao(ls,lin,c,eq){
   }
   return h;
 }
-window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,errBusca,errOrd,errFiltro,errCrit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao};
+window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,errFiltro,errCrit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao};
 // atualiza sozinho a cada 3 min enquanto a aba estiver aberta (sem fechar ligação que estiver ouvindo)
 setInterval(()=>{const pg=$('pageAvaliacao');if(!pg||!pg.classList.contains('active')||!DADOS||DEMO_MODE||!CHAVE)return;
   if([].some.call(document.querySelectorAll('.avd-lig-b'),b=>b.style.display==='block'))return;carregar(true)},180000);
@@ -6658,9 +6668,99 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1100',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1230',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
-</script></body>
+</script><script id="edimo-ordenar">
+/* Ordenar e pesquisar em qualquer tabela do portal:
+   - escolha Crescente/Decrescente (vira a preferência pra todo o portal)
+   - clique no título da coluna pra ordenar por ela (clicar de novo inverte)
+   - listas divididas em 2 colunas são ordenadas juntas e redivididas */
+(function(){
+  const ST={},semAc=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const prefDir=()=>localStorage.getItem('ed_ord_dir');
+  const salvo=k=>{try{return JSON.parse(localStorage.getItem('ed_ord_'+k)||'null')}catch(e){return null}};
+  const hash=s=>{let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return (h>>>0).toString(36)};
+  // valor de uma celula: numero (%, R$, 1.234, 1m08s, 1h05, 00:03:42) ou texto
+  function valor(el){
+    if(!el)return null;if(el.dataset&&el.dataset.v!==undefined){const n=parseFloat(el.dataset.v);return isNaN(n)?el.dataset.v:n}
+    const t=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim();if(!t||t==='-'||t==='—')return null;
+    let m=t.match(/^(\d+)h(\d{1,2})\b/);if(m)return +m[1]*3600+ +m[2]*60;
+    m=t.match(/^(\d+)m(\d{1,2})s/);if(m)return +m[1]*60+ +m[2];
+    m=t.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);if(m)return m[3]!==undefined?+m[1]*3600+ +m[2]*60+ +m[3]:+m[1]*60+ +m[2];
+    m=t.match(/^(?:R\$\s*)?(-?[\d.]*\d(?:,\d+)?)/);if(m){const n=parseFloat(m[1].replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'));if(!isNaN(n))return n}
+    return semAc(t);
+  }
+  // ---- descobre as "unidades" ordenaveis (tabela, grade de 2 tabelas, lista em div)
+  function unidades(){
+    const U=[];
+    document.querySelectorAll('table:not([data-ed])').forEach(tb=>{
+      if(tb.dataset.ed||tb.closest('#pageTV,[data-noord]'))return;
+      const grade=tb.closest('.avd-err-grid,.avd-oper-grid');
+      const tabs=grade?[...grade.querySelectorAll('table')]:[tb];
+      tabs.forEach(t=>t.dataset.ed='1');
+      const hr=tabs[0].querySelector('thead tr')||[...tabs[0].rows].find(r=>r.querySelector('th'));if(!hr)return;
+      const heads=[...hr.cells];if(heads.length<2)return;
+      const todos=tabs.map(t=>{const h=t.querySelector('thead tr')||[...t.rows].find(r=>r.querySelector('th'));return h?[...h.cells]:[]});
+      let ok=true,fix=[];
+      const linhas=()=>{const L=[];tabs.forEach(t=>[...t.rows].forEach(r=>{if(r.querySelector('th'))return;if([...r.cells].some(c=>c.colSpan>1)){fix.push(r);return}L.push(r)}));return L};
+      const L0=linhas();if(L0.length<2)return;
+      // linha com colspan no meio = tabela com detalhe embutido: nao mexe
+      if(fix.some(r=>r.nextElementSibling&&!r.nextElementSibling.querySelector('th')&&![...r.nextElementSibling.cells].some(c=>c.colSpan>1)))ok=false;
+      if(!ok)return;fix=[];
+      const corpo=t=>{const r=[...t.rows].find(x=>!x.querySelector('th'));return r?r.parentNode:(t.tBodies[0]||t)};
+      let ancora=grade||tb;while(!grade&&ancora.parentElement&&ancora.parentElement.children.length===1&&!ancora.parentElement.matches('.od-card,.avd-card,.page,body,td'))ancora=ancora.parentElement;
+      U.push({tipo:'tab',heads,todos,ancora,cel:(r,i)=>r.cells[i],linhas,tb:tabs[0],
+        colocar(L){const vis=L.filter(r=>!r.classList.contains('ed-hide')&&r.style.display!=='none'),esc=L.filter(r=>vis.indexOf(r)<0),F=fix.slice();fix=[];
+          if(tabs.length===1){const b=corpo(tabs[0]);L.concat(F).forEach(r=>b.appendChild(r));return}
+          const c=Math.ceil(vis.length/tabs.length);tabs.forEach((t,i)=>{const b=corpo(t);vis.slice(i*c,(i+1)*c).forEach(r=>b.appendChild(r))});const ul=corpo(tabs[tabs.length-1]);esc.concat(F).forEach(r=>ul.appendChild(r))}});
+    });
+    // listas montadas com div (ex.: Avaliação por Funcionário)
+    document.querySelectorAll('.qa-row.qa-hd:not([data-ed])').forEach(hd=>{
+      hd.dataset.ed='1';const box=hd.parentElement;if(!box||box.closest('#pageTV'))return;
+      const linhas=()=>[...box.children].filter(x=>x!==hd&&x.classList.contains('qa-row'));if(linhas().length<2)return;
+      U.push({tipo:'div',heads:[...hd.children],todos:[[...hd.children]],ancora:hd,cel:(r,i)=>r.children[i],linhas,tb:hd,colocar(L){L.forEach(r=>box.appendChild(r))}});
+    });
+    return U;
+  }
+  function chave(u){const card=u.ancora.closest('.od-card,.avd-card,.page');const t=card?(card.querySelector('.od-h3,.avd-ct,h2,h3')||{}).textContent||'':'';return hash((card&&card.id||'')+'|'+t.replace(/:.*$/,'')+'|'+u.heads.map(h=>h.textContent.trim()).join(','))}
+  function numerica(u,i){let n=0,t=0;u.linhas().slice(0,30).forEach(r=>{const v=valor(u.cel(r,i));if(v===null)return;t++;if(typeof v==='number')n++});return t&&n/t>=.6}
+  function aplicar(u){
+    const s=u.s,L=u.linhas();
+    const q=semAc(s.q).trim();L.forEach(r=>r.classList.toggle('ed-hide',!!q&&semAc(r.innerText).indexOf(q)<0));
+    let O=L;
+    if(s.col>=0){const num=numerica(u,s.col),d=s.dir==='asc'?1:-1;
+      O=L.map((r,i)=>({r,i,v:valor(u.cel(r,s.col))})).sort((a,b)=>{if(a.v===null&&b.v===null)return a.i-b.i;if(a.v===null)return 1;if(b.v===null)return -1;
+        let c=num?((typeof a.v==='number'?a.v:-Infinity)-(typeof b.v==='number'?b.v:-Infinity)):String(a.v).localeCompare(String(b.v),'pt-BR',{numeric:true});return c?c*d:a.i-b.i}).map(x=>x.r)}
+    u.colocar(O);
+    u.todos.flat().forEach(h=>{const i=h.cellIndex!==undefined?h.cellIndex:[...h.parentElement.children].indexOf(h);h.classList.toggle('ed-on',i===s.col);let a=h.querySelector('.ed-ar');if(!a){a=document.createElement('span');a.className='ed-ar';h.appendChild(a)}a.textContent=i===s.col?(s.dir==='asc'?'▲':'▼'):'↕'});
+    if(u.bar){u.bar.querySelectorAll('[data-dir]').forEach(b=>b.classList.toggle('on',b.dataset.dir===s.dir));const n=u.bar.querySelector('.ed-n');if(n){const vis=L.filter(r=>!r.classList.contains('ed-hide')).length;n.textContent=q?vis+' de '+L.length:''}}
+  }
+  function preparar(u){
+    u.k=chave(u);const sv=salvo(u.k),def=u.tb.dataset||{};
+    u.s=ST[u.k]||{q:'',col:sv&&sv.col!==undefined?sv.col:(def.ordCol!==undefined?+def.ordCol:-1),dir:(sv&&sv.dir)||prefDir()||def.ordDir||'desc'};ST[u.k]=u.s;
+    const guarda=()=>localStorage.setItem('ed_ord_'+u.k,JSON.stringify({col:u.s.col,dir:u.s.dir}));
+    u.todos.forEach(hs=>hs.forEach((h,i)=>{if(!h.textContent.trim())return;h.classList.add('ed-th');h.title='Ordenar por '+h.textContent.trim().toLowerCase();
+      h.addEventListener('click',e=>{e.stopPropagation();if(u.s.col===i)u.s.dir=u.s.dir==='asc'?'desc':'asc';else{u.s.col=i;u.s.dir='asc'}guarda();aplicar(u)})}));
+    // barra: pesquisa + crescente/decrescente
+    const card=u.ancora.closest('.od-card,.avd-card,.page,body');const temBusca=card&&card.querySelector('.od-busca input:not(.ed-qi),.qa-busca input');
+    const nL=u.linhas().length,bar=document.createElement('div');bar.className='ed-ob';
+    bar.innerHTML=(!temBusca&&nL>=6?'<label class="ed-q"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input class="ed-qi" type="text" placeholder="Pesquisar pelo nome"></label>':'')+
+      '<span class="ed-l">Ordem</span><button type="button" data-dir="asc">↑ Crescente</button><button type="button" data-dir="desc">↓ Decrescente</button><span class="ed-h">clique no título da coluna: 1x crescente, 2x decrescente</span><span class="ed-n"></span>';
+    const qi=bar.querySelector('input');if(qi){qi.value=u.s.q;qi.addEventListener('input',()=>{u.s.q=qi.value;aplicar(u)})}
+    bar.querySelectorAll('[data-dir]').forEach(b=>b.addEventListener('click',()=>{u.s.dir=b.dataset.dir;localStorage.setItem('ed_ord_dir',u.s.dir);
+      if(u.s.col<0){const d=def.ordCol!==undefined?+def.ordCol:u.heads.findIndex((h,i)=>i>0&&!/^#?$/.test(h.textContent.trim())&&numerica(u,i));u.s.col=d<0?0:d}guarda();aplicar(u)}));
+    const slot=card&&card.querySelector('.ed-slot:empty');
+    if(slot)slot.appendChild(bar);else u.ancora.parentNode.insertBefore(bar,u.ancora);
+    u.bar=bar;
+    if(u.s.col>=0||u.s.q)aplicar(u);else u.todos.flat().forEach(h=>{if(!h.querySelector('.ed-ar')&&h.classList.contains('ed-th')){const a=document.createElement('span');a.className='ed-ar';a.textContent='↕';h.appendChild(a)}});
+  }
+  let tm=null;const varre=()=>{tm=null;try{unidades().forEach(preparar)}catch(e){console.warn('ordenar:',e)}};
+  new MutationObserver(()=>{if(!tm)tm=setTimeout(varre,80)}).observe(document.body,{childList:true,subtree:true});
+  window.addEventListener('load',varre);setTimeout(varre,500);
+})();
+</script>
+
+</body>
 </html>
