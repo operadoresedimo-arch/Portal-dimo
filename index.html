@@ -4728,6 +4728,10 @@ function operTempos(){const m={};operFilt('tempos').forEach(x=>(x.dados||[]).for
 function operPausas(){const m={};operFilt('pausas').forEach(x=>(x.dados||[]).forEach(o=>{const k=nkey(o.n),t=m[k]=m[k]||{n:o.n,dias:{},tot:{lanche:[0,0],banheiro:[0,0],cafe:[0,0],outra:[0,0],bloq:[0,0]},estDias:0,aberta:null,lista:[]};
   const d=t.dias[x.data]=t.dias[x.data]||{lanche:0,ini:''};
   (o.p||[]).forEach(p=>{const tp=tipoPausa(p[0]);t.tot[tp][0]++;t.tot[tp][1]+=p[2]||0;if(tp==='lanche'){d.lanche+=p[2]||0;if(!d.ini)d.ini=p[1]}if(p[3])t.aberta=p;t.lista.push((Object.keys(t.dias).length>1?x.data.slice(0,5)+' ':'')+p[1]+' '+String(p[0]).toLowerCase()+' '+mmss(p[2])+(p[3]?' (em andamento)':''))})}));
+  // reserva: se o log de eventos nao trouxe a operadora naquele dia, usa o total de cada pausa do relatorio de tempos
+  operFilt('tempos').forEach(x=>(x.dados||[]).forEach(o=>{const k=nkey(o.n),pz=o.pz||{};if(!Object.keys(pz).length)return;if(m[k]&&m[k].dias[x.data])return;
+    const t=m[k]=m[k]||{n:o.n,dias:{},tot:{lanche:[0,0],banheiro:[0,0],cafe:[0,0],outra:[0,0],bloq:[0,0]},estDias:0,aberta:null,lista:[]},d=t.dias[x.data]={lanche:0,ini:''};
+    Object.keys(pz).forEach(nm=>{if(/^CRM$/i.test(nm))return;const tp=tipoPausa(nm),v=pz[nm]||0;if(!v)return;t.tot[tp][0]++;t.tot[tp][1]+=v;if(tp==='lanche')d.lanche+=v;t.lista.push((Object.keys(t.dias).length>1?x.data.slice(0,5)+' ':'')+String(nm).toLowerCase()+' '+mmss(v)+' (total do dia)')})}));
   Object.values(m).forEach(t=>{t.estDias=Object.values(t.dias).filter(d=>d.lanche>LANCHE_LIM).length;t.nd=Object.keys(t.dias).length});return m}
 function odBarras(pts,fy){if(!pts.length)return '';const W=620,H=210,L=40,R=10,Tp=12,B=30,mx=Math.max(1,...pts.map(p=>p.y))*1.12,bw=(W-L-R)/pts.length;
   const Y=v=>Tp+(H-Tp-B)*(1-v/mx);let g='';for(let i=0;i<=4;i++){const v=mx*i/4;g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#eef1f5" stroke-dasharray="3 3"/><text x="'+(L-6)+'" y="'+(Y(v)+4)+'" text-anchor="end" class="od-ax">'+fy(v)+'</text>'}
@@ -4757,7 +4761,7 @@ function odPausas(umDia){const P=operPausas(),L=Object.values(P).filter(t=>t.lis
       odInfo('Todas as pausas registradas na Fastway (lanche, banheiro, café e outras), com o horário de cada uma.','<b>Lanche</b> fica vermelho quando passa de 20 min. Passe o mouse na linha pra ver a lista de pausas com horário. "Em pausa agora" vale pra última coleta do robô (de 30 em 30 min).','Lanche estourado repetido vale conversa. Muita pausa de banheiro curta seguida também.'))+
     tbw('<table class="od-tb"><tr><th>Operadora</th><th>Lanche</th><th>Banheiro</th><th>Café</th><th>Outras</th><th>Total</th><th>Situação</th></tr>'+L.map(t=>{
       const tot=['lanche','banheiro','cafe','outra'].reduce((s,k)=>s+t.tot[k][1],0),d1=Object.values(t.dias)[0]||{};
-      const lan=t.tot.lanche[0]?(umDia?'<td data-v="'+t.tot.lanche[1]+'"><b style="color:'+(t.estDias?'#dc2626':'#16a34a')+'">'+mmss(t.tot.lanche[1])+'</b><small> às '+esc(d1.ini||'-')+(t.estDias?' · +'+mmss(t.tot.lanche[1]-20*60):'')+'</small></td>':'<td data-v="'+t.estDias+'"><b style="color:'+(t.estDias?'#dc2626':'#16a34a')+'">'+(t.estDias?'estourou '+t.estDias+'x':'ok')+'</b><small> média '+mmss(t.tot.lanche[1]/Math.max(1,t.nd))+'</small></td>'):'<td data-v="0">-</td>';
+      const lan=t.tot.lanche[0]?(umDia?'<td data-v="'+t.tot.lanche[1]+'"><b style="color:'+(t.estDias?'#dc2626':'#16a34a')+'">'+mmss(t.tot.lanche[1])+'</b><small>'+(d1.ini?' às '+esc(d1.ini):'')+(t.estDias?' +'+mmss(t.tot.lanche[1]-20*60):'')+'</small></td>':'<td data-v="'+t.estDias+'"><b style="color:'+(t.estDias?'#dc2626':'#16a34a')+'">'+(t.estDias?'estourou '+t.estDias+'x':'ok')+'</b><small> média '+mmss(t.tot.lanche[1]/Math.max(1,t.nd))+'</small></td>'):'<td data-v="0">-</td>';
       const st=[];if(t.estDias)st.push(['lanche estourado','#dc2626']);if(umDia&&t.aberta)st.push(['em pausa: '+String(t.aberta[0]).toLowerCase()+' desde '+t.aberta[1],'#b45309']);
       return '<tr data-odf="pz" data-v="'+(t.estDias?'est':'ok')+'" data-v2="'+(t.aberta&&umDia?'agora':'')+'" title="'+esc(t.lista.join('\n'))+'"><td class="nm">'+esc(nc(t.n))+'</td>'+lan+cel(t,'banheiro')+cel(t,'cafe')+cel(t,'outra')+'<td data-v="'+tot+'"><b>'+mmss(tot)+'</b></td><td class="od-sts">'+(st.length?st.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+esc(a[0])+'</span>').join(''):'<span class="od-st" style="--c:#16a34a">'+odi('ok',12)+'regular</span>')+'</td></tr>'}).join('')+'</table>')+'</div>'}
 function odPresenca(){const X=operUlt('mes_ops');if(!X||!X.dados||!(X.dados.ops||[]).length)return '';const D=X.dados.dias||[],O=X.dados.ops.slice();
@@ -6726,7 +6730,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1700',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1710',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
