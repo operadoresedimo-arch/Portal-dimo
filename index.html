@@ -2456,6 +2456,7 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 .avd-fbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}.avd-fbl{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#8a8d92;margin-right:4px}
 .avd-fbar .od-fb,.avd-cbt .od-fb,#pageAvaliacao .od-fb{border-radius:10px!important}
 .avd-kg{display:grid;grid-template-columns:minmax(190px,1fr) 3fr 2fr;gap:12px;margin-bottom:14px;align-items:stretch}.avd-kg.g2{grid-template-columns:minmax(190px,1fr) 3fr}
+.avd-kg.erro{grid-template-columns:minmax(260px,1fr) minmax(0,2fr)}
 .avd-kgc{background:#fff;border:1px solid var(--bd);border-top:4px solid var(--c);border-radius:14px!important;padding:12px 10px 10px;box-shadow:0 1px 4px rgba(15,23,42,.04);display:flex;flex-direction:column}
 .avd-kgt{display:flex;align-items:center;gap:8px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;padding:0 6px 8px}
 .od-ic.sm{padding:5px;border-radius:8px!important}
@@ -2474,9 +2475,11 @@ body .sidebar .sb-logo img{width:100%!important;max-width:none!important;height:
 .avd-sx{overflow-x:auto}.od-tb tr.lk{cursor:pointer}
 .avd-pf{display:inline-block;font-size:.74rem;font-weight:700;color:#8a6a12;background:#fdf3d7;border:1px solid #f0dfa8;padding:3px 8px;border-radius:8px!important}
 .avd-pc{display:flex;align-items:center;gap:8px;justify-content:flex-end}.avd-pc .od-bar{width:80px;min-width:80px;margin:0}.avd-pc b{min-width:38px;text-align:right}
+.avd-oper-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:0 16px 16px}.avd-oper-col{min-width:0;overflow-x:auto}.avd-oper-col .avd-tb{font-size:.7rem}.avd-oper-col .avd-tb th{font-size:.58rem;padding:7px 5px;white-space:normal}.avd-oper-col .avd-tb td{padding:8px 5px}.avd-oper-col .avd-mini{width:38px;margin-left:4px}.avd-oper-col .avd-tb td:first-child{min-width:105px}.avd-oper-col .avd-tb th:nth-child(5),.avd-oper-col .avd-tb td:nth-child(5){white-space:nowrap}
 .avd-cbt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 #pageAvaliacao .avd-tag{background:#fdf3d7;color:#8a6a12;border-radius:20px!important}
-@media(max-width:1100px){.avd-kg,.avd-kg.g2{grid-template-columns:1fr}.avd-plg{grid-template-columns:1fr}}
+.avd-err-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.avd-err-col{min-width:0;overflow-x:auto}.avd-err-col .od-tb{font-size:.74rem}.avd-err-col .od-tb th{padding:8px 5px;font-size:.58rem;white-space:normal}.avd-err-col .od-tb td{padding:8px 5px}.avd-err-col .avd-pc .od-bar{width:52px;min-width:52px}.avd-err-col .avd-pc{gap:4px}.avd-err-col .avd-pc b{min-width:34px}.avd-err-col .od-st{font-size:.62rem;padding:3px 6px}
+@media(max-width:1100px){.avd-kg,.avd-kg.g2{grid-template-columns:1fr}.avd-plg{grid-template-columns:1fr}.avd-oper-grid,.avd-err-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.avd-acs{grid-template-columns:1fr}.avd-kgi,.avd-kgi.n2{grid-template-columns:1fr 1fr}.avd-m+.avd-m:before{display:none}.avd-crs .od-cr span{width:130px}}
 
 .app-with-sidebar .main{max-width:none!important;width:auto!important}
@@ -4463,12 +4466,13 @@ function render(preservar){
   if(FUNIL){const t=funilTot(funilFilt().filter(x=>x.tipo==='total'));kDisc.push(avM('phone','#484a4e','Discagens no período',fmtN(t.dis),fmtN(t.atd)+' atendidas · '+fmtN(t.aco)+' acordos','funil'))}
   if(OPER&&OPER.length){const H=operJunta('hora'),d=H.reduce((s,x)=>s+(x.dis||0),0),a=H.reduce((s,x)=>s+(x.at||0),0);kDisc.push(avM('signal','#b8901f','Operação do discador',d?pf(pc(a,d),1)+'%':'-',d?'atendidas · mailing, rotas, horários e tempos':'sem dados no período','oper'))}
   const N=ls.length,T=contaRes(ls);
-  let h=tabsHTML()+'<div class="avd-kg'+(kDisc.length?'':' g2')+'">'+
+  const itensQualidade=[
+    avM('layers','#b8901f','Aderência média',pf(eq,0)+'%','status dos critérios','nota'),
+    avM('ok','#16a34a','Saíram com acordo',pf(pc(T.a,N),0)+'%',T.a+' de '+N+' ouvidas','res')];
+  if(VIEW!=='erro')itensQualidade.push(avM('alert','#dc2626','Principal erro',fr?esc(fr.fraco||fr.nome):'-',fr?pf(fr.pct,0)+'% de aproveitamento':'','erro',1));
+  let h=tabsHTML()+'<div class="avd-kg'+(kDisc.length?'':' g2')+(VIEW==='erro'?' erro':'')+'">'+
     avGrupo('search','#484a4e','Ligações',[avM('phone','#484a4e','Ligações avaliadas',N,lin.length+' operadora'+(lin.length===1?'':'s'),'rank')])+
-    avGrupo('ok','#16a34a','Qualidade das ligações',[
-      avM('layers','#b8901f','Aderência média',pf(eq,0)+'%','status dos critérios','nota'),
-      avM('ok','#16a34a','Saíram com acordo',pf(pc(T.a,N),0)+'%',T.a+' de '+N+' ouvidas','res'),
-      avM('alert','#dc2626','Principal erro',fr?esc(fr.fraco||fr.nome):'-',fr?pf(fr.pct,0)+'% de aproveitamento':'','erro',1)])+
+    avGrupo('ok','#16a34a','Qualidade das ligações',itensQualidade)+
     (kDisc.length?avGrupo('signal','#484a4e','Discador',kDisc):'')+'</div>';
   if(VIEW){$('avdBody').innerHTML=odVars(h+visao(ls,lin,c,eq));return}
   h+='<div class="od-g2">'+cardResultado(T,N)+cardCriterios(c,eq,fr)+'</div>';
@@ -4581,8 +4585,9 @@ function visaoFunil(){
   h+=melhoriaDiscador(T);
   h+=visaoRotas(rs);
   const O=funilAgr(rs.filter(x=>x.tipo==='op')).sort((a,b)=>b.aco-a.aco||pc(b.aco,b.cpc)-pc(a.aco,a.cpc));
-  h+='<div class="avd-card"><div class="avd-ct">Por operador</div><table class="avd-tb"><tr><th>Operador</th><th>Atendimentos</th><th>Contato devedor</th><th>Acordos</th><th>% acordo / contato</th><th>Tempo médio falando</th></tr>'+
-    O.map(o=>{const tm=o.op?o.seg/o.op:0;return '<tr class="lk" onclick="avd.detalhe(\''+encodeURIComponent(o.nome)+'\')"><td class="nm">'+esc(nc(o.nome))+'</td><td>'+fmtN(o.op)+'</td><td>'+fmtN(o.cpc)+'</td><td><b>'+fmtN(o.aco)+'</b></td><td><b style="color:#16a34a">'+pc(o.aco,o.cpc).toFixed(0)+'%</b>'+mini(pc(o.aco,o.cpc),'#16a34a')+'</td><td>'+Math.floor(tm/60)+'m'+String(Math.round(tm%60)).padStart(2,'0')+'s</td></tr>'}).join('')+'</table></div>';
+  const metadeOp=Math.ceil(O.length/2),partesOp=[O.slice(0,metadeOp),O.slice(metadeOp)];
+  const tabelaOp=lista=>'<div class="avd-oper-col"><table class="avd-tb"><tr><th>Operador</th><th>Atend.</th><th>Contato</th><th>Acordos</th><th>% acordo</th><th>Tempo médio</th></tr>'+lista.map(o=>{const tm=o.op?o.seg/o.op:0;return '<tr class="lk" onclick="avd.detalhe(\''+encodeURIComponent(o.nome)+'\')"><td class="nm">'+esc(nc(o.nome))+'</td><td>'+fmtN(o.op)+'</td><td>'+fmtN(o.cpc)+'</td><td><b>'+fmtN(o.aco)+'</b></td><td><b style="color:#16a34a">'+pc(o.aco,o.cpc).toFixed(0)+'%</b>'+mini(pc(o.aco,o.cpc),'#16a34a')+'</td><td>'+Math.floor(tm/60)+'m'+String(Math.round(tm%60)).padStart(2,'0')+'s</td></tr>'}).join('')+'</table></div>';
+  h+='<div class="avd-card"><div class="avd-ct">Por operador · dividido em duas colunas</div><div class="avd-oper-grid">'+partesOp.map(tabelaOp).join('')+'</div></div>';
   const M=funilAgr(rs.filter(x=>x.tipo==='mailing'&&String(x.nome)!=='0')).filter(m=>m.dis>=50).sort((a,b)=>b.dis-a.dis);
   const diag=m=>{const at=pc(m.atd,m.dis),errado=pc(m.nc,m.op),cpc=pc(m.cpc,m.dis);
     if(m.dis<300)return '<span class="avd-pl" style="background:#f1f5f9;color:#64748b">pouco discado</span>';
@@ -4826,8 +4831,10 @@ function visao(ls,lin,c,eq){
     const rv=L.filter(o=>o.pct<75).length;
     h+='<div class="od-card">'+odHead('alert','#dc2626','Quem mais precisa treinar: '+esc(CFRACO[id]||c[id].nome||id),'Aproveitamento da equipe nesse critério: <b style="color:'+corPct(c[id].pct)+'">'+pf(c[id].pct,0)+'%</b>'+(rv?' · <span class="od-badge">'+rv+' pra revisar</span>':''),'',odInfo('Mostra só esse critério, operadora por operadora.','<b>Aproveitamento</b> = quanto ela fez bem esse ponto nas ligações em que ele se aplicava. "Não se aplica" não conta contra.','Troque o critério nos botões. Comece o feedback por quem está no topo (vermelho).'))+
       '<div class="avd-cbt">'+ids.map(k=>'<button class="od-fb'+(k===id?' on':'')+'" style="--c:'+corPct(c[k].pct)+'" onclick="avd.crit(\''+k+'\')">'+esc(CFRACO[k]||c[k].nome||k)+' · '+pf(c[k].pct,0)+'%</button>').join('')+'</div>'+
-      '<div class="avd-sx"><table class="od-tb od-eq"><tr><th style="text-align:left">Operadora</th><th>Avaliadas</th><th>Não fez</th><th>Aproveitamento</th><th>Situação</th></tr>'+
-      L.map(o=>tr(o,['e',o.pct<75?'rev':'bem'],['<b>'+o.mx+'</b>',o.fal?'<b style="color:#dc2626">'+o.fal+'</b>':'<span class="od-hz">0</span>',pctCel(o.pct),stPill(o.pct<75,o.pct<75?(o.pct<40?'treinar':'melhorar'):'bem')])).join('')+'</table></div></div>';
+      (function(){const corte=Math.ceil(L.length/2),partes=[L.slice(0,corte),L.slice(corte)];
+        const th='<tr><th style="text-align:left">Operadora</th><th>Avaliadas</th><th>Não fez</th><th>Aproveitamento</th><th>Situação</th></tr>';
+        const tbl=parte=>'<div class="avd-err-col"><table class="od-tb od-eq">'+th+parte.map(o=>tr(o,['e',o.pct<75?'rev':'bem'],['<b>'+o.mx+'</b>',o.fal?'<b style="color:#dc2626">'+o.fal+'</b>':'<span class="od-hz">0</span>',pctCel(o.pct),stPill(o.pct<75,o.pct<75?(o.pct<40?'treinar':'melhorar'):'bem')])).join('')+'</table></div>';
+        return '<div class="avd-err-grid">'+partes.map(tbl).join('')+'</div>';})()+'</div>';
   }
   return h;
 }
@@ -6621,7 +6628,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261027-1000',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261027-1030',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
