@@ -2217,7 +2217,7 @@ body::before,body::after{display:none!important}
 .mc-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mc{background:#fff;border:1px solid #eef1f5;border-left:5px solid var(--c);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .mc-t{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.mc-t b{display:block;font-size:.92rem;color:#2f3135;line-height:1.25}.mc-t small{display:block;font-size:.7rem;color:#9ca3af;margin-top:2px}
 .mc-p div{height:7px;background:#eef2f7;border-radius:9px;overflow:hidden}.mc-p i{display:block;height:100%;border-radius:9px}.mc-p span{display:block;font-size:.72rem;color:#6b7280;margin-top:4px}
-.mc-n{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:#fafaf7;border-radius:10px;padding:8px 6px}.mc-n div{text-align:center}.mc-n b{display:block;font-size:1.02rem;color:#2f3135;font-variant-numeric:tabular-nums}.mc-n span{font-size:.66rem;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.mc-n{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#fafaf7;border-radius:10px;padding:8px 6px}.mc-n div{text-align:center}.mc-n b{display:block;font-size:1.02rem;color:#2f3135;font-variant-numeric:tabular-nums}.mc-n span{font-size:.66rem;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
 .mc-a{display:flex;gap:8px;align-items:flex-start;margin-top:auto}.mc-d{flex:none;font-size:.7rem;font-weight:800;color:#fff;background:var(--c);padding:3px 9px;border-radius:99px}.mc-a p{margin:0;font-size:.74rem;color:#6b7280;line-height:1.35}
 .mc-f{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:2px 0 12px}.mc-alerta{display:inline-flex;align-items:center;gap:5px;margin-left:auto;font-size:.76rem;font-weight:800;color:#dc2626}
 .mc-sv{display:flex;gap:6px;flex-wrap:wrap;margin:-2px 0 10px}.mc-sv span{font-size:.72rem;color:#484a4e;background:#f8fafc;border:1px solid #e2e8f0;border-radius:99px;padding:3px 10px;font-weight:600}
@@ -2225,6 +2225,7 @@ body::before,body::after{display:none!important}
 .fn-l{font-size:.74rem;font-weight:700;color:#6b7280}.fn-s b{display:block;font-size:1.5rem;color:#2f3135;margin:4px 0 2px;font-variant-numeric:tabular-nums}.fn-s small{display:block;font-size:.7rem;color:#9ca3af}.fn-s em{display:block;font-style:normal;font-size:.7rem;color:#dc2626;font-weight:700;margin-top:6px}.fn-x{display:flex;align-items:center;color:#cbd5e1;font-style:normal;font-size:1.6rem;font-weight:300}
 @media(max-width:1100px){.mc-g{grid-template-columns:repeat(2,minmax(0,1fr))}.fn{flex-wrap:wrap}.fn-x{display:none}.fn-s{flex:1 1 30%}}@media(max-width:650px){.mc-g{grid-template-columns:1fr}.fn-s{flex:1 1 45%}}
 .eq-sub{display:block;font-size:.68rem;color:#9ca3af;margin-top:1px}.nx-chip.live{background:#ecfdf5!important;color:#15803d!important}.nx-chip.live i{background:#16a34a!important}
+.mc-mais{margin-top:12px}.mc-mais summary{display:inline-flex;align-items:center;gap:6px;cursor:pointer;list-style:none;font-size:.8rem;font-weight:700;color:#484a4e;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 14px}.mc-mais summary::-webkit-details-marker{display:none}.mc-mais[open] summary{margin-bottom:10px;background:#fdf8f0;border-color:#f1e3c2;color:#b8901f}.mc-bol{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle}.mc-mais .mc-d{background:var(--c)}
 @media(max-width:700px){.cu-top{flex-direction:column}.cu-big{text-align:left}}
 .eq-tabs{display:flex;background:#f1f5f9;border-radius:12px!important;padding:3px;gap:2px}.eq-tabs button{border:0;background:transparent;padding:8px 14px;border-radius:9px!important;font-size:.78rem;font-weight:700;color:#64748b;cursor:pointer;font-family:inherit}.eq-tabs button.on{background:#fff;color:#2f3135;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .eq-ks{display:flex;gap:10px;margin-bottom:14px}.eq-k{flex:1 1 0;min-width:0;text-align:left;background:#fff;border:1px solid #e2e8f0;border-top:3px solid var(--c);border-radius:14px!important;padding:12px 14px;cursor:pointer;font-family:inherit;transition:box-shadow .15s,transform .15s}.eq-k:hover{box-shadow:0 4px 14px rgba(15,23,42,.08);transform:translateY(-1px)}.eq-k.on{background:var(--c8);border-color:var(--c30);border-top-color:var(--c);box-shadow:0 0 0 2px var(--c30)}.eq-k.fix{cursor:default}.eq-k.fix:hover{transform:none;box-shadow:none}
@@ -4828,23 +4829,21 @@ function odCentral(){const R=mailRank(),av=avHoje(),viv={};(av&&av.mailings||[])
     const acao=ac?'<b>Acabando:</b> importe a próxima base antes da equipe ficar sem ligação.':d?esc(d.p):'Pouco discado no período: ainda não dá pra julgar.';
     const ord=ac?0:v&&/ATIVO|EXECU/i.test(v.st)?1:2;
     return {id,v,m,dk,cor,acao,ord,nm:(m&&m.nome)||(v&&v.nome)||('Mailing '+id)}}).sort((a,b)=>a.ord-b.ord||(b.m?b.m.dis:0)-(a.m?a.m.dis:0));
-  const cnt=k=>L.filter(x=>x.dk===k).length,noAr=L.filter(x=>x.v&&/ATIVO|EXECU/i.test(x.v.st)).length,acab=L.filter(x=>x.ord===0).length;
+  const roda=x=>x.v&&(x.ord===0||/ATIVO|EXECU/i.test(x.v.st)),A=L.filter(roda),B=L.filter(x=>!roda(x)),acab=A.filter(x=>x.ord===0).length;
   const SV=av?(av.servicos||[]).filter(s=>s.modo&&s.modo!=='PABX'):[];
   const card=x=>{const v=x.v,m=x.m,ne=m?pc(m.ne,m.dis):0;
-    const sit=v?pill(v.s.t,v.s.bg,v.s.c):pill('fora do discador','#f1f5f9','#94a3b8');
-    return '<div class="mc" data-odf="m" data-v="'+esc(x.dk)+'" data-v2="'+(v&&/ATIVO|EXECU/i.test(v.st)?'agora':'')+(x.ord===0?' agora':'')+'" data-n="'+esc((x.nm+' '+x.id).toLowerCase())+'" style="--c:'+x.cor+'">'+
-      '<div class="mc-t"><div><b>'+esc(x.nm)+'</b><small>id '+esc(x.id)+(v&&v.imp?' · importado '+esc(String(v.imp).slice(8,10)+'/'+String(v.imp).slice(5,7)):'')+'</small></div>'+sit+'</div>'+
-      (v?'<div class="mc-p"><div><i style="width:'+Math.min(100,v.s.p).toFixed(0)+'%;background:'+(v.s.o===0?'#dc2626':v.s.o===1?'#c2410c':'#16a34a')+'"></i></div><span><b>'+pf(v.s.p,0)+'%</b> trabalhado · '+fmtN(v.virg)+' virgens de '+fmtN(v.reg)+'</span></div>':'')+
-      '<div class="mc-n"><div><b>'+(m?pf(pc(m.at,m.dis),1)+'%':'-')+'</b><span>atendem</span></div><div><b style="color:'+(ne>=15?'#dc2626':'inherit')+'">'+(m?pf(ne,0)+'%':'-')+'</b><span>não existe</span></div><div><b>'+(m?fmtN(m.aco):v?fmtN(v.conv):'-')+'</b><span>acordos</span></div><div><b>'+(m?fmtN(m.dis):'-')+'</b><span>discagens</span></div></div>'+
+    return '<div class="mc" style="--c:'+x.cor+'">'+
+      '<div class="mc-t"><div><b>'+esc(x.nm)+'</b><small>id '+esc(x.id)+(v.imp?' · importado '+esc(String(v.imp).slice(8,10)+'/'+String(v.imp).slice(5,7)):'')+'</small></div>'+pill(v.s.t,v.s.bg,v.s.c)+'</div>'+
+      '<div class="mc-p"><div><i style="width:'+Math.min(100,v.s.p).toFixed(0)+'%;background:'+(v.s.o===0?'#dc2626':v.s.o===1?'#c2410c':'#16a34a')+'"></i></div><span><b>'+pf(v.s.p,0)+'%</b> trabalhado · '+fmtN(v.virg)+' virgens de '+fmtN(v.reg)+'</span></div>'+
+      '<div class="mc-n"><div><b>'+(m?pf(pc(m.at,m.dis),1)+'%':'-')+'</b><span>atendem</span></div><div><b style="color:'+(ne>=15?'#dc2626':'inherit')+'">'+(m?pf(ne,0)+'%':'-')+'</b><span>não existe</span></div><div><b>'+(m?fmtN(m.aco):fmtN(v.conv))+'</b><span>acordos</span></div></div>'+
       '<div class="mc-a"><span class="mc-d">'+(x.ord===0?'Trocar base':(DEC[x.dk]||DEC['pouco discado'])[1])+'</span><p>'+x.acao+'</p></div></div>'};
-  return '<div class="od-card">'+odHead('layers','#d4a937','Central de mailings','Uma ficha por lista: situação no discador agora + resultado no período'+(av?' · ao vivo '+esc(av.hora):''),
-      '<div class="od-busca">'+odi('search',15)+'<input id="odBuscaM" placeholder="Buscar mailing..." oninput="avd.odBusca()"></div>',
-      odInfo('Junta o que está carregado na Fastway agora com o resultado de cada lista no período filtrado.','<b>Barra</b> = quanto da lista já foi trabalhado. <b>Atendem / Não existe / Acordos</b> = resultado no período. A cor da ficha é a decisão: verde priorizar, dourado manter, laranja pausar, vermelho limpar ou trocar.','Comece pelas fichas vermelhas: base acabando ou suja.'))+
-    (SV.length?'<div class="mc-sv">'+SV.map(s=>'<span>'+esc(s.n)+' · '+esc(String(s.modo||'').toLowerCase())+(s.nec?' · '+s.and+' de '+s.nec+' ligações':'')+'</span>').join('')+'</div>':'')+
-    '<div class="mc-f">'+odBtn('m','all','Todas ('+L.length+')',1,'#484a4e')+(noAr?odBtn('m','agora','No discador ('+noAr+')',0,'#16a34a'):'')+
-      [['priorizar','Priorizar'],['limpar antes','Limpar antes'],['pausar','Pausar'],['manter','Manter']].filter(k=>cnt(k[0])).map(k=>odBtn('m',k[0],k[1]+' ('+cnt(k[0])+')',0,DEC[k[0]][0])).join('')+
-      (acab?'<span class="mc-alerta">'+odi('alert',14)+' '+acab+' acabando</span>':'')+'</div>'+
-    '<div class="mc-g">'+L.map(card).join('')+'</div></div>'}
+  const linha=x=>{const m=x.m,ne=m?pc(m.ne,m.dis):0,v=x.v;
+    return '<tr><td class="nm"><span class="mc-bol" style="background:'+x.cor+'"></span>'+esc(x.nm)+'<small>id '+esc(x.id)+(v?' · '+esc(v.s.t):'')+'</small></td><td>'+(m?fmtN(m.dis):'-')+'</td><td>'+(m?pf(pc(m.at,m.dis),1)+'%':'-')+'</td><td style="color:'+(ne>=15?'#dc2626':'inherit')+'">'+(m?pf(ne,0)+'%':'-')+'</td><td>'+(m?fmtN(m.aco):'-')+'</td><td title="'+esc(x.m&&x.m.d?x.m.d.p:'')+'"><span class="mc-d" style="--c:'+x.cor+'">'+(DEC[x.dk]||DEC['pouco discado'])[1]+'</span></td></tr>'};
+  return '<div class="od-card">'+odHead('layers','#d4a937','Mailings rodando agora',(av?'Ao vivo '+esc(av.hora):'Sem leitura ao vivo hoje')+(SV.length?' · '+SV.map(s=>esc(s.n)+' '+esc(String(s.modo||'').toLowerCase())).join(' · '):''),
+      acab?'<span class="mc-alerta">'+odi('alert',14)+' '+acab+' acabando</span>':'',
+      odInfo('As listas que estão rodando na Fastway agora, com o resultado delas no período filtrado.','<b>Barra</b> = quanto da lista já foi trabalhado. A cor é a decisão: verde priorizar, dourado manter, vermelho limpar ou trocar a base.','Os que acabaram ou foram pausados ficam no botão embaixo.'))+
+    (A.length?'<div class="mc-g">'+A.map(card).join('')+'</div>':'<div class="avd-empty">Nenhum mailing rodando agora.</div>')+
+    (B.length?'<details class="mc-mais"><summary>'+odi('layers',14)+' Ver os que acabaram ou foram pausados ('+B.length+')</summary>'+tbw('<table class="od-tb"><tr><th>Mailing</th><th>Discagens</th><th>Atendem</th><th>Não existe</th><th>Acordos</th><th>Decisão</th></tr>'+B.map(linha).join('')+'</table>')+'</details>':'')+'</div>'}
 // ---- mailings no discador agora (robo --aovivo, API antiga FMI) ----
 function avHoje(){const hj=new Date().toLocaleDateString('pt-BR'),x=(OPER||[]).find(b=>b.bloco==='aovivo'&&b.data===hj);return x&&x.dados&&x.dados.ts?x.dados:null}
 function mailSit(m){const p=m.reg?m.trab/m.reg*100:0,at=/ATIVO|EXECU/i.test(m.st);
@@ -7022,7 +7021,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261028-1810',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261028-1820',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
