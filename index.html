@@ -5128,7 +5128,7 @@ function eqSt(o){const st=String(o.st||'').toUpperCase();
 function eqAVmapa(av){const m={};(av&&av.ops||[]).forEach(o=>{m[nkey(o.n)]=o;if(o.lg)m['@'+String(o.lg).toLowerCase()]=o});return m}
 // ---- quem nao esta logado agora: o ponto diz se ja foi embora ou se esta na empresa fora do discador
 function eqPonto(n){try{if(typeof pontoData==='undefined'||!pontoData)return null;const p=pontoData.find(x=>x.nome&&(typeof mesmaPessoa==='function'?mesmaPessoa(x.nome,n):nkey(x.nome)===nkey(n)));if(!p)return null;
-  const b=parseInt(p.batidas,10);return {e:String(p.entrada||'').slice(0,5),s:String(p.saida||'').slice(0,5),b,foi:!!p.saida&&(isNaN(b)||b%2===0)}}catch(e){return null}}
+  const b=(String(p.batidas||'').match(/\d{1,2}:\d{2}/g)||[]).length;return {e:String(p.entrada||'').slice(0,5),s:String(p.saida||'').slice(0,5),b,foi:!!String(p.saida||'').trim()&&(!b||b%2===0)}}catch(e){return null}}
 const EQ_RANK={fala:1,espera:2,manual:3,tab:4,pausa:5,bloq:6,outro:7};
 function eqRank(o,nm){if(o)return EQ_RANK[eqSt(o).k]||7;const p=eqPonto(nm);return p&&p.foi?10:p&&p.e?8:11}
 function nxOpAg(){const el=document.getElementById('nxOpAg');if(!el)return;const av=typeof eqAV==='function'?eqAV():null,hj=new Date().toLocaleDateString('pt-BR');
@@ -5184,7 +5184,7 @@ function eqMonta(dia){
   if(lib||FX.length)h+='<div class="od-md">'+odi('alert',16)+'<span><b>Manual liberado'+(FX.length?' hoje: '+FX.map(x=>hh(x[0])+(isFinite(x[1])&&x[1]<Date.now()?' às '+hh(x[1]):' até agora')).join(', '):'')+'.</b> Esse período é retrabalho de ficha e não conta como "discando na mão".</span></div>';
   h+='<div class="od-leg"><span><i style="background:#16a34a"></i>Falando</span><span><i style="background:#d4a937"></i>Esperando ligação</span><span><i style="background:#b91c1c"></i>Manual</span><span><i style="background:#d9a5a5"></i>Manual liberado</span><span><i style="background:#8a8d92"></i>Pausa</span><span class="eq-dica">Passe o mouse na linha pra ver cada pausa com horário</span></div>';
   const pzTxt=(pz,k,rot)=>pz&&pz.tot[k][0]?'<div><span>'+rot+'</span><b>'+pz.tot[k][0]+'x · '+mmss(pz.tot[k][1])+'</b></div>':'';
-  h+='<div style="overflow-x:auto"><table class="od-tb od-eq eq-tb"><tr><th style="text-align:left">Operadora</th>'+(AV?'<th style="text-align:left">Agora</th>':'')+'<th>Entrou · Saiu</th><th>Logada</th><th>Atendidas</th><th>TMA</th><th style="min-width:230px">Uso do tempo</th><th>Lanche</th><th>Outras pausas</th><th>Situação</th></tr>'+
+  h+='<div style="overflow-x:auto"><table class="od-tb od-eq eq-tb"><tr><th style="text-align:left">Operadora</th>'+(AV?'<th style="text-align:left">Agora</th>':'')+'<th>Logada</th><th>Atendidas</th><th>TMA</th><th style="min-width:230px">Uso do tempo</th><th>Lanche</th><th>Outras pausas</th><th>Situação</th></tr>'+
     R.map(r=>{const o=r.o,pz=r.pz,tp=r.tp,L=o.login||1,seg=(v,c,t)=>v>0?'<i style="width:'+pc(v,L).toFixed(1)+'%;background:'+c+'" title="'+t+': '+pf(pc(v,L),0)+'%"></i>':'';
       const tur=prosp(o)?'Prospecção':/manh/i.test(o.g)?'Manhã':/tard/i.test(o.g)?'Tarde':/novat/i.test(o.g)?'Novatos':esc(o.g||'');
       const d1=pz?Object.values(pz.dias)[0]||{}:{},lan=pz&&pz.tot.lanche[0]?pz.tot.lanche[1]:0;
@@ -5193,7 +5193,7 @@ function eqMonta(dia){
       const ag=!AV&&hoje&&pz&&pz.aberta?'<span class="od-st" style="--c:#b45309">'+odi('clock',12)+'em pausa desde '+esc(pz.aberta[1])+'</span>':'';
       const st=(r.al.length?r.al.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+a[0]+'</span>').join(''):ag?'':'<span class="od-st" style="--c:#16a34a">'+odi('ok',12)+'regular</span>')+ag;
       const tip=pz?pz.lista.join('\n'):'';
-      return '<tr data-eq="'+r.tags.join(' ')+'" title="'+esc(tip)+'"><td class="nm" style="text-align:left"><b>'+esc(nome(o.n))+'</b><small>'+tur+'</small></td>'+(AV?'<td class="eq-ag" data-k="'+esc(nkey(o.n))+'" data-lg="'+esc(String(o.k||'').toLowerCase())+'" data-nm="'+esc(o.n)+'" data-v="'+eqRank(avDe(o),o.n)+'">'+eqCel(avDe(o),AV,o.n)+'</td>':'')+'<td>'+esc(String(o.ini).slice(0,5))+' · '+esc(String(o.fim).slice(0,5))+'</td><td data-v="'+o.login+'"><b>'+hm(o.login)+'</b></td>'+
+      return '<tr data-eq="'+r.tags.join(' ')+'" title="'+esc(tip)+'"><td class="nm" style="text-align:left"><b>'+esc(nome(o.n))+'</b><small>'+tur+'</small></td>'+(AV?'<td class="eq-ag" data-k="'+esc(nkey(o.n))+'" data-lg="'+esc(String(o.k||'').toLowerCase())+'" data-nm="'+esc(o.n)+'" data-v="'+eqRank(avDe(o),o.n)+'">'+eqCel(avDe(o),AV,o.n)+'</td>':'')+'<td data-v="'+o.login+'"><b>'+hm(o.login)+'</b></td>'+
         '<td>'+(tp?fmtN(tp.at):'-')+'</td><td data-v="'+(tp&&tp.at?tp.tma.toFixed(0):0)+'">'+(tp&&tp.at?mmss(tp.tma):'-')+'</td>'+
         '<td data-v="'+pc(o.fala,L).toFixed(1)+'"><div class="od-stack">'+seg(o.fala,'#16a34a','Falando')+seg(o.ocioso,'#d4a937','Esperando')+seg(mEf(o),'#b91c1c','Manual')+seg(o.manual_lib||0,'#d9a5a5','Manual liberado')+seg(o.pausa,'#8a8d92','Pausa')+'</div>'+
         '<div class="od-stl"><span style="color:#16a34a">'+pf(pc(o.fala,L),0)+'% falando</span><span style="color:#b8901f">'+pf(pc(o.ocioso,L),0)+'% esperando</span><span style="color:#b91c1c">'+pf(pc(mEf(o),L),0)+'% manual</span><span style="color:#6b6e73">'+pf(pc(o.pausa,L),0)+'% pausa</span></div></td>'+
@@ -7021,7 +7021,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261028-1820',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261028-1830',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
