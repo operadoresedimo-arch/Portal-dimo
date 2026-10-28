@@ -2210,6 +2210,7 @@ body::before,body::after{display:none!important}
 .cu-big{text-align:right}.cu-big b{display:block;font-size:2.6rem;line-height:1;font-weight:900;color:var(--c);font-variant-numeric:tabular-nums}.cu-big span{font-size:.74rem;color:#9ca3af;font-weight:700}
 .cu-gauge{margin:18px 0 26px}.cu-bar{position:relative;height:14px;background:#eef2f7;border-radius:99px}.cu-bar>i{display:block;height:100%;border-radius:99px}.cu-bar em{position:absolute;top:-5px;bottom:-5px;width:2px;background:#d97706}.cu-bar em.lim{background:#dc2626}.cu-bar em span{position:absolute;top:22px;left:50%;transform:translateX(-50%);white-space:nowrap;font-style:normal;font-size:.66rem;font-weight:800;color:#9ca3af}.cu-bar em.lim span{color:#dc2626}
 .cu-sec{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;font-weight:800;margin:14px 0 6px}.cu-mix{display:flex;height:16px;border-radius:8px;overflow:hidden;background:#eef2f7}.cu-mix i{display:block;height:100%}
+.tt-ver{display:flex;gap:10px;align-items:flex-start;margin:4px 0 12px;padding:11px 13px;border-radius:12px;background:var(--c8);border:1px solid var(--c30);font-size:.82rem;color:#2f3135}.tt-ver b{color:var(--c)}.tt-ver i{color:var(--c);flex:none}.tt-tb td.dl{font-weight:800}.tt-tb small{display:block;font-size:.66rem;color:#9ca3af;font-weight:600}.tt-tb th.hj,.tt-tb td.hj{background:#fdf8f0}
 @media(max-width:700px){.cu-top{flex-direction:column}.cu-big{text-align:left}}
 .eq-tabs{display:flex;background:#f1f5f9;border-radius:12px!important;padding:3px;gap:2px}.eq-tabs button{border:0;background:transparent;padding:8px 14px;border-radius:9px!important;font-size:.78rem;font-weight:700;color:#64748b;cursor:pointer;font-family:inherit}.eq-tabs button.on{background:#fff;color:#2f3135;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .eq-ks{display:flex;gap:10px;margin-bottom:14px}.eq-k{flex:1 1 0;min-width:0;text-align:left;background:#fff;border:1px solid #e2e8f0;border-top:3px solid var(--c);border-radius:14px!important;padding:12px 14px;cursor:pointer;font-family:inherit;transition:box-shadow .15s,transform .15s}.eq-k:hover{box-shadow:0 4px 14px rgba(15,23,42,.08);transform:translateY(-1px)}.eq-k.on{background:var(--c8);border-color:var(--c30);border-top-color:var(--c);box-shadow:0 0 0 2px var(--c30)}.eq-k.fix{cursor:default}.eq-k.fix:hover{transform:none;box-shadow:none}
@@ -4842,6 +4843,39 @@ function baixarCurtas(){const de=(document.getElementById('cuDe')||{}).value,ate
   if(num.length)add(num,'Por número',[12,16,10,10,9,20]);
   add([{'Regra':'A partir de 12/11/2026: mais de 10.000 chamadas no CNPJ ou mais de 1.000 num número no mesmo dia, com 85% ou mais curtas = 15 dias sem poder ligar (receber continua).'},{'Regra':'Curta = não atendida, ocupada, com falha, caixa postal ou atendida em até 6 segundos.'},{'Regra':'Recomendado pela NovaTech: ficar abaixo de 70% de curtas.'}],'Regra',[120]);
   const f=s=>s.split('-').reverse().join('-');XLSX.writeFile(wb,'chamadas-curtas_'+f(a)+(a!==b?'_a_'+f(b):'')+'.xlsx');sT('Relatório baixado: '+B.length+' dia'+(B.length>1?'s':''))}
+// ---- teste de pausa: manha (08-13h) x tarde (14-20h) do mesmo dia, comparado com a diferenca normal dos dias anteriores
+const TT_M=['08','09','10','11','12','13'],TT_T=['14','15','16','17','18','19','20'];
+function ttTurno(dia,hs){const H=(OPER||[]).find(x=>x.bloco==='hora'&&x.data===dia&&Array.isArray(x.dados)),C=(OPER||[]).find(x=>x.bloco==='curtas'&&x.data===dia&&x.dados);
+  const t={dis:0,at:0,ne:0,el:0,na:0,aco:0,n:0,c:0,h:0};
+  (H?H.dados:[]).forEach(r=>{if(hs.indexOf(String(r.k).padStart(2,'0'))<0||!r.dis)return;t.h++;['dis','at','ne','el','na','aco'].forEach(k=>t[k]+=r[k]||0)});
+  ((C&&C.dados.hora)||[]).forEach(r=>{if(hs.indexOf(String(r.k).padStart(2,'0'))<0)return;t.n+=r.n||0;t.c+=r.c||0});return t}
+const TT_MET=[['Discagens por hora',t=>t.h?t.dis/t.h:0,'n',0],['Atendidas por hora',t=>t.h?t.at/t.h:0,'n',1],['% que atende',t=>pc(t.at,t.dis),'p',1],['% curtas',t=>pc(t.c,t.n),'p',-1],
+  ['% caixa postal',t=>pc(t.el,t.dis),'p',-1],['% inexistente',t=>pc(t.ne,t.dis),'p',-1],['% não atende',t=>pc(t.na,t.dis),'p',0],['Discagens por atendida',t=>t.at?t.dis/t.at:0,'r',-1],['Acordos no turno (discador)',t=>t.aco,'n',1]];
+function ttDelta(a,b,tipo){if(tipo==='p')return b-a;return a?(b-a)/a*100:0}
+function ttFmtD(d,tipo){if(!isFinite(d))return '-';const s=(d>0?'+':'')+pf(d,1);return tipo==='p'?s+' p.p.':s+'%'}
+function ttFmtV(v,tipo){return tipo==='p'?pf(v,1)+'%':tipo==='r'?pf(v,1):fmtN(v)}
+function odTurnos(datas){const dia=datas.slice().sort((a,b)=>dt(a)-dt(b)).pop();if(!dia)return '';
+  const M=ttTurno(dia,TT_M),T=ttTurno(dia,TT_T);if(!M.dis)return '';
+  const ant=[...new Set((OPER||[]).filter(x=>x.bloco==='hora'&&dt(x.data)<dt(dia)&&dt(x.data).getDay()!==6).map(x=>x.data))].sort((a,b)=>dt(b)-dt(a)).map(d=>[ttTurno(d,TT_M),ttTurno(d,TT_T)]).filter(x=>x[0].dis&&x[1].h>=5).slice(0,5);
+  const hoje=dia===new Date().toLocaleDateString('pt-BR'),ultH=T.h?TT_T[T.h-1]:'';
+  const cor=(d,dir)=>!dir||Math.abs(d)<0.5?'#64748b':(d*dir>0?'#16a34a':'#dc2626');
+  const linhas=TT_MET.map(([nm,f,tipo,dir])=>{const vm=f(M),vt=f(T),dh=ttDelta(vm,vt,tipo);
+    const dn=ant.length?ant.reduce((a,x)=>a+ttDelta(f(x[0]),f(x[1]),tipo),0)/ant.length:NaN,ef=isFinite(dn)?dh-dn:NaN;
+    return {nm,tipo,dir,vm,vt,dh,dn,ef}});
+  const g=k=>linhas.find(x=>x.nm===k),cu=g('% curtas'),at=g('Atendidas por hora');
+  let ver,vc;
+  if(!T.dis){ver='A tarde ainda não tem dados. Importe as listas na Fastway, rode a coleta e volte depois das 15h.';vc='#64748b'}
+  else if(!ant.length){ver='Sem dias anteriores pra saber o normal da tarde. Por enquanto compare só manhã x tarde.';vc='#64748b'}
+  else{const bomC=cu.ef<=-2,ruimA=at.ef<=-10;
+    if(bomC&&!ruimA){ver='<b>Funcionando:</b> as curtas caíram <b>'+pf(-cu.ef,1)+' p.p. além do normal</b> da tarde, sem perder atendidas.';vc='#16a34a'}
+    else if(bomC&&ruimA){ver='<b>Cuidado:</b> as curtas caíram, mas as atendidas por hora caíram '+pf(-at.ef,0)+'% além do normal. Talvez a pausa esteja pegando número bom.';vc='#d97706'}
+    else{ver='<b>Ainda sem efeito claro:</b> curtas '+ttFmtD(cu.ef,'p')+' em relação ao normal da tarde. Se as listas já foram importadas, espere fechar mais horas.';vc='#d97706'}}
+  return '<div class="od-card">'+odHead('clock','#b8901f','Teste de pausa: manhã x tarde','Dia '+esc(dia)+' · manhã sem pausa (8h às 14h) x tarde com pausa (14h às 20h)'+(hoje&&ultH?' · tarde parcial até '+ultH+'h':''),'',
+    odInfo('Compara o mesmo dia antes e depois de importar as listas de pausa.','<b>Hoje</b> = quanto a tarde mudou em relação à manhã. <b>Normal</b> = quanto a tarde costuma mudar nos últimos '+(ant.length||'')+' dias úteis, sem teste. <b>Efeito do teste</b> = a diferença entre os dois: é isso que mostra se a pausa ajudou. Verde = melhorou.','Se as curtas caírem e as atendidas por hora se mantiverem, a regra funciona. Se as atendidas caírem muito, deixe a regra mais leve.'))+
+    '<div class="tt-ver" style="--c:'+vc+'">'+'<i>'+odi(vc==='#16a34a'?'ok':'alert',18)+'</i><span>'+ver+'</span></div>'+
+    tbw('<table class="od-tb tt-tb" data-noord><tr><th>Métrica</th><th>Manhã<small>8h às 14h</small></th><th>Tarde<small>14h às 20h</small></th><th class="hj">Hoje<small>tarde x manhã</small></th><th>Normal<small>média de '+ant.length+' dias</small></th><th>Efeito do teste</th></tr>'+
+      linhas.map(l=>'<tr><td class="nm">'+l.nm+'</td><td>'+ttFmtV(l.vm,l.tipo)+'</td><td>'+(T.dis?ttFmtV(l.vt,l.tipo):'-')+'</td><td class="hj">'+(T.dis?ttFmtD(l.dh,l.tipo):'-')+'</td><td style="color:#64748b">'+(ant.length?ttFmtD(l.dn,l.tipo):'-')+'</td><td class="dl" style="color:'+(T.dis&&ant.length?cor(l.ef,l.dir):'#64748b')+'">'+(T.dis&&ant.length?ttFmtD(l.ef,l.tipo):'-')+'</td></tr>').join('')+'</table>')+
+    '<div class="od-nota">Manhã: '+M.h+' h com dado · Tarde: '+T.h+' h. As horas com poucas operadoras logadas puxam as médias por hora pra baixo.</div></div>'}
 function odCurtas(umDia){const D=curtasDados();if(!D.tem||!D.tot.n)return '';
   const T=D.tot,nd=Math.max(1,D.dias.length),p=pc(T.c,T.n),med=T.n/nd,risco=D.dias.filter(x=>x.n>CNPJ_LIM&&pc(x.c,x.n)>=CURTA_LIM).length;
   const hoje=new Date();hoje.setHours(0,0,0,0);const falta=Math.round((CURTA_INICIO-hoje)/864e5);
@@ -4911,6 +4945,7 @@ function visaoOper0(){
     (EQ.login?' A equipe passou <b>'+pf(pc(EQ.fala,EQ.login),0)+'%</b> do tempo falando, <b>'+pf(ocP,0)+'%</b> esperando ligação e <b>'+pf(pc(EQ.pausa,EQ.login),0)+'%</b> em pausa.'+(ocP>=25?' <b class="g">O gargalo é a base, não a equipe.</b>':''):'')+'</p></div>';
   h+='<div class="od-kpis">'+K.map(k=>'<div class="od-k" style="--c:'+k[1]+'"><div class="od-kt"><span>'+k[2]+'</span><i>'+odi(k[0],16)+'</i></div><div class="od-kv">'+k[3]+'</div><div class="od-ks">'+k[4]+'</div></div>').join('')+'</div>';
   h+=odCurtas(umDia);
+  h+=odTurnos(datas);
   // ---- dinheiro que entrou (coletor Cobmais: so totais, sem CPF) ----
   const CB=operFilt('cobmais_pag');
   if(CB.length){const S=CB.reduce((s2,x)=>{const d=x.dados||{};['qtd','valor','principal','honorarios','multa','juros'].forEach(c=>s2[c]=(s2[c]||0)+(d[c]||0));Object.keys(d.forma||{}).forEach(f=>{const y=s2.forma[f]=s2.forma[f]||{q:0,v:0};y.q+=d.forma[f].q;y.v+=d.forma[f].v});if(d.atualizado&&d.atualizado>s2.at)s2.at=d.atualizado;return s2},{forma:{},at:''});
@@ -6942,7 +6977,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261028-1352',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261028-1415',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
