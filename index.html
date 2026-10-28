@@ -2211,6 +2211,9 @@ body::before,body::after{display:none!important}
 .cu-gauge{margin:18px 0 26px}.cu-bar{position:relative;height:14px;background:#eef2f7;border-radius:99px}.cu-bar>i{display:block;height:100%;border-radius:99px}.cu-bar em{position:absolute;top:-5px;bottom:-5px;width:2px;background:#d97706}.cu-bar em.lim{background:#dc2626}.cu-bar em span{position:absolute;top:22px;left:50%;transform:translateX(-50%);white-space:nowrap;font-style:normal;font-size:.66rem;font-weight:800;color:#9ca3af}.cu-bar em.lim span{color:#dc2626}
 .cu-sec{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;font-weight:800;margin:14px 0 6px}.cu-mix{display:flex;height:16px;border-radius:8px;overflow:hidden;background:#eef2f7}.cu-mix i{display:block;height:100%}
 .tt-ver{display:flex;gap:10px;align-items:flex-start;margin:4px 0 12px;padding:11px 13px;border-radius:12px;background:var(--c8);border:1px solid var(--c30);font-size:.82rem;color:#2f3135}.tt-ver b{color:var(--c)}.tt-ver i{color:var(--c);flex:none}.tt-tb td.dl{font-weight:800}.tt-tb small{display:block;font-size:.66rem;color:#9ca3af;font-weight:600}.tt-tb th.hj,.tt-tb td.hj{background:#fdf8f0}
+.mr-res{display:flex;gap:6px;flex-wrap:wrap}.mr-res span{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;background:color-mix(in srgb,var(--c) 10%,#fff);color:var(--c);font-size:.74rem;font-weight:700}.mr-res b{font-size:.9rem}.mr-tb td{padding:9px 8px}.mr-at{display:flex;align-items:center;justify-content:flex-end;gap:8px}.mr-at i{display:block;width:90px;height:6px;border-radius:9px;background:#eef2f7;overflow:hidden}.mr-at u{display:block;height:100%;background:#16a34a;border-radius:9px}
+.tt-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.tt-c{border:1px solid #eef1f5;border-radius:12px;padding:12px 14px;background:#fff}.tt-c span{display:block;font-size:.74rem;color:#6b7280;font-weight:700}.tt-c .tt-v{display:flex;align-items:baseline;gap:6px;margin:4px 0 6px;font-variant-numeric:tabular-nums}.tt-c .tt-v s{color:#9ca3af;text-decoration:none;font-size:.95rem}.tt-c .tt-v b{font-size:1.45rem;color:#2f3135;font-weight:800}.tt-c em{font-style:normal;font-size:.74rem;font-weight:800;padding:2px 8px;border-radius:99px;background:color-mix(in srgb,var(--c) 12%,#fff);color:var(--c)}.tt-mais summary{cursor:pointer;font-size:.78rem;font-weight:700;color:#b8901f;margin:4px 0 8px}@media(max-width:900px){.tt-cards{grid-template-columns:1fr 1fr}}
+.pl-per{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;font-size:.76rem;color:#6b7280;font-weight:700}.pl-per input{border:1px solid #e2e8f0;border-radius:8px;padding:5px 8px;font-family:inherit;font-size:.8rem;color:#2f3135;background:#fff}.pl-per small{color:#9ca3af;font-weight:600}
 @media(max-width:700px){.cu-top{flex-direction:column}.cu-big{text-align:left}}
 .eq-tabs{display:flex;background:#f1f5f9;border-radius:12px!important;padding:3px;gap:2px}.eq-tabs button{border:0;background:transparent;padding:8px 14px;border-radius:9px!important;font-size:.78rem;font-weight:700;color:#64748b;cursor:pointer;font-family:inherit}.eq-tabs button.on{background:#fff;color:#2f3135;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .eq-ks{display:flex;gap:10px;margin-bottom:14px}.eq-k{flex:1 1 0;min-width:0;text-align:left;background:#fff;border:1px solid #e2e8f0;border-top:3px solid var(--c);border-radius:14px!important;padding:12px 14px;cursor:pointer;font-family:inherit;transition:box-shadow .15s,transform .15s}.eq-k:hover{box-shadow:0 4px 14px rgba(15,23,42,.08);transform:translateY(-1px)}.eq-k.on{background:var(--c8);border-color:var(--c30);border-top-color:var(--c);box-shadow:0 0 0 2px var(--c30)}.eq-k.fix{cursor:default}.eq-k.fix:hover{transform:none;box-shadow:none}
@@ -4525,7 +4528,7 @@ function render(preservar){
   const ops={};ls.forEach(l=>(ops[l.operador]=ops[l.operador]||[]).push(l));
   const lin=Object.keys(ops).map(op=>{const a=ops[op],n=ader(a),f=Object.values(cm(a)).filter(x=>x.max).sort((x,y)=>x.pct-y.pct)[0];return{op,a,n,g:a[0].grupo,res:a.filter(temRes).length/a.length*100,f,pend:a.filter(l=>!l.feedback_dado).length}}).sort((x,y)=>y.n-x.n);
   const kDisc=[];
-  if(FUNIL){const t=funilTot(funilFilt().filter(x=>x.tipo==='total'));kDisc.push(avM('phone','#484a4e','Discagens no período',fmtN(t.dis),fmtN(t.atd)+' atendidas · '+fmtN(t.aco)+' acordos','funil'))}
+  if(FUNIL){const t=funilTot(funilFilt().filter(x=>x.tipo==='total'));kDisc.push(avM('layers','#484a4e','Discagens e mailings',fmtN(t.dis),fmtN(t.atd)+' atendidas · listas, curtas e pausas','funil'))}
   if(OPER&&OPER.length){const H=operJunta('hora'),d=H.reduce((s,x)=>s+(x.dis||0),0),a=H.reduce((s,x)=>s+(x.at||0),0);kDisc.push(avM('signal','#b8901f','Operação do discador',d?pf(pc(a,d),1)+'%':'-',d?'atendidas · mailing, rotas, horários e tempos':'sem dados no período','oper'))}
   const N=ls.length,T=contaRes(ls);
   const itensQualidade=[
@@ -4535,7 +4538,7 @@ function render(preservar){
   let h=tabsHTML()+'<div class="avd-kg'+(kDisc.length?'':' g2')+(VIEW==='erro'?' erro':'')+'">'+
     avGrupo('search','#484a4e','Ligações',[avM('phone','#484a4e','Ligações avaliadas',N,lin.length+' operadora'+(lin.length===1?'':'s'),'rank')])+
     avGrupo('ok','#16a34a','Qualidade das ligações',itensQualidade)+
-    (kDisc.length?avGrupo('signal','#484a4e','Discador',kDisc):'')+'</div>';
+    (kDisc.length?avGrupo('signal','#484a4e','Discagem e Mailing',kDisc):'')+'</div>';
   if(VIEW){$('avdBody').innerHTML=odVars(h+visao(ls,lin,c,eq));return}
   h+='<div class="od-g2">'+cardResultado(T,N)+cardCriterios(c,eq,fr)+'</div>';
   h+=acaoHoje(ls);
@@ -4638,28 +4641,21 @@ function visaoRotas(rs){
   base.forEach(r=>{const k=nomeRota(r);if(groups[k])groups[k].push(r)});
   return '<div class="avd-card"><div class="avd-ct">Discagem por rota · situação e sugestão</div><div class="avd-rotas">'+Object.keys(groups).map(k=>{const t=funilTot(groups[k]),cls=k.toLowerCase();return '<div class="avd-rota"><div class="avd-rota-head '+cls+'"><span>'+k+'</span><small>'+fmtN(t.dis)+' discagens</small></div><div class="avd-rota-body"><div class="avd-rota-k"><div><b>'+pc(t.atd,t.dis).toFixed(0)+'%</b><span>atendidas</span></div><div><b>'+pc(t.cpc,t.op).toFixed(0)+'%</b><span>devedor certo</span></div><div><b>'+fmtN(t.aco)+'</b><span>acordos</span></div><div><b>'+pc(t.aco,t.cpc).toFixed(1)+'%</b><span>acordo/contato</span></div></div><div class="avd-rota-sug"><b>Sugestão:</b> '+esc(rotaSug(t))+'</div></div></div>'}).join('')+'</div><div class="avd-leg">A rota é identificada pelo nome da campanha/tronco enviado pelo Fastway. Registros antigos sem essa identificação aparecem somente no funil geral até a próxima rodada.</div></div>';
 }
+function mailPaineis(){const dts=[...new Set(operFilt('hora').map(x=>x.data))];return odMailVivo()+odRanking()+odCurtas(dts.length===1)+odTurnos(dts)}
 function visaoFunil(){
-  const rs=funilFilt();if(!rs.length)return '<div class="avd-card"><div class="avd-empty">Ainda sem dados do funil nesse período. O robô manda a cada rodada de 30 min.</div></div>';
+  const rs=funilFilt();if(!rs.length)return '<div class="avd-card"><div class="avd-empty">Ainda sem dados do funil nesse período. O robô manda a cada rodada de 30 min.</div></div>'+mailPaineis();
   const T=funilTot(rs.filter(x=>x.tipo==='total'));
   const et=[['Discagens',T.dis,'#64748b'],['Atendidas por pessoa',T.atd,'#484a4e'],['Falaram com operador',T.op,'#b8901f'],['Contato com o devedor',T.cpc,'#d4a937'],['Acordos',T.aco,'#16a34a']];
   let h='<div class="avd-card"><div class="avd-ct">Funil da discagem</div><table class="avd-tb" data-noord="1"><tr><th>Etapa</th><th>Quantidade</th><th>% da etapa anterior</th><th>% das discagens</th></tr>'+
     et.map((e,i)=>'<tr><td class="nm">'+e[0]+'</td><td><b>'+fmtN(e[1])+'</b></td><td>'+(i?pc(e[1],et[i-1][1]).toFixed(1)+'%'+mini(pc(e[1],et[i-1][1]),e[2]):'-')+'</td><td>'+pc(e[1],T.dis).toFixed(2)+'%</td></tr>').join('')+'</table>'+
     '<div class="avd-leg" style="padding-top:10px">Das discagens, <b>'+pc(T.ele,T.dis).toFixed(0)+'%</b> caíram em caixa postal ou máquina e <b>'+pc(T.muda,T.dis).toFixed(0)+'%</b> foram ligação muda. Dos atendimentos com operador, <b>'+pc(T.nc,T.op).toFixed(0)+'%</b> foram "não conhece o cliente" (número errado).</div></div>';
+  h+=mailPaineis();
   h+=melhoriaDiscador(T);
   h+=visaoRotas(rs);
   const O=funilAgr(rs.filter(x=>x.tipo==='op')).sort((a,b)=>b.aco-a.aco||pc(b.aco,b.cpc)-pc(a.aco,a.cpc));
   const metadeOp=Math.ceil(O.length/2),partesOp=[O.slice(0,metadeOp),O.slice(metadeOp)];
   const tabelaOp=lista=>'<div class="avd-oper-col"><table class="avd-tb"><tr><th>Operador</th><th>Atend.</th><th>Contato</th><th>Acordos</th><th>% acordo</th><th>Tempo médio</th></tr>'+lista.map(o=>{const tm=o.op?o.seg/o.op:0;return '<tr class="lk" onclick="avd.detalhe(\''+encodeURIComponent(o.nome)+'\')"><td class="nm">'+esc(nc(o.nome))+'</td><td>'+fmtN(o.op)+'</td><td>'+fmtN(o.cpc)+'</td><td><b>'+fmtN(o.aco)+'</b></td><td><b style="color:#16a34a">'+pc(o.aco,o.cpc).toFixed(0)+'%</b>'+mini(pc(o.aco,o.cpc),'#16a34a')+'</td><td>'+Math.floor(tm/60)+'m'+String(Math.round(tm%60)).padStart(2,'0')+'s</td></tr>'}).join('')+'</table></div>';
   h+='<div class="avd-card"><div class="avd-ct">Por operador · dividido em duas colunas</div><div class="avd-oper-grid">'+partesOp.map(tabelaOp).join('')+'</div></div>';
-  const M=funilAgr(rs.filter(x=>x.tipo==='mailing'&&String(x.nome)!=='0')).filter(m=>m.dis>=50).sort((a,b)=>b.dis-a.dis);
-  const diag=m=>{const at=pc(m.atd,m.dis),errado=pc(m.nc,m.op),cpc=pc(m.cpc,m.dis);
-    if(m.dis<300)return '<span class="avd-pl" style="background:#f1f5f9;color:#64748b">pouco discado</span>';
-    if(at<15||errado>=35)return '<span class="avd-pl" style="background:#fee2e2;color:#b91c1c">mailing ruim</span>';
-    if(cpc>=4||m.aco>=3)return '<span class="avd-pl" style="background:#dcfce7;color:#15803d">mailing bom</span>';
-    return '<span class="avd-pl" style="background:#fef3c7;color:#b45309">médio</span>'};
-  h+='<div class="avd-card"><div class="avd-ct">Qualidade do mailing</div><table class="avd-tb"><tr><th>Mailing</th><th>Discagens</th><th>% atendidas</th><th>% caixa/máquina</th><th>% número errado</th><th>% contato devedor</th><th>Acordos</th><th>Diagnóstico</th></tr>'+
-    M.map(m=>'<tr><td class="nm">'+esc(m.nome)+'</td><td>'+fmtN(m.dis)+'</td><td>'+pc(m.atd,m.dis).toFixed(0)+'%</td><td>'+pc(m.ele,m.dis).toFixed(0)+'%</td><td>'+pc(m.nc,m.op).toFixed(0)+'%</td><td>'+pc(m.cpc,m.dis).toFixed(1)+'%</td><td><b>'+m.aco+'</b></td><td>'+diag(m)+'</td></tr>').join('')+
-    '</table><div class="avd-leg" style="padding-top:10px">"Número errado" = atendimentos com operador tabulados como "não conhece o cliente". "Mailing ruim" = menos de 15% atendidas ou 35%+ de número errado: vale higienizar ou trocar a carteira no Cobmais antes de mandar pra discar de novo.</div></div>';
   return h;
 }
 // ===== OPERACAO DO DISCADOR (dados do robo via relatorios v2 da Fastway) =====
@@ -4687,9 +4683,10 @@ function baixaCsv(lista,nome,dias){if(!lista.length){sT('Nenhum número elegíve
   const txt=lista.map(x=>dias?x.f+';;'+validade:x.f).join('\r\n');
   const b=new Blob([txt],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nome;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 async function baixarBloq(q){const tipo=q==='pausa15'?'n':q==='pausa7'?'p':'b',nome=q==='pausa15'?'pausar-inexistente-15-dias':q==='pausa7'?'pausar-caixa-postal-7-dias':'nao-conhece';
-  const RU=operFilt('ruins').filter(x=>x.dados&&x.dados.v>=3&&x.dados.partes);
+  const de=(document.getElementById('plDe')||{}).value,ate=(document.getElementById('plAte')||{}).value,dk=d=>String(d).split('/').reverse().join('-');
+  const RU=(de&&ate?(OPER||[]).filter(x=>x.bloco==='ruins'&&dk(x.data)>=(de<=ate?de:ate)&&dk(x.data)<=(de<=ate?ate:de)):operFilt('ruins')).filter(x=>x.dados&&x.dados.v>=3&&x.dados.partes);
   const rapido=q==='pausa15'?PAUSA15:q==='pausa7'?PAUSA7:BLOQ;
-  if(!RU.length){sT('A nova regra aparece depois da próxima coleta do robô.');return}
+  if(!RU.length){sT('Nenhum dia com a regra nova nesse período. Pra dias antigos, rode node avaliacao.js --ultimos 7 na VM.');return}
   if(!RU.some(x=>(x.dados.partes[tipo]||0)>0)){sT('Nenhum número elegível para esta pausa no período.');return}
   sT('Baixando a lista completa...');
   try{const datas=RU.map(x=>x.data),r=await fetch(API+'?chave='+encodeURIComponent(CHAVE)+'&acao=operacao_lista&dias=40&datas='+encodeURIComponent(datas.join(','))+'&t='+Date.now()),j=await r.json();
@@ -4699,7 +4696,7 @@ async function baixarBloq(q){const tipo=q==='pausa15'?'n':q==='pausa7'?'p':'b',n
       x.dados.split(';').forEach(it=>{const c=it.split(',');if(!c[0])return;const alvo=maps[m[1]],y=alvo[c[0]]=alvo[c[0]]||{f:c[0],t:0,tipo:c[2],ev:0};y.t+=+c[1]||0;y.ev+=+c[3]||0})});
     let L=Object.values(maps[tipo]);if(q==='pausa15')L=L.filter(x=>!maps.b[x.f]);if(q==='pausa7')L=L.filter(x=>!maps.b[x.f]&&!maps.n[x.f]);L.sort((a,b)=>b.t-a.t);
     if(!L.length)throw new Error('lista vazia');
-    baixaCsv(L,nome+(datas.length===1?'-'+datas[0].replace(/\//g,'-'):'')+'.csv',q==='pausa15'?15:q==='pausa7'?7:null);sT(fmtN(L.length)+' números baixados no formato de importação Fastway')}
+    baixaCsv(L,nome+'_'+(datas.length===1?datas[0].replace(/\//g,'-'):datas.sort((a,b)=>dk(a).localeCompare(dk(b)))[0].replace(/\//g,'-')+'_a_'+datas[datas.length-1].replace(/\//g,'-'))+'.csv',q==='pausa15'?15:q==='pausa7'?7:null);sT(fmtN(L.length)+' números baixados no formato de importação Fastway')}
   catch(e){sT('Falha no download completo ('+e.message+'). Baixando os até 250 mais discados.');baixaCsv(rapido,nome+'.csv',q==='pausa15'?15:q==='pausa7'?7:null)}}
 // caixa "O que é / Como ler / O que fazer" de cada painel
 const explica=(oque,ler,fazer)=>'<div class="avd-exp"><div><b>O que é:</b> '+oque+'</div><div><b>Como ler:</b> '+ler+'</div><div><b>O que fazer:</b> '+fazer+'</div></div>';
@@ -4803,6 +4800,19 @@ function odPresenca(){const X=operUlt('mes_ops');if(!X||!X.dados||!(X.dados.ops|
     tbw('<table class="od-tb"><tr><th>Operadora</th><th>Turno</th><th>Dias</th><th>Média logada</th><th>Falando</th><th>Pausa</th><th>Esperando</th><th style="text-align:left">Dias do mês</th></tr>'+R.map(r=>{const o=r.o;
       const strip=D.map(d=>{const x=o.d[d];if(!x)return '<i style="background:#f5b5b5" title="'+d+': não logou"></i>';const a=Math.min(1,x[0]/21600);return '<i style="background:rgba(22,163,74,'+(0.3+a*0.7).toFixed(2)+')" title="'+d+': entrou '+esc(x[5]||'-')+' · logada '+hm(x[0])+'"></i>'}).join('');
       return '<tr><td class="nm">'+esc(nc(o.n))+'</td><td>'+tur(o.g)+'</td><td data-v="'+r.nd+'"><b style="color:'+(r.nd<mxD-2?'#dc2626':'inherit')+'">'+r.nd+'</b><small> de '+D.length+'</small></td><td data-v="'+(r.lg/r.nd)+'">'+hm(r.lg/r.nd)+'</td><td>'+pf(pc(r.fala,r.lg),0)+'%</td><td style="color:'+(pc(r.pausa,r.lg)>15?'#b45309':'inherit')+'">'+pf(pc(r.pausa,r.lg),0)+'%</td><td>'+pf(pc(r.oc,r.lg),0)+'%</td><td data-v="'+r.nd+'" style="text-align:left"><div class="od-strip">'+strip+'</div></td></tr>'}).join('')+'</table>')+'</div>'}
+// ---- ranking dos mailings (simplificado): nome, volume, atende, nao existe, acordos e decisao
+function mailRank(){const H=operJunta('hora'),T=H.reduce((s,x)=>{['dis','at','aco'].forEach(c=>s[c]=(s[c]||0)+(x[c]||0));return s},{});if(!T.dis)return null;
+  const baseMil=T.aco/T.dis*1000,semAco=!T.aco;
+  const M=operJunta('mailing').filter(m=>m.k!=='0'&&m.dis>=200).map(m=>Object.assign(m,{d:decideMail(m,baseMil,semAco,pc(T.at,T.dis)),mil:m.aco/m.dis*1000}))
+    .sort((a,b)=>a.d.o-b.d.o||(semAco?0:b.mil-a.mil)||pc(b.at,b.dis)-pc(a.at,a.dis));
+  return {M,T,baseMil,semAco}}
+function odRanking(){const R=mailRank();if(!R||!R.M.length)return '';const {M,T,semAco}=R,nm=m=>m.nome||('Mailing '+m.k);
+  const cont=v=>M.filter(m=>m.d.t===v).length,res=[['priorizar','#16a34a'],['manter','#b45309'],['pausar','#c2410c'],['limpar antes','#dc2626']].filter(x=>cont(x[0]));
+  const mxA=Math.max(1,...M.map(x=>pc(x.at,x.dis)));
+  return '<div class="od-card">'+odHead('layers','#484a4e','Mailings: qual vale discar','Média da casa: <b>'+pf(pc(T.at,T.dis),1)+'%</b> atendem','<div class="mr-res">'+res.map(x=>'<span style="--c:'+x[1]+'"><b>'+cont(x[0])+'</b>'+x[0]+'</span>').join('')+'</div>',
+      odInfo('Cada mailing é uma lista de devedores que entrou no discador.','<b>Atendem</b> = chance de alguém atender. <b>Não existe</b> = quanto a base está suja. Passe o mouse na decisão pra ver o motivo.','<b>Priorizar</b>: no discador no pico. <b>Limpar antes</b>: higienizar no Cobmais ou pedir telefone novo antes de discar de novo.'))+
+    tbw('<table class="od-tb mr-tb"><tr><th>Mailing</th><th>Discagens</th><th>Atendem</th><th>Não existe</th>'+(semAco?'':'<th>Acordos</th>')+'<th>Decisão</th></tr>'+
+    M.map(m=>{const ne=pc(m.ne,m.dis);return '<tr><td class="nm">'+esc(nm(m))+'</td><td>'+fmtN(m.dis)+'</td><td data-v="'+pc(m.at,m.dis).toFixed(2)+'"><div class="mr-at"><b>'+pf(pc(m.at,m.dis),1)+'%</b><i><u style="width:'+Math.max(3,pc(m.at,m.dis)/mxA*100).toFixed(0)+'%"></u></i></div></td><td data-v="'+ne.toFixed(2)+'"><b style="color:'+(ne>=15?'#dc2626':'#64748b')+'">'+pf(ne,0)+'%</b></td>'+(semAco?'':'<td><b>'+fmtN(m.aco)+'</b></td>')+'<td title="'+esc(m.d.p)+'">'+pill(m.d.t,m.d.bg,m.d.c)+'</td></tr>'}).join('')+'</table>')+'</div>'}
 // ---- mailings no discador agora (robo --aovivo, API antiga FMI) ----
 function avHoje(){const hj=new Date().toLocaleDateString('pt-BR'),x=(OPER||[]).find(b=>b.bloco==='aovivo'&&b.data===hj);return x&&x.dados&&x.dados.ts?x.dados:null}
 function mailSit(m){const p=m.reg?m.trab/m.reg*100:0,at=/ATIVO|EXECU/i.test(m.st);
@@ -4850,7 +4860,7 @@ function ttTurno(dia,hs){const H=(OPER||[]).find(x=>x.bloco==='hora'&&x.data===d
   (H?H.dados:[]).forEach(r=>{if(hs.indexOf(String(r.k).padStart(2,'0'))<0||!r.dis)return;t.h++;['dis','at','ne','el','na','aco'].forEach(k=>t[k]+=r[k]||0)});
   ((C&&C.dados.hora)||[]).forEach(r=>{if(hs.indexOf(String(r.k).padStart(2,'0'))<0)return;t.n+=r.n||0;t.c+=r.c||0});return t}
 const TT_MET=[['Discagens por hora',t=>t.h?t.dis/t.h:0,'n',0],['Atendidas por hora',t=>t.h?t.at/t.h:0,'n',1],['% que atende',t=>pc(t.at,t.dis),'p',1],['% curtas',t=>pc(t.c,t.n),'p',-1],
-  ['% caixa postal',t=>pc(t.el,t.dis),'p',-1],['% inexistente',t=>pc(t.ne,t.dis),'p',-1],['% não atende',t=>pc(t.na,t.dis),'p',0],['Discagens por atendida',t=>t.at?t.dis/t.at:0,'r',-1],['Acordos no turno (discador)',t=>t.aco,'n',1]];
+  ['% caixa postal',t=>pc(t.el,t.dis),'p',-1],['% inexistente',t=>pc(t.ne,t.dis),'p',-1],['% não atende',t=>pc(t.na,t.dis),'p',0],['Discagens por atendida',t=>t.at?t.dis/t.at:0,'r',-1],['Acordos no turno (discador)',t=>t.aco,'n',0]];
 function ttDelta(a,b,tipo){if(tipo==='p')return b-a;return a?(b-a)/a*100:0}
 function ttFmtD(d,tipo){if(!isFinite(d))return '-';const s=(d>0?'+':'')+pf(d,1);return tipo==='p'?s+' p.p.':s+'%'}
 function ttFmtV(v,tipo){return tipo==='p'?pf(v,1)+'%':tipo==='r'?pf(v,1):fmtN(v)}
@@ -4870,12 +4880,17 @@ function odTurnos(datas){const dia=datas.slice().sort((a,b)=>dt(a)-dt(b)).pop();
     if(bomC&&!ruimA){ver='<b>Funcionando:</b> as curtas caíram <b>'+pf(-cu.ef,1)+' p.p. além do normal</b> da tarde, sem perder atendidas.';vc='#16a34a'}
     else if(bomC&&ruimA){ver='<b>Cuidado:</b> as curtas caíram, mas as atendidas por hora caíram '+pf(-at.ef,0)+'% além do normal. Talvez a pausa esteja pegando número bom.';vc='#d97706'}
     else{ver='<b>Ainda sem efeito claro:</b> curtas '+ttFmtD(cu.ef,'p')+' em relação ao normal da tarde. Se as listas já foram importadas, espere fechar mais horas.';vc='#d97706'}}
-  return '<div class="od-card">'+odHead('clock','#b8901f','Teste de pausa: manhã x tarde','Dia '+esc(dia)+' · manhã sem pausa (8h às 14h) x tarde com pausa (14h às 20h)'+(hoje&&ultH?' · tarde parcial até '+ultH+'h':''),'',
-    odInfo('Compara o mesmo dia antes e depois de importar as listas de pausa.','<b>Hoje</b> = quanto a tarde mudou em relação à manhã. <b>Normal</b> = quanto a tarde costuma mudar nos últimos '+(ant.length||'')+' dias úteis, sem teste. <b>Efeito do teste</b> = a diferença entre os dois: é isso que mostra se a pausa ajudou. Verde = melhorou.','Se as curtas caírem e as atendidas por hora se mantiverem, a regra funciona. Se as atendidas caírem muito, deixe a regra mais leve.'))+
-    '<div class="tt-ver" style="--c:'+vc+'">'+'<i>'+odi(vc==='#16a34a'?'ok':'alert',18)+'</i><span>'+ver+'</span></div>'+
-    tbw('<table class="od-tb tt-tb" data-noord><tr><th>Métrica</th><th>Manhã<small>8h às 14h</small></th><th>Tarde<small>14h às 20h</small></th><th class="hj">Hoje<small>tarde x manhã</small></th><th>Normal<small>média de '+ant.length+' dias</small></th><th>Efeito do teste</th></tr>'+
-      linhas.map(l=>'<tr><td class="nm">'+l.nm+'</td><td>'+ttFmtV(l.vm,l.tipo)+'</td><td>'+(T.dis?ttFmtV(l.vt,l.tipo):'-')+'</td><td class="hj">'+(T.dis?ttFmtD(l.dh,l.tipo):'-')+'</td><td style="color:#64748b">'+(ant.length?ttFmtD(l.dn,l.tipo):'-')+'</td><td class="dl" style="color:'+(T.dis&&ant.length?cor(l.ef,l.dir):'#64748b')+'">'+(T.dis&&ant.length?ttFmtD(l.ef,l.tipo):'-')+'</td></tr>').join('')+'</table>')+
-    '<div class="od-nota">Manhã: '+M.h+' h com dado · Tarde: '+T.h+' h. As horas com poucas operadoras logadas puxam as médias por hora pra baixo.</div></div>'}
+  const top=['% curtas','Atendidas por hora','Discagens por atendida','% que atende'].map(g);
+  const card=l=>{const ok=T.dis&&ant.length,c=ok?cor(l.ef,l.dir):'#64748b';return '<div class="tt-c" style="--c:'+c+'"><span>'+l.nm+'</span><div class="tt-v"><s>'+ttFmtV(l.vm,l.tipo)+' →</s><b>'+(T.dis?ttFmtV(l.vt,l.tipo):'-')+'</b></div><em>'+(ok?ttFmtD(l.ef,l.tipo)+' vs normal':'sem base ainda')+'</em></div>'};
+  return '<div class="od-card">'+odHead('clock','#b8901f','Teste de pausa: manhã x tarde',esc(dia)+' · manhã sem pausa (8h às 14h) → tarde com pausa (14h às 20h)'+(hoje&&ultH?' · tarde até '+ultH+'h':''),'',
+    odInfo('Compara o mesmo dia antes e depois de importar as listas de pausa.','Cada quadro mostra <b>manhã → tarde</b>. Embaixo, o <b>efeito do teste</b>: quanto a tarde mudou além do que costuma mudar nos últimos '+(ant.length||'')+' dias úteis. Verde = melhorou.','Curtas caindo sem perder atendidas = a regra funciona.'))+
+    '<div class="tt-ver" style="--c:'+vc+'"><i>'+odi(vc==='#16a34a'?'ok':'alert',18)+'</i><span>'+ver+'</span></div>'+
+    '<div class="tt-cards">'+top.map(card).join('')+'</div>'+
+    '<details class="tt-mais"><summary>Ver todas as métricas</summary>'+tbw('<table class="od-tb tt-tb" data-noord><tr><th>Métrica</th><th>Manhã</th><th>Tarde</th><th>Efeito do teste</th></tr>'+
+      linhas.map(l=>'<tr><td class="nm">'+l.nm+'</td><td>'+ttFmtV(l.vm,l.tipo)+'</td><td>'+(T.dis?ttFmtV(l.vt,l.tipo):'-')+'</td><td class="dl" style="color:'+(T.dis&&ant.length?cor(l.ef,l.dir):'#64748b')+'">'+(T.dis&&ant.length?ttFmtD(l.ef,l.tipo):'-')+'</td></tr>').join('')+'</table>')+'</details></div>'}
+function plPeriodo(){const L=[...new Set((OPER||[]).filter(x=>x.bloco==='ruins'&&x.dados&&x.dados.v>=3).map(x=>String(x.data).split('/').reverse().join('-')))].sort();if(!L.length)return '';
+  const ult=L[L.length-1],f=d=>d.split('-').reverse().join('/');
+  return '<div class="pl-per">'+odi('down',14)+' Período das listas <label>De <input type="date" id="plDe" value="'+ult+'" min="'+L[0]+'" max="'+ult+'"></label><label>Até <input type="date" id="plAte" value="'+ult+'" min="'+L[0]+'" max="'+ult+'"></label><small>regra nova disponível de '+f(L[0])+' a '+f(ult)+' ('+L.length+' dia'+(L.length>1?'s':'')+')</small></div>'}
 function odCurtas(umDia){const D=curtasDados();if(!D.tem||!D.tot.n)return '';
   const T=D.tot,nd=Math.max(1,D.dias.length),p=pc(T.c,T.n),med=T.n/nd,risco=D.dias.filter(x=>x.n>CNPJ_LIM&&pc(x.c,x.n)>=CURTA_LIM).length;
   const hoje=new Date();hoje.setHours(0,0,0,0);const falta=Math.round((CURTA_INICIO-hoje)/864e5);
@@ -4895,7 +4910,7 @@ function odCurtas(umDia){const D=curtasDados();if(!D.tem||!D.tot.n)return '';
       const n2=Math.max(1,T.n-gP),c2=Math.max(0,T.c-gP),p2=pc(c2,n2),cc=p2>=CURTA_LIM?'#dc2626':p2>=CURTA_REC?'#d97706':'#16a34a';
       return '<div class="cu-sim"><div><b>Dois testes de pausa, cada um com prazo próprio</b><span>Teste 1: número inexistente, pausa por 15 dias. Teste 2: caixa postal mais de 5 vezes no dia, pausa por 7 dias. Não atende sozinho fica para tentar em outro horário.</span></div>'+
         (gP?'<div class="cu-sim-r"><span>Se aplicar as duas pausas, curtas iriam de</span><b><s>'+pf(p,1)+'%</s> → <em style="color:'+cc+'">'+pf(p2,1)+'%</em></b><small>discagens/dia: '+fmtN(T.n/nd)+' para '+fmtN(n2/nd)+'</small></div>':'')+
-        '<div class="cu-tests"><div class="cu-test"><div><b>Teste 1: inexistentes, pausa 15 dias</b><span>'+fmtN(n15/nd)+' números/dia · '+fmtN(g15/nd)+' discagens/dia</span></div><button class="od-dl" style="--c:#c2410c" onclick="avd.baixarBloq(\'pausa15\')">'+odi('down',15)+' Lista 15 dias</button></div>'+
+        plPeriodo()+'<div class="cu-tests"><div class="cu-test"><div><b>Teste 1: inexistentes, pausa 15 dias</b><span>'+fmtN(n15/nd)+' números/dia · '+fmtN(g15/nd)+' discagens/dia</span></div><button class="od-dl" style="--c:#c2410c" onclick="avd.baixarBloq(\'pausa15\')">'+odi('down',15)+' Lista 15 dias</button></div>'+
         '<div class="cu-test"><div><b>Teste 2: caixa postal >5x, pausa 7 dias</b><span>'+fmtN(n7/nd)+' números/dia · '+fmtN(g7/nd)+' discagens/dia</span></div><button class="od-dl" style="--c:#b45309" onclick="avd.baixarBloq(\'pausa7\')">'+odi('down',15)+' Lista 7 dias</button></div></div>'+
         '<small class="cu-sim-note">'+fmtN(nNa/nd)+' números com “não atende” sem outro critério ficam para nova tentativa em outro horário. '+(gP?'':'Sem números elegíveis nas duas listas no período selecionado.')+'</small></div>'})()+
     '<div class="cu-sec">De onde vêm as curtas</div><div class="cu-mix">'+seg.filter(x=>x[1]>0).map(x=>'<i style="width:'+pc(x[1],T.n).toFixed(2)+'%;background:'+x[2]+'" title="'+x[0]+': '+fmtN(x[1])+' ('+pf(pc(x[1],T.n),1)+'%)"></i>').join('')+'</div>'+
@@ -4944,8 +4959,6 @@ function visaoOper0(){
     '<p>De <b class="g">'+fmtN(T.dis)+' discagens</b>, só <b class="v">'+fmtN(T.at)+' ('+pf(pc(T.at,T.dis),1)+'%)</b> chegaram numa pessoa. <b class="r">'+pf(pc(T.el,T.dis),0)+'% caíram em caixa postal</b> e <b class="r">'+pf(pc(T.ne,T.dis),0)+'% eram número que não existe</b>. '+(semAco?(acoCob!==null?'Pelo Cobmais saíram <b class="g">'+fmtN(acoCob)+' acordo'+(acoCob===1?'':'s')+'</b> hoje'+(acoCob?' ('+pf(acoCob/T.dis*1000,2)+' a cada mil discagens)':'')+'. Por mailing e por horário ainda não dá: falta cruzar com o Relatório de Pagamentos Detalhado.':'Os acordos ainda não aparecem aqui porque a Fastway não recebe essa marcação (vão vir do Cobmais).'):'Saíram <b class="g">'+fmtN(T.aco)+' acordos</b> ('+pf(baseMil,baseMil<1?2:1)+' a cada mil discagens).')+
     (EQ.login?' A equipe passou <b>'+pf(pc(EQ.fala,EQ.login),0)+'%</b> do tempo falando, <b>'+pf(ocP,0)+'%</b> esperando ligação e <b>'+pf(pc(EQ.pausa,EQ.login),0)+'%</b> em pausa.'+(ocP>=25?' <b class="g">O gargalo é a base, não a equipe.</b>':''):'')+'</p></div>';
   h+='<div class="od-kpis">'+K.map(k=>'<div class="od-k" style="--c:'+k[1]+'"><div class="od-kt"><span>'+k[2]+'</span><i>'+odi(k[0],16)+'</i></div><div class="od-kv">'+k[3]+'</div><div class="od-ks">'+k[4]+'</div></div>').join('')+'</div>';
-  h+=odCurtas(umDia);
-  h+=odTurnos(datas);
   // ---- dinheiro que entrou (coletor Cobmais: so totais, sem CPF) ----
   const CB=operFilt('cobmais_pag');
   if(CB.length){const S=CB.reduce((s2,x)=>{const d=x.dados||{};['qtd','valor','principal','honorarios','multa','juros'].forEach(c=>s2[c]=(s2[c]||0)+(d[c]||0));Object.keys(d.forma||{}).forEach(f=>{const y=s2.forma[f]=s2.forma[f]||{q:0,v:0};y.q+=d.forma[f].q;y.v+=d.forma[f].v});if(d.atualizado&&d.atualizado>s2.at)s2.at=d.atualizado;return s2},{forma:{},at:''});
@@ -4958,7 +4971,7 @@ function visaoOper0(){
   // ---- plano de acao
   const A=[];
   {const D=curtasDados();if(D.tem&&D.tot.n){const nd=Math.max(1,D.dias.length),q=pc(D.tot.c,D.tot.n);if(q>=CURTA_LIM&&D.tot.n/nd>CNPJ_LIM)A.push(['alert','Cortar '+fmtN(cortar(D.tot.n/nd,D.tot.c/nd,CURTA_LIM))+' discagens curtas por dia','Urgente','#dc2626',pf(q,1)+'% das chamadas são curtas. A partir de 12/11, acima de 85% com mais de 10.000 chamadas no dia bloqueia todos os números por 15 dias.'])}}
-  if(ncl)A.push(['ban','Bloquear '+fmtN(ncl)+' números','Imediato','#dc2626',fmtN(ncl)+' atenderam e disseram que não conhecem o cliente.'+(gB?' Gastaram <b>'+fmtN(gB)+' discagens</b> '+perTxt+'.':'')+' Baixe a lista separada no painel de pausa/bloqueio.']);
+  if(ncl)A.push(['ban','Bloquear '+fmtN(ncl)+' números','Imediato','#dc2626',fmtN(ncl)+' atenderam e disseram que não conhecem o cliente.'+(gB?' Gastaram <b>'+fmtN(gB)+' discagens</b> '+perTxt+'.':'')+' Baixe a lista em Discagem e Mailing.']);
   if(ne)A.push(['clock','Pausar '+fmtN(ne)+' números inexistentes por 15 dias','Hoje','#b45309','Teste 1: número inexistente e sem atendimento no dia.'+(g15?' Gastaram <b>'+fmtN(g15)+' discagens</b>.':'')]);
   if(el)A.push(['clock','Pausar '+fmtN(el)+' números por 7 dias','Hoje','#b45309','Teste 2: caixa postal mais de 5 vezes no dia, sem atendimento.'+(g7?' Gastaram <b>'+fmtN(g7)+' discagens</b>.':'')]);
   const ruins=M.filter(m=>m.d.o===3||m.d.o===2),bons=M.filter(m=>m.d.o===0);
@@ -4980,15 +4993,6 @@ function visaoOper0(){
     '<div class="od-card">'+odHead('phone','#484a4e','Resultado das discagens','Pra onde foram as '+fmtN(T.dis)+' discagens','',odInfo('Cada vez que o discador liga, a Fastway marca um resultado.','<b>Atendidas</b> = chegou numa pessoa. <b>Caixa postal</b> = máquina/secretária. <b>Não existe</b> = número inválido. <b>Muda</b> = ligou e ninguém falou.','Quanto maior a fatia de caixa postal e não existe, mais a base precisa de limpeza (painel de bloqueio e ranking dos mailings).'))+
     odDonut([{n:'Caixa postal',v:T.el,c:'#d4a937'},{n:'Não atende / outros',v:Math.max(0,T.dis-T.el-T.ne-T.at-(T.mu||0)),c:'#cbd5e1'},{n:'Não existe',v:T.ne,c:'#dc2626'},{n:'Muda',v:T.mu||0,c:'#b45309'},{n:'Atendidas',v:T.at,c:'#16a34a'}],pf(pc(T.at,T.dis),1)+'%','atendidas')+
     '<div class="od-mbs">'+box('#16a34a','Atendidas',fmtN(T.at))+box('#dc2626','Não existe + caixa postal',pf(pc(T.ne+T.el,T.dis),0)+'%')+'</div></div></div>';
-  // ---- ranking de mailings
-  const cont=v=>M.filter(m=>m.d.t===v).length;
-  h+='<div class="od-card">'+odHead('layers','#484a4e','Ranking e saúde dos mailings',(semAco?'Ordenado por % que atende (média da casa: <b>'+pf(pc(T.at,T.dis),1)+'%</b>). Acordo por mailing entra quando cruzarmos com o Cobmais.':'Qual lista vira acordo e qual só queima discagem · média da casa: <b>'+pf(baseMil,baseMil<1?2:1)+'</b> acordos por mil'),
-      '<div class="od-busca">'+odi('search',15)+'<input id="odBuscaM" placeholder="Buscar mailing..." oninput="avd.odBusca()"></div>'+odBtn('m','all','Todos',1,'#d4a937')+odBtn('m','priorizar','Priorizar ('+cont('priorizar')+')',0,'#16a34a')+odBtn('m','manter','Manter ('+cont('manter')+')',0,'#b45309')+odBtn('m','pausar','Pausar ('+cont('pausar')+')',0,'#c2410c')+odBtn('m','limpar antes','Limpar antes ('+cont('limpar antes')+')',0,'#dc2626'),
-      odInfo('Cada mailing é uma lista de devedores que entrou no discador.','<b>Acordos por mil</b> é a régua principal (quantos acordos a cada mil discagens). <b>Atendem</b> = chance de alguém atender. <b>Não existe</b> = quanto a base está suja. <b>Melhor hora</b> = quando aquela lista mais atende.','<b>Priorizar</b>: no discador no pico. <b>Manter</b>: normal. <b>Pausar</b>: muita discagem sem acordo. <b>Limpar antes</b>: pedir telefone novo ao credor ou higienizar no Cobmais.'))+
-    tbw('<table class="od-tb"><tr><th>#</th><th>Mailing</th><th>Discagens</th><th>Atendem</th><th>Não existe</th><th>Acordos</th><th>Por mil</th><th>Melhor hora</th><th>Decisão</th></tr>'+
-    M.map((m,i)=>'<tr data-odf="m" data-v="'+m.d.t+'" data-n="'+esc(nmM(m).toLowerCase()+' '+m.k)+'"><td class="od-pos">'+(i+1)+'º</td><td class="nm">'+esc(nmM(m))+(m.nome?'<small>id '+esc(m.k)+'</small>':'')+'</td><td>'+fmtN(m.dis)+'</td><td><b>'+pf(pc(m.at,m.dis),1)+'%</b>'+odBar(m.at,m.dis*Math.max(.01,Math.max(...M.map(x=>pc(x.at,x.dis)))/100),'#16a34a')+'</td><td><b style="color:'+(pc(m.ne,m.dis)>=15?'#dc2626':'inherit')+'">'+pf(pc(m.ne,m.dis),1)+'%</b>'+odBar(m.ne,m.dis*.3,'#dc2626')+'</td>'+(semAco?'<td>-</td><td>-</td>':'<td><b>'+fmtN(m.aco)+'</b></td><td><b>'+pf(m.mil,1)+'</b></td>')+'<td>'+(m.bh?esc(m.bh.h)+'h <small>'+pf(pc(m.bh.at,m.bh.dis),1)+'%</small>':'-')+'</td><td class="od-dec">'+pill(m.d.t,m.d.bg,m.d.c)+'<small>'+esc(m.d.p)+'</small></td></tr>').join('')+'</table>')+
-    (M.some(m=>!m.nome)?'<div class="od-nota">A Fastway só manda o número do mailing. Pra aparecer o nome, coloque no config.json do robô: <b>"MAILING_NOMES": {"3758": "Nome da carteira"}</b>.</div>':'')+'</div>';
-  h+=odMailVivo();
   // ---- horario + DDD
   const D=operJunta('ddd').filter(x=>x.dis>=300).sort((a,b)=>b.dis-a.dis),topD=D.slice(0,10).map(x=>x.k),horas=H.map(x=>x.k),mxH=Math.max(1,...H.map(x=>pc(x.at,x.dis)));
   const pk=Hok.slice().sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis))[0];
@@ -5005,12 +5009,7 @@ function visaoOper0(){
     h+='<div class="od-card">'+odHead('signal','#484a4e','Mapa de calor: DDD x hora','Cada quadrado = % que atende naquele DDD e naquela hora · azul forte = muita gente atende','','')+
       tbw('<table class="od-tb od-heat"><tr><th>DDD</th>'+horas.map(x=>'<th>'+esc(x)+'h</th>').join('')+'</tr>'+topD.map(d=>'<tr><td class="nm">'+esc(dddNome(d))+'</td>'+horas.map(hr=>cel(d,hr)).join('')+'</tr>').join('')+'</table>')+'</div>'}
   h+=odRitmoMes(umDia,datas);
-  // ---- bloqueio
-  h+='<div class="od-card">'+odHead('ban','#dc2626','Listas de pausa e bloqueio','Cada regra tem seu próprio prazo e motivo',
-      '<button class="od-dl" onclick="avd.baixarBloq()">'+odi('down',15)+' Baixar: não conhece ('+fmtN(ncl)+')</button><button class="od-dl" style="--c:#c2410c" onclick="avd.baixarBloq(\'pausa15\')">'+odi('down',15)+' Pausar 15 dias: inexistente ('+fmtN(ne)+')</button><button class="od-dl" style="--c:#b45309" onclick="avd.baixarBloq(\'pausa7\')">'+odi('down',15)+' Pausar 7 dias: caixa >5x ('+fmtN(el)+')</button>',
-      odInfo('As listas não excluem números. São arquivos separados para você cadastrar a pausa pelo prazo indicado.','<b>15 dias:</b> Fastway informou número inexistente. <b>7 dias:</b> caixa postal mais de 5 vezes no dia. <b>Não atende</b> sozinho não entra em pausa, pode ser horário; fica para tentar depois. Quem atende e diz que não conhece o cliente continua em lista separada.','Importe cada CSV na regra correspondente da Fastway. Confira o prazo antes de aplicar; o robô só gera os arquivos, não altera a discagem.'))+
-    '<div class="od-big3 quatro"><div style="--c:#c2410c"><b>'+fmtN(ne)+'</b>inexistentes · pausa 15 dias</div><div style="--c:#b45309"><b>'+fmtN(el)+'</b>caixa postal >5x · pausa 7 dias</div><div style="--c:#b91c1c"><b>'+fmtN(ncl)+'</b>não conhecem o cliente'+(novo?'':'<small>aparece na próxima coleta</small>')+'</div><div style="--c:#64748b"><b>não atende</b>mantém para tentar em outro horário</div></div>'+
-    tbw('<table class="od-tb"><tr><th>Telefone</th><th>Tentativas '+(umDia?'hoje':'no período')+'</th><th>Motivo</th><th>Ação</th></tr>'+BLOQ.slice(0,6).concat(PAUSA15.slice(0,6),PAUSA7.slice(0,6)).map(x=>'<tr><td class="nm">'+esc(x.f)+'</td><td>'+x.t+'</td><td>'+motivoTxt(x)+'</td><td>'+(x.tipo==='el'?pill('pausar 7 dias','#ffedd5','#b45309'):x.tipo==='ne'?pill('pausar 15 dias','#ffedd5','#c2410c'):pill('bloquear: não conhece','#fee2e2','#b91c1c'))+'</td></tr>').join('')+'</table>')+'</div>';
+  h+='<div class="od-card eq-ponte">'+odi('layers',18)+'<span><b>Mailings, chamadas curtas e listas de pausa</b> agora ficam em <b>Discagem e Mailing</b>.</span><button class="od-dl" onclick="avd.ver(\'funil\')">Abrir</button></div>';
   h+='<div class="od-card eq-ponte">'+odi('users',18)+'<span><b>Tempo, pausas e presença das operadoras</b> agora ficam juntos no <b>Acompanhamento do Dia</b>.</span><button class="od-dl" onclick="showPage(\'ranking\')">Abrir</button></div>';
   // ---- rotas + operadora do telefone
   const R=operJunta('tronco').filter(r=>r.dis>=50).sort((a,b)=>b.dis-a.dis),C=operJunta('carrier').filter(r=>r.dis>=300).sort((a,b)=>pc(b.at,b.dis)-pc(a.at,a.dis));
@@ -6977,7 +6976,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261028-1415',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261028-1530',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
