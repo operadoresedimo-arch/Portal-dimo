@@ -5177,7 +5177,7 @@ function eqMonta(dia){
   if(hoje)K.push(['agora','#b45309','Em pausa agora',n('agora'),AV?'ao vivo · '+esc(AV.hora):'na última coleta']);
   K.push([null,'#16a34a','Atendidas',fmtN(at),'TMA da equipe '+mmss(tma)]);
   const f=EQ.f;
-  h+='<div class="eq-ks">'+K.map(k=>k[0]?'<button class="eq-k'+(f===k[0]?' on':'')+'" style="--c:'+k[1]+'" onclick="avd.eqFiltro(\''+k[0]+'\')"><span>'+k[2]+'</span><b>'+k[3]+'</b><small>'+k[4]+'</small></button>':'<div class="eq-k fix" style="--c:'+k[1]+'"><span>'+k[2]+'</span><b>'+k[3]+'</b><small>'+k[4]+'</small></div>').join('')+'</div>';
+  h+='<div class="eq-ks">'+K.map(k=>k[0]?'<button class="eq-k'+(f===k[0]?' on':'')+'" style="--c:'+k[1]+'" onclick="avd.eqFiltro(\''+k[0]+'\')"><span>'+k[2]+'</span><b'+(/^#(dc2626|b91c1c)$/.test(k[1])&&String(k[3])!=='0'?' class="al"':'')+'>'+k[3]+'</b><small>'+k[4]+'</small></button>':'<div class="eq-k fix" style="--c:'+k[1]+'"><span>'+k[2]+'</span><b>'+k[3]+'</b><small>'+k[4]+'</small></div>').join('')+'</div>';
   h+=eqFaixa(AV);
   // manual liberado
   const lib=O.reduce((s,o)=>s+(o.manual_lib||0),0),FX=(hoje&&window.MODO?window.MODO.faixasHoje():[]).filter(x=>!(isFinite(x[1])&&x[1]-x[0]<60000)),hh=window.MODO?window.MODO.hhmm:()=>''; // troca desfeita no mesmo minuto nao conta
@@ -7021,7 +7021,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261028-1830',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261029-0800',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
@@ -7212,5 +7212,30 @@ window.CFGP={
 })();
 </script>
 
+<style id="edimo-sobrio">
+/* modo sobrio: cor so onde precisa (alerta, risco, decisao). O resto fica em cinza. */
+.avd-kgc,.od-k,.eq-k,.fn-s{border-top-color:#e5e7eb!important}
+.eq-k.on{border-color:#484a4e!important;box-shadow:0 0 0 2px #e5e7eb!important;background:#f8fafc!important}
+.nx-kpi:after{background:#e5e7eb!important}
+.nx-ic{background:#f3f4f6!important;color:#484a4e!important}
+.od-ic{color:#484a4e!important;background:#f3f4f6!important;border-color:#e5e7eb!important}
+.avd-m .od-kv{color:#2f3135!important}
+.avd-m.on{background:#f8fafc!important}
+.eq-k b{color:#2f3135!important}.eq-k b.al{color:#dc2626!important}
+.od-mb{background:#fff!important;border-color:#eef1f5!important}
+.od-mb b{color:#2f3135!important}.od-mb[style*="--c:#dc2626"] b{color:#dc2626!important}
+.od-dl{--c:#484a4e!important}
+.cu-sim{background:#fff!important;border:1px solid #eef1f5!important}
+.cu-sim>div:first-child>b,.cu-test b{color:#2f3135!important}
+.cu-test{border-color:#eef1f5!important}
+.cu-dl{background:#fff!important;border-color:#eef1f5!important}
+.fn-s em{color:#9ca3af!important}
+.od-info summary,.tt-mais summary{color:#6b7280!important}
+.od-st[style*="--c:#16a34a"]{--c:#64748b!important}
+.od-stl span{color:#6b7280!important}
+.nx-chip.live{background:#f8fafc!important;color:#484a4e!important}
+.mc-sv span,.mc-mais summary{color:#484a4e!important}
+.avd-m .od-kt i,.od-k .od-kt i{color:#9ca3af!important;background:#f3f4f6!important;border-color:#e5e7eb!important}
+</style>
 </body>
 </html>
