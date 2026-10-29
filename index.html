@@ -1518,8 +1518,7 @@ body{background:#f0f1f3!important;color:#1a1a1a!important}
 body::before,body::after{display:none!important}
 .bg-layer{background:none!important}
 
-/* SQUARE CORNERS EVERYWHERE */
-*{border-radius:0!important}
+/* cantos arredondados de volta (a regra de tudo quadrado foi tirada em 29/10) */
 
 /* Cards & panels */
 .stat-card,.podium-panel,.table-panel,.comp-stat,.collab-card,.cd-month-card,.cd-comp,
@@ -4328,7 +4327,7 @@ function filtroOpcoes(){
   const ops=[...new Set((DADOS||[]).map(l=>String(l.operador||'').trim()).filter(Boolean))].sort();
   const op=ops.map(x=>'<option value="'+esc(x)+'">'+esc(nc(x))+'</option>').join('');
   const cr=Object.keys(CNOME||{}).map(x=>'<option value="'+x+'">'+esc(CNOME[x])+'</option>').join('');
-  return '<select id="avdOp" onchange="avd.filtrar()"><option value="">Todos operadores</option>'+op+'</select><select id="avdTipo" onchange="avd.filtrar()"><option value="">Todos os tipos</option><option value="negociacao_nova">Negociação nova</option><option value="parcela_vencida">Parcela vencida</option><option value="boleto_pagamento">Boleto / pagamento</option><option value="contestacao">Contestação</option><option value="terceiro">Terceiro</option><option value="outro">Outro</option></select><select id="avdRes" onchange="avd.filtrar()"><option value="">Todos resultados</option><option value="acordo">Acordos</option><option value="sem acordo">Sem acordo</option><option value="retorno">Retorno</option></select><select id="avdCrit" onchange="avd.filtrar()"><option value="">Qualquer critério</option>'+cr+'</select><label><input id="avdFalhas" type="checkbox" onchange="avd.filtrar()"> só com falhas</label><button class="clear" onclick="avd.limparFiltros()">Limpar filtros</button>';
+  return '<select id="avdOp" onchange="avd.filtrar()"><option value="">Todos operadores</option>'+op+'</select><select id="avdTipo" onchange="avd.filtrar()"><option value="">Todos os tipos</option><option value="negociacao_nova">Negociação nova</option><option value="parcela_vencida">Parcela vencida</option><option value="boleto_pagamento">Boleto / pagamento</option><option value="contestacao">Contestação</option><option value="terceiro">Terceiro</option><option value="outro">Outro</option></select><select id="avdRes" onchange="avd.filtrar()"><option value="">Todos resultados</option><option value="acordo">Acordos</option><option value="sem acordo">Sem acordo</option></select><select id="avdCrit" onchange="avd.filtrar()"><option value="">Qualquer critério</option>'+cr+'</select><label><input id="avdFalhas" type="checkbox" onchange="avd.filtrar()"> só com falhas</label><button class="clear" onclick="avd.limparFiltros()">Limpar filtros</button>';
 }
 function filtrosHTML(){return '<div class="avd-fil"><select id="avdPer" onchange="avd.filtrar()"><option value="0">Tudo</option><option value="hoje">Hoje</option><option value="ontem">Ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="custom">Período personalizado</option><option value="dia">Escolher dia...</option></select><input type="date" id="avdDia" onblur="avd.filtrar()" style="display:none"><input type="date" id="avdIni" onblur="avd.filtrar()" style="display:none"><input type="date" id="avdFim" onblur="avd.filtrar()" style="display:none"><input type="time" id="avdHIni" onblur="avd.filtrar()" style="display:none"><input type="time" id="avdHFim" onblur="avd.filtrar()" style="display:none"><select id="avdGrp" onchange="avd.filtrar()"><option value="">Todos grupos</option><option value="novato">Novatos</option><option value="veterano">Veteranos</option></select><button onclick="avd.carregar(true)">↻ Atualizar</button><span class="avd-export"><button class="xls" onclick="avd.exportarExcel(\'filtro\')">▣ Excel</button><button class="pdf" onclick="avd.exportarPDF(\'filtro\')">▤ PDF</button></span><div class="avd-filter-more">'+filtroOpcoes()+'</div></div>'}
 function telaSenha(msg){root().innerHTML=cabec()+'<div class="avd-login"><div class="avd-ic">🔐</div><h3>Área do supervisor</h3><p>Digite a senha da avaliação de discagem</p><input class="avd-in" type="password" id="avdSenha" placeholder="Senha" onkeydown="if(event.key===\'Enter\')avd.entrar()"><button class="avd-btn" onclick="avd.entrar()">Entrar</button><p style="color:#ef4444;margin-top:10px">'+(msg||'')+'</p></div>'}
@@ -4373,11 +4372,11 @@ function temFalha(l){
   if(Array.isArray(l.erros)&&l.erros.length)return true;
   return (l.criterios||[]).some(c=>c.status==='nao'||(c.max&&Number(c.pontos)<Number(c.max)*.5));
 }
-function resMatch(l,v){if(!v)return true;const r=String(l.resultado||'').toLowerCase();if(v==='acordo')return temRes(l);if(v==='sem acordo')return !temRes(l)&&r.indexOf('retorno')<0;if(v==='retorno')return r.indexOf('retorno')>=0;return true}
+function resMatch(l,v){if(!v)return true;const r=String(l.resultado||'').toLowerCase();if(v==='acordo')return temRes(l);if(v==='sem acordo')return !temRes(l);if(v==='retorno')return r.indexOf('retorno')>=0;return true}
 function critMatch(l,v){return !v||(l.criterios||[]).some(c=>String(c.id)===v&&((c.status&&c.status!=='bem'&&c.status!=='na')||(!c.status&&Number(c.pontos)<Number(c.max||100)*.75)))}
 function filt(){
   const grp=$('avdGrp'),g=grp?grp.value:'',op=$('avdOp')&&$('avdOp').value,tipo=$('avdTipo')&&$('avdTipo').value,res=$('avdRes')&&$('avdRes').value,crit=$('avdCrit')&&$('avdCrit').value,only=$('avdFalhas')&&$('avdFalhas').checked;
-  return DADOS.filter(l=>noPer(l.data)&&horaOk(l)&&(!g||l.grupo===g)&&(!op||String(l.operador)===op)&&(!tipo||String(l.tipo_ligacao||'outro')===tipo)&&resMatch(l,res)&&critMatch(l,crit)&&(!only||temFalha(l))&& (AVD_TAB==='todos'||(AVD_TAB==='acordos'&&temRes(l))||(AVD_TAB==='sem'&&!temRes(l)&&String(l.resultado||'').toLowerCase().indexOf('retorno')<0)||(AVD_TAB==='atencao'&&temFalha(l))));
+  return DADOS.filter(l=>noPer(l.data)&&horaOk(l)&&(!g||l.grupo===g)&&(!op||String(l.operador)===op)&&(!tipo||String(l.tipo_ligacao||'outro')===tipo)&&resMatch(l,res)&&critMatch(l,crit)&&(!only||temFalha(l))&& (AVD_TAB==='todos'||(AVD_TAB==='acordos'&&temRes(l))||(AVD_TAB==='sem'&&!temRes(l))||(AVD_TAB==='atencao'&&temFalha(l))));
 }
 function dadosExportar(modo,valor){
   if(modo==='operador')return filt().filter(l=>String(l.operador).toUpperCase()===String(valor).toUpperCase());
@@ -4499,7 +4498,7 @@ function acaoHoje(ls){
 }
 function ver(v){VIEW=(v==='rank'||VIEW===v)?'':v;CRIT='';render()}
 function crit(id){CRIT=id;render()}
-const resOf=l=>{const r=String(l.resultado||'').toLowerCase();return r.indexOf('acordo')===0?'a':r.indexOf('retorno')>=0?'r':'s'};
+const resOf=l=>{const r=String(l.resultado||'').toLowerCase();return r.indexOf('acordo')===0?'a':'s'}; // nao fazemos retorno: retorno agendado conta como sem acordo
 const pc=(x,t)=>t?(x/t*100):0;
 const mini=(p,c)=>'<span class="avd-mini"><i style="width:'+Math.max(2,Math.min(100,p)).toFixed(0)+'%;background:'+c+'"></i></span>';
 
@@ -4507,16 +4506,16 @@ const mini=(p,c)=>'<span class="avd-mini"><i style="width:'+Math.max(2,Math.min(
 const AV_COR={a:'#16a34a',r:'#d4a937',s:'#dc2626'};
 const corPct=p=>p>=75?'#16a34a':p>=40?'#d4a937':'#dc2626';
 function contaRes(a){const t={a:0,r:0,s:0};a.forEach(l=>t[resOf(l)]++);return t}
-function stackRes(t,n){const w=x=>pc(x,n).toFixed(1);return '<div class="od-stack"><i style="width:'+w(t.a)+'%;background:'+AV_COR.a+'"></i><i style="width:'+w(t.r)+'%;background:'+AV_COR.r+'"></i><i style="width:'+w(t.s)+'%;background:'+AV_COR.s+'"></i></div><div class="od-stl"><span style="color:'+AV_COR.a+'">'+pf(pc(t.a,n),0)+'% acordo</span><span style="color:#a8841f">'+pf(pc(t.r,n),0)+'% retorno</span><span style="color:'+AV_COR.s+'">'+pf(pc(t.s,n),0)+'% perdido</span></div>'}
-const legRes='<div class="od-leg"><span><i style="background:'+AV_COR.a+'"></i>Acordo feito</span><span><i style="background:'+AV_COR.r+'"></i>Retorno agendado</span><span><i style="background:'+AV_COR.s+'"></i>Perdido</span></div>';
+function stackRes(t,n){const w=x=>pc(x,n).toFixed(1);return '<div class="od-stack"><i style="width:'+w(t.a)+'%;background:'+AV_COR.a+'"></i><i style="width:'+w(t.s)+'%;background:'+AV_COR.s+'"></i></div><div class="od-stl"><span style="color:'+AV_COR.a+'">'+pf(pc(t.a,n),0)+'% acordo</span><span style="color:'+AV_COR.s+'">'+pf(pc(t.s,n),0)+'% perdido</span></div>'}
+const legRes='<div class="od-leg"><span><i style="background:'+AV_COR.a+'"></i>Acordo feito</span><span><i style="background:'+AV_COR.s+'"></i>Perdido</span></div>';
 const pctCel=p=>'<div class="avd-pc"><div class="od-bar"><i style="width:'+Math.max(2,Math.min(100,p)).toFixed(0)+'%;background:'+corPct(p)+'"></i></div><b style="color:'+corPct(p)+'">'+pf(p,0)+'%</b></div>';
 const stPill=(rev,txt)=>'<span class="od-st" style="--c:'+(rev?'#b91c1c':'#16a34a')+'">'+odi(rev?'alert':'ok',13)+' '+(txt||(rev?'revisar':'bem'))+'</span>';
 const opCel=o=>'<span class="od-ui">'+odi('user',15)+'</span><span class="nm">'+esc(nc(o.op))+'</span>'+(o.g==='novato'?' <span class="avd-tag">novato</span>':'');
 function avM(ic,c,tit,v,sub,vw,txt){const at=vw==='rank'?VIEW==='':VIEW===vw;return '<div class="avd-m'+(vw?' clk':'')+(at&&vw?' on':'')+'" style="--c:'+c+'"'+(vw?' onclick="avd.ver(\''+vw+'\')"':'')+'><div class="od-kt"><span>'+tit+'</span><i>'+odi(ic,16)+'</i></div><div class="od-kv'+(txt?' txt':'')+'">'+v+'</div><div class="od-ks">'+sub+'</div>'+(vw?'<div class="avd-hint">'+(at?(vw==='rank'?'vendo o ranking':'clique pra voltar'):'clique pra detalhar')+'</div>':'')+'</div>'}
 function avGrupo(ic,c,t,itens){return '<div class="avd-kgc" style="--c:'+c+';flex:'+itens.length+' 1 0"><div class="avd-kgt"><span class="od-ic sm">'+odi(ic,14)+'</span>'+t+'</div><div class="avd-kgi n'+itens.length+'">'+itens.join('')+'</div></div>'}
 function cardResultado(T,N){
-  return '<div class="od-card">'+odHead('phone','#16a34a','Resultado das ligações ouvidas',N+' ligaç'+(N===1?'ão avaliada':'ões avaliadas')+' pela IA','',odInfo('Como terminou cada ligação que a IA ouviu.','<b>Acordo feito</b> = fechou na ligação. <b>Retorno</b> = ficou de ligar de novo. <b>Perdido</b> = encerrou sem acordo nem retorno.','Fatia vermelha grande = abrir as ligações perdidas e ver em qual critério a operadora travou.'))+
-    (N?odDonut([{n:'Acordo feito',v:T.a,c:AV_COR.a},{n:'Retorno agendado',v:T.r,c:AV_COR.r},{n:'Perdido (sem acordo)',v:T.s,c:AV_COR.s}],pf(pc(T.a,N),0)+'%','com acordo')+
+  return '<div class="od-card">'+odHead('phone','#16a34a','Resultado das ligações ouvidas',N+' ligaç'+(N===1?'ão avaliada':'ões avaliadas')+' pela IA','',odInfo('Como terminou cada ligação que a IA ouviu.','<b>Acordo feito</b> = fechou na ligação. <b>Perdido</b> = encerrou sem acordo.','Fatia vermelha grande = abrir as ligações perdidas e ver em qual critério a operadora travou.'))+
+    (N?odDonut([{n:'Acordo feito',v:T.a,c:AV_COR.a},{n:'Perdido (sem acordo)',v:T.s,c:AV_COR.s}],pf(pc(T.a,N),0)+'%','com acordo')+
     '<div class="od-mbs"><div class="od-mb" style="--c:#16a34a"><span>Acordos feitos</span><b>'+T.a+'</b><small>de '+N+' ouvidas</small></div><div class="od-mb" style="--c:#dc2626"><span>Perdidas (sem acordo)</span><b>'+pf(pc(T.s,N),0)+'%</b><small>'+T.s+' ligaç'+(T.s===1?'ão':'ões')+'</small></div></div>':'<div class="avd-empty">Sem ligações nesse filtro.</div>')+'</div>'}
 function cardCriterios(c,eq,fr,grande){
   const L=Object.keys(c).filter(k=>c[k].max).sort((a,b)=>c[a].pct-c[b].pct);
@@ -4526,7 +4525,7 @@ function cardCriterios(c,eq,fr,grande){
 function cardRanking(lin){
   const L=lin.map(o=>Object.assign({},o,{t:contaRes(o.a),rev:o.a.some(temFalha)})),nr=L.filter(o=>o.rev).length;
   return '<div class="od-card">'+odHead('users','#d4a937','Ranking de qualidade','Barra = como terminaram as ligações ouvidas de cada operadora'+(nr?' · <span class="od-badge">'+nr+' pra revisar</span>':''),odBtn('q','all','Todas ('+L.length+')',true,'#d4a937')+odBtn('q','rev','Revisar ('+nr+')',false,'#dc2626')+odBtn('q','bem','Bem ('+(L.length-nr)+')',false,'#16a34a'),
-    odInfo('Operadoras ordenadas pela aderência (quanto seguiram o roteiro nas ligações ouvidas).','<b>Aderência</b> = % dos critérios bem feitos. <b>Barra</b> = acordo, retorno ou perdido. <b>Ponto fraco</b> = critério com pior resultado dela.','Clique na operadora pra abrir as ligações e dar o feedback. Comece por quem está em <b>revisar</b> com feedback pendente.'))+
+    odInfo('Operadoras ordenadas pela aderência (quanto seguiram o roteiro nas ligações ouvidas).','<b>Aderência</b> = % dos critérios bem feitos. <b>Barra</b> = acordo ou perdido. <b>Ponto fraco</b> = critério com pior resultado dela.','Clique na operadora pra abrir as ligações e dar o feedback. Comece por quem está em <b>revisar</b> com feedback pendente.'))+
     (L.length?legRes+'<div class="avd-sx"><table class="od-tb od-eq" data-ord-col="3"><tr><th style="width:34px">#</th><th style="text-align:left">Operadora</th><th>Ouvidas</th><th>Aderência</th><th style="text-align:left;min-width:260px">Resultado das ligações</th><th style="text-align:left">Ponto fraco</th><th>Situação</th></tr>'+
     L.map((o,i)=>'<tr class="lk" data-odf="q" data-v="'+(o.rev?'rev':'bem')+'" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><td class="od-pos">'+(i+1)+'º</td><td style="text-align:left">'+opCel(o)+'</td><td><b>'+o.a.length+'</b></td><td data-v="'+o.n.toFixed(2)+'">'+pctCel(o.n)+'</td><td style="text-align:left" data-v="'+pc(o.t.a,o.a.length).toFixed(2)+'">'+stackRes(o.t,o.a.length)+'</td><td style="text-align:left;white-space:normal">'+(o.f?'<span class="avd-pf">'+esc(o.f.fraco||o.f.nome)+'</span>':'<span class="od-hz">-</span>')+'</td><td class="od-sts" data-v="'+((o.rev?10:0)+o.pend)+'">'+stPill(o.rev)+(o.pend?'<span class="od-st" style="--c:#b45309">'+o.pend+' feedback'+(o.pend>1?'s':'')+'</span>':'')+'</td></tr>').join('')+'</table></div>':'<div class="avd-empty">Nenhuma ligação avaliada nesse período.</div>')+'</div>'}
 let ERR_FOPEN=false,ERR_L=[];
@@ -5084,10 +5083,10 @@ function visao(ls,lin,c,eq){
     const fe=L.filter(o=>o.t.a).length;
     h+='<div class="od-g2">'+cardResultado(T,N)+
       '<div class="od-card">'+odHead('trend','#16a34a','Quem mais fecha acordo','% das ligações ouvidas que viraram acordo','')+'<div class="avd-crs">'+L.slice(0,8).map(o=>'<div class="od-cr clk" onclick="avd.detalhe(\''+encodeURIComponent(o.op)+'\')"><span>'+esc(nc(o.op))+'<small>'+o.t.a+' de '+o.a.length+' ouvidas</small></span><div class="od-bar big"><i style="width:'+Math.max(2,pc(o.t.a,o.a.length)).toFixed(0)+'%;background:#16a34a"></i></div><b style="color:#16a34a">'+pf(pc(o.t.a,o.a.length),0)+'%</b></div>').join('')+'</div>'+
-      '<div class="od-mbs"><div class="od-mb" style="--c:#16a34a"><span>Fecharam pelo menos 1 acordo</span><b>'+fe+' de '+L.length+'</b><small>operadoras ouvidas</small></div><div class="od-mb" style="--c:#b8901f"><span>Retornos agendados</span><b>'+T.r+'</b><small>'+pf(pc(T.r,N),0)+'% das ligações</small></div></div></div></div>';
-    h+='<div class="od-card">'+odHead('users','#16a34a','Resultado por operadora','Barra = acordo, retorno e perdido nas ligações ouvidas',odBtn('r','all','Todas ('+L.length+')',true,'#d4a937')+odBtn('r','aco','Com acordo ('+fe+')',false,'#16a34a')+odBtn('r','zero','Sem acordo ('+(L.length-fe)+')',false,'#dc2626'))+legRes+
-      '<div class="avd-sx"><table class="od-tb od-eq"><tr><th style="text-align:left">Operadora</th><th>Ouvidas</th><th>Acordo</th><th>Retorno</th><th>Perdido</th><th style="text-align:left;min-width:260px">Resultado</th><th>Situação</th></tr>'+
-      L.map(o=>tr(o,['r',o.t.a?'aco':'zero'],['<b>'+o.a.length+'</b>','<b style="color:#16a34a">'+o.t.a+'</b>','<b style="color:#a8841f">'+o.t.r+'</b>','<b style="color:#dc2626">'+o.t.s+'</b>',{l:1,h:stackRes(o.t,o.a.length)},stPill(o.rev)])).join('')+'</table></div></div>';
+      '<div class="od-mbs"><div class="od-mb" style="--c:#16a34a"><span>Fecharam pelo menos 1 acordo</span><b>'+fe+' de '+L.length+'</b><small>operadoras ouvidas</small></div><div class="od-mb" style="--c:#dc2626"><span>Sem nenhum acordo</span><b>'+(L.length-fe)+' de '+L.length+'</b><small>operadoras ouvidas</small></div></div></div></div>';
+    h+='<div class="od-card">'+odHead('users','#16a34a','Resultado por operadora','Barra = acordo e perdido nas ligações ouvidas',odBtn('r','all','Todas ('+L.length+')',true,'#d4a937')+odBtn('r','aco','Com acordo ('+fe+')',false,'#16a34a')+odBtn('r','zero','Sem acordo ('+(L.length-fe)+')',false,'#dc2626'))+legRes+
+      '<div class="avd-sx"><table class="od-tb od-eq"><tr><th style="text-align:left">Operadora</th><th>Ouvidas</th><th>Acordo</th><th>Perdido</th><th style="text-align:left;min-width:260px">Resultado</th><th>Situação</th></tr>'+
+      L.map(o=>tr(o,['r',o.t.a?'aco':'zero'],['<b>'+o.a.length+'</b>','<b style="color:#16a34a">'+o.t.a+'</b>','<b style="color:#dc2626">'+o.t.s+'</b>',{l:1,h:stackRes(o.t,o.a.length)},stPill(o.rev)])).join('')+'</table></div></div>';
   }else if(VIEW==='nota'){
     const L=lin.map(o=>Object.assign({},o,{rev:o.a.some(temFalha)}));
     const fx=p=>p>=75?'bem':p>=40?'parte':'nao',nb=L.filter(o=>fx(o.n)==='bem').length,np=L.filter(o=>fx(o.n)==='parte').length,nn=L.length-nb-np;
@@ -7037,7 +7036,7 @@ setInterval(function(){if(S)badge()},60000);
 /* Atualização automática do Portal Édimo: nunca servir uma cópia antiga do HTML. */
 (function(){
   if(!('serviceWorker' in navigator))return;
-  navigator.serviceWorker.register('./sw.js?v=20261029-0815',{updateViaCache:'none'})
+  navigator.serviceWorker.register('./sw.js?v=20261029-0830',{updateViaCache:'none'})
     .then(function(reg){return reg.update()})
     .catch(function(e){console.warn('Atualização do portal:',e)});
 })();
@@ -7230,6 +7229,7 @@ window.CFGP={
 
 <style id="edimo-sobrio">
 /* modo sobrio: cor so onde precisa (alerta, risco, decisao). O resto fica em cinza. */
+.od-leg i,.avd-leg i,.eq-live span i,.nx-chip i,.mc-bol{border-radius:50%!important}
 .nx-tg2{grid-template-columns:repeat(2,1fr)!important;margin-top:16px}.nx-ext{--c:#94a3b8}.nx-ext p{font-size:.76rem}.nx-ext table td:first-child{text-align:left;white-space:nowrap}.nx-ext tr.tot td{font-weight:800;border-top:1px solid #e5e7eb}.nx-saiu{font-size:.62rem;color:#9ca3af;border:1px solid #e5e7eb;border-radius:6px;padding:0 5px;margin-left:4px}@media(max-width:900px){.nx-tg2{grid-template-columns:1fr!important}}
 .avd-kgc,.od-k,.eq-k,.fn-s{border-top-color:#e5e7eb!important}
 .eq-k.on{border-color:#484a4e!important;box-shadow:0 0 0 2px #e5e7eb!important;background:#f8fafc!important}
