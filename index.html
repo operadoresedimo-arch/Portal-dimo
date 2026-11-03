@@ -219,7 +219,7 @@ body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg)
 #pageTV:fullscreen .tv-al-big{font-size:3.4rem!important}
 .tv-pl{font-family:inherit!important;font-size:.72rem!important;color:#64748b!important;font-weight:600}.tv-pl-x{color:#fbbf24!important}
 body.tv-full{overflow:hidden!important}
-body.tv-full>*:not(#pageTV):not(#tvFlash):not(#dgOver){display:none!important}
+body.tv-full>*:not(#pageTV):not(#tvFlash):not(#dgOver):not(#tvFesta){display:none!important}
 body.tv-full #pageTV{display:block!important;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2147483000;border-radius:0;overflow:auto;margin:0;padding:0}
 #tvFlash{z-index:2147483600!important}#dgOver{z-index:2147483500!important}
 body.tv-full .tv-al-big{font-size:3.4rem!important}
@@ -3673,7 +3673,12 @@ function genComp(){
     const totA=ms[sumIdx].ops.reduce((s,o)=>s+o.a,0);   // tudo da planilha: operadores + secretaria/prospeccao + nao comissionado
     const totV=ms[sumIdx].ops.reduce((s,o)=>s+o.v,0);
     const antA=sumIdx>0?ms[sumIdx-1].ops.reduce((s,o)=>s+o.a,0):0;
-    const odOp=od.filter(o=>o.t===0||o.t===1||o.t===2);
+    // tabela: todos os operadores (0/1/2) que aparecem em qualquer uma das 3 planilhas, nao so quem ja tem acordo no mes atual
+    const odOp=[...allN.values()].filter(o=>o.t===0||o.t===1||o.t===2).sort(function(a,b){
+      if(compSortBy==='nome')return a.name.localeCompare(b.name);
+      if(compSortBy==='acordos'){return(b.m[sortMIdx]?b.m[sortMIdx].a:0)-(a.m[sortMIdx]?a.m[sortMIdx].a:0);}
+      return(b.m[sortMIdx]?b.m[sortMIdx].v:0)-(a.m[sortMIdx]?a.m[sortMIdx].v:0);
+    });
     const antV=sumIdx>0?ms[sumIdx-1].ops.reduce((s,o)=>s+o.v,0):0;
     const varA=antA?Math.round((totA/antA-1)*1000)/10:null;
     const du=diasUt(ms[sumIdx].period),mediaDia=du?(totA/du):0;
@@ -6328,6 +6333,87 @@ function relatorioEhDeHoje(csv,data,meta){
   const campos=data&&data.ops?data.ops.map(o=>String(o.data||o.dia||o.date||'')).join(' '):'';
   return campos.includes(hoje)||campos.includes(hoje.split('/').reverse().join('-'));
 }
+// ===== COMEMORACAO DE NOVOS ACORDOS (fogos + luzes por 60s a cada rodada nova) =====
+// Compara a planilha nova com a anterior (guardada no navegador, por dia) e mostra quem fez acordo novo.
+var festaNovos=null,festaAte=0,festaTm=null,festaAlTm=null,festaEl=null,festaRaf=0,festaFw=null;
+const FESTA_SEG=60;
+function festaDiff(data){
+  const dia=tvHoje();let base=null;
+  try{base=JSON.parse(localStorage.getItem('tvFestaBase')||'null')}catch(e){}
+  const m={};((data&&data.ops)||[]).forEach(o=>{if(o&&o.n)m[o.n]=(m[o.n]||0)+(o.a||0)});
+  const novos=[];
+  if(base&&base.dia===dia&&base.m){Object.keys(m).forEach(n=>{const d=m[n]-(base.m[n]||0);if(d>0)novos.push({n,d,t:m[n]})})}
+  else if(new Date().getHours()<9){Object.keys(m).forEach(n=>{if(m[n]>0)novos.push({n,d:m[n],t:m[n]})})} // 1a rodada do dia comemora tudo
+  try{localStorage.setItem('tvFestaBase',JSON.stringify({dia,m}))}catch(e){}
+  novos.sort((a,b)=>b.d-a.d||b.t-a.t);return novos;
+}
+function festaCSS(){
+  if(document.getElementById('tvFestaCss'))return;
+  const s=document.createElement('style');s.id='tvFestaCss';s.textContent=
+  '#tvFesta{position:fixed;inset:0;z-index:2147483650;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,rgba(40,32,10,.82),rgba(8,8,12,.94));font-family:Inter,system-ui,sans-serif;overflow:hidden;cursor:pointer}'+
+  '#tvFesta.on{display:flex;animation:fzIn .5s ease-out}'+
+  '@keyframes fzIn{from{opacity:0}to{opacity:1}}'+
+  '#tvFesta canvas{position:absolute;inset:0;width:100%;height:100%}'+
+  '#tvFesta .fz-luz{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen}'+
+  '#tvFesta .fz-luz i{position:absolute;bottom:-10vh;width:22vw;height:140vh;transform-origin:50% 100%;background:linear-gradient(to top,rgba(212,169,55,.55),rgba(255,236,170,.10) 60%,transparent);filter:blur(18px);animation:fzLuz 4s ease-in-out infinite alternate}'+
+  '#tvFesta .fz-luz i:nth-child(1){left:-4vw;--a:-28deg;--b:8deg}#tvFesta .fz-luz i:nth-child(2){left:22vw;--a:-14deg;--b:16deg;animation-delay:-1s;background:linear-gradient(to top,rgba(96,165,250,.45),transparent 70%)}'+
+  '#tvFesta .fz-luz i:nth-child(3){right:22vw;--a:14deg;--b:-16deg;animation-delay:-2s;background:linear-gradient(to top,rgba(52,211,153,.4),transparent 70%)}#tvFesta .fz-luz i:nth-child(4){right:-4vw;--a:28deg;--b:-8deg;animation-delay:-3s}'+
+  '@keyframes fzLuz{from{transform:rotate(var(--a))}to{transform:rotate(var(--b))}}'+
+  '#tvFesta .fz-box{position:relative;width:min(94vw,1500px);text-align:center;color:#fff}'+
+  '#tvFesta .fz-tt{font-weight:900;font-size:clamp(2.4rem,6vw,6.5rem);letter-spacing:.02em;line-height:1;color:#D4A937;text-shadow:0 0 30px rgba(212,169,55,.8),0 6px 0 rgba(0,0,0,.35);animation:fzPulse 1.2s ease-in-out infinite}'+
+  '@keyframes fzPulse{50%{transform:scale(1.05);text-shadow:0 0 60px rgba(255,220,120,1),0 6px 0 rgba(0,0,0,.35)}}'+
+  '#tvFesta .fz-gr{display:flex;flex-wrap:wrap;justify-content:center;gap:2vh 2vw;margin-top:4vh}'+
+  '#tvFesta .fz-c{max-width:90vw;background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:2px solid rgba(212,169,55,.75);border-radius:24px;padding:2.2vh 2.4vw;min-width:20vw;box-shadow:0 0 40px rgba(212,169,55,.35);opacity:0;animation:fzCard .6s cubic-bezier(.2,1.4,.4,1) forwards,fzGlow 2s ease-in-out infinite}'+
+  '@keyframes fzCard{from{opacity:0;transform:translateY(40px) scale(.8)}to{opacity:1;transform:none}}'+
+  '@keyframes fzGlow{50%{box-shadow:0 0 70px rgba(255,214,102,.65)}}'+
+  '#tvFesta .fz-n{font-weight:800;font-size:var(--fn,3.2rem);line-height:1.1;white-space:normal;overflow-wrap:anywhere;max-width:86vw}'+
+  '#tvFesta .fz-q{font-weight:900;font-size:calc(var(--fn,3.2rem)*1.25);color:#4ade80;line-height:1.1;margin-top:.6vh}'+
+  '#tvFesta .fz-t{font-weight:600;font-size:calc(var(--fn,3.2rem)*.5);color:#e5d3a1;margin-top:.4vh}'+
+  '#tvFesta .fz-mais{width:100%;font-size:2rem;font-weight:700;color:#e5d3a1}'+
+  '#tvFesta .fz-bar{height:8px;border-radius:8px;background:rgba(255,255,255,.15);margin:5vh auto 0;width:50%;overflow:hidden}'+
+  '#tvFesta .fz-bar i{display:block;height:100%;background:#D4A937;transform-origin:left;animation:fzBar linear forwards}'+
+  '@keyframes fzBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}';
+  document.head.appendChild(s);
+}
+function festaEsc(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function festaSom(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const ac=new C();[523,659,784,1047].forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;const t=ac.currentTime+i*.14;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.25,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.55)});setTimeout(()=>ac.close(),2500)}catch(e){}}
+function festaFogos(cv){
+  const ctx=cv.getContext('2d'),P=[],CORES=['#D4A937','#ffe08a','#ffffff','#4ade80','#60a5fa','#f472b6','#fb923c'];
+  let W=0,H=0,ult=0;
+  function tam(){W=cv.width=cv.clientWidth;H=cv.height=cv.clientHeight}tam();
+  function estoura(){const x=W*(.12+Math.random()*.76),y=H*(.12+Math.random()*.42),c=CORES[Math.floor(Math.random()*CORES.length)],n=70+Math.floor(Math.random()*50);
+    for(let i=0;i<n;i++){const a=Math.PI*2*i/n,v=2+Math.random()*4.5;P.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,v:1,c:Math.random()<.2?'#fff':c})}}
+  function passo(t){
+    if(!festaEl||!festaEl.classList.contains('on'))return;
+    if(cv.clientWidth!==W||cv.clientHeight!==H)tam();
+    if(t-ult>650){ult=t;estoura();if(Math.random()<.4)estoura()}
+    ctx.globalCompositeOperation='destination-out';ctx.fillStyle='rgba(0,0,0,.22)';ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation='lighter';
+    for(let i=P.length-1;i>=0;i--){const p=P[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.05;p.vx*=.985;p.vy*=.985;p.v-=.012;
+      if(p.v<=0){P.splice(i,1);continue}ctx.globalAlpha=p.v;ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,2.4,0,Math.PI*2);ctx.fill()}
+    ctx.globalAlpha=1;festaRaf=requestAnimationFrame(passo)}
+  cancelAnimationFrame(festaRaf);festaRaf=requestAnimationFrame(passo);
+}
+function festaOff(){if(festaEl)festaEl.classList.remove('on');cancelAnimationFrame(festaRaf);clearTimeout(festaTm);festaAte=0}
+function tvFesta(lista){
+  if(!lista||!lista.length)return;festaCSS();
+  if(!festaEl){festaEl=document.createElement('div');festaEl.id='tvFesta';festaEl.onclick=festaOff;
+    festaEl.innerHTML='<canvas></canvas><div class="fz-luz"><i></i><i></i><i></i><i></i></div><div class="fz-box"><div class="fz-tt"></div><div class="fz-gr"></div><div class="fz-bar"><i></i></div></div>'}
+  if(festaEl.parentNode!==document.body)document.body.appendChild(festaEl);
+  const max=12,top=lista.slice(0,max),resto=lista.length-top.length,q=top.length;
+  const fn=q===1?'min(7rem,9vw)':q<=2?'min(5rem,5.5vw)':q<=4?'min(3.6rem,4vw)':q<=6?'min(2.8rem,3.2vw)':'min(2.1rem,2.6vw)';
+  const tot=lista.reduce((s,x)=>s+x.d,0);
+  festaEl.querySelector('.fz-tt').textContent=q===1?'\uD83C\uDF89 NOVO ACORDO! \uD83C\uDF89':'\uD83C\uDF89 '+tot+' NOVOS ACORDOS! \uD83C\uDF89';
+  let h='';top.forEach((x,i)=>{h+='<div class="fz-c" style="animation-delay:'+(i*.18)+'s,'+(i*.18)+'s"><div class="fz-n">'+festaEsc(x.n)+'</div><div class="fz-q">+'+x.d+' acordo'+(x.d>1?'s':'')+'</div><div class="fz-t">'+x.t+' hoje</div></div>'});
+  if(resto>0)h+='<div class="fz-mais">e mais '+resto+' com acordo novo</div>';
+  const gr=festaEl.querySelector('.fz-gr');gr.style.setProperty('--fn',fn);gr.innerHTML=h;
+  const bar=festaEl.querySelector('.fz-bar i');bar.style.animation='none';void bar.offsetWidth;bar.style.animation='fzBar '+FESTA_SEG+'s linear forwards';
+  festaEl.classList.add('on');festaFogos(festaEl.querySelector('canvas'));festaSom();
+  festaAte=Date.now()+FESTA_SEG*1000;clearTimeout(festaTm);festaTm=setTimeout(festaOff,FESTA_SEG*1000);
+}
+document.addEventListener('fullscreenchange',()=>{if(festaEl&&festaEl.parentNode!==document.body)document.body.appendChild(festaEl)});
+window.tvFestaTeste=()=>tvFesta([{n:'Samanta',d:1,t:3},{n:'Jana',d:2,t:5}]);
+if(/[?&]festa=teste/.test(location.search))setTimeout(window.tvFestaTeste,4000);
 // Confere a cada 5 min se o robo ja trocou a planilha (rodada de ~30 min).
 // Planilha NOVA: atualiza os numeros e dispara o alerta (se o ritmo estiver baixo).
 // Seguranca: se a planilha nao mudar em 30 min, dispara do mesmo jeito (o alerta nunca fica parado).
@@ -6343,11 +6429,12 @@ async function atualizarDadosTV(abrindo){
     if(nova){const data=parseCSV(csv),info=emissaoInfo(csv);
       const hoje=data&&relatorioEhDeHoje(csv,data,lido.meta);
       tvLeitura={em:Date.now(),data:info.data,hora:info.hora,hoje:!!hoje,semFormato:!data};
-      if(hoje){tvUltimaPlanilha=csv;tvEmissao=info.hora||lido.meta.hora||'';tvTrocouEm=Date.now();tvAtualizadoHoje=true;cRD=data;if(typeof loadPonto==='function')await comTempo(loadPonto(),60000).catch(()=>{});}}
+      if(hoje){tvUltimaPlanilha=csv;tvEmissao=info.hora||lido.meta.hora||'';tvTrocouEm=Date.now();tvAtualizadoHoje=true;cRD=data;festaNovos=festaDiff(data);if(typeof loadPonto==='function')await comTempo(loadPonto(),60000).catch(()=>{});}}
     const venceu=Date.now()-tvUltimoAlerta>=29*60000;
     render();
     const pg=$('pageTV');
-    if(pg&&pg.classList.contains('active')&&(nova||abrindo||venceu)){tvUltimoAlerta=Date.now();alarmar(calcular());render();}
+    const fz=festaNovos;festaNovos=null;if(pg&&pg.classList.contains('active')&&fz&&fz.length)tvFesta(fz);
+    if(pg&&pg.classList.contains('active')&&(nova||abrindo||venceu)){tvUltimoAlerta=Date.now();clearTimeout(festaAlTm);if(festaAte>Date.now()){festaAlTm=setTimeout(()=>{alarmar(calcular());render()},festaAte-Date.now()+500)}else{alarmar(calcular());render();}}
   }catch(e){console.warn('TV: nao consegui ler a planilha agora',e)}
   finally{tvAtualizando=false;}
 }
