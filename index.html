@@ -3361,11 +3361,12 @@ function pC(rows){
     if(hI>=0)break;
   }
   if(hI===-1||cols.op===undefined)return{period,ops:[]};
-  const ops=[];
+  const ops=[];let allA=0,allV=0;
   for(let i=hI+1;i<rows.length;i++){
     const row=rows[i];if(!row)continue;
     const nm=String(row[cols.op]||'').trim();
     const cfg=cols.cfg!==undefined?String(row[cols.cfg]||'').trim():'';
+    if(nm&&nm!=='Subtotal'&&nm!=='Total'&&nm!=='Totais'&&!nm.startsWith('*')&&cfg!=='Subtotal'){allA+=cols.qtd!==undefined?(parseInt(row[cols.qtd])||0):0;allV+=cols.val!==undefined?(parseFloat(row[cols.val])||0):0;}
     if(!nm||nm==='Subtotal'||nm.startsWith('NÃO')||nm==='Total'||nm==='Totais'||nm.startsWith('*'))continue;
     if(cfg==='Subtotal')continue;
     if(nm.toLowerCase().includes('suporte'))continue;if(/^[Zz]-/.test(nm))continue;
@@ -3375,7 +3376,7 @@ function pC(rows){
     const turno=nm.match(/^(\d)/)?parseInt(nm.match(/^(\d)/)[1]):-1;ops.push({n:cn(nm),cfg:cfg,a:qtd,v:Math.round(val*100)/100,t:turno});
   }
   ops.sort((a,b)=>b.v-a.v||b.a-a.a);
-  return{period,ops};
+  return{period,ops,allA,allV:Math.round(allV*100)/100};
 }
 
 function autoComp(){if(cD.some(d=>d!==null))genComp();}
@@ -3398,11 +3399,14 @@ function parseCompCSV(text){
   const cols={};
   hCells.forEach((h,j)=>{const hv=h.trim().replace(/"/g,'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(hv==='operador')cols.op=j;else if(hv.startsWith('configura'))cols.cfg=j;else if(hv==='quantidade')cols.qtd=j;else if(hv==='valor')cols.val=j;});
   if(cols.op===undefined)return{period,ops:[]};
-  const ops=[];
+  const ops=[];let allA=0,allV=0;
   for(let i=hI+1;i<lines.length;i++){
     const line=lines[i].trim();if(!line)continue;
     const cells=csvSplit(line);
     const nm=(cells[cols.op]||'').trim().replace(/^"|"$/g,'');
+    // total do mes = planilha inteira (inclusive NAO COMISSIONADO e Z-); a lista de operadores continua igual
+    if(nm&&nm!=='Subtotal'&&nm!=='Total'&&nm!=='Totais'&&!nm.startsWith('*')&&(cols.cfg===undefined||(cells[cols.cfg]||'').trim().replace(/^"|"$/g,'')!=='Subtotal')){
+      allA+=cols.qtd!==undefined?(parseInt(parseBR(cells[cols.qtd]))||0):0;allV+=cols.val!==undefined?(parseBR(cells[cols.val])||0):0;}
     if(!nm||nm==='Subtotal'||nm==='Total'||nm==='Totais'||nm.startsWith('NÃO')||nm.startsWith('NAO')||nm.startsWith('*'))continue;
     if(nm.toLowerCase().includes('suporte'))continue;if(/^[Zz]-/.test(nm))continue;
     const cfg=cols.cfg!==undefined?(cells[cols.cfg]||'').trim().replace(/^"|"$/g,''):'';
@@ -3413,7 +3417,7 @@ function parseCompCSV(text){
     const turno=nm.match(/^(\d)/)?parseInt(nm.match(/^(\d)/)[1]):-1;ops.push({n:cn(nm),cfg:cfg,a:qtd,v:Math.round(val*100)/100,t:turno});
   }
   ops.sort((a,b)=>b.v-a.v||b.a-a.a);
-  return{period,ops};
+  return{period,ops,allA,allV:Math.round(allV*100)/100};
 }
 
 function wsBR(ws){for(var k in ws){if(k[0]==='!')continue;var c=ws[k];if(!c)continue;
@@ -3539,13 +3543,17 @@ function genComp(){
     const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const reais=v=>{const s=fm(v||0),i=s.lastIndexOf(',');return s.slice(0,i)+'<small>'+s.slice(i)+'</small>'};
     const diasUt=p=>{const m=String(p||'').match(/(\d{2})\/(\d{2})\/(\d{4}).*?(\d{2})\/(\d{2})\/(\d{4})/);if(!m)return 0;let d=new Date(+m[3],+m[2]-1,+m[1]),f=new Date(+m[6],+m[5]-1,+m[4]),n=0;while(d<=f){const w=d.getDay();if(w>=1&&w<=5)n++;d.setDate(d.getDate()+1)}return n};
-    const totA=od.reduce((s,o)=>s+(o.m[sumIdx]?o.m[sumIdx].a:0),0);
-    const totV=od.reduce((s,o)=>s+(o.m[sumIdx]?o.m[sumIdx].v:0),0);
-    const antA=sumIdx>0?od.reduce((s,o)=>s+(o.m[sumIdx-1]?o.m[sumIdx-1].a:0),0):0;
-    const antV=sumIdx>0?ms[sumIdx-1].ops.reduce((s,o)=>s+o.v,0):0;
+    // totais do mes escolhido = planilha inteira daquele mes (antes so somava quem tem acordo no mes atual)
+    const opsMes=ms[sumIdx].ops||[],opsAnt=sumIdx>0?(ms[sumIdx-1].ops||[]):[];
+    // inclui NAO COMISSIONADO e Z- (allA/allV); se o dado for antigo, cai na soma dos operadores
+    const tA=m=>m&&m.allA!=null?m.allA:((m&&m.ops)||[]).reduce((s,o)=>s+o.a,0),tV=m=>m&&m.allV!=null?m.allV:((m&&m.ops)||[]).reduce((s,o)=>s+o.v,0);
+    const totA=tA(ms[sumIdx]);
+    const totV=tV(ms[sumIdx]);
+    const antA=sumIdx>0?tA(ms[sumIdx-1]):0;
+    const antV=sumIdx>0?tV(ms[sumIdx-1]):0;
     const varA=antA?Math.round((totA/antA-1)*1000)/10:null;
     const du=diasUt(ms[sumIdx].period),mediaDia=du?(totA/du):0;
-    const ativos=od.filter(o=>o.m[sumIdx]&&o.m[sumIdx].a>0);
+    const ativos=opsMes.filter(o=>o.a>0);
     const porT=t=>ativos.filter(o=>o.t===t).length;
     const lbl=sumIdx===nowIdx?'mês atual':shortPeriod(ms[sumIdx].period);
     h+='<div class="nx-kpis c3">';
@@ -5728,10 +5736,10 @@ function festaCSS(){
   '#tvFesta .fz-tt{font-weight:900;font-size:clamp(2.4rem,6vw,6.5rem);letter-spacing:.02em;line-height:1;color:#D4A937;text-shadow:0 0 30px rgba(212,169,55,.8),0 6px 0 rgba(0,0,0,.35);animation:fzPulse 1.2s ease-in-out infinite}'+
   '@keyframes fzPulse{50%{transform:scale(1.05);text-shadow:0 0 60px rgba(255,220,120,1),0 6px 0 rgba(0,0,0,.35)}}'+
   '#tvFesta .fz-gr{display:flex;flex-wrap:wrap;justify-content:center;gap:2vh 2vw;margin-top:4vh}'+
-  '#tvFesta .fz-c{background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:2px solid rgba(212,169,55,.75);border-radius:24px;padding:2.2vh 2.4vw;min-width:20vw;box-shadow:0 0 40px rgba(212,169,55,.35);opacity:0;animation:fzCard .6s cubic-bezier(.2,1.4,.4,1) forwards,fzGlow 2s ease-in-out infinite}'+
+  '#tvFesta .fz-c{max-width:90vw;background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:2px solid rgba(212,169,55,.75);border-radius:24px;padding:2.2vh 2.4vw;min-width:20vw;box-shadow:0 0 40px rgba(212,169,55,.35);opacity:0;animation:fzCard .6s cubic-bezier(.2,1.4,.4,1) forwards,fzGlow 2s ease-in-out infinite}'+
   '@keyframes fzCard{from{opacity:0;transform:translateY(40px) scale(.8)}to{opacity:1;transform:none}}'+
   '@keyframes fzGlow{50%{box-shadow:0 0 70px rgba(255,214,102,.65)}}'+
-  '#tvFesta .fz-n{font-weight:800;font-size:var(--fn,3.2rem);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:42vw}'+
+  '#tvFesta .fz-n{font-weight:800;font-size:var(--fn,3.2rem);line-height:1.1;white-space:normal;overflow-wrap:anywhere;max-width:86vw}'+
   '#tvFesta .fz-q{font-weight:900;font-size:calc(var(--fn,3.2rem)*1.25);color:#4ade80;line-height:1.1;margin-top:.6vh}'+
   '#tvFesta .fz-t{font-weight:600;font-size:calc(var(--fn,3.2rem)*.5);color:#e5d3a1;margin-top:.4vh}'+
   '#tvFesta .fz-mais{width:100%;font-size:2rem;font-weight:700;color:#e5d3a1}'+
@@ -5766,7 +5774,7 @@ function tvFesta(lista){
     festaEl.innerHTML='<canvas></canvas><div class="fz-luz"><i></i><i></i><i></i><i></i></div><div class="fz-box"><div class="fz-tt"></div><div class="fz-gr"></div><div class="fz-bar"><i></i></div></div>'}
   if(festaEl.parentNode!==document.body)document.body.appendChild(festaEl);
   const max=12,top=lista.slice(0,max),resto=lista.length-top.length,q=top.length;
-  const fn=q===1?'7rem':q<=2?'5rem':q<=4?'3.6rem':q<=6?'2.8rem':'2.1rem';
+  const fn=q===1?'min(7rem,9vw)':q<=2?'min(5rem,5.5vw)':q<=4?'min(3.6rem,4vw)':q<=6?'min(2.8rem,3.2vw)':'min(2.1rem,2.6vw)';
   const tot=lista.reduce((s,x)=>s+x.d,0);
   festaEl.querySelector('.fz-tt').textContent=q===1?'\uD83C\uDF89 NOVO ACORDO! \uD83C\uDF89':'\uD83C\uDF89 '+tot+' NOVOS ACORDOS! \uD83C\uDF89';
   let h='';top.forEach((x,i)=>{h+='<div class="fz-c" style="animation-delay:'+(i*.18)+'s,'+(i*.18)+'s"><div class="fz-n">'+festaEsc(x.n)+'</div><div class="fz-q">+'+x.d+' acordo'+(x.d>1?'s':'')+'</div><div class="fz-t">'+x.t+' hoje</div></div>'});
