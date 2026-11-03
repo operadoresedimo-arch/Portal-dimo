@@ -3587,7 +3587,13 @@ function genComp(){
       return '<td class="'+(cur?'cur':'')+'">'+(showAcordos?'<b class="nx-qa">'+d.a+' acordo'+(d.a===1?'':'s')+'</b>':'')+(showValor?'<span class="nx-qv">'+fm(d.v)+'</span>':'')+
         (pct!==null?'<div class="nx-bar sm"><i style="width:'+pct+'%;background:'+cor+'"></i></div><small class="'+(pr>=100?'ok':'')+'">'+(pr>=100?'🏆 bateu a meta ('+pr+'%)':pr+'% da meta'+(cur?' até agora':''))+'</small>':'<small class="nx-z">sem meta</small>')+'</td>'};
     const metaTxt=(cfg,t)=>{if(t===0||/novat|experi/i.test(String(cfg||'')))return 'Em experiência · sem meta';const m=getMeta(cfg);return m&&m.max>0?'Meta '+fs(m.max):''};
-    od.forEach((op,i)=>{
+    // tabela do admin: todos que aparecem em qualquer uma das 3 planilhas (nao so quem ja tem acordo no mes atual)
+    const odTodos=[...allN.values()].sort(function(a,b){
+      if(compSortBy==='nome')return a.name.localeCompare(b.name);
+      if(compSortBy==='acordos'){return(b.m[sortMIdx]?b.m[sortMIdx].a:0)-(a.m[sortMIdx]?a.m[sortMIdx].a:0);}
+      return(b.m[sortMIdx]?b.m[sortMIdx].v:0)-(a.m[sortMIdx]?a.m[sortMIdx].v:0);
+    });
+    odTodos.forEach((op,i)=>{
       const hl=mU(op.name,uN)?' hl':'';
       const tur=op.t===1?'Manhã':op.t===2?'Tarde':op.t===0?'Novato':'';
       h+='<tr class="'+hl+'"><td class="nmcell"><div class="nx-op"><span class="nx-av s'+(i<3?' t'+(i+1):'')+'">'+ini(op.name)+'</span><div><b>'+esc(op.name)+'</b><small>'+[tur==='Novato'?'':tur,metaTxt(op.cfg,op.t)].filter(Boolean).join(' · ')+'</small></div></div></td>';
