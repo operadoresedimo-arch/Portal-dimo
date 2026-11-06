@@ -6683,6 +6683,7 @@ const TVF={
  ganho:{tag:'Mostrar o ganho',p:'não mostraram o ganho de pagar',f:'"Pagando a entrada, cancelo o protocolo e o nome sai do SPC e Serasa em 5 a 7 dias úteis"'},
  sistema:{tag:'Regra do sistema',p:'não usaram o prazo do sistema',f:'"O sistema me libera a entrada até [dia]. Se for hoje, consigo uma entrada menor"'},
  insistencia:{tag:'Insistência',p:'desistiram no primeiro não',f:'Não aceite o primeiro não: "Quanto você consegue e em que dia?"'},
+ insistparte:{tag:'Insistência',p:'insistiram pouco antes de encerrar',f:'Antes de encerrar, volte ao ganho e ao prazo do sistema: "Quanto você consegue e em que dia?"'},
  fechamento:{tag:'Fechamento',p:'fecharam sem formalizar',f:'"A ligação é gravada e vale como contrato verbal. Te mando o boleto no WhatsApp agora"'},
  conformidade:{tag:'Postura',p:'passaram do limite na cobrança',f:'Fale só consequência verdadeira: cartório, restrição no CPF e prazo do sistema'}};
 function analisar(D){
@@ -6693,6 +6694,13 @@ function analisar(D){
     const id=ALIAS[String(c.id||'').toLowerCase()]||String(c.id||'').toLowerCase();if(!TVF[id])return;
     if(id==='fechamento'&&!ehAcordo(l))return;
     const st=stC(c);if(st==='na')return;
+    if(id==='insistencia'){
+      // so conta negociacao com o proprio devedor (fora terceiro, caixa postal, contestacao, boleto...)
+      const tp=String(l.tipo_ligacao||'').toLowerCase(),ct=String(l.contato_alcancado||'').toLowerCase();
+      if(tp!=='negociacao_nova'||/terceiro|caixa|maquina|nao_falou/.test(ct))return;
+      // "nao" = desistiu no primeiro nao; "parte" = insistiu pouco (conta separado)
+      const x=tot.insistencia=tot.insistencia||{ap:0,falha:0},y=tot.insistparte=tot.insistparte||{ap:0,falha:0};
+      x.ap++;y.ap++;if(st==='nao')x.falha++;else if(st==='parte')y.falha++;return}
     const x=tot[id]=tot[id]||{ap:0,falha:0};x.ap++;if(st!=='bem')x.falha++}));
   const itens=Object.keys(tot).filter(k=>tot[k].ap>=3&&tot[k].falha/tot[k].ap>=.3)
     .sort((a,b)=>tot[b].falha-tot[a].falha||tot[b].falha/tot[b].ap-tot[a].falha/tot[a].ap).slice(0,3)
