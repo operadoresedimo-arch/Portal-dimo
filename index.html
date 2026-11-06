@@ -2565,6 +2565,21 @@ th.ed-th{cursor:pointer;user-select:none;white-space:nowrap}th.ed-th:hover{color
 <style id="edimo-prosp-css">
 /* ===== PROSPECCAO: CRM DE CREDORES v2 (tema padrao do portal) ===== */
 #pageProsp{font-family:'Inter',system-ui,sans-serif}
+/* CRM: no lugar da barra do portal (so no computador) */
+#cxSide{display:none}
+@media(min-width:769px){
+ body.crm-on .sidebar{display:none!important}
+ body.crm-on #cxSide{display:block;position:fixed;left:0;top:0;bottom:0;width:220px;z-index:45;background:#fff;border-right:1px solid #e3e8ef;overflow-y:auto;font-family:'Inter',system-ui,sans-serif;
+  --pn:#fff;--pn2:#f6f8fb;--ln:#e3e8ef;--t2:#475569;--t3:#6b7280;--az:#0f3557;--ou:#b8901f;--vm:#8B1A1A}
+ body.crm-on #cxSide .cx-sb{border-right:0;min-height:100%;padding:14px 10px}
+ body.crm-on.app-with-sidebar .main{margin-left:220px!important}
+ body.crm-on.app-with-sidebar .toolbar{margin-left:220px!important}
+ body.crm-on #pageProsp .cx{grid-template-columns:minmax(0,1fr)}
+ body.crm-on #pageProsp .cx-sb-in{display:none}
+}
+.cx-volta{width:100%;border:1px solid #cfd8e3;background:#f6f8fb;color:#0f3557;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.8rem;font-weight:700;cursor:pointer;text-align:left;margin-bottom:12px}
+.cx-volta:hover{background:#0f3557;color:#fff;border-color:#0f3557}
+
 .cx{--pn:#fff;--pn2:#f6f8fb;--ln:#e3e8ef;--ln2:#cfd8e3;--tx:#1a1f36;--t2:#475569;--t3:#6b7280;--az:#0f3557;--az2:#174a78;--ou:#b8901f;--vm:#8B1A1A;
  display:grid;grid-template-columns:210px minmax(0,1fr);min-height:calc(100vh - 110px);background:#f3f6fa;color:var(--tx);border-radius:16px;overflow:hidden;border:1px solid var(--ln)}
 .cx *{box-sizing:border-box}
@@ -6800,7 +6815,10 @@ function casca(conteudo,semMenu){
     if(S.abas&&S.abas.length){m+='<div class="cx-sep">Outras planilhas</div>'+S.abas.map(function(a){return it('aba:'+a,'🗂️',abaNome(a))}).join('')}
     m+='<div class="cx-foot">'+(CARREG?'Atualizando...':'<b>●</b> Conectado à planilha')+'<br>'+(TS?'Atualizado às '+p2(new Date(TS).getHours())+':'+p2(new Date(TS).getMinutes()):'')+'<br><a href="#" onclick="CRM.recarregar();return false" style="color:#0f3557;font-weight:700">↻ Atualizar agora</a></div>';
   }
-  return '<div class="cx">'+m+'</aside><section class="cx-main">'+conteudo+'</section></div>';
+  m+='</aside>';
+  var lado=$('cxSide');if(!lado){lado=document.createElement('div');lado.id='cxSide';document.body.appendChild(lado)}
+  lado.innerHTML=m.replace('<aside class="cx-sb">','<aside class="cx-sb"><button class="cx-volta" onclick="CRM.voltar()">&larr; Voltar ao portal</button>');
+  return '<div class="cx">'+m.replace('<aside class="cx-sb">','<aside class="cx-sb cx-sb-in">')+'<section class="cx-main">'+conteudo+'</section></div>';
 }
 function hd(t,p,acoes){return '<div class="cx-hd"><div><h2>'+esc(t)+'</h2><p>'+esc(p)+'</p></div><div class="cx-tb" style="margin:0">'+(acoes||'')+'</div></div>'}
 function render(){
@@ -7016,6 +7034,7 @@ function fechar(forcar){
 function salvo(c,txt){var i=S.credores.findIndex(function(x){return x.id===c.id});if(i>=0)S.credores[i]=c;else S.credores.push(c);delete HC[c.id];cacheGravar();toast(txt);render()}
 
 window.CRM={
+  voltar:function(){showPage(ANTP||'ranking');try{window.scrollTo(0,0)}catch(e){}},
   recarregar:function(){carregar();if(VIEW.indexOf('aba:')===0){delete TAB[VIEW.slice(4)]}render()},
   entrar:function(){var i=$('cxSenha');if(!i||!i.value)return;var b=i.nextElementSibling;if(b)b.disabled=true;
     post({type:'qtoken',login:key(),senha:i.value}).then(function(j){if(j.status==='ok'&&j.token){tokSet(j.token);carregar()}else{pedeSenha(j.msg==='senha'?'Senha incorreta.':(j.msg||'Não deu certo.'))}}).catch(function(){pedeSenha('Sem conexão. Tente de novo.')})},
@@ -7073,9 +7092,11 @@ function montar(){
   EL=$('pageProsp');return true;
 }
 montar();
-var sp=window.showPage;
+var sp=window.showPage,ANTP='';
 window.showPage=function(p){
+  if(p!=='prosp')ANTP=p;
   sp(p);montar();
+  document.body.classList.toggle('crm-on',p==='prosp');
   var pg=$('pageProsp'),sb=$('sbP');if(pg)pg.classList.toggle('active',p==='prosp');if(sb)sb.classList.toggle('active',p==='prosp');
   if(p==='prosp'){
     if(!S&&tokGet()){var c=cacheLer();if(c){S=c.d;TS=c.t}}          // abre na hora com a ultima copia
