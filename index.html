@@ -6349,11 +6349,33 @@ function festaCSS(){
   document.head.appendChild(s);
 }
 function festaEsc(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+// O navegador so deixa tocar som depois que alguem clicou na pagina. Se estiver bloqueado,
+// tenta um contexto novo e, se ainda assim nao der, mostra o aviso "toque para liberar o som".
 function festaSom(){try{
-  // fogos de artificio + plateia aplaudindo (Web Audio, sem arquivo) ~10s
   const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
-  let a=(typeof ac==='function')?ac():null,propria=false;if(!a){a=new C();propria=true}
-  if(a.state==='suspended')a.resume();
+  let feito=false;
+  const tenta=()=>{if(feito)return;
+    let a=(typeof ac==='function')?ac():null;
+    if(a&&a.state==='running'){feito=true;festaToca(a,false);return}
+    try{const b=new C();if(b.state==='running'){feito=true;festaToca(b,true);return}b.close()}catch(e){}
+    feito=true;somBloqueado(true)};
+  const a0=(typeof ac==='function')?ac():null;
+  if(a0&&a0.state==='running'){tenta();return}
+  if(a0&&a0.resume)a0.resume().then(tenta,tenta);
+  setTimeout(tenta,500);
+}catch(e){}}
+function somBloqueado(on){
+  let b=document.getElementById('tvSomAviso');
+  if(!on){if(b)b.remove();return}
+  if(!b){b=document.createElement('button');b.id='tvSomAviso';b.type='button';b.textContent='\uD83D\uDD07 Som bloqueado pelo navegador: toque aqui uma vez para liberar';
+    b.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:2147483660;background:#8B1A1A;color:#fff;border:2px solid #D4A937;border-radius:14px;padding:14px 22px;font:800 1.1rem Inter,system-ui,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.4)';
+    b.onclick=e=>{e.stopPropagation();const a=ac();const ok=()=>{somBloqueado(false);if(a&&a.state==='running')bip(880,.18,0,.25)};if(a&&a.resume)a.resume().then(ok,ok);else ok()}}
+  if(b.parentNode!==document.body)document.body.appendChild(b);
+}
+// qualquer clique/tecla na pagina ja libera o som pras proximas festas
+['pointerdown','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{try{const a=ac();if(!a)return;const ok=()=>{if(a.state==='running')somBloqueado(false)};if(a.state==='running')ok();else if(a.resume)a.resume().then(ok,()=>{})}catch(e){}},{capture:true,passive:true}));
+function festaToca(a,propria){try{
+  // fogos de artificio + plateia aplaudindo (Web Audio, sem arquivo) ~10s
   const R=a.sampleRate,T0=a.currentTime+.05,rnd=(x,y)=>x+Math.random()*(y-x);
   const nb=a.createBuffer(1,R*2,R),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
   const comp=a.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=6;
@@ -6418,7 +6440,7 @@ function tvFesta(lista){
   festaEl.classList.add('on');festaFogos(festaEl.querySelector('canvas'));festaSom();
   festaAte=Date.now()+FESTA_SEG*1000;clearTimeout(festaTm);festaTm=setTimeout(festaOff,FESTA_SEG*1000);
 }
-document.addEventListener('fullscreenchange',()=>{if(festaEl&&festaEl.parentNode!==document.body)document.body.appendChild(festaEl)});
+document.addEventListener('fullscreenchange',()=>{if(festaEl&&festaEl.parentNode!==document.body)document.body.appendChild(festaEl);const sa=document.getElementById('tvSomAviso');if(sa&&sa.parentNode!==document.body)document.body.appendChild(sa)});
 window.tvFestaTeste=()=>tvFesta([{n:'Samanta',d:1,t:3},{n:'Jana',d:2,t:5}]);
 if(/[?&]festa=teste/.test(location.search))setTimeout(window.tvFestaTeste,4000);
 // Confere a cada 5 min se o robo ja trocou a planilha (rodada de ~30 min).
