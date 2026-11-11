@@ -2729,7 +2729,7 @@ th.ed-th{cursor:pointer;user-select:none;white-space:nowrap}th.ed-th:hover{color
 .nx-head .hist-bar{margin:0!important;justify-content:flex-end!important}
 .nx-head .hist-bar button{border-radius:12px!important;font-size:.76rem!important;padding:8px 14px!important;background:#fff!important;color:#334155!important;border:1px solid #e2e8f0!important}
 .nx-head .hist-bar button.on{background:#059669!important;color:#fff!important;border-color:#059669!important}
-.nx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}.nx-kpis.c3{grid-template-columns:repeat(3,1fr)}
+.nx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}.nx-tc2 table tr.avg td{border-top:2px solid #d4a937;font-weight:700;color:#8a6d16;background:rgba(212,169,55,.08)}.nx-kpis.c3{grid-template-columns:repeat(3,1fr)}
 .nx-kpi{position:relative;overflow:hidden;background:#fff;border:1px solid #e2e8f0;border-radius:18px!important;padding:18px 20px 20px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
 .nx-kpi:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--k)}
 .k-g{--k:#10b981;--kb:#ecfdf5;--kc:#059669}.k-r{--k:#8b1d24;--kb:#fdf3f3;--kc:#8b1d24}.k-b{--k:#484a4e;--kb:#f3f4f6;--kc:#2f3135}.k-a{--k:#f59e0b;--kb:#fffbeb;--kc:#d97706}.k-p{--k:#a855f7;--kb:#faf5ff;--kc:#9333ea}
@@ -2987,8 +2987,9 @@ var RK_DRIVE='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjz
 const CP_M1='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
 const CP_M2='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
 const CP_NOW='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=mes%20atual.xlsx';
+const CP_M3='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=3%20mes%20atras.xlsx';
 const PT='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?output=csv';
-let cU=null,cRD=null;const cD=[null,null,null];let allEntradas={};let allLogins={};let allAdmissao={};let pontoData=null;
+let cU=null,cRD=null;const cD=[null,null,null,null];let allEntradas={};let allLogins={};let allAdmissao={};let pontoData=null;
 
 function parseBR(s){if(!s)return 0;s=s.replace(/"/g,'').trim();if(!s||s==='0')return 0;s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0;}
 
@@ -3522,7 +3523,8 @@ async function compRemota(url){
 }
 async function loadCompDrive(){
   try{
-    const ds=await Promise.all([compRemota(CP_M1),compRemota(CP_M2),compRemota(CP_NOW)]);
+    // cada arquivo carrega sozinho: se um faltar no Drive, os outros aparecem do mesmo jeito
+    const ds=(await Promise.allSettled([compRemota(CP_M1),compRemota(CP_M2),compRemota(CP_NOW),compRemota(CP_M3)])).map((r,i)=>{if(r.status!=='fulfilled')console.log('Comp Drive: arquivo '+(i+1)+' nao carregou:',r.reason&&r.reason.message);return r.status==='fulfilled'?r.value:null});
     ds.forEach((d,idx)=>{if(d&&d.ops.length>0){cD[idx]=d;const el=document.getElementById('slot'+idx);if(el){el.classList.add('loaded');el.querySelector('.slot-icon').textContent='✅';const de=document.getElementById('sd'+idx);de.textContent=d.period;de.style.display='block';}}});
     autoComp();
   }catch(e){console.log('Comp Drive error:',e);}
@@ -3587,7 +3589,9 @@ function compTurnosHtml(ms0){
       '<div class="nx-tch"><b><i></i>'+T.n+'</b>'+(varDia===null?'':'<span class="nx-var '+(varDia>=0?'up':'dn')+'" title="valor por dia útil vs mês anterior">'+(varDia>=0?'↑ ':'↓ ')+Math.abs(varDia)+'%</span>')+'</div>'+
       '<div class="nx-tv">'+reais(cur.v)+'</div><p>'+cur.a+' acordos · '+cur.ops+' operadores · <b>'+part+'% do total</b></p>'+
       '<table><tr><th>Mês</th><th>Acordos</th><th>Valor</th><th>/dia</th><th>Ticket</th></tr>'+
-      dado.map((d,i)=>{const x=d.r[T.t];return '<tr class="'+(i===last?'cur':'')+'"><td>'+d.per+'</td><td>'+x.a+'</td><td>'+fk(x.v)+'</td><td>'+fk(x.dia)+'</td><td>'+fk(x.tk)+'</td></tr>'}).join('')+'</table></div>';
+      dado.map((d,i)=>{const x=d.r[T.t];return '<tr class="'+(i===last?'cur':'')+'"><td>'+d.per+'</td><td>'+x.a+'</td><td>'+fk(x.v)+'</td><td>'+fk(x.dia)+'</td><td>'+fk(x.tk)+'</td></tr>'}).join('')+
+      (last>0?(()=>{const F=dado.slice(0,last).map(d=>d.r[T.t]),n=F.length,a=F.reduce((s,x)=>s+x.a,0)/n,v=F.reduce((s,x)=>s+x.v,0)/n,dia=F.reduce((s,x)=>s+x.dia,0)/n;
+        return '<tr class="avg" title="Média dos meses fechados, sem o mês atual"><td>Média '+n+' fech.</td><td>'+Math.round(a)+'</td><td>'+fk(v)+'</td><td>'+fk(dia)+'</td><td>'+fk(a?v/a:0)+'</td></tr>'})():'')+'</table></div>';
   });
   h+='</div>'+compExtrasHtml(ms,dado,fk);
   const rk=TS.map(T=>({n:T.n.replace('Turno ',''),v:dado[last].r[T.t].porOp})).sort((a,b)=>b.v-a.v);
@@ -3656,10 +3660,13 @@ function genComp(){
     const ativos=odOp.filter(o=>o.m[sumIdx]&&o.m[sumIdx].a>0);
     const porT=t=>ativos.filter(o=>o.t===t).length;
     const lbl=sumIdx===nowIdx?'mês atual':shortPeriod(ms[sumIdx].period);
-    h+='<div class="nx-kpis c3">';
+    const FEC=ms.map((m,i)=>i).filter(i=>i!==nowIdx),fA=FEC.length?FEC.reduce((s,i)=>s+ms[i].ops.reduce((x,o)=>x+o.a,0),0)/FEC.length:0,fV=FEC.length?FEC.reduce((s,i)=>s+ms[i].ops.reduce((x,o)=>x+o.v,0),0)/FEC.length:0;
+    const fPct=fV&&sumIdx===nowIdx?Math.round(totV/fV*100):null;
+    h+='<div class="nx-kpis'+(FEC.length?'':' c3')+'">';
     h+='<div class="nx-kpi k-b"><div class="nx-kh"><span>Total acordos ('+lbl+')</span><i class="nx-ic">📋</i></div><div class="nx-kv">'+totA+(varA===null?'':' <span class="nx-var '+(varA>=0?'up':'dn')+'">'+(varA>=0?'↗ +':'↘ ')+String(varA).replace('.',',')+'% vs '+shortPeriod(ms[sumIdx-1].period)+'</span>')+'</div><p>Média de '+mediaDia.toLocaleString('pt-BR',{maximumFractionDigits:1})+' acordos por dia útil em '+shortPeriod(ms[sumIdx].period)+'</p></div>';
     h+='<div class="nx-kpi k-r"><div class="nx-kh"><span>Valor total ('+lbl+')</span><i class="nx-ic">💰</i></div><div class="nx-kv">'+reais(totV)+'</div><p class="nx-sp">'+(sumIdx>0?'<span>Volume '+shortPeriod(ms[sumIdx-1].period)+': <b>'+fs(antV)+'</b></span>':'<span></span>')+(sumIdx===nowIdx?'<em>Em andamento</em>':'')+'</p></div>';
     h+='<div class="nx-kpi k-p"><div class="nx-kh"><span>Operadores ativos</span><i class="nx-ic">👥</i></div><div class="nx-kv">'+ativos.length+' <em>com acordo no período</em></div><div class="nx-tags"><span>'+porT(1)+' Manhã</span><span>'+porT(2)+' Tarde</span><span>'+porT(0)+' Novatos</span></div></div>';
+    if(FEC.length)h+='<div class="nx-kpi k-b"><div class="nx-kh"><span>Média '+FEC.length+(FEC.length>1?' meses fechados':' mês fechado')+'</span><i class="nx-ic">📊</i></div><div class="nx-kv">'+reais(fV)+'</div><p>'+Math.round(fA)+' acordos por mês · '+FEC.map(i=>shortPeriod(ms[i].period)).join(', ')+(fPct!==null?'<br><b>Mês atual até agora: '+fPct+'% da média</b>':'')+'</p></div>';
     h+='</div>';
     h+=compTurnosHtml(ms);
     // month tabs (barra do topo)
@@ -3673,11 +3680,12 @@ function genComp(){
     const showValor=compViewMode==='all'||compViewMode==='valor';
     const cols=ms.map((m,i)=>i).filter(i=>showAll||compMonthFilter===String(i));
     const sb=(k,t)=>'<button class="sort-btn'+(compSortBy===k?' active':'')+'" onclick="setSort(\''+k+'\',this)">'+t+'</button>';
-    h+='<div class="nx-card nx-mx"><div class="nx-ch"><div><h3>Desempenho por Operador '+(ms.length>=3?'(Trimestre)':'')+'</h3><p>Comparativo de cada operador entre '+ms.map(m=>shortPeriod(m.period)).join(', ').replace(/, ([^,]*)$/,' e $1')+'</p></div></div>'+
+    h+='<div class="nx-card nx-mx"><div class="nx-ch"><div><h3>Desempenho por Operador '+(ms.length>=3?'('+ms.length+' meses)':'')+'</h3><p>Comparativo de cada operador entre '+ms.map(m=>shortPeriod(m.period)).join(', ').replace(/, ([^,]*)$/,' e $1')+'</p></div></div>'+
        '<div class="nx-mxc nx-mxr"><input id="compSearch" type="search" placeholder="Buscar por nome..." value="'+esc(window.NXCB||'')+'" oninput="window.NXCB=this.value;filterCompTable()"><span>Ordenar:</span>'+sb('valor','Valor')+sb('acordos','Acordos')+sb('nome','Nome')+'</div>';
     h+='<div class="nx-tw"><table class="comp-table nx-t"><thead><tr><th>Operador</th>';
     cols.forEach(i=>{h+='<th class="'+(i===nowIdx?'cur':'')+'">'+shortPeriod(ms[i].period)+(i===nowIdx?' (atual)':'')+'</th>'});
-    h+='<th>Média '+ms.length+(ms.length>1?' meses':' mês')+'</th><th>Tempo de empresa</th></tr></thead><tbody>';
+    const MIx=ms.length>1?ms.map((m,i)=>i).filter(i=>i!==nowIdx):[0];   // media so dos meses fechados (sem o mes atual)
+    h+='<th title="Média só dos meses já fechados, sem o mês atual">Média '+MIx.length+(ms.length>1?(MIx.length>1?' meses fechados':' mês fechado'):' mês')+'</th><th>Tempo de empresa</th></tr></thead><tbody>';
     const ini=n=>String(n||'').split(/\s+/).filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
     const semMeta=(d,cfg)=>(d&&d.t===0)||/novat|experi/i.test(String(cfg||''));
     const metaDe=(d,cfg)=>{if(semMeta(d,cfg))return null;const m=getMeta(cfg);return m&&m.max>0?m:null};
@@ -3692,13 +3700,13 @@ function genComp(){
       const tur=op.t===1?'Manhã':op.t===2?'Tarde':op.t===0?'Novato':'';
       h+='<tr class="'+hl+'"><td class="nmcell"><div class="nx-op"><span class="nx-av s'+(i<3?' t'+(i+1):'')+'">'+ini(op.name)+'</span><div><b>'+esc(op.name)+'</b><small>'+[tur==='Novato'?'':tur,metaTxt(op.cfg,op.t)].filter(Boolean).join(' · ')+'</small></div></div></td>';
       cols.forEach(mi=>{h+=cel(op.m[mi],op.cfg,mi===nowIdx)});
-      let sA=0,sV=0,c=0;ms.forEach((m,mi)=>{const d=op.m[mi];if(d){sA+=d.a;sV+=d.v;c++}});
+      let sA=0,sV=0,c=0;MIx.forEach(mi=>{const d=op.m[mi];if(d){sA+=d.a;sV+=d.v;c++}});
       const mV=c?Math.round(sV*100/c)/100:0;
       // media da meta: so os meses em que ela ja tinha meta (fora da experiencia); se hoje e novata, nao tem meta
-      let pS=0,pN=0;ms.forEach((m,mi)=>{const d=op.m[mi];if(!d)return;const mt=metaDe(d,d.cfg||op.cfg);if(mt){pS+=d.v/mt.max*100;pN++}});
+      let pS=0,pN=0;MIx.forEach(mi=>{const d=op.m[mi];if(!d)return;const mt=metaDe(d,d.cfg||op.cfg);if(mt){pS+=d.v/mt.max*100;pN++}});
       const mp=op.t===0||!pN?null:Math.round(pS/pN);
       const mst=mp===null?'':mp>=100?['ok','na meta']:mp>=85?['perto','perto da meta']:['abaixo','abaixo da meta'];
-      h+='<td data-v="'+(compSortBy==='acordos'?(c?sA/c:0):mV)+'">'+(showAcordos?'<b class="nx-qa">'+(c?Math.round(sA/c):0)+' acordos</b>':'')+(showValor?'<span class="nx-qv">'+fm(mV)+'</span>':'')+
+      h+='<td data-v="'+(compSortBy==='acordos'?(c?sA/c:0):mV)+'">'+(!c?'<span class="nx-z">sem mês fechado</span>':'')+(c&&showAcordos?'<b class="nx-qa">'+Math.round(sA/c)+' acordos</b>':'')+(c&&showValor?'<span class="nx-qv">'+fm(mV)+'</span>':'')+
         (mp===null?'':'<div class="nx-bar sm"><i style="width:'+Math.min(100,mp)+'%;background:'+(mp>=100?'#10b981':mp>=85?'#22c55e':'#f59e0b')+'"></i></div><small><span class="nx-ms '+mst[0]+'">'+mst[1]+'</span> '+mp+'%</small>')+'</td>';
       h+='<td><span class="nx-tempo">'+tempoExtenso(op.name)+'</span></td></tr>';
     });
@@ -3712,7 +3720,7 @@ function genComp(){
     const myD=od.find(op=>mU(op.name,uN));let h='';
     if(myD){
       const meta=getMeta(myD.cfg);
-      const curD=myD.m[nowIdx],prevD=ms.length>=2?myD.m[nowIdx-1]:null,oldD=ms.length>=3?myD.m[0]:null;
+      const curD=myD.m[nowIdx],prevD=ms.length>=2?myD.m[nowIdx-1]:null,oldD=ms.length>=3?myD.m[nowIdx-2]:null;
       const curA=curD?curD.a:0,curV=curD?curD.v:0;
       const prevA=prevD?prevD.a:0,prevV=prevD?prevD.v:0;
       const hitMeta=meta&&meta.max>0&&curV>=meta.max;
@@ -3739,7 +3747,7 @@ function genComp(){
       // ── ROW 2: Month cards (left) + Comparison (right) ──
       h+='<div class="cd-left"><div class="cd-months">';
       if(oldD){
-        h+='<div class="cd-month-card mc-old"><div class="cd-mc-header"><span class="cd-mc-period">'+shortPeriod(ms[0].period)+'</span></div>';
+        h+='<div class="cd-month-card mc-old"><div class="cd-mc-header"><span class="cd-mc-period">'+shortPeriod(ms[nowIdx-2].period)+'</span></div>';
         h+='<div class="cd-mc-row"><div class="cd-mc-item"><div class="cd-mc-val" style="color:var(--text3)">'+oldD.a+'</div><div class="cd-mc-lbl">Acordos</div></div>';
         h+='<div class="cd-mc-item"><div class="cd-mc-val" style="color:var(--text3)">'+fm(oldD.v)+'</div><div class="cd-mc-lbl">Valor</div></div></div></div>';
       }
