@@ -3488,7 +3488,7 @@ function parseCompCSV(text){
   for(let i=0;i<lines.length;i++){if(lines[i].includes('Operador')){hCells=csvSplit(lines[i]);if(hCells.join(' ').toLowerCase().match(/quantidade|valor/)){hI=i;break;}}}
   if(hI===-1)return{period,ops:[]};
   const cols={};
-  hCells.forEach((h,j)=>{const hv=h.trim().replace(/"/g,'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(hv==='operador')cols.op=j;else if(hv.startsWith('configura'))cols.cfg=j;else if(hv==='quantidade')cols.qtd=j;else if(hv==='valor')cols.val=j;else if(hv.startsWith('comiss')&&cols.com===undefined)cols.com=j;});
+  hCells.forEach((h,j)=>{const hv=h.trim().replace(/"/g,'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(hv==='operador')cols.op=j;else if(hv.startsWith('configura'))cols.cfg=j;else if(hv==='quantidade')cols.qtd=j;else if(hv==='valor')cols.val=j;else if(hv.startsWith('receita')&&cols.rec===undefined)cols.rec=j;});
   if(cols.op===undefined)return{period,ops:[]};
   const ops=[];
   for(let i=hI+1;i<lines.length;i++){
@@ -3501,8 +3501,8 @@ function parseCompCSV(text){
     const qtd=cols.qtd!==undefined?(parseInt(parseBR(cells[cols.qtd]))||0):0;
     const val=cols.val!==undefined?parseBR(cells[cols.val]):0;
     if(qtd===0&&val===0)continue;
-    const com=cols.com!==undefined&&String(cells[cols.com]||'').trim()!==''?Math.round(parseBR(cells[cols.com])*100)/100:undefined;
-    ops.push({n:compNome(nm),cfg:cfg,a:qtd,v:Math.round(val*100)/100,t:compTipo(nm),z:/^[Zz]-/.test(nm),c:com});
+    const rec=cols.rec!==undefined&&String(cells[cols.rec]||'').trim()!==''?Math.round(parseBR(cells[cols.rec])*100)/100:undefined;
+    ops.push({n:compNome(nm),cfg:cfg,a:qtd,v:Math.round(val*100)/100,t:compTipo(nm),z:/^[Zz]-/.test(nm),r:rec});
   }
   const ops2=compJuntaNC(ops);ops2.sort((a,b)=>b.v-a.v||b.a-a.a);
   return{period,ops:ops2};
@@ -3612,26 +3612,23 @@ function compExtrasHtml(ms,dado,fk){const last=ms.length-1,G=[{t:'sec',n:'Secret
   return h+'</div>'}
 // meses sempre do mais antigo pro atual (o Drive as vezes entrega fora de ordem)
 function mesesEmOrdem(){const ini=m=>{const x=String(m.period||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);return x?+(x[3]+x[2]+x[1]):0};return cD.filter(d=>d!==null).slice().sort((a,b)=>ini(a)-ini(b))}
-// ===== COMISSAO (so admin): se a planilha tiver coluna de comissao usa ela; senao calcula pela regra do portal =====
-// regra: 5% do valor; experiencia recebe sempre; 20k+ garantida; demais so quando bate a meta da faixa
-function compComissao(d,cfg,t){if(!d)return 0;if(typeof d.c==='number'&&isFinite(d.c))return d.c;cfg=d.cfg||cfg;
-  if(t===0||d.t===0||/novat|experi/i.test(String(cfg||'')))return Math.round(d.v*5)/100;
-  const m=getMeta(cfg);if(!m||!m.max)return 0;if(m.cls==='eq-20mais'||d.v>=m.max)return Math.round(d.v*5)/100;return 0}
+// ===== RECEITA (so admin): vem da coluna "Receita" da planilha do mes =====
+function compReceita(d){return d&&typeof d.r==='number'&&isFinite(d.r)?d.r:null}
 var COMP_EXP=null;
 function compExport(tipo){const X=COMP_EXP;if(!X||!X.linhas.length){alert('Abra o Comparativo com os meses carregados primeiro.');return}
-  const cab=['Operador','Turno'].concat(...X.meses.map(m=>[m+' acordos',m+' cobrado'])).concat(['Média cobrada','Média comissão','Comissão / cobrado']);
-  const lin=X.linhas.map(l=>[l.n,l.tur].concat(...l.m.map(d=>d?[d.a,d.v]:['',''])).concat([l.mv,l.mc,l.mv?Math.round(l.mc/l.mv*1000)/10+'%':'']));
-  const tot=['TOTAL',''].concat(...X.meses.map((m,i)=>{const L=X.linhas.map(l=>l.m[i]).filter(Boolean);return [L.reduce((s,d)=>s+d.a,0),Math.round(L.reduce((s,d)=>s+d.v,0)*100)/100]})).concat([Math.round(X.linhas.reduce((s,l)=>s+l.mv,0)*100)/100,Math.round(X.linhas.reduce((s,l)=>s+l.mc,0)*100)/100,'']);
-  const nome='comparativo-comissao_'+X.meses.join('_').replace(/\//g,'-');
-  if(tipo==='xlsx'){const ws=XLSX.utils.aoa_to_sheet([['Comparativo de acordos e comissão · '+X.meses.length+' meses fechados'],['Comissão: '+X.fonte],[],cab].concat(lin,[tot]));
+  const cab=['Operador','Turno'].concat(...X.meses.map(m=>[m+' acordos',m+' cobrado'])).concat(['Média cobrada','Média receita','Receita / cobrado']);
+  const lin=X.linhas.map(l=>[l.n,l.tur].concat(...l.m.map(d=>d?[d.a,d.v]:['',''])).concat([l.mv,l.mc===null?'':l.mc,l.pr===null?'':String(l.pr).replace('.',',')+'%']));
+  const tot=['TOTAL',''].concat(...X.meses.map((m,i)=>{const L=X.linhas.map(l=>l.m[i]).filter(Boolean);return [L.reduce((s,d)=>s+d.a,0),Math.round(L.reduce((s,d)=>s+d.v,0)*100)/100]})).concat([Math.round(X.linhas.reduce((s,l)=>s+l.mv,0)*100)/100,Math.round(X.linhas.reduce((s,l)=>s+(l.mc||0),0)*100)/100,'']);
+  const nome='comparativo-receita_'+X.meses.join('_').replace(/\//g,'-');
+  if(tipo==='xlsx'){const ws=XLSX.utils.aoa_to_sheet([['Comparativo de acordos e receita · '+X.meses.length+' meses fechados'],[X.fonte],[],cab].concat(lin,[tot]));
     ws['!cols']=[{wch:28},{wch:10}].concat(...X.meses.map(()=>[{wch:10},{wch:14}])).concat([{wch:15},{wch:15},{wch:12}]);
     const R=XLSX.utils.decode_range(ws['!ref']);for(let r=4;r<=R.e.r;r++)for(let c=2;c<=R.e.c;c++){const a=ws[XLSX.utils.encode_cell({r,c})];if(a&&a.t==='n'){const h=String(cab[c]||'');if(!/acordos$/.test(h))a.z='"R$" #,##0.00'}}
     const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Comparativo');XLSX.writeFile(wb,nome+'.xlsx');return}
   const e=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),R$=v=>v===''?'-':fm(v);
   const w=window.open('','_blank');if(!w){alert('O navegador bloqueou a janela. Libere pop-ups pro portal e tente de novo.');return}
   w.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>'+e(nome)+'</title><style>@page{size:A4 landscape;margin:10mm}*{box-sizing:border-box}body{font:10.5px Arial;color:#172033;margin:0}h1{font-size:18px;margin:0 0 3px;color:#0f3557}p{color:#667085;margin:0 0 10px}table{width:100%;border-collapse:collapse}th{background:#0f3557;color:#fff;text-align:right;font-size:9.5px;padding:6px}th:first-child,td:first-child{text-align:left}td{border-bottom:1px solid #dfe5ec;padding:5px 6px;text-align:right;white-space:nowrap}tr:nth-child(even) td{background:#f5f7fa}td small{color:#667085}.md{background:#fbf6e6!important;font-weight:700}.tt td{font-weight:800;border-top:2px solid #0f3557;background:#eef2f7!important}</style></head><body>'+
-    '<h1>Comparativo de acordos e comissão</h1><p>'+X.meses.length+' meses fechados: '+e(X.meses.join(', '))+' · comissão: '+e(X.fonte)+' · gerado em '+new Date().toLocaleString('pt-BR')+'</p><table><tr><th>Operador</th>'+X.meses.map(m=>'<th>'+e(m)+'</th>').join('')+'<th>Média cobrada</th><th>Média comissão</th><th>Com./cobrado</th></tr>'+
-    X.linhas.map(l=>'<tr><td><b>'+e(l.n)+'</b> <small>'+e(l.tur)+'</small></td>'+l.m.map(d=>'<td>'+(d?R$(d.v)+'<br><small>'+d.a+' acordos</small>':'-')+'</td>').join('')+'<td class="md">'+R$(l.mv)+'</td><td class="md">'+R$(l.mc)+'</td><td>'+(l.mv?(Math.round(l.mc/l.mv*1000)/10).toString().replace('.',',')+'%':'-')+'</td></tr>').join('')+
+    '<h1>Comparativo de acordos e receita</h1><p>'+X.meses.length+' meses fechados: '+e(X.meses.join(', '))+' · '+e(X.fonte)+' · gerado em '+new Date().toLocaleString('pt-BR')+'</p><table><tr><th>Operador</th>'+X.meses.map(m=>'<th>'+e(m)+'</th>').join('')+'<th>Média cobrada</th><th>Média receita</th><th>Receita/cobrado</th></tr>'+
+    X.linhas.map(l=>'<tr><td><b>'+e(l.n)+'</b> <small>'+e(l.tur)+'</small></td>'+l.m.map(d=>'<td>'+(d?R$(d.v)+'<br><small>'+d.a+' acordos</small>':'-')+'</td>').join('')+'<td class="md">'+R$(l.mv)+'</td><td class="md">'+(l.mc===null?'-':R$(l.mc))+'</td><td>'+(l.pr===null?'-':String(l.pr).replace('.',',')+'%')+'</td></tr>').join('')+
     '<tr class="tt"><td>TOTAL</td>'+X.meses.map((m,i)=>'<td>'+R$(tot[3+i*2])+'</td>').join('')+'<td>'+R$(tot[tot.length-3])+'</td><td>'+R$(tot[tot.length-2])+'</td><td></td></tr></table><script>setTimeout(function(){window.print()},300)<\/script></body></html>');
   w.document.close()}
 function genComp(){
@@ -3645,7 +3642,7 @@ function genComp(){
   const allN=new Map();
   ms.forEach((m,mi)=>{m.ops.forEach(o=>{
     if(!allN.has(o.n))allN.set(o.n,{name:o.n,cfg:o.cfg,t:o.t,m:new Array(ms.length).fill(null)});
-    const r=allN.get(o.n);r.m[mi]={a:o.a,v:o.v,cfg:o.cfg,t:o.t};if(o.cfg)r.cfg=o.cfg;if(o.t!==undefined)r.t=o.t;if(o.t!==undefined)r.t=o.t;
+    const r=allN.get(o.n);r.m[mi]={a:o.a,v:o.v,cfg:o.cfg,t:o.t,r:o.r};if(o.cfg)r.cfg=o.cfg;if(o.t!==undefined)r.t=o.t;if(o.t!==undefined)r.t=o.t;
   });});
   // Only show operators present in the current month
   const allFiltered=[...allN.values()].filter(function(op){return op.m[nowIdx]!==null;});
@@ -3704,20 +3701,20 @@ function genComp(){
     const cols=ms.map((m,i)=>i).filter(i=>showAll||compMonthFilter===String(i));
     const sb=(k,t)=>'<button class="sort-btn'+(compSortBy===k?' active':'')+'" onclick="setSort(\''+k+'\',this)">'+t+'</button>';
     h+='<div class="nx-card nx-mx"><div class="nx-ch"><div><h3>Desempenho por Operador '+(ms.length>=3?'('+ms.length+' meses)':'')+'</h3><p>Comparativo de cada operador entre '+ms.map(m=>shortPeriod(m.period)).join(', ').replace(/, ([^,]*)$/,' e $1')+'</p></div></div>'+
-       '<div class="nx-mxc nx-mxr"><input id="compSearch" type="search" placeholder="Buscar por nome..." value="'+esc(window.NXCB||'')+'" oninput="window.NXCB=this.value;filterCompTable()"><span>Ordenar:</span>'+sb('valor','Valor')+sb('acordos','Acordos')+sb('nome','Nome')+'<span style="margin-left:auto"></span><button class="sort-btn" onclick="compExport(\'xlsx\')" title="Meses fechados + média cobrada + média de comissão">⬇ Excel</button><button class="sort-btn" onclick="compExport(\'pdf\')" title="Meses fechados + média cobrada + média de comissão">⬇ PDF</button></div>';
+       '<div class="nx-mxc nx-mxr"><input id="compSearch" type="search" placeholder="Buscar por nome..." value="'+esc(window.NXCB||'')+'" oninput="window.NXCB=this.value;filterCompTable()"><span>Ordenar:</span>'+sb('valor','Valor')+sb('acordos','Acordos')+sb('nome','Nome')+'<span style="margin-left:auto"></span><button class="sort-btn" onclick="compExport(\'xlsx\')" title="Meses fechados + média cobrada + média de receita">⬇ Excel</button><button class="sort-btn" onclick="compExport(\'pdf\')" title="Meses fechados + média cobrada + média de receita">⬇ PDF</button></div>';
     h+='<div class="nx-tw"><table class="comp-table nx-t"><thead><tr><th>Operador</th>';
     cols.forEach(i=>{h+='<th class="'+(i===nowIdx?'cur':'')+'">'+shortPeriod(ms[i].period)+(i===nowIdx?' (atual)':'')+'</th>'});
     const MIx=ms.length>1?ms.map((m,i)=>i).filter(i=>i!==nowIdx):[0];   // media so dos meses fechados (sem o mes atual)
-    h+='<th title="Média só dos meses já fechados, sem o mês atual">Média cobrada '+MIx.length+(ms.length>1?(MIx.length>1?' meses fechados':' mês fechado'):' mês')+'</th><th title="Média da comissão nos meses fechados (5% do valor quando bate a meta; experiência e 20k+ sempre)">Média comissão</th><th>Tempo de empresa</th></tr></thead><tbody>';
+    h+='<th title="Média só dos meses já fechados, sem o mês atual">Média cobrada '+MIx.length+(ms.length>1?(MIx.length>1?' meses fechados':' mês fechado'):' mês')+'</th><th title="Média da receita (coluna Receita da planilha) nos meses fechados">Média receita</th><th>Tempo de empresa</th></tr></thead><tbody>';
     const EXL=[];
     const ini=n=>String(n||'').split(/\s+/).filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
     const semMeta=(d,cfg)=>(d&&d.t===0)||/novat|experi/i.test(String(cfg||''));
     const metaDe=(d,cfg)=>{if(semMeta(d,cfg))return null;const m=getMeta(cfg);return m&&m.max>0?m:null};
-    const cel=(d,cfg,cur)=>{if(d&&d.cfg)cfg=d.cfg;const dv=' data-v="'+(d?(compSortBy==='acordos'?d.a:d.v):'')+'"';if(d&&semMeta(d,cfg))return '<td class="'+(cur?'cur':'')+'"'+dv+'>'+(showAcordos?'<b class="nx-qa">'+d.a+' acordo'+(d.a===1?'':'s')+'</b>':'')+(showValor?'<span class="nx-qv">'+fm(d.v)+'</span>':'')+'<small class="nx-com">comissão '+fm(compComissao(d,cfg,0))+'</small><small class="nx-z">em experiência · sem meta</small></td>';if(!d)return '<td class="'+(cur?'cur':'')+'"><span class="nx-z">-</span></td>';
+    const cel=(d,cfg,cur)=>{if(d&&d.cfg)cfg=d.cfg;const dv=' data-v="'+(d?(compSortBy==='acordos'?d.a:d.v):'')+'"';if(d&&semMeta(d,cfg))return '<td class="'+(cur?'cur':'')+'"'+dv+'>'+(showAcordos?'<b class="nx-qa">'+d.a+' acordo'+(d.a===1?'':'s')+'</b>':'')+(showValor?'<span class="nx-qv">'+fm(d.v)+'</span>':'')+(compReceita(d)!==null?'<small class="nx-com">receita '+fm(compReceita(d))+'</small>':'')+'<small class="nx-z">em experiência · sem meta</small></td>';if(!d)return '<td class="'+(cur?'cur':'')+'"><span class="nx-z">-</span></td>';
       const m=getMeta(cfg),pct=m&&m.max>0?Math.min(100,Math.round(d.v/m.max*100)):null,cor=pct===null?'#94a3b8':pct>=100?'#10b981':pct>=60?'#22c55e':'#f59e0b';
       const pr=m&&m.max>0?Math.round(d.v/m.max*100):null;
-      const cm=compComissao(d,cfg);
-      return '<td class="'+(cur?'cur':'')+'"'+dv+'>'+(showAcordos?'<b class="nx-qa">'+d.a+' acordo'+(d.a===1?'':'s')+'</b>':'')+(showValor?'<span class="nx-qv">'+fm(d.v)+'</span>':'')+'<small class="nx-com">comissão '+(cm?fm(cm):'R$ 0')+'</small>'+
+      const rc=compReceita(d);
+      return '<td class="'+(cur?'cur':'')+'"'+dv+'>'+(showAcordos?'<b class="nx-qa">'+d.a+' acordo'+(d.a===1?'':'s')+'</b>':'')+(showValor?'<span class="nx-qv">'+fm(d.v)+'</span>':'')+(rc!==null?'<small class="nx-com">receita '+fm(rc)+'</small>':'')+
         (pct!==null?'<div class="nx-bar sm"><i style="width:'+pct+'%;background:'+cor+'"></i></div><small class="'+(pr>=100?'ok':'')+'">'+(pr>=100?'🏆 bateu a meta ('+pr+'%)':pr+'% da meta'+(cur?' até agora':''))+'</small>':'<small class="nx-z">sem meta</small>')+'</td>'};
     const metaTxt=(cfg,t)=>{if(t===0||/novat|experi/i.test(String(cfg||'')))return 'Em experiência · sem meta';const m=getMeta(cfg);return m&&m.max>0?'Meta '+fs(m.max):''};
     odOp.forEach((op,i)=>{
@@ -3733,14 +3730,15 @@ function genComp(){
       const mst=mp===null?'':mp>=100?['ok','na meta']:mp>=85?['perto','perto da meta']:['abaixo','abaixo da meta'];
       h+='<td data-v="'+(compSortBy==='acordos'?(c?sA/c:0):mV)+'">'+(!c?'<span class="nx-z">sem mês fechado</span>':'')+(c&&showAcordos?'<b class="nx-qa">'+Math.round(sA/c)+' acordos</b>':'')+(c&&showValor?'<span class="nx-qv">'+fm(mV)+'</span>':'')+
         (mp===null?'':'<div class="nx-bar sm"><i style="width:'+Math.min(100,mp)+'%;background:'+(mp>=100?'#10b981':mp>=85?'#22c55e':'#f59e0b')+'"></i></div><small><span class="nx-ms '+mst[0]+'">'+mst[1]+'</span> '+mp+'%</small>')+'</td>';
-      let sC=0;MIx.forEach(mi=>{const d=op.m[mi];if(d)sC+=compComissao(d,op.cfg,op.t)});const mC=c?Math.round(sC*100/c)/100:0;
-      h+='<td data-v="'+mC+'">'+(c?'<span class="nx-qv">'+fm(mC)+'</span><small>'+(mV?(Math.round(mC/mV*1000)/10).toString().replace('.',',')+'% do cobrado':'')+'</small>':'<span class="nx-z">-</span>')+'</td>';
-      EXL.push({n:op.name,tur:tur||'',m:MIx.map(mi=>op.m[mi]?{a:op.m[mi].a,v:op.m[mi].v}:null),mv:mV,mc:mC});
+      let sR=0,nR=0,sVR=0;MIx.forEach(mi=>{const d=op.m[mi],r=compReceita(d);if(r!==null){sR+=r;nR++;sVR+=d.v}});const mC=nR?Math.round(sR*100/nR)/100:null,mVR=nR?sVR/nR:0;
+      h+='<td data-v="'+(mC||0)+'">'+(mC!==null?'<span class="nx-qv">'+fm(mC)+'</span><small>'+(mVR?(Math.round(mC/mVR*1000)/10).toString().replace('.',',')+'% do cobrado':'')+'</small>':'<span class="nx-z">-</span>')+'</td>';
+      EXL.push({n:op.name,tur:tur||'',m:MIx.map(mi=>op.m[mi]?{a:op.m[mi].a,v:op.m[mi].v}:null),mv:mV,mc:mC,pr:mC!==null&&mVR?Math.round(mC/mVR*1000)/10:null});
       h+='<td><span class="nx-tempo">'+tempoExtenso(op.name)+'</span></td></tr>';
     });
     h+='</tbody></table></div></div>';
-    const temCol=MIx.some(mi=>ms[mi].ops.some(o=>typeof o.c==='number'));
-    COMP_EXP={meses:MIx.map(mi=>shortPeriod(ms[mi].period)),linhas:EXL,fonte:temCol?'coluna de comissão da planilha':'calculada: 5% do valor quando bate a meta (experiência e 20k+ sempre)'};
+    const semRec=MIx.filter(mi=>!ms[mi].ops.some(o=>typeof o.r==='number')).map(mi=>shortPeriod(ms[mi].period));
+    COMP_EXP={meses:MIx.map(mi=>shortPeriod(ms[mi].period)),linhas:EXL,fonte:semRec.length?'atenção: planilha sem coluna Receita em '+semRec.join(', '):'receita: coluna Receita de cada planilha'};
+    if(semRec.length)h=h.replace('<div class="nx-tw"><table class="comp-table','<div class="od-md" style="margin:0 0 10px">⚠️ <span>Não achei a coluna <b>Receita</b> na planilha de '+semRec.join(', ')+'. A média de receita desses meses fica em branco.</span></div><div class="nx-tw"><table class="comp-table');
     document.getElementById('compR').innerHTML=h;
     if(window.NXCB)filterCompTable();
 
