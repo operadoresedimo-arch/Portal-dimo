@@ -6228,7 +6228,9 @@ let virou='';setInterval(()=>{const k=JSON.stringify(atual());if(k!==virou){viro
 (function(){
 const TV={META:4,JANELA_MIN:340,
   NIVEIS:[{min:.85,id:'ok',nome:'No ritmo',cor:'#22c55e'},{min:.65,id:'baixo',nome:'BAIXO',cor:'#eab308'},{min:.45,id:'muito',nome:'MUITO BAIXO',cor:'#f97316'},{min:-1,id:'extremo',nome:'EXTREMAMENTE BAIXO',cor:'#ef4444'}],
-  ALERTA_SEG:60};                                    // o alerta chama atencao por 60s e depois a tela volta ao normal          // minutos entre um aviso sonoro e outro
+  ALERTA_SEG:60,                                     // o alerta de ritmo chama atencao por 60s
+  ALERTA_MIN:60,                                     // alerta de acordos baixo: no maximo 1 vez por hora
+  APOS_FESTA_SEG:60};                                // se teve festa, o alerta de baixo espera a festa acabar + 60s                                    // o alerta chama atencao por 60s e depois a tela volta ao normal          // minutos entre um aviso sonoro e outro
 const $=id=>document.getElementById(id);
 const hm=s=>{const m=String(s||'').match(/(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null};
 const agoraMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
@@ -6496,8 +6498,9 @@ document.addEventListener('fullscreenchange',()=>{if(festaEl&&festaEl.parentNode
 window.tvFestaTeste=()=>tvFesta([{n:'Samanta',d:1,t:3},{n:'Jana',d:2,t:5}]);
 if(/[?&]festa=teste/.test(location.search))setTimeout(window.tvFestaTeste,4000);
 // Confere a cada 5 min se o robo ja trocou a planilha (rodada de ~30 min).
-// Planilha NOVA: atualiza os numeros e dispara o alerta (se o ritmo estiver baixo).
-// Seguranca: se a planilha nao mudar em 30 min, dispara do mesmo jeito (o alerta nunca fica parado).
+// Planilha NOVA: atualiza os numeros e, se teve acordo novo, faz a FESTA (toda planilha nova).
+// Alerta de ACORDOS BAIXO: no maximo 1 vez por hora (na primeira planilha nova depois de 1h; se a planilha travar, dispara com 70 min).
+// Ordem: primeiro a festa; o alerta de baixo so vem 60s depois que a festa terminar.
 async function atualizarDadosTV(abrindo){
   tvJanela();
   if(new Date().getHours()>=21)return;
@@ -6511,11 +6514,11 @@ async function atualizarDadosTV(abrindo){
       const hoje=data&&relatorioEhDeHoje(csv,data,lido.meta);
       tvLeitura={em:Date.now(),data:info.data,hora:info.hora,hoje:!!hoje,semFormato:!data};
       if(hoje){tvUltimaPlanilha=csv;tvEmissao=info.hora||lido.meta.hora||'';tvTrocouEm=Date.now();tvAtualizadoHoje=true;cRD=data;festaNovos=festaDiff(data);if(typeof loadPonto==='function')await comTempo(loadPonto(),60000).catch(()=>{});}}
-    const venceu=Date.now()-tvUltimoAlerta>=29*60000;
+    const passou=Date.now()-tvUltimoAlerta,venceu=passou>=(TV.ALERTA_MIN+10)*60000,horaDeAlertar=abrindo||venceu||(nova&&passou>=(TV.ALERTA_MIN-1)*60000);
     render();
     const pg=$('pageTV');
     const fz=festaNovos;festaNovos=null;if(pg&&pg.classList.contains('active')&&fz&&fz.length)tvFesta(fz);
-    if(pg&&pg.classList.contains('active')&&(nova||abrindo||venceu)){tvUltimoAlerta=Date.now();clearTimeout(festaAlTm);if(festaAte>Date.now()){festaAlTm=setTimeout(()=>{alarmar(calcular());render()},festaAte-Date.now()+500)}else{alarmar(calcular());render();}}
+    if(pg&&pg.classList.contains('active')&&horaDeAlertar){tvUltimoAlerta=Date.now();clearTimeout(festaAlTm);if(festaAte>Date.now()){festaAlTm=setTimeout(()=>{alarmar(calcular());render()},festaAte-Date.now()+TV.APOS_FESTA_SEG*1000)}else{alarmar(calcular());render();}}
   }catch(e){console.warn('TV: nao consegui ler a planilha agora',e)}
   finally{tvAtualizando=false;}
 }
