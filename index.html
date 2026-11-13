@@ -7492,7 +7492,7 @@ function bdCss(){if($('bdCss'))return;var s=document.createElement('style');s.id
   document.head.appendChild(s)}
 function bdKp(c,t,n){return '<div style="--c:'+c+'"><b>'+inteiro(n||0)+'</b><span>'+esc(t)+'</span></div>'}
 function bdTag(o){if(!o)return '';var m={novo:['Novo','#16a34a'],existe:['Já no banco','#d97706'],dup:['Repetido no arquivo','#9ca3af']}[o.s];
-  return '<span class="bd-st" style="--c:'+m[1]+'">'+m[0]+'</span>'+(o.o&&o.s!=='dup'?' <small style="color:#2563eb">também em '+esc(o.o)+'</small>':'')}
+  return '<span class="bd-st" style="--c:'+m[1]+'">'+m[0]+'</span>'+(o.s==='novo'&&o.pb?' <small style="color:#b45309">CPF/CNPJ já estava no banco</small>':'')+(o.o&&o.s!=='dup'?' <small style="color:#2563eb">também em '+esc(o.o)+'</small>':'')}
 function bdRot(k){for(var i=0;i<BD_META_OP.length;i++)if(BD_META_OP[i][0]===k)return BD_META_OP[i][1];return k}
 function bdNomeArq(n){return String(n||'planilha').replace(/\.[^.]+$/,'').replace(/[^\w\-]+/g,'_').slice(0,40)}
 function bdCredOpts(sel){var L=S.credores.slice().sort(function(a,b){return String(a.nome).localeCompare(String(b.nome))});
@@ -7501,8 +7501,14 @@ function bdCredOpts(sel){var L=S.credores.slice().sort(function(a,b){return Stri
 function bdArrumaRef(ws){var r=null;for(var k in ws){if(k.charAt(0)==='!')continue;var c=XLSX.utils.decode_cell(k);
   if(!r)r={s:{r:c.r,c:c.c},e:{r:c.r,c:c.c}};else{if(c.r<r.s.r)r.s.r=c.r;if(c.c<r.s.c)r.s.c=c.c;if(c.r>r.e.r)r.e.r=c.r;if(c.c>r.e.c)r.e.c=c.c}}
   if(r)ws['!ref']=XLSX.utils.encode_range(r)}
-function bdAchaChave(cab){var t=[/cpf|cnpj|documento/,/telefone|celular|fone|whats/,/nome|cliente|empresa|razao/];
-  for(var a=0;a<t.length;a++)for(var i=0;i<cab.length;i++)if(t[a].test(nz(cab[i])))return i;return 0}
+function bdAcha(cab,re,nao){for(var i=0;i<cab.length;i++){var k=nz(cab[i]);if(re.test(k)&&!(nao&&nao.test(k)))return i}return -1}
+function bdAchaDoc(cab){return bdAcha(cab,/cpf|cnpj|documento/)}
+// o que identifica uma LINHA: CPF/CNPJ + contrato + parcela quando a planilha tem (uma linha por parcela); senao so o CPF/CNPJ, telefone ou nome
+function bdAchaChaves(cab){var d=bdAchaDoc(cab);
+  if(d>=0){var K=[d],c=bdAcha(cab,/contrato/,/data|observ|obs\b|valor|plano/),p=bdAcha(cab,/parcela/,/observ|obs\b|valor|qtd|quant|total/);
+    if(c>=0)K.push(c);if(p>=0)K.push(p);return K}
+  var t=bdAcha(cab,/telefone|celular|fone|whats/);if(t>=0)return [t];
+  var n=bdAcha(cab,/nome|cliente|empresa|razao/);return [n>=0?n:0]}
 function bdLerFolha(I,nome){
   var A=XLSX.utils.sheet_to_json(I.wb.Sheets[nome],{header:1,raw:false,defval:''}),hi=-1;
   for(var i=0;i<Math.min(A.length,20);i++){if(A[i].filter(function(x){return String(x).trim()}).length>=2){hi=i;break}}
@@ -7514,15 +7520,18 @@ function bdLerFolha(I,nome){
   // tira colunas sem nome e sem nenhum dado (sobra comum de Excel)
   var keep=cab.map(function(k,j){return !/^Coluna \d+$/.test(k)||L.some(function(o){return o[j]!==''})});
   if(keep.indexOf(false)>=0){cab=cab.filter(function(k,j){return keep[j]});L=L.map(function(o){return o.filter(function(x,j){return keep[j]})})}
-  I.cab=cab;I.linhas=L;I.chave=bdAchaChave(cab);
+  I.cab=cab;I.linhas=L;I.chaves=bdAchaChaves(cab);I.doc=bdAchaDoc(cab);
 }
-// chave do registro: CPF/CNPJ com zeros, telefone so numeros, senao o texto normalizado
-function bdChave(I,r){var v=String(r[I.chave]||'').trim(),k=nz(I.cab[I.chave]),d=v.replace(/\D/g,'');
+// cada parte da chave: CPF/CNPJ com zeros, telefone so numeros, senao o texto normalizado
+function bdParte(col,val){var v=String(val||'').trim(),k=nz(col),d=v.replace(/\D/g,'');
   if(/cpf|cnpj|documento/.test(k)&&d){if(d.length<=11)d=('00000000000'+d).slice(-11);else if(d.length<14)d=('00000000000000'+d).slice(-14);return d}
   if(/telefone|celular|fone|whats/.test(k)&&d)return d.replace(/^55(?=\d{10,11}$)/,'');
   if(d.length>=8&&d.length===v.replace(/[\s.\-\/()]/g,'').length)return d;
-  var t=nz(v).replace(/[^a-z0-9]+/g,' ').trim();if(t)return t;
+  return nz(v).replace(/[^a-z0-9]+/g,' ').trim()}
+function bdChave(I,r){var p=I.chaves.map(function(j){return bdParte(I.cab[j],r[j])});
+  if(p.some(String))return p.join('|');
   return 'linha:'+nz(r.join(' ')).replace(/[^a-z0-9]+/g,' ').trim().slice(0,150)}
+function bdDoc(I,r){return I.doc>=0?bdParte(I.cab[I.doc],r[I.doc]):''}
 
 function vBanco(){bdCss();
   var h=hd('Banco de dados','Importe as planilhas uma vez: o portal confere os repetidos e monta planilhas sem fazer na mão.','');
@@ -7533,23 +7542,24 @@ function vBdImp(){var I=BD.imp;
   var h='<div class="cx-card"><div class="bd-g"><label>Credor da planilha<select onchange="CRM.bdSet(\'credor\',this.value)"'+(I&&I.enviando?' disabled':'')+'>'+bdCredOpts(I?I.credor:'')+'</select></label>'+
     '<label>Arquivo (Excel ou CSV)<input type="file" accept=".xlsx,.xls,.csv" onchange="CRM.bdArquivo(this)"'+(I&&I.enviando?' disabled':'')+'></label>';
   if(I&&I.abas&&I.abas.length>1)h+='<label>Aba da planilha<select onchange="CRM.bdFolha(this.value)">'+I.abas.map(function(a){return '<option value="'+esc(a.n)+'"'+(a.n===I.folha?' selected':'')+'>'+esc(a.n)+' ('+inteiro(a.q)+' linhas)</option>'}).join('')+'</select></label>';
-  if(I&&I.cab)h+='<label>Coluna que identifica o registro<select onchange="CRM.bdSet(\'chave\',+this.value)">'+I.cab.map(function(k,i){return '<option value="'+i+'"'+(i===I.chave?' selected':'')+'>'+esc(k)+'</option>'}).join('')+'</select></label>';
   h+='</div>';
+  if(I&&I.cab)h+='<div class="bd-sub">O que torna cada linha única 🔑 <small style="font-weight:600;color:#64748b">· linha repetida = mesmos valores nessas colunas</small></div><div class="bd-ck">'+I.cab.map(function(k,i){return '<label><input type="checkbox"'+(I.chaves.indexOf(i)>=0?' checked':'')+(I.enviando?' disabled':'')+' onchange="CRM.bdChaveCk('+i+',this.checked)"> '+esc(k)+'</label>'}).join('')+'</div>';
   if(!I||!I.cab)return h+'<div class="cx-vazio"><b>'+(I&&I.arquivo?'Não achei dados nessa aba':'Escolha o credor e o arquivo')+'</b>O portal confere cada linha com o banco: o que é novo, o que já existe nesse credor e o que se repete dentro do próprio arquivo.</div></div>';
-  h+='<div class="bd-sub">'+esc(I.arquivo)+(I.abas&&I.abas.length>1?' · aba '+esc(I.folha):'')+' · '+inteiro(I.linhas.length)+' linhas</div>';
-  if(I.prev){var P=I.prev;h+='<div class="bd-kp">'+bdKp('#16a34a','Novos',P.novo)+bdKp('#d97706','Já estão no banco',P.existe)+bdKp('#9ca3af','Repetidos no arquivo',P.dup)+bdKp('#2563eb','Também em outro credor',P.outro)+'</div>'}
+  h+='<div class="bd-sub">'+esc(I.arquivo)+(I.abas&&I.abas.length>1?' · aba '+esc(I.folha):'')+' · '+inteiro(I.linhas.length)+' linhas · '+I.cab.length+' colunas (todas vão para o banco)</div>';
+  if(I.prev){var P=I.prev;h+='<div class="bd-kp">'+bdKp('#16a34a','Linhas novas',P.novo)+bdKp('#d97706','Linhas já no banco',P.existe)+bdKp('#9ca3af','Repetidas no arquivo',P.dup)+
+    (I.doc>=0?bdKp('#b45309','Pessoas (CPF/CNPJ) que já estavam no banco',P.pb)+bdKp('#2563eb','Pessoas também em outro credor',P.po):bdKp('#2563eb','Também em outro credor',P.outro))+'</div>'}
   else h+='<div style="height:12px"></div>';
   h+='<div class="bd-act">'+(I.enviando?'<b>'+esc(I.enviando)+'</b>':'<button class="cx-btn'+(I.prev?'':' pri')+'" onclick="CRM.bdConferir()">'+(I.prev?'↻ Conferir de novo':'🔎 Conferir repetidos')+'</button>'+
     (I.prev?'<button class="cx-btn" onclick="CRM.bdBaixarConf()">⬇ Baixar conferência (Excel)</button><button class="cx-btn pri" onclick="CRM.bdImportar()"'+(I.prev.novo||I.prev.existe?'':' disabled')+'>📥 Importar para o banco</button>':''))+'</div>';
-  var vis=I.cab.slice(0,6),st=I.st||[];
-  h+='<div class="cx-tw"><table class="cx-t"><thead><tr>'+(I.prev?'<th>Situação</th>':'')+vis.map(function(k,j){return '<th>'+esc(k)+(j===I.chave?' 🔑':'')+'</th>'}).join('')+'</tr></thead><tbody>';
-  I.linhas.slice(0,50).forEach(function(r,i){h+='<tr>'+(I.prev?'<td>'+bdTag(st[i])+'</td>':'')+vis.map(function(k,j){return '<td>'+esc(r[j])+'</td>'}).join('')+'</tr>'});
+  var vis=I.cab,st=I.st||[];
+  h+='<div class="cx-tw" style="overflow-x:auto"><table class="cx-t" style="min-width:max-content"><thead><tr>'+(I.prev?'<th>Situação</th>':'')+vis.map(function(k,j){return '<th style="white-space:nowrap">'+esc(k)+(I.chaves.indexOf(j)>=0?' 🔑':'')+'</th>'}).join('')+'</tr></thead><tbody>';
+  I.linhas.slice(0,50).forEach(function(r,i){h+='<tr>'+(I.prev?'<td style="white-space:nowrap">'+bdTag(st[i])+'</td>':'')+vis.map(function(k,j){return '<td style="white-space:nowrap">'+esc(r[j])+'</td>'}).join('')+'</tr>'});
   h+='</tbody></table></div>'+(I.linhas.length>50?'<div class="bd-nota">Mostrando 50 de '+inteiro(I.linhas.length)+'. A conferência em Excel traz todas, com todas as colunas.</div>':'');
   return h+'</div>';
 }
 function vBdExp(){var E=BD.exp;
   if(!E.info){if(!E.carreg){E.carreg=true;api({acao:'banco_info'}).then(function(j){E.carreg=false;E.info=j;
-      if(!E.cols){E.cols={credor:1};(j.colunas||[]).slice(0,6).forEach(function(k){E.cols[k]=1})}if(VIEW==='banco')render()})
+      if(!E.cols){E.cols={credor:1};(j.colunas||[]).forEach(function(k){E.cols[k]=1})}else (j.colunas||[]).forEach(function(k){if(E.cols[k]===undefined)E.cols[k]=1});if(VIEW==='banco')render()})
     .catch(function(e){E.carreg=false;E.info={erro:e.message};if(VIEW==='banco')render()})}
     return '<div class="cx-card"><div class="cx-vazio">Carregando o banco de dados...</div></div>'}
   var I=E.info;
@@ -7560,7 +7570,7 @@ function vBdExp(){var E=BD.exp;
     I.credores.map(function(c){var k=c.id||'_';return '<label><input type="checkbox"'+(E.cred[k]?' checked':'')+' onchange="CRM.bdCk(\'cred\',\''+js(k)+'\',this.checked)"> '+esc(c.nome)+' <span style="color:#94a3b8">('+inteiro(c.n)+')</span></label>'}).join('')+'</div>';
   h+='<div class="bd-g" style="padding-top:0"><label style="grid-column:1/-1">Nomes, CPFs ou CNPJs (opcional, um por linha)<textarea rows="4" placeholder="Deixe vazio para trazer todos" oninput="CRM.bdVal(\'termos\',this.value)">'+esc(E.termos)+'</textarea></label>'+
     '<label>Importados de<input type="date" value="'+esc(E.de)+'" onchange="CRM.bdVal(\'de\',this.value)"></label><label>até<input type="date" value="'+esc(E.ate)+'" onchange="CRM.bdVal(\'ate\',this.value)"></label></div>';
-  h+='<div class="bd-sub">Colunas da planilha</div><div class="bd-ck">'+BD_META_OP.concat((I.colunas||[]).map(function(k){return [k,k]})).map(function(o){return '<label><input type="checkbox"'+(E.cols[o[0]]?' checked':'')+' onchange="CRM.bdCk(\'cols\',\''+js(o[0])+'\',this.checked)"> '+esc(o[1])+'</label>'}).join('')+'</div>';
+  h+='<div class="bd-sub">Colunas da planilha <a href="#" style="font-weight:600;margin-left:8px" onclick="CRM.bdCols(1);return false">marcar todas</a> · <a href="#" style="font-weight:600" onclick="CRM.bdCols(0);return false">desmarcar todas</a></div><div class="bd-ck">'+BD_META_OP.concat((I.colunas||[]).map(function(k){return [k,k]})).map(function(o){return '<label><input type="checkbox"'+(E.cols[o[0]]?' checked':'')+' onchange="CRM.bdCk(\'cols\',\''+js(o[0])+'\',this.checked)"> '+esc(o[1])+'</label>'}).join('')+'</div>';
   h+='<div class="bd-act">'+(E.busc?'<b>Buscando no banco...</b>':'<button class="cx-btn" onclick="CRM.bdBuscar(0)">🔎 Ver prévia</button><button class="cx-btn pri" onclick="CRM.bdBuscar(1)">⬇ Baixar planilha (Excel)</button>')+
     '<button class="cx-btn" onclick="CRM.bdInfo()">↻ Atualizar</button>'+(I.url&&S.adm?'<a class="cx-btn" href="'+esc(I.url)+'" target="_blank" rel="noopener">Abrir planilha do banco</a>':'')+'</div>';
   if(E.res){var R=E.res;h+='<div class="bd-sub" style="padding:0 16px 10px">'+inteiro(R.total)+' registros encontrados'+(R.cortado?' · a planilha traz os primeiros '+inteiro(R.linhas.length):'')+'</div>';
@@ -7571,44 +7581,51 @@ function bdColsSel(){var E=BD.exp,ord=BD_META_OP.map(function(x){return x[0]}).c
 function bdXlsx(j){var A=[j.cab.map(bdRot)].concat(j.linhas),wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(A),'Planilha');XLSX.writeFile(wb,'planilha-banco-'+hojeIso()+'.xlsx');
   if(j.cortado)alert('A planilha veio com as primeiras '+j.linhas.length+' linhas de '+j.total+'. Filtre por credor ou nome para pegar o resto.')}
-function bdFimConf(res){var I=BD.imp,seen={},P={novo:0,existe:0,dup:0,outro:0};
-  I.st=I.ch.map(function(k){var s;if(seen[k])s='dup';else{seen[k]=1;s=res[k]&&res[k].e?'existe':'novo'}P[s]++;var o=(res[k]&&res[k].o)||'';if(o&&s!=='dup')P.outro++;return {s:s,o:o}});
+function bdFimConf(res,rd){var I=BD.imp,seen={},P={novo:0,existe:0,dup:0,outro:0,pb:0,po:0},pv={};
+  I.st=I.ch.map(function(k,i){var s;if(seen[k])s='dup';else{seen[k]=1;s=res[k]&&res[k].e?'existe':'novo'}P[s]++;
+    var d=I.docs[i],D=d?rd[d]:null,o=(D?D.o:(res[k]&&res[k].o))||'';if(o&&s!=='dup')P.outro++;
+    if(d&&!pv[d]){pv[d]=1;if(D&&D.e)P.pb++;if(D&&D.o)P.po++}
+    return {s:s,o:o,pb:!!(D&&D.e)}});
   I.prev=P;I.enviando='';render()}
 
 Object.assign(window.CRM,{
   bdAba:function(a){BD.aba=a;render()},
   bdSet:function(k,v){var I=BD.imp;if(!I){BD.imp=I={}}I[k]=v;I.prev=null;I.st=null;I.ch=null;render()},
+  bdChaveCk:function(i,v){var I=BD.imp;if(!I||!I.cab)return;var K=I.chaves.filter(function(x){return x!==i});if(v)K.push(i);K.sort(function(a,b){return a-b});
+    if(!K.length){toast('Marque pelo menos uma coluna');render();return}I.chaves=K;I.prev=null;I.st=null;I.ch=null;render()},
   bdArquivo:function(inp){var f=inp.files&&inp.files[0];if(!f)return;var cred=BD.imp?BD.imp.credor||'':'',rd=new FileReader();
-    rd.onload=function(e){try{var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'}),I={credor:cred,arquivo:f.name,wb:wb,abas:[]};
+    rd.onload=function(e){try{var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',dateNF:'dd/mm/yyyy'}),I={credor:cred,arquivo:f.name,wb:wb,abas:[]};
       wb.SheetNames.forEach(function(n){var ws=wb.Sheets[n];bdArrumaRef(ws);var rg=ws['!ref']?XLSX.utils.decode_range(ws['!ref']):null;I.abas.push({n:n,q:rg?rg.e.r-rg.s.r:0})});
       var m=I.abas.slice().sort(function(a,b){return b.q-a.q})[0];BD.imp=I;bdLerFolha(I,m?m.n:wb.SheetNames[0]);render()}
       catch(err){toast('Não consegui ler o arquivo: '+err.message)}};
     rd.readAsArrayBuffer(f)},
   bdFolha:function(n){var I=BD.imp;if(!I||!I.wb)return;bdLerFolha(I,n);render()},
   bdConferir:function(){var I=BD.imp;if(!I||!I.cab||I.enviando)return;
-    I.ch=I.linhas.map(function(r){return bdChave(I,r)});
-    var uniq=[],vis={};I.ch.forEach(function(k){if(!vis[k]){vis[k]=1;uniq.push(k)}});
-    var res={},i=0;I.enviando='Conferindo '+uniq.length+' registros no banco...';render();
-    (function lote(){var part=uniq.slice(i,i+3000);if(!part.length){bdFimConf(res);return}
-      api({acao:'banco_previa',credor_id:I.credor||'',chaves:part}).then(function(j){part.forEach(function(k,x){res[k]={e:j.existe[x],o:j.outro[x]}});i+=3000;lote()})
+    I.ch=I.linhas.map(function(r){return bdChave(I,r)});I.docs=I.linhas.map(function(r){return bdDoc(I,r)});
+    var uk=[],ud=[],vk={},vd={};I.ch.forEach(function(k){if(!vk[k]){vk[k]=1;uk.push(k)}});I.docs.forEach(function(d){if(d&&!vd[d]){vd[d]=1;ud.push(d)}});
+    var res={},rd={},i=0,j0=0;I.enviando='Conferindo '+inteiro(uk.length)+' linhas no banco...';render();
+    (function lote(){var pk=uk.slice(i,i+3000),pd=ud.slice(j0,j0+3000);if(!pk.length&&!pd.length){bdFimConf(res,rd);return}
+      api({acao:'banco_previa',credor_id:I.credor||'',chaves:pk,docs:pd}).then(function(j){pk.forEach(function(k,x){res[k]={e:j.existe[x],o:j.outro[x]}});
+        pd.forEach(function(d,x){rd[d]={e:j.docExiste[x],o:j.docOutro[x]}});i+=3000;j0+=3000;lote()})
       .catch(function(e){I.enviando='';render();toast('Não conferiu: '+e.message)})})()},
   bdBaixarConf:function(){var I=BD.imp;if(!I||!I.st)return;var lab={novo:'Novo',existe:'Já está no banco',dup:'Repetido no arquivo'};
-    var A=[['Situação','Também em outro credor'].concat(I.cab)].concat(I.linhas.map(function(r,i){return [lab[I.st[i].s],I.st[i].s==='dup'?'':I.st[i].o].concat(r)}));
+    var A=[['Situação','CPF/CNPJ já estava no banco','Também em outro credor'].concat(I.cab)].concat(I.linhas.map(function(r,i){var t=I.st[i];return [lab[t.s],t.pb?'Sim':'',t.s==='dup'?'':t.o].concat(r)}));
     var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(A),'Conferencia');XLSX.writeFile(wb,'conferencia-'+bdNomeArq(I.arquivo)+'-'+hojeIso()+'.xlsx')},
   bdImportar:function(){var I=BD.imp;if(!I||!I.prev||!I.ch||I.enviando)return;var c=I.credor?acha(I.credor):null;
-    if(!confirm('Importar para o banco?\n\n• '+I.prev.novo+' novos entram\n• '+I.prev.existe+' que já existem só completam campos vazios\n• '+I.prev.dup+' repetidos dentro do arquivo não duplicam\n\nCredor: '+(c?c.nome:'(sem credor)')))return;
+    if(!confirm('Importar para o banco?\n\n• '+I.prev.novo+' linhas novas entram (com todas as colunas)\n• '+I.prev.existe+' que já existem só completam campos vazios\n• '+I.prev.dup+' repetidas dentro do arquivo não duplicam\n\nCredor: '+(c?c.nome:'(sem credor)')))return;
     var N=I.linhas.length,i=0,T={novos:0,repetidos:0,completados:0};
     (function lote(){
       if(i>=N){I.enviando='';I.prev=null;I.st=null;BD.exp.info=null;BD.exp.res=null;render();
         alert('Importação concluída\n\n'+T.novos+' novos no banco\n'+T.repetidos+' já existiam ('+T.completados+' tiveram campos completados)');return}
       I.enviando='Importando... '+i+' de '+N+' linhas';render();
-      api({acao:'banco_importar',credor_id:I.credor||'',credor:c?c.nome:'',arquivo:I.arquivo,cab:I.cab,linhas:I.linhas.slice(i,i+400),chaves:I.ch.slice(i,i+400)})
+      api({acao:'banco_importar',credor_id:I.credor||'',credor:c?c.nome:'',arquivo:I.arquivo,cab:I.cab,linhas:I.linhas.slice(i,i+400),chaves:I.ch.slice(i,i+400),docs:I.docs.slice(i,i+400)})
       .then(function(j){T.novos+=j.novos;T.repetidos+=j.repetidos;T.completados+=j.completados;i+=400;lote()})
       .catch(function(e){I.enviando='';render();alert('A importação parou na linha '+(i+1)+' de '+N+'.\n\n'+e.message+'\n\nO que já entrou está salvo. Clique em Conferir repetidos e importe de novo: o que já entrou não duplica.')})})()},
   bdInfo:function(){BD.exp.info=null;BD.exp.res=null;render()},
   bdTodos:function(){BD.exp.cred={};BD.exp.res=null;render()},
   bdCk:function(g,k,v){BD.exp[g][k]=v?1:0;BD.exp.res=null;render()},
   bdVal:function(k,v){BD.exp[k]=v},
+  bdCols:function(v){var E=BD.exp;if(!E.info)return;BD_META_OP.map(function(x){return x[0]}).concat(E.info.colunas||[]).forEach(function(k){E.cols[k]=v?1:0});E.res=null;render()},
   bdBuscar:function(baixar){var E=BD.exp;if(!E.info||E.busc)return;var cols=bdColsSel();if(!cols.length){toast('Marque pelo menos uma coluna');return}
     var cred=Object.keys(E.cred).filter(function(k){return E.cred[k]}).map(function(k){return k==='_'?'':k});
     var termos=String(E.termos||'').split(/\r?\n|;/).map(function(s){return s.trim()}).filter(String);
