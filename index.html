@@ -7549,8 +7549,8 @@ function vBdImp(){var I=BD.imp;
   if(I.prev){var P=I.prev;h+='<div class="bd-kp">'+bdKp('#16a34a','Linhas novas',P.novo)+bdKp('#d97706','Linhas já no banco',P.existe)+bdKp('#9ca3af','Repetidas no arquivo',P.dup)+
     (I.doc>=0?bdKp('#b45309','Pessoas (CPF/CNPJ) que já estavam no banco',P.pb)+bdKp('#2563eb','Pessoas também em outro credor',P.po):bdKp('#2563eb','Também em outro credor',P.outro))+'</div>'}
   else h+='<div style="height:12px"></div>';
-  h+='<div class="bd-act">'+(I.enviando?'<b>'+esc(I.enviando)+'</b>':'<button class="cx-btn'+(I.prev?'':' pri')+'" onclick="CRM.bdConferir()">'+(I.prev?'↻ Conferir de novo':'🔎 Conferir repetidos')+'</button>'+
-    (I.prev?'<button class="cx-btn" onclick="CRM.bdBaixarConf()">⬇ Baixar conferência (Excel)</button><button class="cx-btn pri" onclick="CRM.bdImportar()"'+(I.prev.novo||I.prev.existe?'':' disabled')+'>📥 Importar para o banco</button>':''))+'</div>';
+  h+='<div class="bd-act">'+(I.enviando?'<b>'+esc(I.enviando)+'</b>'+(I.importando?'<button class="cx-btn dan" onclick="CRM.bdCancelar()">⏹ Parar importação</button>':''):'<button class="cx-btn'+(I.prev?'':' pri')+'" onclick="CRM.bdConferir()">'+(I.prev?'↻ Conferir de novo':'🔎 Conferir repetidos')+'</button>'+
+    (I.prev?'<button class="cx-btn" onclick="CRM.bdBaixarConf()">⬇ Baixar conferência (Excel)</button><button class="cx-btn pri" onclick="CRM.bdImportar()"'+(I.prev.novo||I.prev.existe?'':' disabled')+'>📥 Importar para o banco</button>':'')+'<button class="cx-btn" onclick="CRM.bdCancelar()">✕ Cancelar</button>')+'</div>';
   var vis=I.cab,st=I.st||[];
   h+='<div class="cx-tw" style="overflow-x:auto"><table class="cx-t" style="min-width:max-content"><thead><tr>'+(I.prev?'<th>Situação</th>':'')+vis.map(function(k,j){return '<th style="white-space:nowrap">'+esc(k)+(I.chaves.indexOf(j)>=0?' 🔑':'')+'</th>'}).join('')+'</tr></thead><tbody>';
   I.linhas.slice(0,50).forEach(function(r,i){h+='<tr>'+(I.prev?'<td style="white-space:nowrap">'+bdTag(st[i])+'</td>':'')+vis.map(function(k,j){return '<td style="white-space:nowrap">'+esc(r[j])+'</td>'}).join('')+'</tr>'});
@@ -7599,6 +7599,10 @@ Object.assign(window.CRM,{
       var m=I.abas.slice().sort(function(a,b){return b.q-a.q})[0];BD.imp=I;bdLerFolha(I,m?m.n:wb.SheetNames[0]);render()}
       catch(err){toast('Não consegui ler o arquivo: '+err.message)}};
     rd.readAsArrayBuffer(f)},
+  bdCancelar:function(){var I=BD.imp;if(!I)return;
+    if(I.importando){if(confirm('Parar a importação?\n\nO que já entrou fica salvo no banco. Se importar de novo depois, o que já entrou não duplica.'))I.parar=1;return}
+    if(I.enviando)return;
+    BD.imp={credor:I.credor||''};render();toast('Planilha cancelada. Nada foi importado.')},
   bdFolha:function(n){var I=BD.imp;if(!I||!I.wb)return;bdLerFolha(I,n);render()},
   bdConferir:function(){var I=BD.imp;if(!I||!I.cab||I.enviando)return;
     I.ch=I.linhas.map(function(r){return bdChave(I,r)});I.docs=I.linhas.map(function(r){return bdDoc(I,r)});
@@ -7613,14 +7617,16 @@ Object.assign(window.CRM,{
     var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(A),'Conferencia');XLSX.writeFile(wb,'conferencia-'+bdNomeArq(I.arquivo)+'-'+hojeIso()+'.xlsx')},
   bdImportar:function(){var I=BD.imp;if(!I||!I.prev||!I.ch||I.enviando)return;var c=I.credor?acha(I.credor):null;
     if(!confirm('Importar para o banco?\n\n• '+I.prev.novo+' linhas novas entram (com todas as colunas)\n• '+I.prev.existe+' que já existem só completam campos vazios\n• '+I.prev.dup+' repetidas dentro do arquivo não duplicam\n\nCredor: '+(c?c.nome:'(sem credor)')))return;
-    var N=I.linhas.length,i=0,T={novos:0,repetidos:0,completados:0};
+    var N=I.linhas.length,i=0,T={novos:0,repetidos:0,completados:0};I.importando=1;I.parar=0;
     (function lote(){
-      if(i>=N){I.enviando='';I.prev=null;I.st=null;BD.exp.info=null;BD.exp.res=null;render();
+      if(I.parar&&i<N){I.enviando='';I.importando=0;I.parar=0;I.prev=null;I.st=null;BD.exp.info=null;BD.exp.res=null;render();
+        alert('Importação parada na linha '+i+' de '+N+'.\n\n'+T.novos+' linhas novas já tinham entrado no banco e ficaram salvas.');return}
+      if(i>=N){I.enviando='';I.importando=0;I.prev=null;I.st=null;BD.exp.info=null;BD.exp.res=null;render();
         alert('Importação concluída\n\n'+T.novos+' novos no banco\n'+T.repetidos+' já existiam ('+T.completados+' tiveram campos completados)');return}
       I.enviando='Importando... '+i+' de '+N+' linhas';render();
       api({acao:'banco_importar',credor_id:I.credor||'',credor:c?c.nome:'',arquivo:I.arquivo,cab:I.cab,linhas:I.linhas.slice(i,i+400),chaves:I.ch.slice(i,i+400),docs:I.docs.slice(i,i+400)})
       .then(function(j){T.novos+=j.novos;T.repetidos+=j.repetidos;T.completados+=j.completados;i+=400;lote()})
-      .catch(function(e){I.enviando='';render();alert('A importação parou na linha '+(i+1)+' de '+N+'.\n\n'+e.message+'\n\nO que já entrou está salvo. Clique em Conferir repetidos e importe de novo: o que já entrou não duplica.')})})()},
+      .catch(function(e){I.enviando='';I.importando=0;render();alert('A importação parou na linha '+(i+1)+' de '+N+'.\n\n'+e.message+'\n\nO que já entrou está salvo. Clique em Conferir repetidos e importe de novo: o que já entrou não duplica.')})})()},
   bdInfo:function(){BD.exp.info=null;BD.exp.res=null;render()},
   bdTodos:function(){BD.exp.cred={};BD.exp.res=null;render()},
   bdCk:function(g,k,v){BD.exp[g][k]=v?1:0;BD.exp.res=null;render()},
