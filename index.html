@@ -7485,10 +7485,12 @@ window.PP={fechar:function(){fechar(true)}};   // compatibilidade com o nome ant
 
 // ---- BANCO DE DADOS: importar planilha (confere repetidos) e criar planilha a partir do banco ----
 // Dados na planilha propria "Banco de Dados - Prospeccao" via CRM-Banco.gs (acoes banco_*).
-var BD={aba:'imp',imp:null,exp:{info:null,carreg:false,cred:{},cols:null,termos:'',de:'',ate:'',res:null,busc:false}};
+var BD={aba:'imp',imp:null,dd:null,exp:{info:null,carreg:false,cred:{},cols:null,termos:'',de:'',ate:'',res:null,busc:false}};
 var BD_META_OP=[['credor','Credor'],['arquivo','Arquivo de origem'],['importado_em','Data da importação']];
 function bdCss(){if($('bdCss'))return;var s=document.createElement('style');s.id='bdCss';
-  s.textContent='.bd-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.bd-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;padding:16px}.bd-g label{display:flex;flex-direction:column;gap:5px;font-size:.78rem;font-weight:700;color:#475569}.bd-g select,.bd-g input,.bd-g textarea{border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.82rem;background:#fff;color:#1f2937}.bd-kp{display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px 14px}.bd-kp div{border:1px solid #e5e7eb;border-top:3px solid var(--c);border-radius:10px;padding:10px 14px;min-width:140px}.bd-kp b{display:block;font-size:1.3rem}.bd-kp span{font-size:.74rem;color:#64748b}.bd-st{display:inline-block;border-radius:6px;padding:2px 7px;font-size:.7rem;font-weight:800;color:#fff;background:var(--c);white-space:nowrap}.bd-ck{display:flex;flex-wrap:wrap;gap:6px 16px;padding:6px 16px 14px;max-height:200px;overflow:auto}.bd-ck label{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;cursor:pointer}.bd-sub{padding:14px 16px 0;font-size:.82rem;font-weight:800;color:#0f3557}.bd-act{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:0 16px 16px}.bd-nota{padding:10px 16px;color:#64748b;font-size:.78rem}';
+  s.textContent='.bd-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.bd-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;padding:16px}.bd-g label{display:flex;flex-direction:column;gap:5px;font-size:.78rem;font-weight:700;color:#475569}.bd-g select,.bd-g input,.bd-g textarea{border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.82rem;background:#fff;color:#1f2937}.bd-kp{display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px 14px}.bd-kp div{border:1px solid #e5e7eb;border-top:3px solid var(--c);border-radius:10px;padding:10px 14px;min-width:140px}.bd-kp b{display:block;font-size:1.3rem}.bd-kp span{font-size:.74rem;color:#64748b}.bd-st{display:inline-block;border-radius:6px;padding:2px 7px;font-size:.7rem;font-weight:800;color:#fff;background:var(--c);white-space:nowrap}.bd-ck{display:flex;flex-wrap:wrap;gap:6px 16px;padding:6px 16px 14px;max-height:200px;overflow:auto}.bd-ck label{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;cursor:pointer}.bd-sub{padding:14px 16px 0;font-size:.82rem;font-weight:800;color:#0f3557}.bd-act{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:0 16px 16px}.bd-nota{padding:10px 16px;color:#64748b;font-size:.78rem}'+
+    '.bd-dd{position:relative;display:flex;flex-direction:column;gap:5px;font-size:.78rem;font-weight:700;color:#475569}.bd-ddb{width:100%;text-align:left;border:1px solid #cbd5e1;border-radius:9px;padding:9px 30px 9px 10px;background:#fff;font-family:inherit;font-size:.82rem;font-weight:500;color:#1f2937;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}.bd-ddb:after{content:"\\25BE";position:absolute;right:11px;top:50%;transform:translateY(-50%);color:#64748b}.bd-ddb.on{border-color:#0f3557;box-shadow:0 0 0 3px rgba(15,53,87,.12)}'+
+    '.bd-ddp{position:absolute;z-index:40;top:100%;left:0;right:0;margin-top:4px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;box-shadow:0 12px 30px rgba(15,23,42,.18);max-height:320px;overflow:auto;padding:6px}.bd-g .bd-ddp label,.bd-ddp label{display:flex;flex-direction:row;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;font-weight:600;font-size:.8rem;color:#1f2937;cursor:pointer}.bd-ddp label:hover{background:#f1f5f9}.bd-g .bd-ddp input,.bd-ddp input{width:auto;padding:0;border:0;margin:0;accent-color:#0f3557}.bd-ddp .bd-all{border-bottom:1px solid #e5e7eb;border-radius:7px 7px 0 0;margin-bottom:4px;padding-bottom:9px}';
   document.head.appendChild(s)}
 function bdKp(c,t,n){return '<div style="--c:'+c+'"><b>'+inteiro(n||0)+'</b><span>'+esc(t)+'</span></div>'}
 function bdTag(o){if(!o)return '';var m={novo:['Novo','#16a34a'],existe:['Já no banco','#d97706'],dup:['Repetido no arquivo','#9ca3af']}[o.s];
@@ -7533,7 +7535,16 @@ function bdChave(I,r){var p=I.chaves.map(function(j){return bdParte(I.cab[j],r[j
   return 'linha:'+nz(r.join(' ')).replace(/[^a-z0-9]+/g,' ').trim().slice(0,150)}
 function bdDoc(I,r){return I.doc>=0?bdParte(I.cab[I.doc],r[I.doc]):''}
 
+// filtro em lista: "Selecionar todos" e depois cada coluna
+function bdDdChaves(I){var n=I.chaves.length,tot=I.cab.length,ab=BD.dd==='chaves',nomes=I.chaves.map(function(j){return I.cab[j]});
+  var res=!n?'Nenhuma coluna marcada':n===tot?'Todas as colunas ('+tot+')':(nomes.slice(0,3).join(', ')+(n>3?' +'+(n-3):''));
+  var h='<div class="bd-dd">O que torna cada linha única 🔑<button type="button" class="bd-ddb'+(ab?' on':'')+'" title="'+esc(nomes.join(', '))+'" onclick="CRM.bdDd(\'chaves\',event)"'+(I.enviando?' disabled':'')+'>'+esc(res)+'</button>';
+  if(ab)h+='<div class="bd-ddp" onclick="event.stopPropagation()"><label class="bd-all"><input type="checkbox"'+(n===tot?' checked':'')+' onchange="CRM.bdChaveTodas(this.checked)"> <b>Selecionar todos</b></label>'+
+    I.cab.map(function(k,i){return '<label><input type="checkbox"'+(I.chaves.indexOf(i)>=0?' checked':'')+' onchange="CRM.bdChaveCk('+i+',this.checked)"> '+esc(k)+'</label>'}).join('')+'</div>';
+  return h+'</div>'}
+var BD_DDL=false;
 function vBanco(){bdCss();
+  if(!BD_DDL){BD_DDL=true;document.addEventListener('click',function(){if(BD.dd){BD.dd=null;if(VIEW==='banco')render()}})}
   var h=hd('Banco de dados','Importe as planilhas uma vez: o portal confere os repetidos e monta planilhas sem fazer na mão.','');
   h+='<div class="bd-tabs"><button class="cx-btn'+(BD.aba==='imp'?' pri':'')+'" onclick="CRM.bdAba(\'imp\')">📥 Importar planilha</button><button class="cx-btn'+(BD.aba==='exp'?' pri':'')+'" onclick="CRM.bdAba(\'exp\')">📤 Criar planilha</button></div>';
   return h+(BD.aba==='imp'?vBdImp():vBdExp());
@@ -7542,8 +7553,8 @@ function vBdImp(){var I=BD.imp;
   var h='<div class="cx-card"><div class="bd-g"><label>Credor da planilha<select onchange="CRM.bdSet(\'credor\',this.value)"'+(I&&I.enviando?' disabled':'')+'>'+bdCredOpts(I?I.credor:'')+'</select></label>'+
     '<label>Arquivo (Excel ou CSV)<input type="file" accept=".xlsx,.xls,.csv" onchange="CRM.bdArquivo(this)"'+(I&&I.enviando?' disabled':'')+'></label>';
   if(I&&I.abas&&I.abas.length>1)h+='<label>Aba da planilha<select onchange="CRM.bdFolha(this.value)">'+I.abas.map(function(a){return '<option value="'+esc(a.n)+'"'+(a.n===I.folha?' selected':'')+'>'+esc(a.n)+' ('+inteiro(a.q)+' linhas)</option>'}).join('')+'</select></label>';
+  if(I&&I.cab)h+=bdDdChaves(I);
   h+='</div>';
-  if(I&&I.cab)h+='<div class="bd-sub">O que torna cada linha única 🔑 <small style="font-weight:600;color:#64748b">· linha repetida = mesmos valores nessas colunas</small></div><div class="bd-ck">'+I.cab.map(function(k,i){return '<label><input type="checkbox"'+(I.chaves.indexOf(i)>=0?' checked':'')+(I.enviando?' disabled':'')+' onchange="CRM.bdChaveCk('+i+',this.checked)"> '+esc(k)+'</label>'}).join('')+'</div>';
   if(!I||!I.cab)return h+'<div class="cx-vazio"><b>'+(I&&I.arquivo?'Não achei dados nessa aba':'Escolha o credor e o arquivo')+'</b>O portal confere cada linha com o banco: o que é novo, o que já existe nesse credor e o que se repete dentro do próprio arquivo.</div></div>';
   h+='<div class="bd-sub">'+esc(I.arquivo)+(I.abas&&I.abas.length>1?' · aba '+esc(I.folha):'')+' · '+inteiro(I.linhas.length)+' linhas · '+I.cab.length+' colunas (todas vão para o banco)</div>';
   if(I.prev){var P=I.prev;h+='<div class="bd-kp">'+bdKp('#16a34a','Linhas novas',P.novo)+bdKp('#d97706','Linhas já no banco',P.existe)+bdKp('#9ca3af','Repetidas no arquivo',P.dup)+
@@ -7592,7 +7603,9 @@ Object.assign(window.CRM,{
   bdAba:function(a){BD.aba=a;render()},
   bdSet:function(k,v){var I=BD.imp;if(!I){BD.imp=I={}}I[k]=v;I.prev=null;I.st=null;I.ch=null;render()},
   bdChaveCk:function(i,v){var I=BD.imp;if(!I||!I.cab)return;var K=I.chaves.filter(function(x){return x!==i});if(v)K.push(i);K.sort(function(a,b){return a-b});
-    if(!K.length){toast('Marque pelo menos uma coluna');render();return}I.chaves=K;I.prev=null;I.st=null;I.ch=null;render()},
+    I.chaves=K;I.prev=null;I.st=null;I.ch=null;render()},
+  bdChaveTodas:function(v){var I=BD.imp;if(!I||!I.cab)return;I.chaves=v?I.cab.map(function(k,i){return i}):[];I.prev=null;I.st=null;I.ch=null;render()},
+  bdDd:function(q,ev){if(ev)ev.stopPropagation();BD.dd=BD.dd===q?null:q;render()},
   bdArquivo:function(inp){var f=inp.files&&inp.files[0];if(!f)return;var cred=BD.imp?BD.imp.credor||'':'',rd=new FileReader();
     rd.onload=function(e){try{var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',dateNF:'dd/mm/yyyy'}),I={credor:cred,arquivo:f.name,wb:wb,abas:[]};
       wb.SheetNames.forEach(function(n){var ws=wb.Sheets[n];bdArrumaRef(ws);var rg=ws['!ref']?XLSX.utils.decode_range(ws['!ref']):null;I.abas.push({n:n,q:rg?rg.e.r-rg.s.r:0})});
@@ -7605,6 +7618,7 @@ Object.assign(window.CRM,{
     BD.imp={credor:I.credor||''};render();toast('Planilha cancelada. Nada foi importado.')},
   bdFolha:function(n){var I=BD.imp;if(!I||!I.wb)return;bdLerFolha(I,n);render()},
   bdConferir:function(){var I=BD.imp;if(!I||!I.cab||I.enviando)return;
+    if(!I.chaves.length){BD.dd='chaves';render();toast('Escolha pelo menos uma coluna em "O que torna cada linha única"');return}
     I.ch=I.linhas.map(function(r){return bdChave(I,r)});I.docs=I.linhas.map(function(r){return bdDoc(I,r)});
     var uk=[],ud=[],vk={},vd={};I.ch.forEach(function(k){if(!vk[k]){vk[k]=1;uk.push(k)}});I.docs.forEach(function(d){if(d&&!vd[d]){vd[d]=1;ud.push(d)}});
     var res={},rd={},i=0,j0=0;I.enviando='Conferindo '+inteiro(uk.length)+' linhas no banco...';render();
