@@ -7018,7 +7018,7 @@ function casca(conteudo,semMenu){
   var it=function(v,ic,t,n){return '<button class="cx-nav'+(VIEW===v?' on':'')+'" onclick="CRM.ir(\''+js(v)+'\')">'+ic+' '+esc(t)+(n?'<em>'+n+'</em>':'')+'</button>'};
   var m='<aside class="cx-sb"><div class="cx-logo"><b>CRM Édimo</b><small>Prospecção e suporte</small></div>';
   if(!semMenu&&S){
-    m+=it('painel','📊','Painel')+it('pend','✅','Pendências',nh)+it('leads','🎯','Prospecção',nl)+it('credores','🏢','Credores',na)+it('feedback','💬','Feedback',nf)+it('planilhas','📄','Planilhas',np)+it('campanhas','🏷️','Campanhas');
+    m+=it('painel','📊','Painel')+it('pend','✅','Pendências',nh)+it('leads','🎯','Prospecção',nl)+it('credores','🏢','Credores',na)+it('feedback','💬','Feedback',nf)+it('planilhas','📄','Planilhas',np)+it('campanhas','🏷️','Campanhas')+it('banco','🗄️','Banco de dados');
     if(S.abas&&S.abas.length){m+='<div class="cx-sep">Outras planilhas</div>'+S.abas.map(function(a){return it('aba:'+a,'🗂️',abaNome(a))}).join('')}
     m+='<div class="cx-foot">'+(CARREG?'Atualizando...':'<b>●</b> Conectado à planilha')+'<br>'+(TS?'Atualizado às '+p2(new Date(TS).getHours())+':'+p2(new Date(TS).getMinutes()):'')+'<br><a href="#" onclick="CRM.recarregar();return false" style="color:#0f3557;font-weight:700">↻ Atualizar agora</a></div>';
   }
@@ -7039,6 +7039,7 @@ function render(){
   else if(VIEW==='campanhas')h=vCampanhas();
   else if(VIEW==='feedback')h=vFeedback();
   else if(VIEW==='planilhas')h=vPlanilhas();
+  else if(VIEW==='banco')h=vBanco();
   else if(VIEW.indexOf('aba:')===0)h=vAba(VIEW.slice(4));
   else{VIEW='painel';h=vPainel()}
   var foco=document.activeElement&&document.activeElement.id,pos=0;try{pos=document.activeElement.selectionStart}catch(e){}
@@ -7481,6 +7482,141 @@ window.CRM={
     var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='credores-'+hojeIso()+'.csv';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
 };
 window.PP={fechar:function(){fechar(true)}};   // compatibilidade com o nome antigo
+
+// ---- BANCO DE DADOS: importar planilha (confere repetidos) e criar planilha a partir do banco ----
+// Dados na planilha propria "Banco de Dados - Prospeccao" via CRM-Banco.gs (acoes banco_*).
+var BD={aba:'imp',imp:null,exp:{info:null,carreg:false,cred:{},cols:null,termos:'',de:'',ate:'',res:null,busc:false}};
+var BD_META_OP=[['credor','Credor'],['arquivo','Arquivo de origem'],['importado_em','Data da importação']];
+function bdCss(){if($('bdCss'))return;var s=document.createElement('style');s.id='bdCss';
+  s.textContent='.bd-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.bd-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;padding:16px}.bd-g label{display:flex;flex-direction:column;gap:5px;font-size:.78rem;font-weight:700;color:#475569}.bd-g select,.bd-g input,.bd-g textarea{border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.82rem;background:#fff;color:#1f2937}.bd-kp{display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px 14px}.bd-kp div{border:1px solid #e5e7eb;border-top:3px solid var(--c);border-radius:10px;padding:10px 14px;min-width:140px}.bd-kp b{display:block;font-size:1.3rem}.bd-kp span{font-size:.74rem;color:#64748b}.bd-st{display:inline-block;border-radius:6px;padding:2px 7px;font-size:.7rem;font-weight:800;color:#fff;background:var(--c);white-space:nowrap}.bd-ck{display:flex;flex-wrap:wrap;gap:6px 16px;padding:6px 16px 14px;max-height:200px;overflow:auto}.bd-ck label{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;cursor:pointer}.bd-sub{padding:14px 16px 0;font-size:.82rem;font-weight:800;color:#0f3557}.bd-act{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:0 16px 16px}.bd-nota{padding:10px 16px;color:#64748b;font-size:.78rem}';
+  document.head.appendChild(s)}
+function bdKp(c,t,n){return '<div style="--c:'+c+'"><b>'+inteiro(n||0)+'</b><span>'+esc(t)+'</span></div>'}
+function bdTag(o){if(!o)return '';var m={novo:['Novo','#16a34a'],existe:['Já no banco','#d97706'],dup:['Repetido no arquivo','#9ca3af']}[o.s];
+  return '<span class="bd-st" style="--c:'+m[1]+'">'+m[0]+'</span>'+(o.o&&o.s!=='dup'?' <small style="color:#2563eb">também em '+esc(o.o)+'</small>':'')}
+function bdRot(k){for(var i=0;i<BD_META_OP.length;i++)if(BD_META_OP[i][0]===k)return BD_META_OP[i][1];return k}
+function bdNomeArq(n){return String(n||'planilha').replace(/\.[^.]+$/,'').replace(/[^\w\-]+/g,'_').slice(0,40)}
+function bdCredOpts(sel){var L=S.credores.slice().sort(function(a,b){return String(a.nome).localeCompare(String(b.nome))});
+  return '<option value="">(sem credor)</option>'+L.map(function(c){return '<option value="'+esc(c.id)+'"'+(c.id===sel?' selected':'')+'>'+esc(c.nome)+(c.status&&c.status!=='Ativo'?' ('+esc(c.status)+')':'')+'</option>'}).join('')}
+// o Cobmais grava a "dimensao" errada no xlsx; recalcula pelo que tem de verdade
+function bdArrumaRef(ws){var r=null;for(var k in ws){if(k.charAt(0)==='!')continue;var c=XLSX.utils.decode_cell(k);
+  if(!r)r={s:{r:c.r,c:c.c},e:{r:c.r,c:c.c}};else{if(c.r<r.s.r)r.s.r=c.r;if(c.c<r.s.c)r.s.c=c.c;if(c.r>r.e.r)r.e.r=c.r;if(c.c>r.e.c)r.e.c=c.c}}
+  if(r)ws['!ref']=XLSX.utils.encode_range(r)}
+function bdAchaChave(cab){var t=[/cpf|cnpj|documento/,/telefone|celular|fone|whats/,/nome|cliente|empresa|razao/];
+  for(var a=0;a<t.length;a++)for(var i=0;i<cab.length;i++)if(t[a].test(nz(cab[i])))return i;return 0}
+function bdLerFolha(I,nome){
+  var A=XLSX.utils.sheet_to_json(I.wb.Sheets[nome],{header:1,raw:false,defval:''}),hi=-1;
+  for(var i=0;i<Math.min(A.length,20);i++){if(A[i].filter(function(x){return String(x).trim()}).length>=2){hi=i;break}}
+  I.folha=nome;I.prev=null;I.st=null;I.ch=null;
+  if(hi<0){I.cab=null;I.linhas=[];return}
+  var vist={},cab=A[hi].map(function(x,j){var k=String(x).replace(/\s+/g,' ').trim()||('Coluna '+(j+1)),b=k,n=2;while(vist[nz(k)])k=b+' '+(n++);vist[nz(k)]=1;return k});
+  var L=[];for(var r=hi+1;r<A.length;r++){var row=A[r];if(!row.some(function(x){return String(x).trim()}))continue;
+    var o=[];for(var j=0;j<cab.length;j++)o.push(String(row[j]==null?'':row[j]).trim());L.push(o)}
+  // tira colunas sem nome e sem nenhum dado (sobra comum de Excel)
+  var keep=cab.map(function(k,j){return !/^Coluna \d+$/.test(k)||L.some(function(o){return o[j]!==''})});
+  if(keep.indexOf(false)>=0){cab=cab.filter(function(k,j){return keep[j]});L=L.map(function(o){return o.filter(function(x,j){return keep[j]})})}
+  I.cab=cab;I.linhas=L;I.chave=bdAchaChave(cab);
+}
+// chave do registro: CPF/CNPJ com zeros, telefone so numeros, senao o texto normalizado
+function bdChave(I,r){var v=String(r[I.chave]||'').trim(),k=nz(I.cab[I.chave]),d=v.replace(/\D/g,'');
+  if(/cpf|cnpj|documento/.test(k)&&d){if(d.length<=11)d=('00000000000'+d).slice(-11);else if(d.length<14)d=('00000000000000'+d).slice(-14);return d}
+  if(/telefone|celular|fone|whats/.test(k)&&d)return d.replace(/^55(?=\d{10,11}$)/,'');
+  if(d.length>=8&&d.length===v.replace(/[\s.\-\/()]/g,'').length)return d;
+  var t=nz(v).replace(/[^a-z0-9]+/g,' ').trim();if(t)return t;
+  return 'linha:'+nz(r.join(' ')).replace(/[^a-z0-9]+/g,' ').trim().slice(0,150)}
+
+function vBanco(){bdCss();
+  var h=hd('Banco de dados','Importe as planilhas uma vez: o portal confere os repetidos e monta planilhas sem fazer na mão.','');
+  h+='<div class="bd-tabs"><button class="cx-btn'+(BD.aba==='imp'?' pri':'')+'" onclick="CRM.bdAba(\'imp\')">📥 Importar planilha</button><button class="cx-btn'+(BD.aba==='exp'?' pri':'')+'" onclick="CRM.bdAba(\'exp\')">📤 Criar planilha</button></div>';
+  return h+(BD.aba==='imp'?vBdImp():vBdExp());
+}
+function vBdImp(){var I=BD.imp;
+  var h='<div class="cx-card"><div class="bd-g"><label>Credor da planilha<select onchange="CRM.bdSet(\'credor\',this.value)"'+(I&&I.enviando?' disabled':'')+'>'+bdCredOpts(I?I.credor:'')+'</select></label>'+
+    '<label>Arquivo (Excel ou CSV)<input type="file" accept=".xlsx,.xls,.csv" onchange="CRM.bdArquivo(this)"'+(I&&I.enviando?' disabled':'')+'></label>';
+  if(I&&I.abas&&I.abas.length>1)h+='<label>Aba da planilha<select onchange="CRM.bdFolha(this.value)">'+I.abas.map(function(a){return '<option value="'+esc(a.n)+'"'+(a.n===I.folha?' selected':'')+'>'+esc(a.n)+' ('+inteiro(a.q)+' linhas)</option>'}).join('')+'</select></label>';
+  if(I&&I.cab)h+='<label>Coluna que identifica o registro<select onchange="CRM.bdSet(\'chave\',+this.value)">'+I.cab.map(function(k,i){return '<option value="'+i+'"'+(i===I.chave?' selected':'')+'>'+esc(k)+'</option>'}).join('')+'</select></label>';
+  h+='</div>';
+  if(!I||!I.cab)return h+'<div class="cx-vazio"><b>'+(I&&I.arquivo?'Não achei dados nessa aba':'Escolha o credor e o arquivo')+'</b>O portal confere cada linha com o banco: o que é novo, o que já existe nesse credor e o que se repete dentro do próprio arquivo.</div></div>';
+  h+='<div class="bd-sub">'+esc(I.arquivo)+(I.abas&&I.abas.length>1?' · aba '+esc(I.folha):'')+' · '+inteiro(I.linhas.length)+' linhas</div>';
+  if(I.prev){var P=I.prev;h+='<div class="bd-kp">'+bdKp('#16a34a','Novos',P.novo)+bdKp('#d97706','Já estão no banco',P.existe)+bdKp('#9ca3af','Repetidos no arquivo',P.dup)+bdKp('#2563eb','Também em outro credor',P.outro)+'</div>'}
+  else h+='<div style="height:12px"></div>';
+  h+='<div class="bd-act">'+(I.enviando?'<b>'+esc(I.enviando)+'</b>':'<button class="cx-btn'+(I.prev?'':' pri')+'" onclick="CRM.bdConferir()">'+(I.prev?'↻ Conferir de novo':'🔎 Conferir repetidos')+'</button>'+
+    (I.prev?'<button class="cx-btn" onclick="CRM.bdBaixarConf()">⬇ Baixar conferência (Excel)</button><button class="cx-btn pri" onclick="CRM.bdImportar()"'+(I.prev.novo||I.prev.existe?'':' disabled')+'>📥 Importar para o banco</button>':''))+'</div>';
+  var vis=I.cab.slice(0,6),st=I.st||[];
+  h+='<div class="cx-tw"><table class="cx-t"><thead><tr>'+(I.prev?'<th>Situação</th>':'')+vis.map(function(k,j){return '<th>'+esc(k)+(j===I.chave?' 🔑':'')+'</th>'}).join('')+'</tr></thead><tbody>';
+  I.linhas.slice(0,50).forEach(function(r,i){h+='<tr>'+(I.prev?'<td>'+bdTag(st[i])+'</td>':'')+vis.map(function(k,j){return '<td>'+esc(r[j])+'</td>'}).join('')+'</tr>'});
+  h+='</tbody></table></div>'+(I.linhas.length>50?'<div class="bd-nota">Mostrando 50 de '+inteiro(I.linhas.length)+'. A conferência em Excel traz todas, com todas as colunas.</div>':'');
+  return h+'</div>';
+}
+function vBdExp(){var E=BD.exp;
+  if(!E.info){if(!E.carreg){E.carreg=true;api({acao:'banco_info'}).then(function(j){E.carreg=false;E.info=j;
+      if(!E.cols){E.cols={credor:1};(j.colunas||[]).slice(0,6).forEach(function(k){E.cols[k]=1})}if(VIEW==='banco')render()})
+    .catch(function(e){E.carreg=false;E.info={erro:e.message};if(VIEW==='banco')render()})}
+    return '<div class="cx-card"><div class="cx-vazio">Carregando o banco de dados...</div></div>'}
+  var I=E.info;
+  if(I.erro){var m=I.erro;E.info=null;return '<div class="cx-card"><div class="cx-vazio"><b>Não consegui abrir o banco</b>'+esc(m)+'<br><br><button class="cx-btn" onclick="CRM.bdInfo()">Tentar de novo</button></div></div>'}
+  if(!I.total)return '<div class="cx-card"><div class="cx-vazio"><b>O banco ainda está vazio</b>Importe uma planilha primeiro, em 📥 Importar planilha.</div></div>';
+  var nSel=Object.keys(E.cred).filter(function(k){return E.cred[k]}).length;
+  var h='<div class="cx-card"><div class="bd-sub">Credores <small style="font-weight:600;color:#64748b">· '+inteiro(I.total)+' registros no banco</small></div><div class="bd-ck"><label><input type="checkbox"'+(nSel?'':' checked')+' onchange="CRM.bdTodos()"> Todos</label>'+
+    I.credores.map(function(c){var k=c.id||'_';return '<label><input type="checkbox"'+(E.cred[k]?' checked':'')+' onchange="CRM.bdCk(\'cred\',\''+js(k)+'\',this.checked)"> '+esc(c.nome)+' <span style="color:#94a3b8">('+inteiro(c.n)+')</span></label>'}).join('')+'</div>';
+  h+='<div class="bd-g" style="padding-top:0"><label style="grid-column:1/-1">Nomes, CPFs ou CNPJs (opcional, um por linha)<textarea rows="4" placeholder="Deixe vazio para trazer todos" oninput="CRM.bdVal(\'termos\',this.value)">'+esc(E.termos)+'</textarea></label>'+
+    '<label>Importados de<input type="date" value="'+esc(E.de)+'" onchange="CRM.bdVal(\'de\',this.value)"></label><label>até<input type="date" value="'+esc(E.ate)+'" onchange="CRM.bdVal(\'ate\',this.value)"></label></div>';
+  h+='<div class="bd-sub">Colunas da planilha</div><div class="bd-ck">'+BD_META_OP.concat((I.colunas||[]).map(function(k){return [k,k]})).map(function(o){return '<label><input type="checkbox"'+(E.cols[o[0]]?' checked':'')+' onchange="CRM.bdCk(\'cols\',\''+js(o[0])+'\',this.checked)"> '+esc(o[1])+'</label>'}).join('')+'</div>';
+  h+='<div class="bd-act">'+(E.busc?'<b>Buscando no banco...</b>':'<button class="cx-btn" onclick="CRM.bdBuscar(0)">🔎 Ver prévia</button><button class="cx-btn pri" onclick="CRM.bdBuscar(1)">⬇ Baixar planilha (Excel)</button>')+
+    '<button class="cx-btn" onclick="CRM.bdInfo()">↻ Atualizar</button>'+(I.url&&S.adm?'<a class="cx-btn" href="'+esc(I.url)+'" target="_blank" rel="noopener">Abrir planilha do banco</a>':'')+'</div>';
+  if(E.res){var R=E.res;h+='<div class="bd-sub" style="padding:0 16px 10px">'+inteiro(R.total)+' registros encontrados'+(R.cortado?' · a planilha traz os primeiros '+inteiro(R.linhas.length):'')+'</div>';
+    if(R.linhas.length)h+='<div class="cx-tw"><table class="cx-t"><thead><tr>'+R.cab.map(function(k){return '<th>'+esc(bdRot(k))+'</th>'}).join('')+'</tr></thead><tbody>'+R.linhas.slice(0,50).map(function(r){return '<tr>'+r.map(function(x){return '<td>'+esc(x)+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>'+(R.linhas.length>50?'<div class="bd-nota">Mostrando 50. O Excel traz todos.</div>':'')}
+  return h+'</div>';
+}
+function bdColsSel(){var E=BD.exp,ord=BD_META_OP.map(function(x){return x[0]}).concat(E.info.colunas||[]);return ord.filter(function(k){return E.cols[k]})}
+function bdXlsx(j){var A=[j.cab.map(bdRot)].concat(j.linhas),wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(A),'Planilha');XLSX.writeFile(wb,'planilha-banco-'+hojeIso()+'.xlsx');
+  if(j.cortado)alert('A planilha veio com as primeiras '+j.linhas.length+' linhas de '+j.total+'. Filtre por credor ou nome para pegar o resto.')}
+function bdFimConf(res){var I=BD.imp,seen={},P={novo:0,existe:0,dup:0,outro:0};
+  I.st=I.ch.map(function(k){var s;if(seen[k])s='dup';else{seen[k]=1;s=res[k]&&res[k].e?'existe':'novo'}P[s]++;var o=(res[k]&&res[k].o)||'';if(o&&s!=='dup')P.outro++;return {s:s,o:o}});
+  I.prev=P;I.enviando='';render()}
+
+Object.assign(window.CRM,{
+  bdAba:function(a){BD.aba=a;render()},
+  bdSet:function(k,v){var I=BD.imp;if(!I){BD.imp=I={}}I[k]=v;I.prev=null;I.st=null;I.ch=null;render()},
+  bdArquivo:function(inp){var f=inp.files&&inp.files[0];if(!f)return;var cred=BD.imp?BD.imp.credor||'':'',rd=new FileReader();
+    rd.onload=function(e){try{var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'}),I={credor:cred,arquivo:f.name,wb:wb,abas:[]};
+      wb.SheetNames.forEach(function(n){var ws=wb.Sheets[n];bdArrumaRef(ws);var rg=ws['!ref']?XLSX.utils.decode_range(ws['!ref']):null;I.abas.push({n:n,q:rg?rg.e.r-rg.s.r:0})});
+      var m=I.abas.slice().sort(function(a,b){return b.q-a.q})[0];BD.imp=I;bdLerFolha(I,m?m.n:wb.SheetNames[0]);render()}
+      catch(err){toast('Não consegui ler o arquivo: '+err.message)}};
+    rd.readAsArrayBuffer(f)},
+  bdFolha:function(n){var I=BD.imp;if(!I||!I.wb)return;bdLerFolha(I,n);render()},
+  bdConferir:function(){var I=BD.imp;if(!I||!I.cab||I.enviando)return;
+    I.ch=I.linhas.map(function(r){return bdChave(I,r)});
+    var uniq=[],vis={};I.ch.forEach(function(k){if(!vis[k]){vis[k]=1;uniq.push(k)}});
+    var res={},i=0;I.enviando='Conferindo '+uniq.length+' registros no banco...';render();
+    (function lote(){var part=uniq.slice(i,i+3000);if(!part.length){bdFimConf(res);return}
+      api({acao:'banco_previa',credor_id:I.credor||'',chaves:part}).then(function(j){part.forEach(function(k,x){res[k]={e:j.existe[x],o:j.outro[x]}});i+=3000;lote()})
+      .catch(function(e){I.enviando='';render();toast('Não conferiu: '+e.message)})})()},
+  bdBaixarConf:function(){var I=BD.imp;if(!I||!I.st)return;var lab={novo:'Novo',existe:'Já está no banco',dup:'Repetido no arquivo'};
+    var A=[['Situação','Também em outro credor'].concat(I.cab)].concat(I.linhas.map(function(r,i){return [lab[I.st[i].s],I.st[i].s==='dup'?'':I.st[i].o].concat(r)}));
+    var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(A),'Conferencia');XLSX.writeFile(wb,'conferencia-'+bdNomeArq(I.arquivo)+'-'+hojeIso()+'.xlsx')},
+  bdImportar:function(){var I=BD.imp;if(!I||!I.prev||!I.ch||I.enviando)return;var c=I.credor?acha(I.credor):null;
+    if(!confirm('Importar para o banco?\n\n• '+I.prev.novo+' novos entram\n• '+I.prev.existe+' que já existem só completam campos vazios\n• '+I.prev.dup+' repetidos dentro do arquivo não duplicam\n\nCredor: '+(c?c.nome:'(sem credor)')))return;
+    var N=I.linhas.length,i=0,T={novos:0,repetidos:0,completados:0};
+    (function lote(){
+      if(i>=N){I.enviando='';I.prev=null;I.st=null;BD.exp.info=null;BD.exp.res=null;render();
+        alert('Importação concluída\n\n'+T.novos+' novos no banco\n'+T.repetidos+' já existiam ('+T.completados+' tiveram campos completados)');return}
+      I.enviando='Importando... '+i+' de '+N+' linhas';render();
+      api({acao:'banco_importar',credor_id:I.credor||'',credor:c?c.nome:'',arquivo:I.arquivo,cab:I.cab,linhas:I.linhas.slice(i,i+400),chaves:I.ch.slice(i,i+400)})
+      .then(function(j){T.novos+=j.novos;T.repetidos+=j.repetidos;T.completados+=j.completados;i+=400;lote()})
+      .catch(function(e){I.enviando='';render();alert('A importação parou na linha '+(i+1)+' de '+N+'.\n\n'+e.message+'\n\nO que já entrou está salvo. Clique em Conferir repetidos e importe de novo: o que já entrou não duplica.')})})()},
+  bdInfo:function(){BD.exp.info=null;BD.exp.res=null;render()},
+  bdTodos:function(){BD.exp.cred={};BD.exp.res=null;render()},
+  bdCk:function(g,k,v){BD.exp[g][k]=v?1:0;BD.exp.res=null;render()},
+  bdVal:function(k,v){BD.exp[k]=v},
+  bdBuscar:function(baixar){var E=BD.exp;if(!E.info||E.busc)return;var cols=bdColsSel();if(!cols.length){toast('Marque pelo menos uma coluna');return}
+    var cred=Object.keys(E.cred).filter(function(k){return E.cred[k]}).map(function(k){return k==='_'?'':k});
+    var termos=String(E.termos||'').split(/\r?\n|;/).map(function(s){return s.trim()}).filter(String);
+    E.busc=true;render();
+    api({acao:'banco_buscar',credores:cred,todos:!cred.length,termos:termos,colunas:cols,de:E.de||'',ate:E.ate||''})
+    .then(function(j){E.busc=false;E.res=j;render();if(baixar){if(j.linhas.length)bdXlsx(j);else toast('Nenhum registro com esses filtros')}})
+    .catch(function(e){E.busc=false;render();toast('Não buscou: '+e.message)})}
+});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&MD&&$('cxMd')&&$('cxMd').className==='on')fechar(false)});
 
 // ---- liga no portal ----
