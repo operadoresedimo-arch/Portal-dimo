@@ -2,6 +2,51 @@
 
 <html lang="pt-BR">
 <head>
+<script id="edimo-auth-v2">
+/* Autenticacao no servidor. Nao baixa senhas nem hashes. */
+window.EdimoAuth=(function(){
+  var API='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec',NOME='edimo_sessao_v2',pendente=null;
+  function chave(f){return String(f.login||f.nome||'').trim().toLowerCase().replace(/^\d+\./,'')}
+  function ler(){try{return JSON.parse(sessionStorage.getItem(NOME)||localStorage.getItem(NOME)||'null')}catch(e){return null}}
+  function limpar(){pendente=null;[localStorage,sessionStorage].forEach(function(st){[NOME,'user','mu','mq_tok','lm','nm','em','cacheDados','cacheDadosDia','cacheDados2'].forEach(function(k){st.removeItem(k)})})}
+  function salvar(r){
+    if(r.trocar){pendente=r;return r}
+    pendente=null;
+    localStorage.removeItem(NOME);sessionStorage.removeItem(NOME);
+    (r.keep?localStorage:sessionStorage).setItem(NOME,JSON.stringify({token:r.token,user:r.user,expira:r.expira,keep:r.keep}));
+    if(r.monitoriaToken)localStorage.setItem('mq_tok',JSON.stringify({k:chave(r.user),t:r.monitoriaToken}));
+    return r;
+  }
+  function post(b){
+    var s=pendente||ler();if(!b.sessao&&s)b.sessao=s.token;
+    return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b),cache:'no-store'})
+    .then(function(r){return r.json()}).then(function(r){
+      if(!r||r.status!=='ok'){
+        var erro=new Error(r&&r.msg?r.msg:'Nao foi possivel autenticar. Confira a implantacao.');erro.relogin=!!(r&&r.relogin);
+        if(erro.relogin){limpar();if(typeof cU!=='undefined'&&cU)setTimeout(function(){location.reload()},100)}
+        throw erro;
+      }
+      return r;
+    });
+  }
+  function entrar(u,p,keep){limpar();return post({type:'auth_entrar',usuario:u,senha:p,manter:!!keep}).then(salvar)}
+  function restaurar(){
+    var s=ler();if(!s){limpar();return Promise.resolve(null)}
+    return post({type:'auth_sessao',sessao:s.token}).then(salvar);
+  }
+  function mudar(atual,nova){return post({type:'auth_senha',atual:atual,nova:nova}).then(salvar)}
+  function csvCell(s){s=String(s==null?'':s);return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+  function diretorio(){return post({type:'auth_diretorio'}).then(function(r){
+    var rows=[['NOME','Login','ENTRADA','SENHA','PERFIL']];
+    (r.pessoas||[]).forEach(function(p){rows.push([p.nome,p.login,p.entrada,'',p.perfil])});
+    var texto=rows.map(function(row){return row.map(csvCell).join(',')}).join('\n');
+    return {text:function(){return Promise.resolve(texto)}};
+  })}
+  function senhasStatus(){return post({type:'auth_status_senhas'}).then(function(r){return r.alteradas||{}})}
+  return {login:entrar,restore:restaurar,change:mudar,directoryResponse:diretorio,passwordStatus:senhasStatus,clear:limpar};
+})();
+</script>
+
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, viewport-fit=cover" name="viewport"/>
 <title>Portal | Édimo Soluções em Cobranças</title>
@@ -2981,7 +3026,6 @@ body .sidebar .sb-nav .sb-item{border-radius:12px!important}
 <div class="toolbar" id="toolbar"><button class="btn-new admin-only" onclick="loadDrive()">↻ Atualizar</button><button class="btn-link admin-only" onclick="copyLink()">🔗 Link</button></div>
 <div class="toast" id="toast"></div>
 <script>
-const SH='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?gid=92433521&single=true&output=csv';
 const RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XSTNkcp2pbSTKTsVsygCKucMChmcI4hTZkC_pNEsuFNeQ/pub?output=csv';
 var RK_DRIVE='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=Relat%C3%B3rio%20de%20Acordos.xlsx';
 const CP_M1='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
@@ -3259,13 +3303,14 @@ function parseCSV(text){
   return{d:dt,ta,tv:Math.round(tv*100)/100,ops};
 }
 
-async function doLogin(){const u=document.getElementById('loginUser').value.trim().toLowerCase(),p=document.getElementById('loginPass').value;if(!u||!p)return;document.getElementById('loginError').style.display='none';document.getElementById('loginLoading').style.display='block';try{const r=await fetch(SH),c=await r.text(),rows=c.split('\n').map(r=>{const cells=[];let cell='',inQ=false;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){cells.push(cell.trim());cell=''}else cell+=ch;}cells.push(cell.trim());return cells;});let f=null;for(let i=1;i<rows.length;i++){if(rows[i].length>=4){allEntradas[rows[i][0].toLowerCase().trim()]=loginToShift(rows[i][1]?rows[i][1].trim():'');
-        allLogins[rows[i][0].toLowerCase().trim()]=rows[i][1]?rows[i][1].trim():'';
-        allAdmissao[rows[i][0].toLowerCase().trim()]=rows[i][2]?rows[i][2].trim():'';const n=rows[i][0].toLowerCase().trim(),s=rows[i][3].trim(),pf=rows[i][4]?rows[i][4].toLowerCase().trim():'colaborador';if((n===u||(rows[i][1]&&rows[i][1].toLowerCase().trim()===u))&&s===p){f={nome:rows[i][0].trim(),perfil:pf,entrada:rows[i][2].trim(),login:rows[i][1]?rows[i][1].trim():''};break}}}document.getElementById('loginLoading').style.display='none';if(f){cU=f;try{MQ_token(f.login||f.nome,p)}catch(e){}((document.getElementById('loginKeep')||{}).checked?localStorage:sessionStorage).setItem('user',JSON.stringify(f));document.getElementById('loginScreen').style.display='none';setupUI();startApp()}else{document.getElementById('loginError').style.display='block'}}catch(e){document.getElementById('loginLoading').style.display='none';document.getElementById('loginError').textContent='Erro de conexão';document.getElementById('loginError').style.display='block'}}
+function doLogin(){return window.edimoLoginSeguro?window.edimoLoginSeguro():undefined}
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 function setupUI(){document.getElementById('navUser').innerHTML='👤 '+cU.nome;if(isA())document.querySelectorAll('.admin-only').forEach(el=>el.style.display='')}
-function doLogout(){sessionStorage.removeItem('user');localStorage.removeItem('user');cU=null;cRD=null;window.location.hash='';window.location.reload()}
-window.addEventListener('load',()=>{const s=sessionStorage.getItem('user')||localStorage.getItem('user');if(s){try{cU=JSON.parse(s);document.getElementById('loginScreen').style.display='none';setupUI();startApp()}catch(e){}}});
+function doLogout(){EdimoAuth.clear();sessionStorage.removeItem('user');localStorage.removeItem('user');cU=null;cRD=null;window.location.hash='';window.location.reload()}
+window.addEventListener('load',function(){
+  EdimoAuth.restore().then(function(r){if(!r)return;cU=r.user;(r.keep?localStorage:sessionStorage).setItem('user',JSON.stringify(cU));document.getElementById('loginScreen').style.display='none';setupUI();startApp()})
+  .catch(function(){document.getElementById('loginLoading').style.display='none';var el=document.getElementById('loginError');el.textContent='Entre novamente para validar sua sessao. Sem conexao, tente de novo.';el.style.display='block'});
+});
 function isA(){return cU&&cU.perfil==='admin'}
 
 function loginToShift(login){
@@ -3284,7 +3329,7 @@ function loginToShift(login){
 
 async function loadEntradas(){
   try{
-    const r=await fetch(SH+'&t='+Date.now());
+    const r=await EdimoAuth.directoryResponse();
     const c=await r.text();
     const rows=c.split('\n').map(function(r){const cells=[];let cell='',inQ=false;for(let i=0;i<r.length;i++){const ch=r[i];if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){cells.push(cell.trim());cell='';}else cell+=ch;}cells.push(cell.trim());return cells;});
     for(let i=1;i<rows.length;i++){
@@ -5315,35 +5360,20 @@ window.addEventListener('load',()=>setTimeout(avdNav,50));
 (function(){
 var SCRIPT_URL='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec';
 var pwCtx=null,pend=null;
-function sha(t){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)).then(function(h){return Array.prototype.map.call(new Uint8Array(h),function(x){return('0'+x.toString(16)).slice(-2)}).join('')})}
 function chaveDe(f){return String(f.login||f.nome||'').trim().toLowerCase().replace(/^\d+\./,'')}
-function hashSenha(k,s){return sha('edimo|'+k+'|'+s)}
 function $(i){return document.getElementById(i)}
 function erro(t){$('loginLoading').style.display='none';var e=$('loginError');e.textContent=t;e.style.display='block'}
 function csv(r){var cells=[],cell='',q=false;for(var i=0;i<r.length;i++){var ch=r[i];if(ch==='"')q=!q;else if(ch===','&&!q){cells.push(cell.trim());cell=''}else cell+=ch}cells.push(cell.trim());return cells}
 function entrar(f,keep){cU=f;(keep?localStorage:sessionStorage).setItem('user',JSON.stringify(f));$('loginScreen').style.display='none';setupUI();startApp()}
-window.doLogin=function(){
+window.edimoLoginSeguro=window.doLogin=function(){
   var u=$('loginUser').value.trim().toLowerCase(),p=$('loginPass').value;if(!u||!p)return;
+  var keep=!!($('loginKeep')||{}).checked;
   $('loginError').style.display='none';$('loginLoading').style.display='block';
-  var pSen=fetch(SCRIPT_URL+'?type=senhas&t='+Date.now()).then(function(r){return r.json()}).catch(function(){return null});
-  Promise.all([fetch(SH+'&t='+Date.now()).then(function(r){return r.text()}),pSen]).then(function(res){
-    var rows=res[0].split('\n').map(csv),senhas=res[1],cand=null,padrao='';
-    for(var i=1;i<rows.length;i++){var r=rows[i];if(r.length<4)continue;
-      var nm=r[0].toLowerCase().trim(),lg=r[1]?r[1].trim():'';
-      try{allEntradas[nm]=loginToShift(lg);allLogins[nm]=lg;allAdmissao[nm]=r[2]?r[2].trim():''}catch(e){}
-      if(!cand&&(nm===u||(lg&&lg.toLowerCase()===u))){cand={nome:r[0].trim(),perfil:r[4]?r[4].toLowerCase().trim():'colaborador',entrada:(r[2]||'').trim(),login:lg};padrao=(r[3]||'').trim()}
-    }
-    if(!cand)return erro('Usu\u00E1rio ou senha incorretos');
-    if(!senhas)return erro('Erro de conex\u00E3o, tente de novo');
-    var key=chaveDe(cand),salva=senhas[key];
-    (salva?hashSenha(key,p).then(function(h){return h===salva}):Promise.resolve(padrao===p)).then(function(ok){
-      $('loginLoading').style.display='none';
-      if(!ok)return erro('Usu\u00E1rio ou senha incorretos');
-      var keep=($('loginKeep')||{}).checked;
-      if(!salva){pend={f:cand,keep:keep};pwCtx={key:key,atual:p,forcar:true};abrirSenha(true);return}
-      entrar(cand,keep);
-    });
-  }).catch(function(){erro('Erro de conex\u00E3o')});
+  EdimoAuth.login(u,p,keep).then(function(r){
+    $('loginLoading').style.display='none';$('loginPass').value='';
+    if(r.trocar){pend={f:r.user,keep:keep};pwCtx={key:chaveDe(r.user),atual:p,forcar:true};abrirSenha(true);return}
+    entrar(r.user,keep);
+  }).catch(function(e){erro(e.message||'Erro de conexao')});
 };
 window.abrirSenha=function(forcar){
   if(!forcar){if(typeof cU==='undefined'||!cU)return;pwCtx={key:chaveDe(cU),atual:'',forcar:false}}
@@ -5364,12 +5394,11 @@ window.salvarSenha=function(){
   if(n===atual)return pwErr('A nova senha precisa ser diferente da atual');
   if(n!==c)return pwErr('As senhas n\u00E3o conferem');
   var b=$('pwBtn');b.disabled=true;b.textContent='Salvando...';
-  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'senha',login:pwCtx.key,atual:atual,nova:n})})
-  .then(function(r){return r.json()}).then(function(r){
+  EdimoAuth.change(atual,n).then(function(r){
     b.disabled=false;b.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';
-    if(r.status==='ok'){fecharSenha();if(pwCtx.forcar&&pend){entrar(pend.f,pend.keep);pend=null}else alert('Senha alterada!')}
+    if(r.status==='ok'){var forcar=pwCtx.forcar,keep=pend&&pend.keep;fecharSenha();pwCtx=null;pend=null;if(forcar){entrar(r.user,keep)}else{cU=r.user;alert('Senha alterada!')}}
     else pwErr(r.msg||'N\u00E3o foi poss\u00EDvel salvar');
-  }).catch(function(){b.disabled=false;b.textContent=pwCtx.forcar?'Salvar e entrar':'Salvar';pwErr('Erro de conex\u00E3o, tente de novo')});
+  }).catch(function(e){b.disabled=false;b.textContent=pwCtx&&pwCtx.forcar?'Salvar e entrar':'Salvar';pwErr(e.message||'Erro de conexao, tente de novo')});
 };
 ['pwNova','pwConf','pwAtual'].forEach(function(i){var el=$(i);if(el)el.addEventListener('keydown',function(e){if(e.key==='Enter')salvarSenha()})});
 })();
@@ -7730,7 +7759,7 @@ window.showPage=function(p){montar();
 let PESSOAS=null,ED=null,FIL='todos',BUSCA='',MSG='';
 function csv(r){const c=[];let s='',q=false;for(const ch of r){if(ch==='"')q=!q;else if(ch===','&&!q){c.push(s.trim());s=''}else s+=ch}c.push(s.trim());return c}
 async function abrir(){if(!pode('config'))return;ED=ED||JSON.parse(JSON.stringify(CFG));render();
-  if(!PESSOAS){try{const t=await fetch(SH+'&t='+Date.now()).then(r=>r.text()),R=t.split('\n').map(csv);
+  if(!PESSOAS){try{const t=await EdimoAuth.directoryResponse().then(r=>r.text()),R=t.split('\n').map(csv);
       PESSOAS=R.slice(1).filter(r=>r.length>=4&&r[0]).map(r=>({nome:r[0].trim(),login:(r[1]||'').trim(),pl:dePlanilha(r[4]||''),plTxt:(r[4]||'colaborador').trim()}))
         .map(p=>Object.assign(p,{k:chaveP(p.login,p.nome)})).sort((a,b)=>a.nome.localeCompare(b.nome))}catch(e){PESSOAS=[]}render()}}
 const tit=n=>String(n||'').toLowerCase().split(/\s+/).filter(Boolean).map(w=>['de','da','do','das','dos','e'].includes(w)?w:w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
