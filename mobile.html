@@ -937,15 +937,17 @@ function loadData(){
   if(temCache){if(!acessoValido()){derrubar();return}go(curTab||'inicio')}else telaCarregando();
   // tudo em paralelo; ranking depende so da lista de logins
   var pLog=loadLogins().then(function(){if(!acessoValido()){derrubar();throw 'off'}});
-  var pRk=pLog.then(loadRanking).then(function(){if(!temCache&&primeiraCarga){primeiraCarga=false;go('inicio')}else if(curTab==='inicio')rerender()});
+  // Baixa o ranking enquanto o cadastro carrega, mas so interpreta apos o cadastro.
+  var pCSV=rkCSV();
+  var pRk=Promise.all([pLog,pCSV]).then(function(inicio){return loadRanking(inicio[1])}).then(function(){if(!temCache&&primeiraCarga){primeiraCarga=false;go('inicio')}else if(curTab==='inicio')rerender()});
   var pResto=Promise.all([loadPonto(),loadComp(),loadHist()]);
   var pFoto=loadFotos();
   Promise.all([pRk,pResto]).then(function(){if(curTab!=='inicio')goKeep(curTab);salvarCache()}).catch(function(){});
   Promise.all([pRk,pFoto]).then(function(){rerender();salvarCache()}).catch(function(){});
 }
 
-function loadRanking(){
-  return rkCSV().then(function(csv){
+function loadRanking(csvPronto){
+  return (typeof csvPronto==='string'?Promise.resolve(csvPronto):rkCSV()).then(function(csv){
     var lines=csv.split('\n'),dt='',hI=-1;
     for(var i=0;i<lines.length;i++){var m=lines[i].match(/(\d{2}\/\d{2}\/\d{4})\s*at/);if(m){dt=m[1];break}}
     for(var i=0;i<lines.length;i++){if(lines[i].includes(',Operador,')){hI=i;break}}

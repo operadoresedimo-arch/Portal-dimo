@@ -3361,7 +3361,7 @@ async function loadEntradas(){
 }
 
 setInterval(async function(){try{await loadPonto();updateFaltaAlert();if(cRD&&document.getElementById('pageRanking')&&document.getElementById('pageRanking').offsetParent){const y=window.scrollY,mc=document.querySelector('.main,.content,main');const my=mc?mc.scrollTop:0;renderR(cRD);window.scrollTo(0,y);if(mc)mc.scrollTop=my}}catch(e){}},300000); // ponto atualiza a cada 5 min
-async function startApp(){showNav();showPage('ranking');const h=window.location.hash;if(h&&h.startsWith('#d=')){try{const j=LZString.decompressFromEncodedURIComponent(h.substring(3));if(j){cRD=JSON.parse(j);renderR(cRD);loadEntradas().then(function(){renderR(cRD)});loadCompDrive();return}}catch(e){}}await loadDrive();await loadEntradas();if(cRD)renderR(cRD);loadCompDrive();}
+async function startApp(){showNav();showPage('ranking');const h=window.location.hash;if(h&&h.startsWith('#d=')){try{const j=LZString.decompressFromEncodedURIComponent(h.substring(3));if(j){cRD=JSON.parse(j);renderR(cRD);loadEntradas().then(function(){renderR(cRD)});loadCompDrive();return}}catch(e){}}await loadDrive();loadCompDrive();}
 
 // sem acordo ainda no dia: mantem o cabecalho (com o botao do discador e o Hoje/Escolher dia) e avisa
 function rankSemAcordos(){const pg=document.getElementById('pageRanking');if(!pg)return;
@@ -3370,7 +3370,7 @@ function rankSemAcordos(){const pg=document.getElementById('pageRanking');if(!pg
     '<p>Édimo Debarba Junior <b>·</b> Última leitura às <strong>'+hr+'</strong></p></div>'+(window.MODO?window.MODO.widget('acordos'):'')+'</div>'+
     '<div class="nx-vazio"><b>Nenhum acordo ainda hoje</b><span>Última leitura do Cobmais às '+hr+'. A tela atualiza sozinha quando sair o primeiro acordo.</span></div><div id="eqWrap">'+(window.EQUIPE?window.EQUIPE.html(''):'')+'</div></div>';
   if(window.histBarra)window.histBarra()}
-async function loadDrive(){const rl0=document.getElementById('rankLoading');if(rl0)rl0.style.display='block';try{await loadPonto();const csv=await rkCSV();const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{rankSemAcordos()}}catch(e){const rl=document.getElementById('rankLoading');if(rl){rl.style.display='block';rl.innerHTML='Erro ao carregar.'}}}
+async function loadDrive(){const rl0=document.getElementById('rankLoading');if(rl0)rl0.style.display='block';try{const inicio=await Promise.all([loadPonto(),rkCSV(),loadEntradas()]);const csv=inicio[1];const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{rankSemAcordos()}}catch(e){const rl=document.getElementById('rankLoading');if(rl){rl.style.display='block';rl.innerHTML='Erro ao carregar.'}}}
 
 function showNav(){document.getElementById('nav').style.display='block'}
 function showPage(p){
