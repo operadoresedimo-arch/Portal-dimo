@@ -54,6 +54,9 @@ window.EdimoAuth=(function(){
       return post(body,true).then(function(r){return resposta(r)});
     }
     var recurso=u.searchParams.get('type');
+    if(['comissao','acordosdia','diashist'].indexOf(recurso)>=0){
+      return post({type:'relatorio_ler',recurso:recurso,arquivo:u.searchParams.get('arquivo')||'mes atual.xlsx',data:u.searchParams.get('data')||''}).then(function(r){return resposta(r.dados)});
+    }
     if(['feedver','feed','feedfoto','fotos'].indexOf(recurso)<0)return fetch(url,opcoes);
     return post({type:'dados_ler',recurso:recurso,id:u.searchParams.get('id')||''}).then(function(r){return resposta(r.dados)});
   }
@@ -754,7 +757,6 @@ body.is-adm .op-only{display:none!important}
 </div>
 </div>
 <script>
-var RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XSTNkcp2pbSTKTsVsygCKucMChmcI4hTZkC_pNEsuFNeQ/pub?output=csv';
 var RK_DRIVE='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=Relat%C3%B3rio%20de%20Acordos.xlsx';
 var CP_M1='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
 var CP_M2='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
@@ -1009,9 +1011,9 @@ function wsBR(ws){for(var k in ws){if(k[0]==='!')continue;var c=ws[k];if(!c)cont
  if(c.t==='n'&&!(c.z&&XLSX.SSF.is_date(c.z))){c.w=String(Math.round(c.v*100)/100).replace('.',',');}
  else if(c.t==='s'&&/^-?\d{1,3}(,\d{3})*\.\d{1,2}$|^-?\d+\.\d{1,2}$/.test(String(c.v).trim())){c.w=c.v=String(c.v).trim().replace(/,/g,'').replace('.',',');}}
  return ws;}
-function rkCSV(){return fetch(RK_DRIVE+'&t='+Date.now()).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.msg||'sem arquivo');var bin=atob(j.base64),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);var wb=XLSX.read(a,{type:'array'});return XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));}).catch(function(e){console.warn('Ranking: nao li o Relatorio de Acordos do Drive, usando link antigo:',e&&e.message||e);return fetch(RK+'&t='+Date.now()).then(function(r){return r.text()})});}
+function rkCSV(){return EdimoAuth.fetchData(RK_DRIVE+'&t='+Date.now()).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.msg||'sem arquivo');var bin=atob(j.base64),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);var wb=XLSX.read(a,{type:'array'});return XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));});}
 function compRemota(url){
-  return fetch(url+'&t='+Date.now()).then(function(r){return r.json()}).then(function(j){
+  return EdimoAuth.fetchData(url+'&t='+Date.now()).then(function(r){return r.json()}).then(function(j){
     if(!j.ok)throw new Error(j.msg||'arquivo nao encontrado');
     var bin=atob(j.base64),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
     var wb=XLSX.read(a,{type:'array'}),csv=XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));return parseCompCSV(csv);

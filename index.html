@@ -55,6 +55,9 @@ window.EdimoAuth=(function(){
       return post(body,true).then(function(r){return resposta(r)});
     }
     var recurso=u.searchParams.get('type');
+    if(['comissao','acordosdia','diashist'].indexOf(recurso)>=0){
+      return post({type:'relatorio_ler',recurso:recurso,arquivo:u.searchParams.get('arquivo')||'mes atual.xlsx',data:u.searchParams.get('data')||''}).then(function(r){return resposta(r.dados)});
+    }
     if(['feedver','feed','feedfoto','fotos'].indexOf(recurso)<0)return fetch(url,opcoes);
     return post({type:'dados_ler',recurso:recurso,id:u.searchParams.get('id')||''}).then(function(r){return resposta(r.dados)});
   }
@@ -3041,7 +3044,6 @@ body .sidebar .sb-nav .sb-item{border-radius:12px!important}
 <div class="toolbar" id="toolbar"><button class="btn-new admin-only" onclick="loadDrive()">↻ Atualizar</button><button class="btn-link admin-only" onclick="copyLink()">🔗 Link</button></div>
 <div class="toast" id="toast"></div>
 <script>
-const RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XSTNkcp2pbSTKTsVsygCKucMChmcI4hTZkC_pNEsuFNeQ/pub?output=csv';
 var RK_DRIVE='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=Relat%C3%B3rio%20de%20Acordos.xlsx';
 const CP_M1='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
 const CP_M2='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
@@ -3573,9 +3575,9 @@ function wsBR(ws){for(var k in ws){if(k[0]==='!')continue;var c=ws[k];if(!c)cont
  if(c.t==='n'&&!(c.z&&XLSX.SSF.is_date(c.z))){c.w=String(Math.round(c.v*100)/100).replace('.',',');}
  else if(c.t==='s'&&/^-?\d{1,3}(,\d{3})*\.\d{1,2}$|^-?\d+\.\d{1,2}$/.test(String(c.v).trim())){c.w=c.v=String(c.v).trim().replace(/,/g,'').replace('.',',');}}
  return ws;}
-function rkCSV(){return fetch(RK_DRIVE+'&t='+Date.now()).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.msg||'sem arquivo');var bin=atob(j.base64),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);var wb=XLSX.read(a,{type:'array'});return XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));}).catch(function(e){console.warn('Ranking: nao li o Relatorio de Acordos do Drive, usando link antigo:',e&&e.message||e);return fetch(RK+'&t='+Date.now()).then(function(r){return r.text()})});}
+function rkCSV(){return EdimoAuth.fetchData(RK_DRIVE+'&t='+Date.now()).then(function(r){return r.json()}).then(function(j){if(!j.ok)throw new Error(j.msg||'sem arquivo');var bin=atob(j.base64),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);var wb=XLSX.read(a,{type:'array'});return XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));});}
 async function compRemota(url){
-  const j=await fetch(url+'&t='+Date.now()).then(r=>r.json());
+  const j=await EdimoAuth.fetchData(url+'&t='+Date.now()).then(r=>r.json());
   if(!j.ok)throw new Error(j.msg||'arquivo nao encontrado');
   const bin=atob(j.base64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
   const wb=XLSX.read(a,{type:'array'}),csv=XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));
@@ -6337,7 +6339,7 @@ document.addEventListener('fullscreenchange',flashPai);
 let tvLeitura=null;
 // Le o Relatorio de Acordos direto do Drive. Sem reserva no link antigo: ele devolvia a planilha de ontem.
 async function tvLerDrive(){
-  const j=await fetch(RK_DRIVE+'&t='+Date.now(),{cache:'no-store'}).then(r=>r.json());
+  const j=await EdimoAuth.fetchData(RK_DRIVE+'&t='+Date.now(),{cache:'no-store'}).then(r=>r.json());
   if(!j||!j.ok)throw new Error((j&&j.msg)||'sem arquivo');
   const bin=atob(j.base64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
   const wb=XLSX.read(a,{type:'array'}),csv=XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));
@@ -6705,7 +6707,7 @@ function calHtml(){
 }
 function redesenha(){const b=document.querySelector('#pageRanking .hist-bar');if(b)b.remove();barra()}
 window.histBarra=barra;
-window.histCal=function(e){if(e)e.stopPropagation();calAberto=!calAberto;if(calAberto){const r=rankDia||hoje();calMes=new Date(+r.slice(0,4),+r.slice(5,7)-1,1)}redesenha()};
+window.histCal=function(e){if(e)e.stopPropagation();carregarDiasProtegidos();calAberto=!calAberto;if(calAberto){const r=rankDia||hoje();calMes=new Date(+r.slice(0,4),+r.slice(5,7)-1,1)}redesenha()};
 window.histMes=function(n){calMes=new Date(calMes.getFullYear(),calMes.getMonth()+n,1);redesenha()};
 window.histEscolhe=function(iso){calAberto=false;histDia(iso)};
 document.addEventListener('click',()=>{if(calAberto){calAberto=false;redesenha()}});
@@ -6713,7 +6715,7 @@ window.histDia=async function(dia){
   if(!dia||dia===hoje()){rankDia='';histData=null;histInfo='';if(cRD)renderR(cRD);if(typeof loadDrive==='function')loadDrive();return}
   rankDia=dia;histInfo='Carregando '+br(dia)+'...';if(cRD)renderR(cRD);
   try{
-    const j=await fetch(base()+'?type=acordosdia&data='+dia+'&t='+Date.now()).then(r=>r.json());
+    const j=await EdimoAuth.fetchData(base()+'?type=acordosdia&data='+dia+'&t='+Date.now()).then(r=>r.json());
     if(rankDia!==dia)return;
     if(!j.ok){histData=null;rankDia='';histInfo=(j.msg==='sem registro desse dia'?'Sem registro em '+br(dia)+'. O histórico começa a ser salvo a partir de hoje.':'Não consegui abrir: '+(j.msg||'erro'));if(cRD)renderR(cRD);return}
     const bin=atob(j.base64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
@@ -6722,7 +6724,13 @@ window.histDia=async function(dia){
     d.d=br(dia);histData=d;histInfo='Mostrando '+br(dia)+' · fechamento salvo às '+String(j.salvo||'').slice(11);renderR(histData);
   }catch(e){rankDia='';histData=null;histInfo='Não consegui abrir esse dia agora.';if(cRD)renderR(cRD)}
 };
-fetch(base()+'?type=diashist&t='+Date.now()).then(r=>r.json()).then(j=>{if(j&&j.ok){histDias=j.dias||[];if(calAberto)redesenha()}}).catch(()=>{});
+let histDiasLidosEm=0,histDiasLendo=false;
+function carregarDiasProtegidos(){
+  if(typeof cU==='undefined'||!cU||histDiasLendo||Date.now()-histDiasLidosEm<60000)return;
+  histDiasLendo=true;
+  EdimoAuth.fetchData(base()+'?type=diashist&t='+Date.now()).then(r=>r.json()).then(j=>{if(j&&j.ok){histDias=j.dias||[];histDiasLidosEm=Date.now();if(calAberto)redesenha()}}).catch(()=>{}).finally(()=>{histDiasLendo=false});
+}
+
 })();
 </script>
 <script id="edimo-diagnostico">
