@@ -16,11 +16,12 @@ window.EdimoAuth=(function(){
     if(r.monitoriaToken)localStorage.setItem('mq_tok',JSON.stringify({k:chave(r.user),t:r.monitoriaToken}));
     return r;
   }
-  function post(b){
+  function post(b,preservarErro){
     var s=pendente||ler();if(!b.sessao&&s)b.sessao=s.token;
     return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b),cache:'no-store'})
     .then(function(r){return r.json()}).then(function(r){
       if(!r||r.status!=='ok'){
+        if(preservarErro&&r&&!r.relogin)return r;
         var erro=new Error(r&&r.msg?r.msg:'Nao foi possivel autenticar. Confira a implantacao.');erro.relogin=!!(r&&r.relogin);
         if(erro.relogin){limpar();if(typeof cU!=='undefined'&&cU)setTimeout(function(){location.reload()},100)}
         throw erro;
@@ -42,7 +43,21 @@ window.EdimoAuth=(function(){
     return {text:function(){return Promise.resolve(texto)}};
   })}
   function senhasStatus(){return post({type:'auth_status_senhas'}).then(function(r){return r.alteradas||{}})}
-  return {login:entrar,restore:restaurar,change:mudar,directoryResponse:diretorio,passwordStatus:senhasStatus,clear:limpar};
+  function resposta(dados,texto){return {json:function(){return Promise.resolve(dados)},text:function(){return Promise.resolve(texto===undefined?JSON.stringify(dados):texto)}}}
+  function ponto(){return post({type:'dados_ler',recurso:'ponto'}).then(function(r){return resposta(null,r.texto)})}
+  function buscarDados(url,opcoes){
+    var u=new URL(String(url),location.href),api=new URL(API),opts=opcoes||{};
+    if(u.origin!==api.origin||u.pathname!==api.pathname)return fetch(url,opcoes);
+    if(String(opts.method||'GET').toUpperCase()==='POST'){
+      var body;try{body=JSON.parse(opts.body)}catch(e){return fetch(url,opcoes)}
+      if(['post','comentar','reagir','feeddel','fixar','foto','fotodel','reset'].indexOf(body.type)<0)return fetch(url,opcoes);
+      return post(body,true).then(function(r){return resposta(r)});
+    }
+    var recurso=u.searchParams.get('type');
+    if(['feedver','feed','feedfoto','fotos'].indexOf(recurso)<0)return fetch(url,opcoes);
+    return post({type:'dados_ler',recurso:recurso,id:u.searchParams.get('id')||''}).then(function(r){return resposta(r.dados)});
+  }
+  return {login:entrar,restore:restaurar,change:mudar,directoryResponse:diretorio,passwordStatus:senhasStatus,clear:limpar,pointResponse:ponto,fetchData:buscarDados};
 })();
 </script>
 
@@ -741,7 +756,6 @@ body.is-adm .op-only{display:none!important}
 <script>
 var RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XSTNkcp2pbSTKTsVsygCKucMChmcI4hTZkC_pNEsuFNeQ/pub?output=csv';
 var RK_DRIVE='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=Relat%C3%B3rio%20de%20Acordos.xlsx';
-var PT='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?output=csv';
 var CP_M1='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
 var CP_M2='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
 var CP_NOW='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=mes%20atual.xlsx';
@@ -873,7 +887,7 @@ function loadLogins(){
     });
   }).catch(function(){});
 }
-function loadFotos(){if(!temScript)return Promise.resolve();return fetch(SCRIPT_URL+'?type=fotos&t='+Date.now()).then(function(r){return r.json()}).then(function(f){fotoMap=f||{}}).catch(function(){})}
+function loadFotos(){if(!temScript)return Promise.resolve();return EdimoAuth.fetchData(SCRIPT_URL+'?type=fotos&t='+Date.now()).then(function(r){return r.json()}).then(function(f){fotoMap=f||{}}).catch(function(){})}
 // Confere se o login salvo no celular ainda existe na aba Login (mudou no Cobmais ou saiu da empresa -> desloga)
 function acessoValido(){
   if(!cU||loginsLidos<10)return true; // sem internet ou planilha incompleta: nao derruba
@@ -979,7 +993,7 @@ function loadRanking(){
 }
 
 function loadPonto(){
-  return fetch(PT+'&t='+Date.now()).then(function(r){return r.text()}).then(function(csv){
+  return EdimoAuth.pointResponse().then(function(r){return r.text()}).then(function(csv){
     var lines=csv.split('\n'),rows=[];
     for(var i=1;i<lines.length;i++){
       var cells=csvSplit(lines[i]);
@@ -1342,7 +1356,7 @@ function fotoSel(inp){
 function enviarFoto(url){
   var key=chaveDe(cU),dv=document.getElementById('drwAv');
   dv.style.cssText='background:url('+url+') center/cover;opacity:.5';dv.textContent='';
-  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'foto',login:key,foto:url})})
+  EdimoAuth.fetchData(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'foto',login:key,foto:url})})
   .then(function(r){return r.json()}).then(function(r){
     dv.style.opacity='1';
     if(r.status==='ok'){fotoMap[key]=url;go(curTab)}else alert(r.msg||'N\u00E3o foi poss\u00EDvel salvar a foto');
@@ -1351,7 +1365,7 @@ function enviarFoto(url){
 function removerFoto(k,n){
   if(!confirm('Remover a foto de '+n+'?'))return;
   if(!admPass){admPass=prompt('Confirme a SUA senha de admin:')||'';if(!admPass)return}
-  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'fotodel',admin:chaveDe(cU),senha:admPass,login:k})})
+  EdimoAuth.fetchData(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'fotodel',admin:chaveDe(cU),senha:admPass,login:k})})
   .then(function(r){return r.json()}).then(function(r){
     if(r.status==='ok'){delete fotoMap[k];var o=document.querySelector('.tr-ov');if(o)o.remove();go(curTab)}
     else{if(/admin/i.test(r.msg||''))admPass='';alert(r.msg||'N\u00E3o foi poss\u00EDvel remover')}
@@ -1363,7 +1377,7 @@ var feedData=null,feedVer=-1,feedFotos={},feedFotoReq={},feedTimer=null,feedImg=
 function hx(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function avK(k,cor){var f=fotoMap[k];return f?'background:url('+f+') center/cover;color:transparent;':'background:'+cor+';'}
 function nomeCurto(n){n=String(n||'').toLowerCase().split(/\s+/).filter(function(x){return x});var r=n.length>1?[n[0],n[n.length-1]]:n;return r.map(function(p){return p.charAt(0).toUpperCase()+p.slice(1)}).join(' ')}
-function api(b){return fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)}).then(function(r){return r.json()})}
+function api(b){return EdimoAuth.fetchData(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)}).then(function(r){return r.json()})}
 function admCred(b){if(!admPass)admPass=prompt('Confirme a SUA senha de admin:')||'';if(!admPass)return false;b.admin=chaveDe(cU);b.senha=admPass;return true}
 function tempoAtras(iso){
   var d=new Date(iso),m=Math.floor((Date.now()-d)/60000);
@@ -1414,10 +1428,10 @@ function renderInicio(){
 }
 function carregarFeed(force){
   if(!temScript||feedBusy)return;feedBusy=true;
-  var p=force?Promise.resolve({ver:-2}):fetch(SCRIPT_URL+'?type=feedver&t='+Date.now()).then(function(r){return r.json()});
+  var p=force?Promise.resolve({ver:-2}):EdimoAuth.fetchData(SCRIPT_URL+'?type=feedver&t='+Date.now()).then(function(r){return r.json()});
   p.then(function(v){
     if(!force&&v.ver===feedVer){feedBusy=false;return}
-    return fetch(SCRIPT_URL+'?type=feed&t='+Date.now()).then(function(r){return r.json()}).then(function(d){feedData=d;feedVer=d.ver;feedBusy=false;desenharFeed();salvarCache()});
+    return EdimoAuth.fetchData(SCRIPT_URL+'?type=feed&t='+Date.now()).then(function(r){return r.json()}).then(function(d){feedData=d;feedVer=d.ver;feedBusy=false;desenharFeed();salvarCache()});
   }).catch(function(){feedBusy=false;var l=document.getElementById('fdList');if(l&&!feedData)l.innerHTML='<div class="ad-empty">N\u00E3o foi poss\u00EDvel carregar o feed</div>'});
 }
 function atualizarTopo(){return loadRanking().then(function(){var b=document.getElementById('fdTopBox');if(b)b.innerHTML=topoFeed(rankData)})}
@@ -1465,7 +1479,7 @@ function desenharFeed(){
 }
 function carregarFotoPost(id){
   if(feedFotoReq[id])return;feedFotoReq[id]=1;
-  fetch(SCRIPT_URL+'?type=feedfoto&id='+encodeURIComponent(id)).then(function(r){return r.json()}).then(function(r){
+  EdimoAuth.fetchData(SCRIPT_URL+'?type=feedfoto&id='+encodeURIComponent(id)).then(function(r){return r.json()}).then(function(r){
     if(r&&r.foto){feedFotos[id]=r.foto;var d=document.querySelector('.fd-img[data-f="'+id+'"]');if(d)d.innerHTML=fdFotosHtml(r.foto)}
   }).catch(function(){feedFotoReq[id]=0});
 }
@@ -1759,7 +1773,7 @@ function diasNoMes(ano,mes){return new Date(ano,mes+1,0).getDate()}
 // dia do mes anterior com a mesma quantidade de dias uteis
 function diaEquivalente(ano,mes,alvo){var n=diasNoMes(ano,mes),t=0;for(var i=1;i<=n;i++){t+=pesoDia(new Date(ano,mes,i));if(t>=alvo)return i}return n}
 var histData=null;
-function loadHist(){if(!temScript||!isAdm())return Promise.resolve();return fetch(SCRIPT_URL+'?type=hist&t='+Date.now()).then(function(r){return r.json()}).then(function(h){histData=h&&h.dias?h.dias:null}).catch(function(){})}
+function loadHist(){if(!temScript||!isAdm())return Promise.resolve();return EdimoAuth.fetchData(SCRIPT_URL+'?type=hist&t='+Date.now()).then(function(r){return r.json()}).then(function(h){histData=h&&h.dias?h.dias:null}).catch(function(){})}
 function renderCompGeral(){
   var el=document.getElementById('pgComp');
   var cur=compMonths[2]?compMonths[2].ops.filter(function(o){return ativoOp(o.raw)}):[],prv=compMonths[1]?compMonths[1].ops:[];
@@ -1866,7 +1880,7 @@ function renderSenhas(){
 function resetSenha(k,n){
   if(!confirm('Resetar a senha de '+n+' para Edimo123?'))return;
   if(!admPass){admPass=prompt('Confirme a SUA senha de admin:')||'';if(!admPass)return}
-  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'reset',admin:chaveDe(cU),senha:admPass,login:k})})
+  EdimoAuth.fetchData(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type:'reset',admin:chaveDe(cU),senha:admPass,login:k})})
   .then(function(r){return r.json()}).then(function(r){
     if(r.status==='ok'){alert('Senha de '+n+' resetada!');renderSenhas()}
     else{if(/admin/i.test(r.msg||''))admPass='';alert(r.msg||'N\u00E3o foi poss\u00EDvel resetar')}

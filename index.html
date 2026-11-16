@@ -17,11 +17,12 @@ window.EdimoAuth=(function(){
     if(r.monitoriaToken)localStorage.setItem('mq_tok',JSON.stringify({k:chave(r.user),t:r.monitoriaToken}));
     return r;
   }
-  function post(b){
+  function post(b,preservarErro){
     var s=pendente||ler();if(!b.sessao&&s)b.sessao=s.token;
     return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b),cache:'no-store'})
     .then(function(r){return r.json()}).then(function(r){
       if(!r||r.status!=='ok'){
+        if(preservarErro&&r&&!r.relogin)return r;
         var erro=new Error(r&&r.msg?r.msg:'Nao foi possivel autenticar. Confira a implantacao.');erro.relogin=!!(r&&r.relogin);
         if(erro.relogin){limpar();if(typeof cU!=='undefined'&&cU)setTimeout(function(){location.reload()},100)}
         throw erro;
@@ -43,7 +44,21 @@ window.EdimoAuth=(function(){
     return {text:function(){return Promise.resolve(texto)}};
   })}
   function senhasStatus(){return post({type:'auth_status_senhas'}).then(function(r){return r.alteradas||{}})}
-  return {login:entrar,restore:restaurar,change:mudar,directoryResponse:diretorio,passwordStatus:senhasStatus,clear:limpar};
+  function resposta(dados,texto){return {json:function(){return Promise.resolve(dados)},text:function(){return Promise.resolve(texto===undefined?JSON.stringify(dados):texto)}}}
+  function ponto(){return post({type:'dados_ler',recurso:'ponto'}).then(function(r){return resposta(null,r.texto)})}
+  function buscarDados(url,opcoes){
+    var u=new URL(String(url),location.href),api=new URL(API),opts=opcoes||{};
+    if(u.origin!==api.origin||u.pathname!==api.pathname)return fetch(url,opcoes);
+    if(String(opts.method||'GET').toUpperCase()==='POST'){
+      var body;try{body=JSON.parse(opts.body)}catch(e){return fetch(url,opcoes)}
+      if(['post','comentar','reagir','feeddel','fixar','foto','fotodel','reset'].indexOf(body.type)<0)return fetch(url,opcoes);
+      return post(body,true).then(function(r){return resposta(r)});
+    }
+    var recurso=u.searchParams.get('type');
+    if(['feedver','feed','feedfoto','fotos'].indexOf(recurso)<0)return fetch(url,opcoes);
+    return post({type:'dados_ler',recurso:recurso,id:u.searchParams.get('id')||''}).then(function(r){return resposta(r.dados)});
+  }
+  return {login:entrar,restore:restaurar,change:mudar,directoryResponse:diretorio,passwordStatus:senhasStatus,clear:limpar,pointResponse:ponto,fetchData:buscarDados};
 })();
 </script>
 
@@ -3032,7 +3047,6 @@ const CP_M1='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e0
 const CP_M2='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
 const CP_NOW='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=mes%20atual.xlsx';
 const CP_M3='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=3%20mes%20atras.xlsx';
-const PT='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?output=csv';
 let cU=null,cRD=null;const cD=[null,null,null,null];let allEntradas={};let allLogins={};let allAdmissao={};let pontoData=null;
 
 function parseBR(s){if(!s)return 0;s=s.replace(/"/g,'').trim();if(!s||s==='0')return 0;s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0;}
@@ -3040,7 +3054,7 @@ function parseBR(s){if(!s)return 0;s=s.replace(/"/g,'').trim();if(!s||s==='0')re
 // === PONTO INTEGRATION ===
 async function loadPonto(){
   try{
-    const r=await fetch(PT+'&t='+Date.now());
+    const r=await EdimoAuth.pointResponse();
     const csv=await r.text();
     const lines=csv.split('\n');
     const rows=[];
