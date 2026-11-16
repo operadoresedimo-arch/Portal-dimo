@@ -4,7 +4,7 @@
 <script id="edimo-auth-v2">
 /* Autenticacao no servidor. Nao baixa senhas nem hashes. */
 window.EdimoAuth=(function(){
-  var API='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec',NOME='edimo_sessao_v2',pendente=null;
+  var API='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec',NOME='edimo_sessao_v2',pendente=null;
   function chave(f){return String(f.login||f.nome||'').trim().toLowerCase().replace(/^\d+\./,'')}
   function ler(){try{return JSON.parse(sessionStorage.getItem(NOME)||localStorage.getItem(NOME)||'null')}catch(e){return null}}
   function limpar(){pendente=null;[localStorage,sessionStorage].forEach(function(st){[NOME,'user','mu','mq_tok','lm','nm','em','cacheDados','cacheDadosDia','cacheDados2'].forEach(function(k){st.removeItem(k)})})}
@@ -740,11 +740,11 @@ body.is-adm .op-only{display:none!important}
 </div>
 <script>
 var RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XSTNkcp2pbSTKTsVsygCKucMChmcI4hTZkC_pNEsuFNeQ/pub?output=csv';
-var RK_DRIVE='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=Relat%C3%B3rio%20de%20Acordos.xlsx';
+var RK_DRIVE='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=Relat%C3%B3rio%20de%20Acordos.xlsx';
 var PT='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?output=csv';
-var CP_M1='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
-var CP_M2='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
-var CP_NOW='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=mes%20atual.xlsx';
+var CP_M1='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
+var CP_M2='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
+var CP_NOW='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=mes%20atual.xlsx';
 var cU=null,rankData=null,pontoData=null,compMonths=[null,null,null];
 // loginMap: {cobmaisLogin: fullName} e.g. {"1.gislaine.batista":"Gislaine Miranda Batista"}
 // nameMap: {fullNameLower: cobmaisLogin}
@@ -763,7 +763,7 @@ function normN(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036
 
 // === LOGIN ===
 // >>> COLE AQUI a URL do Apps Script (a mesma que esta no sync-login.js, termina com /exec) <<<
-var SCRIPT_URL='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec';
+var SCRIPT_URL='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec';
 var temScript=/^https:\/\/script\.google\.com\/.+\/exec$/.test(SCRIPT_URL);
 var pwCtx=null; // {key, atual, forcar}
 document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});

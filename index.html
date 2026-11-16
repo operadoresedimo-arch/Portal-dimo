@@ -5,7 +5,7 @@
 <script id="edimo-auth-v2">
 /* Autenticacao no servidor. Nao baixa senhas nem hashes. */
 window.EdimoAuth=(function(){
-  var API='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec',NOME='edimo_sessao_v2',pendente=null;
+  var API='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec',NOME='edimo_sessao_v2',pendente=null;
   function chave(f){return String(f.login||f.nome||'').trim().toLowerCase().replace(/^\d+\./,'')}
   function ler(){try{return JSON.parse(sessionStorage.getItem(NOME)||localStorage.getItem(NOME)||'null')}catch(e){return null}}
   function limpar(){pendente=null;[localStorage,sessionStorage].forEach(function(st){[NOME,'user','mu','mq_tok','lm','nm','em','cacheDados','cacheDadosDia','cacheDados2'].forEach(function(k){st.removeItem(k)})})}
@@ -3027,11 +3027,11 @@ body .sidebar .sb-nav .sb-item{border-radius:12px!important}
 <div class="toast" id="toast"></div>
 <script>
 const RK='https://docs.google.com/spreadsheets/d/e/2PACX-1vRjHX1-Uu8HaBwa7iT_5XSTNkcp2pbSTKTsVsygCKucMChmcI4hTZkC_pNEsuFNeQ/pub?output=csv';
-var RK_DRIVE='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=Relat%C3%B3rio%20de%20Acordos.xlsx';
-const CP_M1='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
-const CP_M2='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
-const CP_NOW='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=mes%20atual.xlsx';
-const CP_M3='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec?type=comissao&arquivo=3%20mes%20atras.xlsx';
+var RK_DRIVE='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=Relat%C3%B3rio%20de%20Acordos.xlsx';
+const CP_M1='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=1%20mes%20atras.xlsx';
+const CP_M2='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=2%20mes%20atras.xlsx';
+const CP_NOW='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=mes%20atual.xlsx';
+const CP_M3='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec?type=comissao&arquivo=3%20mes%20atras.xlsx';
 const PT='https://docs.google.com/spreadsheets/d/e/2PACX-1vS9gWUTuOKx-WK8-p3vk93yJunFAuqVYrdxqPTzuJg3UIAX5GkVOC2wkD_DXIKE9nf0P9xDOgfHwAUZ/pub?output=csv';
 let cU=null,cRD=null;const cD=[null,null,null,null];let allEntradas={};let allLogins={};let allAdmissao={};let pontoData=null;
 
@@ -5358,7 +5358,7 @@ window.addEventListener('load',()=>setTimeout(avdNav,50));
 <script id="edimo-senha-js">
 /* Login igual ao mobile: senha padrão no 1º acesso -> cria senha própria (aba Senhas, hash SHA-256) */
 (function(){
-var SCRIPT_URL='https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec';
+var SCRIPT_URL='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec';
 var pwCtx=null,pend=null;
 function chaveDe(f){return String(f.login||f.nome||'').trim().toLowerCase().replace(/^\d+\./,'')}
 function $(i){return document.getElementById(i)}
@@ -6848,7 +6848,7 @@ window.dgTeste=function(){if(ULT&&!ULT.erro)iniciaSlides();else buscar().then(D=
    Dados nas abas CRM_* da planilha "Ponto edimo" via Script Ponto (arquivo CRM.gs, type 'crm'). Login: mesmo token da qualidade (qtoken).
    Cache: guarda a ultima lista neste computador e abre na hora; atualiza por tras. */
 (function(){
-var URLP=(typeof SCRIPT_URL!=='undefined'&&SCRIPT_URL)||'https://script.google.com/macros/s/AKfycbzL0N1oG-cg9CFfiZ2HdDcLAjzACv3fGGsgdVargDw7bqrf3zhSlHwwRF8YhjHXrGoXqQ/exec';
+var URLP=(typeof SCRIPT_URL!=='undefined'&&SCRIPT_URL)||'https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec';
 var STC={Ativo:'#16a34a',Suspenso:'#d97706',Rescindido:'#9ca3af'};
 var MESES=['JANEIRO','FEVEREIRO','MARCO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'],MC=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 var DATAS={inicio:1,custo_alterado:1,fb_whats:1,fb_email:1,fb_lig:1,ult_planilha:1,rescisao:1,ult_contato:1,prox_data:1,fb_ult:1,fb_prox:1,isencao_ini:1,isencao_fim:1,proposta_env:1,vencimento:1};
