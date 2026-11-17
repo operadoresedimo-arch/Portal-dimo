@@ -2871,6 +2871,7 @@ th.ed-th{cursor:pointer;user-select:none;white-space:nowrap}th.ed-th:hover{color
 .nx-tc2 table{width:100%;border-collapse:collapse;font-size:.72rem}.nx-tc2 th{color:#94a3b8;font-weight:700;text-align:right;padding:5px 4px;font-size:.62rem;text-transform:uppercase}.nx-tc2 th:first-child,.nx-tc2 td:first-child{text-align:left}
 .nx-tc2 td{text-align:right;padding:6px 4px;border-top:1px solid #f1f5f9;color:#334155}.nx-tc2 tr.cur td{font-weight:800;background:color-mix(in srgb,var(--c) 10%,#fff)}
 .nx-insight{margin-top:16px;background:#eff6ff;border:1px solid #dbeafe;border-radius:12px!important;padding:12px 16px;font-size:.78rem;color:#1e3a8a}
+.nx-tn{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;font-size:.62rem;font-weight:700;vertical-align:1px}.nx-tn.t1{background:#dcfce7;color:#15803d}.nx-tn.t2{background:#fef3c7;color:#b45309}.nx-tn.t0{background:#ede9fe;color:#6d28d9}
 .nx-mxc{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.nx-mxr{margin:-6px 0 14px}.nx-mxr #compSearch{flex:1;min-width:240px}.nx-mxr span{margin-left:6px}.nx-mxc span{font-size:.72rem;color:#64748b}
 .nx-mxc .sort-btn{border:1px solid #e2e8f0;background:#fff;border-radius:9px!important;padding:6px 11px;font-size:.74rem;font-weight:600;color:#475569;cursor:pointer;font-family:inherit}.nx-mxc .sort-btn.active{border-color:#8b1d24;color:#8b1d24}
 .nx-tw{overflow-x:auto;margin:0 -22px -20px}
@@ -3528,6 +3529,8 @@ function pC(rows){
 
 // tipo de cada linha da planilha: 0/1/2 = operadores (novato, manha, tarde); 'sec' = secretaria e prospeccao (3+, sem numero, suporte); 'nc' = nao comissionado + quem saiu (Z-)
 function compTipo(nm){if(/^N[ÃA]O\s*COMISSION/i.test(nm)||/^[Zz]-/.test(nm))return 'nc';if(/suporte/i.test(nm))return 'sec';const m=nm.match(/^(\d)/);if(m){const d=+m[1];return d<=2?d:'sec'}return 'sec'}
+// turno ATUAL pelo login do cadastro (0. novato, 1. manha, 2. tarde). Login sem 0/1/2 = fora da tabela. Sem cadastro ou nome ambiguo: usa o login da planilha
+function compTurnoAtual(op){try{const ks=Object.keys(allLogins||{}).filter(k=>mesmaPessoa(op.name,k));if(ks.length===1){const m=String(allLogins[ks[0]]||'').trim().match(/^(\d)\./);if(m&&+m[1]<=2)return +m[1];return 'fora'}}catch(e){}return op.t}
 function compNome(nm){if(/^N[ÃA]O\s*COMISSION/i.test(nm))return 'Sem comissão (planilha)';return cn(nm.replace(/^[Zz]-/,''))}
 function compJuntaNC(ops){const nc=ops.filter(o=>o.t==='nc');if(!nc.length)return ops;const r=ops.filter(o=>o.t!=='nc');
   r.push({n:'Não comissionado',cfg:'',t:'nc',a:nc.reduce((x,o)=>x+o.a,0),v:Math.round(nc.reduce((x,o)=>x+o.v,0)*100)/100,det:nc.map(o=>({n:o.n,a:o.a,v:o.v,z:o.z}))});return r}
@@ -3762,7 +3765,7 @@ function genComp(){
     const cols=ms.map((m,i)=>i).filter(i=>showAll||compMonthFilter===String(i));
     const sb=(k,t)=>'<button class="sort-btn'+(compSortBy===k?' active':'')+'" onclick="setSort(\''+k+'\',this)">'+t+'</button>';
     h+='<div class="nx-card nx-mx"><div class="nx-ch"><div><h3>Desempenho por Operador '+(ms.length>=3?'('+ms.length+' meses)':'')+'</h3><p>Comparativo de cada operador entre '+ms.map(m=>shortPeriod(m.period)).join(', ').replace(/, ([^,]*)$/,' e $1')+'</p></div></div>'+
-       '<div class="nx-mxc nx-mxr"><input id="compSearch" type="search" placeholder="Buscar por nome..." value="'+esc(window.NXCB||'')+'" oninput="window.NXCB=this.value;filterCompTable()"><span>Ordenar:</span>'+sb('valor','Valor')+sb('acordos','Acordos')+sb('nome','Nome')+'<span style="margin-left:auto"></span><button class="sort-btn" onclick="compExport(\'xlsx\')" title="Meses fechados + média cobrada + média de receita">⬇ Excel</button><button class="sort-btn" onclick="compExport(\'pdf\')" title="Meses fechados + média cobrada + média de receita">⬇ PDF</button></div>';
+       '<div class="nx-mxc nx-mxr"><input id="compSearch" type="search" placeholder="Buscar por nome..." value="'+esc(window.NXCB||'')+'" oninput="window.NXCB=this.value;filterCompTable()"><span>Ordenar:</span>'+sb('valor','Valor')+sb('acordos','Acordos')+sb('nome','Nome')+'<span>Turno:</span>@@TURNOS@@<span style="margin-left:auto"></span><button class="sort-btn" onclick="compExport(\'xlsx\')" title="Meses fechados + média cobrada + média de receita">⬇ Excel</button><button class="sort-btn" onclick="compExport(\'pdf\')" title="Meses fechados + média cobrada + média de receita">⬇ PDF</button></div>';
     h+='<div class="nx-tw"><table class="comp-table nx-t"><thead><tr><th>Operador</th>';
     const colsF=cols.filter(i=>i!==nowIdx),temCur=cols.includes(nowIdx);   // mes atual vai por ultimo (as medias sao so dos fechados)
     colsF.forEach(i=>{h+='<th>'+shortPeriod(ms[i].period)+'</th>'});
@@ -3779,10 +3782,13 @@ function genComp(){
       return '<td class="'+(cur?'cur':'')+'"'+dv+'>'+(showAcordos?'<b class="nx-qa">'+d.a+' acordo'+(d.a===1?'':'s')+'</b>':'')+(showValor?'<span class="nx-qv">'+fm(d.v)+'</span>':'')+(rc!==null?'<small class="nx-com">receita '+fm(rc)+'</small>':'')+
         (pct!==null?'<div class="nx-bar sm"><i style="width:'+pct+'%;background:'+cor+'"></i></div><small class="'+(pr>=100?'ok':'')+'">'+(pr>=100?'🏆 bateu a meta ('+pr+'%)':pr+'% da meta'+(cur?' até agora':''))+'</small>':'<small class="nx-z">sem meta</small>')+'</td>'};
     const metaTxt=(cfg,t)=>{if(t===0||/novat|experi/i.test(String(cfg||'')))return 'Em experiência · sem meta';const m=getMeta(cfg);return m&&m.max>0?'Meta '+fs(m.max):''};
-    odOp.forEach((op,i)=>{
+    const odTab=odOp.map(o=>Object.assign(o,{ta:compTurnoAtual(o)})).filter(o=>o.ta===0||o.ta===1||o.ta===2);
+    const odVis=odTab.filter(o=>compTurnoF==='todos'||o.ta===+compTurnoF);
+    if(!odVis.length)h+='<tr><td colspan="'+(colsF.length+4+(temCur?1:0))+'" style="text-align:center;padding:24px;color:#64748b">Nenhum operador nesse turno</td></tr>';
+    odVis.forEach((op,i)=>{
       const hl=mU(op.name,uN)?' hl':'';
-      const tur=op.t===1?'Manhã':op.t===2?'Tarde':op.t===0?'Novato':'';
-      h+='<tr class="'+hl+'"><td class="nmcell"><div class="nx-op"><span class="nx-av s'+(i<3?' t'+(i+1):'')+'">'+ini(op.name)+'</span><div><b>'+esc(op.name)+'</b><small>'+[tur==='Novato'?'':tur,metaTxt(op.cfg,op.t)].filter(Boolean).join(' · ')+'</small></div></div></td>';
+      const tur=op.ta===1?'Manhã':op.ta===2?'Tarde':'Novato';
+      h+='<tr class="'+hl+'"><td class="nmcell"><div class="nx-op"><span class="nx-av s'+(i<3?' t'+(i+1):'')+'">'+ini(op.name)+'</span><div><b>'+esc(op.name)+' <span class="nx-tn t'+op.ta+'">'+tur+'</span></b><small>'+metaTxt(op.cfg,op.t)+'</small></div></div></td>';
       colsF.forEach(mi=>{h+=cel(op.m[mi],op.cfg,false)});
       let sA=0,sV=0,c=0;MIx.forEach(mi=>{const d=op.m[mi];if(d){sA+=d.a;sV+=d.v;c++}});
       const mV=c?Math.round(sV*100/c)/100:0;
@@ -3797,6 +3803,8 @@ function genComp(){
       EXL.push({tp:tempoExtenso(op.name),n:op.name,tur:tur||'',m:MIx.map(mi=>op.m[mi]?{a:op.m[mi].a,v:op.m[mi].v}:null),mv:mV,mc:mC,pr:mC!==null&&mVR?Math.round(mC/mVR*1000)/10:null});
       h+='<td><span class="nx-tempo">'+tempoExtenso(op.name)+'</span></td>'+(temCur?cel(op.m[nowIdx],op.cfg,true):'')+'</tr>';
     });
+    const tb=(k,t)=>'<button class="sort-btn'+(compTurnoF===k?' active':'')+'" onclick="setCompTurno(\''+k+'\')">'+t+' ('+(k==='todos'?odTab.length:odTab.filter(o=>o.ta===+k).length)+')</button>';
+    h=h.replace('@@TURNOS@@',tb('todos','Todos')+tb('1','Manhã')+tb('2','Tarde')+tb('0','Novatos'));
     h+='</tbody></table></div></div>';
     const semRec=MIx.filter(mi=>!ms[mi].ops.some(o=>typeof o.r==='number')).map(mi=>shortPeriod(ms[mi].period));
     COMP_EXP={meses:MIx.map(mi=>shortPeriod(ms[mi].period)),linhas:EXL,fonte:semRec.length?'atenção: planilha sem coluna Receita em '+semRec.join(', '):'receita: coluna Receita de cada planilha'};
@@ -3968,6 +3976,8 @@ function genComp(){
 
 let compViewMode='all';
 let compSortBy='valor';
+let compTurnoF='todos';   // filtro da tabela Desempenho por Operador: todos | 1 manha | 2 tarde | 0 novatos
+function setCompTurno(t){compTurnoF=t;genComp();}
 let compMonthFilter='all';
 
 function setViewMode(mode,btn){
