@@ -7622,7 +7622,7 @@ function vBdImp(){var I=BD.imp;
     (I.doc>=0?bdKp('#b45309','Pessoas (CPF/CNPJ) que já estavam no banco',P.pb)+bdKp('#2563eb','Pessoas também em outro credor',P.po):bdKp('#2563eb','Também em outro credor',P.outro))+'</div>'}
   else h+='<div style="height:12px"></div>';
   h+='<div class="bd-act">'+(I.enviando?'<b>'+esc(I.enviando)+'</b>'+(I.importando?'<button class="cx-btn dan" onclick="CRM.bdCancelar()">⏹ Parar importação</button>':''):'<button class="cx-btn'+(I.prev?'':' pri')+'" onclick="CRM.bdConferir()">'+(I.prev?'↻ Conferir de novo':'🔎 Conferir repetidos')+'</button>'+
-    (I.prev?'<button class="cx-btn" onclick="CRM.bdBaixarConf()">⬇ Baixar conferência (Excel)</button><button class="cx-btn pri" onclick="CRM.bdImportar()"'+(I.prev.novo||I.prev.existe?'':' disabled')+'>📥 Importar para o banco</button>':'')+'<button class="cx-btn" onclick="CRM.bdCancelar()">✕ Cancelar</button>')+'</div>';
+    (I.prev?'<button class="cx-btn" onclick="CRM.bdBaixarConf()">⬇ Baixar conferência (Excel)</button>'+(I.prev.novo?'<button class="cx-btn" onclick="CRM.bdBaixarNovos()" title="Só as linhas que ainda não estão no banco deste credor, sem as repetidas do arquivo. Mesmas colunas da planilha, pronta para mandar ao Cobmais">⬇ Baixar só os novos ('+inteiro(I.prev.novo)+')</button>':'')+'<button class="cx-btn pri" onclick="CRM.bdImportar()"'+(I.prev.novo||I.prev.existe?'':' disabled')+'>📥 Importar para o banco</button>':'')+'<button class="cx-btn" onclick="CRM.bdCancelar()">✕ Cancelar</button>')+'</div>';
   var vis=I.cab,st=I.st||[];
   h+='<div class="cx-tw" style="overflow-x:auto"><table class="cx-t" style="min-width:max-content"><thead><tr>'+(I.prev?'<th>Situação</th>':'')+vis.map(function(k,j){return '<th style="white-space:nowrap">'+esc(k)+(I.chaves.indexOf(j)>=0?' 🔑':'')+'</th>'}).join('')+'</tr></thead><tbody>';
   I.linhas.slice(0,50).forEach(function(r,i){h+='<tr>'+(I.prev?'<td style="white-space:nowrap">'+bdTag(st[i])+'</td>':'')+vis.map(function(k,j){return '<td style="white-space:nowrap">'+esc(r[j])+'</td>'}).join('')+'</tr>'});
@@ -7690,6 +7690,14 @@ Object.assign(window.CRM,{
   bdBaixarConf:function(){var I=BD.imp;if(!I||!I.st)return;var lab={novo:'Novo',existe:'Já está no banco',dup:'Repetido no arquivo'};
     var A=[['Situação','CPF/CNPJ já estava no banco','Também em outro credor'].concat(I.cab)].concat(I.linhas.map(function(r,i){var t=I.st[i];return [lab[t.s],t.pb?'Sim':'',t.s==='dup'?'':t.o].concat(r)}));
     var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(A),'Conferencia');XLSX.writeFile(wb,'conferencia-'+bdNomeArq(I.arquivo)+'-'+hojeIso()+'.xlsx')},
+  // so as linhas novas (nao estao no banco deste credor e nao repetem no arquivo), com as colunas da planilha, para mandar ao Cobmais
+  bdBaixarNovos:function(){var I=BD.imp;if(!I||!I.st||!I.cab)return;var L=[],cpfJa=0;
+    I.linhas.forEach(function(r,i){var t=I.st[i];if(t&&t.s==='novo'){L.push(r);if(t.pb)cpfJa++}});
+    if(!L.length){toast('Nenhuma linha nova nesse arquivo');return}
+    var ws=XLSX.utils.aoa_to_sheet([I.cab].concat(L)),wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Novos');XLSX.writeFile(wb,'novos-'+bdNomeArq(I.arquivo)+'-'+hojeIso()+'.xlsx');
+    if(cpfJa)alert(L.length+' linhas novas baixadas.\n\nAtenção: '+cpfJa+' delas são de CPF/CNPJ que já estava no banco deste credor (linha diferente, ex.: outro contrato ou telefone). Confira antes de mandar ao Cobmais.');
+    else toast(L.length+' linhas novas baixadas')},
   bdImportar:function(){var I=BD.imp;if(!I||!I.prev||!I.ch||I.enviando)return;var c=I.credor?acha(I.credor):null;
     if(!confirm('Importar para o banco?\n\n• '+I.prev.novo+' linhas novas entram (com todas as colunas)\n• '+I.prev.existe+' que já existem só completam campos vazios\n• '+I.prev.dup+' repetidas dentro do arquivo não duplicam\n\nCredor: '+(c?c.nome:'(sem credor)')))return;
     var N=I.linhas.length,i=0,T={novos:0,repetidos:0,completados:0};I.importando=1;I.parar=0;
