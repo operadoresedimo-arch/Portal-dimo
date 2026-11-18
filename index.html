@@ -2740,7 +2740,7 @@ th.ed-th{cursor:pointer;user-select:none;white-space:nowrap}th.ed-th:hover{color
 .cx-chip{border:1px solid var(--ln2);background:#fff;color:var(--t2);border-radius:999px;padding:6px 11px;font-family:inherit;font-size:.74rem;font-weight:600;cursor:pointer}
 .cx-chip i{font-style:normal;color:var(--c);font-weight:800;margin-left:4px}
 .cx-chip.on{background:var(--az);color:#fff;border-color:var(--az)}.cx-chip.on i{color:#fff}
-#cxMd{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+#cxMd{--pn:#fff;--pn2:#f6f8fb;--ln:#e3e8ef;--ln2:#cfd8e3;--tx:#1a1f36;--t2:#475569;--t3:#6b7280;--az:#0f3557;--az2:#174a78;--ou:#b8901f;--vm:#8B1A1A;position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
 #cxMd.on{display:flex}
 #cxMd .ov{position:absolute;inset:0;background:rgba(15,23,42,.45)}
 #cxMd .md{position:relative;width:min(860px,100%);max-height:calc(100vh - 40px);display:flex;flex-direction:column;background:#fff;border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.25);color:#1a1f36;font-family:'Inter',system-ui,sans-serif;animation:cxIn .18s ease-out}
@@ -7569,7 +7569,8 @@ function bdAchaDoc(cab){return bdAcha(cab,/cpf|cnpj|documento/)}
 // o que identifica uma LINHA: CPF/CNPJ + contrato + parcela quando a planilha tem (uma linha por parcela); senao so o CPF/CNPJ, telefone ou nome
 function bdAchaChaves(cab){var d=bdAchaDoc(cab);
   if(d>=0){var K=[d],c=bdAcha(cab,/contrato/,/data|observ|obs\b|valor|plano/),p=bdAcha(cab,/parcela/,/observ|obs\b|valor|qtd|quant|total/);
-    if(c>=0)K.push(c);if(p>=0)K.push(p);return K}
+    var ve=bdAcha(cab,/venc/),va=bdAcha(cab,/valor/,/atualiz|corrig|receita|comiss|juros|multa/),op=bdAcha(cab,/(observ|obs\b).*parcela|parcela.*(observ|obs\b)/);
+    [c,p,ve,va,op].forEach(function(j){if(j>=0&&K.indexOf(j)<0)K.push(j)});return K}
   var t=bdAcha(cab,/telefone|celular|fone|whats/);if(t>=0)return [t];
   var n=bdAcha(cab,/nome|cliente|empresa|razao/);return [n>=0?n:0]}
 function bdLerFolha(I,nome){
@@ -7684,7 +7685,7 @@ Object.assign(window.CRM,{
     var uk=[],ud=[],vk={},vd={};I.ch.forEach(function(k){if(!vk[k]){vk[k]=1;uk.push(k)}});I.docs.forEach(function(d){if(d&&!vd[d]){vd[d]=1;ud.push(d)}});
     var res={},rd={},i=0,j0=0;I.enviando='Conferindo '+inteiro(uk.length)+' linhas no banco...';render();
     (function lote(){var pk=uk.slice(i,i+3000),pd=ud.slice(j0,j0+3000);if(!pk.length&&!pd.length){bdFimConf(res,rd);return}
-      api({acao:'banco_previa',credor_id:I.credor||'',chaves:pk,docs:pd}).then(function(j){pk.forEach(function(k,x){res[k]={e:j.existe[x],o:j.outro[x]}});
+      api({acao:'banco_previa',credor_id:I.credor||'',chaves:pk,docs:pd,cols:I.chaves.map(function(j){return I.cab[j]})}).then(function(j){pk.forEach(function(k,x){res[k]={e:j.existe[x],o:j.outro[x]}});
         pd.forEach(function(d,x){rd[d]={e:j.docExiste[x],o:j.docOutro[x]}});i+=3000;j0+=3000;lote()})
       .catch(function(e){I.enviando='';render();toast('Não conferiu: '+e.message)})})()},
   bdBaixarConf:function(){var I=BD.imp;if(!I||!I.st)return;var lab={novo:'Novo',existe:'Já está no banco',dup:'Repetido no arquivo'};
@@ -7707,7 +7708,7 @@ Object.assign(window.CRM,{
       if(i>=N){I.enviando='';I.importando=0;I.prev=null;I.st=null;BD.exp.info=null;BD.exp.res=null;render();
         alert('Importação concluída\n\n'+T.novos+' novos no banco\n'+T.repetidos+' já existiam ('+T.completados+' tiveram campos completados)');return}
       I.enviando='Importando... '+i+' de '+N+' linhas';render();
-      api({acao:'banco_importar',credor_id:I.credor||'',credor:c?c.nome:'',arquivo:I.arquivo,cab:I.cab,linhas:I.linhas.slice(i,i+400),chaves:I.ch.slice(i,i+400),docs:I.docs.slice(i,i+400)})
+      api({acao:'banco_importar',cols:I.chaves.map(function(j){return I.cab[j]}),credor_id:I.credor||'',credor:c?c.nome:'',arquivo:I.arquivo,cab:I.cab,linhas:I.linhas.slice(i,i+400),chaves:I.ch.slice(i,i+400),docs:I.docs.slice(i,i+400)})
       .then(function(j){T.novos+=j.novos;T.repetidos+=j.repetidos;T.completados+=j.completados;i+=400;lote()})
       .catch(function(e){I.enviando='';I.importando=0;render();alert('A importação parou na linha '+(i+1)+' de '+N+'.\n\n'+e.message+'\n\nO que já entrou está salvo. Clique em Conferir repetidos e importe de novo: o que já entrou não duplica.')})})()},
   bdInfo:function(){BD.exp.info=null;BD.exp.res=null;render()},
