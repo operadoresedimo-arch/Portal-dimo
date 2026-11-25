@@ -5205,8 +5205,8 @@ function eqNomes(lista){const c={};lista.forEach(n=>{const k=nc(n);c[k]=(c[k]||0
 function eqCom(f){const sv=OPER;OPER=EQ.dados||[];EQ_MODE=true;try{return f()}finally{OPER=sv;EQ_MODE=false}}
 async function eqBusca(dia){if(EQ.busy||!CHAVE)return;EQ.busy=true;
   try{const [,mm,aa]=dia.split('/'),ini='01/'+mm+'/'+aa;
-    const r=await fetch(API+'?chave='+encodeURIComponent(CHAVE)+'&acao=operacao&dias=40&blocos=operadores,tempos,pausas,mes_ops,aovivo&datas='+encodeURIComponent(dia+','+ini)+'&t='+Date.now()),j=await r.json();
-    if(j&&j.ok){EQ.dados=(j.operacao||[]).filter(x=>x.bloco==='mes_ops'?x.data===ini:(x.data===dia&&/^(operadores|tempos|pausas|aovivo)$/.test(x.bloco)));EQ.dia=dia;EQ.ms=Date.now()}}
+    const r=await fetch(API+'?chave='+encodeURIComponent(CHAVE)+'&acao=operacao&dias=40&blocos=operadores,tempos,pausas,mes_ops,aovivo,desligou&datas='+encodeURIComponent(dia+','+ini)+'&t='+Date.now()),j=await r.json();
+    if(j&&j.ok){EQ.dados=(j.operacao||[]).filter(x=>x.bloco==='mes_ops'?x.data===ini:(x.data===dia&&/^(operadores|tempos|pausas|aovivo|desligou)$/.test(x.bloco)));EQ.dia=dia;EQ.ms=Date.now()}}
   catch(e){}finally{EQ.busy=false}
   const w=document.getElementById('eqWrap');if(w)w.innerHTML=eqHTML(dia)}
 function eqHTML(dia){
@@ -5252,6 +5252,46 @@ setInterval(eqAVbusca,60000);
 function eqPinta(){const av=eqAV();if(!av)return;const M=eqAVmapa(av);
   document.querySelectorAll('.eq-tb td.eq-ag').forEach(td=>{const o=M[td.dataset.k]||M['@'+td.dataset.lg];td.innerHTML=eqCel(o,av,td.dataset.nm);td.dataset.v=eqRank(o,td.dataset.nm);const tr=td.parentNode,tg=(tr.dataset.eq||'').split(' ').filter(t=>t&&t!=='agora'&&t!=='aovivo');if(o)tg.push('aovivo');if(o&&eqSt(o).k==='pausa')tg.push('agora');tr.dataset.eq=tg.join(' ')});nxOpAg();
   const f=document.getElementById('eqLive');if(f)f.outerHTML=eqFaixa(av);eqTick();eqAplica()}
+// ---- quem desligou (robo: bloco desligou, coluna cli_desligou da Fastway) ----
+function operDesl(){const m={};operFilt('desligou').forEach(x=>(x.dados||[]).forEach(o=>{if(!o||!o.k)return;const t=m[nkey(o.k)]=m[nkey(o.k)]||{n:0,at:0,fal:0,aco:0,cli:0,flu:0,op:0,sem:0,ou:0,opR:0,opH:{}};
+  ['n','at','fal','aco','cli','flu','op','sem','ou','opR'].forEach(c=>t[c]+=(+o[c]||0));(o.opH||[]).forEach(h=>{t.opH[h[0]]=(t.opH[h[0]]||0)+(+h[1]||0)});m['@'+String(o.k).toLowerCase()]=t}));return m}
+function eqOpCss(){if(document.getElementById('eqOpCss'))return;const st=document.createElement('style');st.id='eqOpCss';st.textContent=
+  '.eq-tb td.nm.eq-clk{cursor:pointer}.eq-tb td.nm.eq-clk b{text-decoration:underline dotted #c9ccd1;text-underline-offset:3px}.eq-tb td.nm.eq-clk:hover b{color:#b8901f}'+
+  '#eqOpMd{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(30,32,36,.55)}'+
+  '#eqOpMd .eqm{background:#fff;border-radius:18px;width:min(760px,100%);max-height:calc(100vh - 40px);overflow:auto;box-shadow:0 24px 60px rgba(15,23,42,.3);padding:22px 24px;font-size:.88rem;color:#2f3237}'+
+  '#eqOpMd .eqm-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:3px solid #d4a937;padding-bottom:12px;margin-bottom:16px}'+
+  '#eqOpMd .eqm-h h3{margin:0;font-size:1.25rem;color:#484a4e}#eqOpMd .eqm-h small{display:block;color:#8a8d92;margin-top:3px}'+
+  '#eqOpMd .eqm-x{border:0;background:#f1f2f4;border-radius:10px;width:36px;height:36px;font-size:1.2rem;cursor:pointer;color:#484a4e}'+
+  '#eqOpMd .eqm-k{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:18px}'+
+  '#eqOpMd .eqm-k div{background:#fdf8f0;border-radius:12px;padding:10px 12px}#eqOpMd .eqm-k span{display:block;font-size:.72rem;color:#8a8d92}#eqOpMd .eqm-k b{font-size:1.25rem;color:#484a4e}'+
+  '#eqOpMd h4{margin:16px 0 8px;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:#8a8d92}'+
+  '#eqOpMd .eqm-bar{display:flex;height:14px;border-radius:99px;overflow:hidden;background:#eef0f2}#eqOpMd .eqm-bar i{display:block;height:100%}'+
+  '#eqOpMd .eqm-lg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 16px;margin-top:10px}#eqOpMd .eqm-lg div{display:flex;align-items:center;gap:8px}#eqOpMd .eqm-lg i{width:10px;height:10px;border-radius:3px;flex:none}#eqOpMd .eqm-lg b{margin-left:auto}'+
+  '#eqOpMd .eqm-al{margin-top:12px;padding:10px 12px;border-radius:10px;background:#fef2f2;color:#991b1b}#eqOpMd .eqm-ok{margin-top:12px;padding:10px 12px;border-radius:10px;background:#f0fdf4;color:#166534}'+
+  '#eqOpMd .eqm-vz{padding:12px;border-radius:10px;background:#f6f7f8;color:#6b6e73}#eqOpMd .eqm-pz{columns:2;font-size:.8rem;color:#484a4e}#eqOpMd .eqm-pz div{break-inside:avoid;padding:2px 0}'+
+  '#eqOpMd .eqm-f{margin-top:16px;font-size:.74rem;color:#9ca3af}'+
+  '@media(max-width:640px){#eqOpMd .eqm-k{grid-template-columns:repeat(2,minmax(0,1fr))}#eqOpMd .eqm-lg,#eqOpMd .eqm-pz{grid-template-columns:1fr;columns:1}}';document.head.appendChild(st)}
+function eqOpFecha(){const m=document.getElementById('eqOpMd');if(m)m.remove()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')eqOpFecha()});
+function eqOp(ix){const r=(EQ.rows||[])[ix];if(!r)return;eqOpCss();eqOpFecha();
+  const o=r.o,tp=r.tp,pz=r.pz,d=r.ds,L=o.login||1,mEf=Math.max(0,(o.manual||0)-(o.manual_lib||0));
+  const k=(t,v)=>'<div><span>'+t+'</span><b>'+v+'</b></div>';
+  let h='<div class="eqm" role="dialog" aria-modal="true" aria-label="'+esc(r.nm)+'" onclick="event.stopPropagation()"><div class="eqm-h"><div><h3>'+esc(r.nm)+'</h3><small>'+esc(r.tur)+' · '+esc(EQ.dia)+'</small></div><button type="button" class="eqm-x" onclick="avd.eqOpFecha()" aria-label="Fechar">×</button></div>';
+  h+='<div class="eqm-k">'+k('Ligações com ela',d?fmtN(d.n):'-')+k('Atendidas',tp?fmtN(tp.at):'-')+k('TMA',tp&&tp.at?mmss(tp.tma):'-')+k('Logada',hm(o.login))+k('Acordos',d?fmtN(d.aco):'-')+'</div>';
+  h+='<h4>Quem desligou</h4>';
+  if(!d||!d.n)h+='<div class="eqm-vz">Ainda sem essa informação para '+esc(r.nm)+' nesse dia. Aparece depois da próxima coleta do robô da Fastway.</div>';
+  else{const sem=d.sem+d.ou,it=[['Cliente desligou no atendimento',d.cli,'#484a4e'],['Cliente desligou no fluxo',d.flu,'#a3a6ab'],['Ela desligou',d.op,'#dc2626'],['Sem informação da Fastway',sem,'#e2e4e7']];
+    h+='<div class="eqm-bar">'+it.filter(x=>x[1]>0).map(x=>'<i style="width:'+pc(x[1],d.n).toFixed(1)+'%;background:'+x[2]+'" title="'+x[0]+': '+x[1]+'"></i>').join('')+'</div>';
+    h+='<div class="eqm-lg">'+it.map(x=>'<div><i style="background:'+x[2]+'"></i>'+x[0]+'<b>'+fmtN(x[1])+' · '+pf(pc(x[1],d.n),0)+'%</b></div>').join('')+'</div>';
+    const hs=Object.keys(d.opH).map(x=>[x,d.opH[x]]).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    if(d.opR>0)h+='<div class="eqm-al"><b>'+fmtN(d.opR)+(d.opR===1?' ligação encerrada':' ligações encerradas')+' por ela com até 10 s de conversa.</b>'+(hs.length?' Horários com mais desligamentos dela: '+hs.map(x=>esc(x[0])+'h ('+x[1]+')').join(', ')+'.':'')+'</div>';
+    else if(d.op>0)h+='<div class="eqm-ok">Nenhuma ligação encerrada por ela nos primeiros 10 s.'+(hs.length?' Horários com mais desligamentos dela: '+hs.map(x=>esc(x[0])+'h ('+x[1]+')').join(', ')+'.':'')+'</div>';}
+  h+='<h4>Uso do tempo</h4><div class="eqm-bar">'+[[o.fala,'#16a34a'],[o.ocioso,'#d4a937'],[mEf,'#b91c1c'],[o.manual_lib||0,'#d9a5a5'],[o.pausa,'#8a8d92']].filter(x=>x[0]>0).map(x=>'<i style="width:'+pc(x[0],L).toFixed(1)+'%;background:'+x[1]+'"></i>').join('')+'</div>';
+  h+='<div class="eqm-lg"><div><i style="background:#16a34a"></i>Falando<b>'+pf(pc(o.fala,L),0)+'%</b></div><div><i style="background:#d4a937"></i>Esperando ligação<b>'+pf(pc(o.ocioso,L),0)+'%</b></div><div><i style="background:#b91c1c"></i>Manual<b>'+pf(pc(mEf,L),0)+'%</b></div><div><i style="background:#8a8d92"></i>Pausa<b>'+pf(pc(o.pausa,L),0)+'%</b></div></div>';
+  if(r.al&&r.al.length)h+='<h4>Situação</h4><div>'+r.al.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+esc(a[0])+'</span>').join('')+'</div>';
+  if(pz&&pz.lista&&pz.lista.length)h+='<h4>Pausas</h4><div class="eqm-pz">'+pz.lista.slice(0,24).map(x=>'<div>'+esc(x)+'</div>').join('')+'</div>';
+  h+='<div class="eqm-f">Dados da Fastway. "Sem informação" é quando a Fastway não preenche quem desligou: não conta como desligamento dela.</div></div>';
+  const md=document.createElement('div');md.id='eqOpMd';md.innerHTML=h;md.addEventListener('click',eqOpFecha);document.body.appendChild(md);const b=md.querySelector('.eqm-x');if(b)b.focus()}
 function eqMonta(dia){
   const hoje=dia===new Date().toLocaleDateString('pt-BR');
   const O=operOps(),TP=operTempos(),PZ=operPausas(),MO=(EQ.dados||[]).find(x=>x.bloco==='mes_ops');
@@ -5262,6 +5302,7 @@ function eqMonta(dia){
   if(!O.length)return h+'<div class="avd-empty">Ainda sem dados da Fastway '+(hoje?'hoje':'nesse dia')+'.</div></div>';
   const prosp=o=>/prospec/i.test(o.g||''),mEf=o=>Math.max(0,(o.manual||0)-(o.manual_lib||0)),nome=eqNomes(O.map(o=>o.n));
   const AV=hoje?eqAV():null,AVM=eqAVmapa(AV),avDe=o=>AVM[nkey(o.n)]||AVM['@'+String(o.k||'').toLowerCase()];
+  const DS=operDesl(),dsDe=o=>DS[nkey(o.n)]||DS['@'+String(o.k||'').toLowerCase()]||null;
   const R=O.map(o=>{const k=nkey(o.n),tp=TP[k],pz=PZ[k],tags=[],al=[];
     if(!prosp(o)&&pc(mEf(o),o.login)>20){al.push(['discando na mão','#b91c1c']);tags.push('manual')}
     if(pz&&pz.estDias){al.push(['lanche estourado','#dc2626']);tags.push('lanche')}
@@ -5286,15 +5327,15 @@ function eqMonta(dia){
   h+='<div class="od-leg"><span><i style="background:#16a34a"></i>Falando</span><span><i style="background:#d4a937"></i>Esperando ligação</span><span><i style="background:#b91c1c"></i>Manual</span><span><i style="background:#d9a5a5"></i>Manual liberado</span><span><i style="background:#8a8d92"></i>Pausa</span><span class="eq-dica">Passe o mouse na linha pra ver cada pausa com horário</span></div>';
   const pzTxt=(pz,k,rot)=>pz&&pz.tot[k][0]?'<div><span>'+rot+'</span><b>'+pz.tot[k][0]+'x · '+mmss(pz.tot[k][1])+'</b></div>':'';
   h+='<div style="overflow-x:auto"><table class="od-tb od-eq eq-tb"><tr><th style="text-align:left">Operadora</th>'+(AV?'<th style="text-align:left">Agora</th>':'')+'<th>Logada</th><th>Atendidas</th><th>TMA</th><th style="min-width:230px">Uso do tempo</th><th>Lanche</th><th>Outras pausas</th><th>Situação</th></tr>'+
-    R.map(r=>{const o=r.o,pz=r.pz,tp=r.tp,L=o.login||1,seg=(v,c,t)=>v>0?'<i style="width:'+pc(v,L).toFixed(1)+'%;background:'+c+'" title="'+t+': '+pf(pc(v,L),0)+'%"></i>':'';
+    (EQ.rows=[],R).map((r,ix)=>{const o=r.o,pz=r.pz,tp=r.tp,L=o.login||1,seg=(v,c,t)=>v>0?'<i style="width:'+pc(v,L).toFixed(1)+'%;background:'+c+'" title="'+t+': '+pf(pc(v,L),0)+'%"></i>':'';
       const tur=prosp(o)?'Prospecção':/manh/i.test(o.g)?'Manhã':/tard/i.test(o.g)?'Tarde':/novat/i.test(o.g)?'Novatos':esc(o.g||'');
       const d1=pz?Object.values(pz.dias)[0]||{}:{},lan=pz&&pz.tot.lanche[0]?pz.tot.lanche[1]:0;
       const lanH=lan?'<td data-v="'+lan+'"><b style="color:'+(pz.estDias?'#dc2626':lan>LANCHE_BASE?'#d97706':'#16a34a')+'">'+mmss(lan)+'</b><small>'+(d1.ini?'saiu '+esc(d1.ini):'')+(lan>LANCHE_BASE?(d1.ini?' · ':'')+'+'+mmss(lan-LANCHE_BASE)+(pz.estDias?'':' tolerância'):'')+'</small></td>':'<td data-v="0"><small>ainda não</small></td>';
       const outras=pz?pzTxt(pz,'banheiro','Banheiro')+pzTxt(pz,'cafe','Café')+pzTxt(pz,'outra','Outras')+pzTxt(pz,'bloq','Bloqueio'):'';
       const ag=!AV&&hoje&&pz&&pz.aberta?'<span class="od-st" style="--c:#b45309">'+odi('clock',12)+'em pausa desde '+esc(pz.aberta[1])+'</span>':'';
       const st=(r.al.length?r.al.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+a[0]+'</span>').join(''):ag?'':'<span class="od-st" style="--c:#16a34a">'+odi('ok',12)+'regular</span>')+ag;
-      const tip=pz?pz.lista.join('\n'):'';
-      return '<tr data-eq="'+r.tags.join(' ')+'" title="'+esc(tip)+'"><td class="nm" style="text-align:left"><b>'+esc(nome(o.n))+'</b><small>'+tur+'</small></td>'+(AV?'<td class="eq-ag" data-k="'+esc(nkey(o.n))+'" data-lg="'+esc(String(o.k||'').toLowerCase())+'" data-nm="'+esc(o.n)+'" data-v="'+eqRank(avDe(o),o.n)+'">'+eqCel(avDe(o),AV,o.n)+'</td>':'')+'<td data-v="'+o.login+'"><b>'+hm(o.login)+'</b></td>'+
+      const tip=pz?pz.lista.join('\n'):'';EQ.rows[ix]=Object.assign({},r,{ds:dsDe(o),nm:nome(o.n),tur});
+      return '<tr data-eq="'+r.tags.join(' ')+'" title="'+esc(tip)+'"><td class="nm eq-clk" style="text-align:left" onclick="avd.eqOp('+ix+')" title="Abrir detalhes da operadora"><b>'+esc(nome(o.n))+'</b><small>'+tur+'</small></td>'+(AV?'<td class="eq-ag" data-k="'+esc(nkey(o.n))+'" data-lg="'+esc(String(o.k||'').toLowerCase())+'" data-nm="'+esc(o.n)+'" data-v="'+eqRank(avDe(o),o.n)+'">'+eqCel(avDe(o),AV,o.n)+'</td>':'')+'<td data-v="'+o.login+'"><b>'+hm(o.login)+'</b></td>'+
         '<td>'+(tp?fmtN(tp.at):'-')+'</td><td data-v="'+(tp&&tp.at?tp.tma.toFixed(0):0)+'">'+(tp&&tp.at?mmss(tp.tma):'-')+'</td>'+
         '<td data-v="'+pc(o.fala,L).toFixed(1)+'"><div class="od-stack">'+seg(o.fala,'#16a34a','Falando')+seg(o.ocioso,'#d4a937','Esperando')+seg(mEf(o),'#b91c1c','Manual')+seg(o.manual_lib||0,'#d9a5a5','Manual liberado')+seg(o.pausa,'#8a8d92','Pausa')+'</div>'+
         '<div class="od-stl"><span style="color:#16a34a">'+pf(pc(o.fala,L),0)+'% falando</span><span style="color:#b8901f">'+pf(pc(o.ocioso,L),0)+'% esperando</span><span style="color:#b91c1c">'+pf(pc(mEf(o),L),0)+'% manual</span><span style="color:#6b6e73">'+pf(pc(o.pausa,L),0)+'% pausa</span></div></td>'+
@@ -5316,7 +5357,7 @@ function eqTab(k){EQ.tab=k;eqRedesenha()}
 function eqFiltro(k){EQ.f=EQ.f===k?'all':k;document.querySelectorAll('.eq-k[onclick]').forEach(b=>b.classList.toggle('on',b.getAttribute('onclick').indexOf("'"+EQ.f+"'")>0));eqAplica()}
 window.EQUIPE={html:eqHTML};
 let PDFF=null;function pdfFunc(){if(!PDFF)return;if(!window.QA||!window.QA.pdfIds){sT('O modelo do PDF ainda não carregou. Tente de novo em alguns segundos.');return}window.QA.pdfIds(PDFF.op,PDFF.a,PDFF.t)}
-window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,errFiltro,errCrit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao,eqTab,eqFiltro,pdfFunc,baixarCurtas};
+window.avd={carregar,entrar,render,detalhe,abre,feedback,copiarMinuta,ver,crit,errFiltro,errCrit,verCrit:function(k){VIEW='erro';CRIT=k;render()},exportarExcel,exportarPDF,filtrar,limparFiltros,tab:selecionarTab,baixarBloq,odFiltra,odBusca,odAcao,eqTab,eqFiltro,eqOp,eqOpFecha,pdfFunc,baixarCurtas};
 // atualiza sozinho a cada 3 min enquanto a aba estiver aberta (sem fechar ligação que estiver ouvindo)
 setInterval(()=>{const pg=$('pageAvaliacao');if(!pg||!pg.classList.contains('active')||!DADOS||DEMO_MODE||!CHAVE)return;
   if([].some.call(document.querySelectorAll('.avd-lig-b'),b=>b.style.display==='block'))return;carregar(true)},180000);
