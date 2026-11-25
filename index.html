@@ -3445,12 +3445,12 @@ function renderR(data){
   const cnt={todos:rows.length,com:rows.filter(r=>r.o.a>0).length,sem:rows.filter(r=>r.o.a===0).length,manha:rows.filter(r=>r.tur==='Manhã').length,tarde:rows.filter(r=>r.tur==='Tarde').length,novato:rows.filter(r=>r.tur==='Novato').length};
   const F=window.NXF||'todos',tab=(k,t)=>'<button class="'+(F===k?'on':'')+'" onclick="nxFiltro(\''+k+'\',this)">'+t+' ('+cnt[k]+')</button>';
   h+='<div class="nx-card nx-list"><div class="nx-ch"><div><h3>Lista de Operadores</h3><p>Acompanhe os registros e as métricas de cada operador da equipe</p></div><div class="nx-tabs">'+tab('todos','Todos')+tab('com','Com acordos')+tab('sem','Sem acordos')+tab('manha','Manhã')+tab('tarde','Tarde')+(cnt.novato?tab('novato','Novatos'):'')+'</div></div>';
-  h+='<div class="nx-tr nx-th"><div>#</div><div>Operador</div><div>Horário / Turno</div><div>Progresso da meta</div><div>Acordos</div><div>Valor total</div></div>';
+  h+='<div class="nx-tr nx-th"><div>#</div><div>Operador</div><div>Horário / Turno</div><div>Progresso da meta ('+META+' acordos)</div><div>Acordos</div><div>Valor total</div></div>';
   rows.forEach(r=>{const o=r.o,p=r.i+1,pm=Math.min(100,Math.round(o.a/META*100));
     const chip=r.st==='miss'?'<span class="nx-tc miss">Faltou</span>':r.st==='pending'?'<span class="nx-tc pend">Aguardando'+(r.tur?' · '+r.tur:'')+'</span>':r.pt?'<span class="nx-tc '+(r.st==='late'?'late':'ok')+'">🕒 '+esc(r.pt.entrada)+(r.tur?' · '+r.tur:'')+'</span>':(r.tur?'<span class="nx-tc pend">'+r.tur+'</span>':'');
     h+='<div class="nx-tr'+(r.me?' me':'')+(r.st==='miss'?' miss':'')+(o.a===0?' zero':'')+(p<=3&&o.a>0?' top':'')+'" data-n="'+esc(normN(o.n))+'" data-f="'+(o.a>0?'com':'sem')+' '+(r.tur==='Manhã'?'manha':r.tur==='Tarde'?'tarde':r.tur==='Novato'?'novato':'')+'">'+
       '<div><span class="nx-rk">'+p+'</span></div><div class="nx-op"><span class="nx-av s">'+ini(o.n)+'</span><div><b>'+esc(o.n)+'</b><small>'+esc(r.lg||'')+'</small></div></div>'+
-      '<div>'+chip+'</div>'+(r.tur==='Novato'?'<div class="nx-pg2"><span class="nx-exp">Em experiência · sem meta</span></div>':'<div class="nx-pg2"><div><span>Meta '+META+' acordos</span><b style="color:'+(pm>=100?'#059669':'#475569')+'">'+pm+'%</b></div><div class="nx-bar"><i style="width:'+pm+'%;background:'+(pm>=100?'#10b981':pm>=50?'#f59e0b':'#94a3b8')+'"></i></div></div>')+
+      '<div>'+chip+'</div>'+(r.tur==='Novato'?'<div class="nx-pg2"><span class="nx-exp">Em experiência · sem meta</span></div>':'<div class="nx-pg2"><div><span></span><b style="color:'+(pm>=100?'#059669':'#475569')+'">'+pm+'%</b></div><div class="nx-bar"><i style="width:'+pm+'%;background:'+(pm>=100?'#10b981':pm>=50?'#f59e0b':'#94a3b8')+'"></i></div></div>')+
       '<div><span class="nx-ac'+(o.a?'':' z')+'">'+o.a+'</span></div><div class="nx-vl">'+(o.v>0?fm(o.v):'<span>R$ 0</span>')+'</div></div>';
   });
   h+='<div class="nx-vazio" id="nxVazio" style="display:none">Nenhum operador nesse filtro.</div></div>';
@@ -4605,7 +4605,7 @@ function cardCriterios(c,eq,fr,grande){
   const L=Object.keys(c).filter(k=>c[k].max).sort((a,b)=>c[a].pct-c[b].pct);
   return '<div class="od-card">'+odHead('layers','#d4a937','Aderência por critério','Quanto a equipe aplicou cada etapa da ligação','',odInfo('Cada ligação é conferida etapa por etapa (abertura, motivo, opções, negociação...).','<b>Verde</b> = a equipe faz bem (75%+). <b>Amarelo</b> = faz em parte. <b>Vermelho</b> = quase não faz. O primeiro da lista é o principal erro.','Clique no critério pra ver quem mais precisa treinar ele.'))+
     (L.length?'<div class="avd-crs'+(grande?' big':'')+'">'+L.map(k=>'<div class="od-cr clk" onclick="avd.verCrit(\''+k+'\')"><span>'+esc(c[k].nome)+'<small>'+c[k].max+' avaliada'+(c[k].max===1?'':'s')+(c[k].na?' · '+c[k].na+' não se aplica':'')+'</small></span><div class="od-bar big"><i style="width:'+Math.max(2,c[k].pct).toFixed(0)+'%;background:'+corPct(c[k].pct)+'"></i></div><b style="color:'+corPct(c[k].pct)+'">'+pf(c[k].pct,0)+'%</b></div>').join('')+'</div>'+
-    '<div class="od-mbs"><div class="od-mb" style="--c:#b8901f"><span>Aderência média da equipe</span><b>'+pf(eq,0)+'%</b><small>média dos critérios</small></div><div class="od-mb" style="--c:#dc2626"><span>Principal erro da equipe</span><b>'+(fr?esc(fr.fraco||fr.nome):'-')+'</b><small>'+(fr?pf(fr.pct,0)+'% de aproveitamento':'')+'</small></div></div>':'<div class="avd-empty">Sem critérios avaliados nesse filtro.</div>')+'</div>'}
+    '<div class="od-mbs'+(VIEW==='erro'?'':' od-dup')+'"><div class="od-mb" style="--c:#b8901f"><span>Aderência média da equipe</span><b>'+pf(eq,0)+'%</b><small>média dos critérios</small></div><div class="od-mb" style="--c:#dc2626"><span>Principal erro da equipe</span><b>'+(fr?esc(fr.fraco||fr.nome):'-')+'</b><small>'+(fr?pf(fr.pct,0)+'% de aproveitamento':'')+'</small></div></div>':'<div class="avd-empty">Sem critérios avaliados nesse filtro.</div>')+'</div>'}
 function cardRanking(lin){
   const L=lin.map(o=>Object.assign({},o,{t:contaRes(o.a),rev:o.a.some(temFalha)})),nr=L.filter(o=>o.rev).length;
   return '<div class="od-card">'+odHead('users','#d4a937','Ranking de qualidade','Barra = como terminaram as ligações ouvidas de cada operadora'+(nr?' · <span class="od-badge">'+nr+' pra revisar</span>':''),odBtn('q','all','Todas ('+L.length+')',true,'#d4a937')+odBtn('q','rev','Revisar ('+nr+')',false,'#dc2626')+odBtn('q','bem','Bem ('+(L.length-nr)+')',false,'#16a34a'),
@@ -7979,7 +7979,7 @@ window.CFGP={
     u.todos.forEach(hs=>hs.forEach((h,i)=>{if(!h.textContent.trim())return;h.classList.add('ed-th');h.title='Ordenar por '+h.textContent.trim().toLowerCase()+' (1 clique: crescente, 2 cliques: decrescente)';
       h.addEventListener('click',e=>{e.stopPropagation();if(u.s.col===i)u.s.dir=u.s.dir==='asc'?'desc':'asc';else{u.s.col=i;u.s.dir='asc'}guarda();aplicar(u)})}));
     // barra: pesquisa + crescente/decrescente
-    const card=u.ancora.closest('.od-card,.avd-card,.page,body');const temBusca=card&&card.querySelector('.od-busca input:not(.ed-qi),.qa-busca input,input[type=search]:not(.ed-qi),#compSearch');
+    const card=u.ancora.closest('.od-card,.avd-card,.cx-main,.page,body');const temBusca=card&&card.querySelector('.od-busca input:not(.ed-qi),.qa-busca input,input[type=search]:not(.ed-qi),#compSearch,.cx-main input.cx-in[placeholder^="Buscar"]');
     const nL=u.linhas().length;let bar=null;
     if(!temBusca&&nL>=6){bar=document.createElement('div');bar.className='ed-ob';
       bar.innerHTML='<label class="ed-q"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input class="ed-qi" type="text" placeholder="Pesquisar pelo nome"></label><span class="ed-n"></span>';
@@ -8021,6 +8021,23 @@ window.CFGP={
 .nx-chip.live{background:#f8fafc!important;color:#484a4e!important}
 .mc-sv span,.mc-mais summary{color:#484a4e!important}
 .avd-m .od-kt i,.od-k .od-kt i{color:#9ca3af!important;background:#f3f4f6!important;border-color:#e5e7eb!important}
+</style>
+<style id="edimo-limpo">
+/* limpeza visual 25/11: so apresentacao, nenhum dado removido */
+.od-dup{display:none!important}
+.cx-kp{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important}
+.cx-k{border-top-color:#e5e7eb!important}
+.cx-alist button{border-left:1px solid var(--ln)!important;position:relative;padding-left:16px!important}
+.cx-alist button:before{content:"";position:absolute;left:7px;top:50%;width:5px;height:5px;margin-top:-2.5px;border-radius:50%;background:var(--c)}
+.cx-funil button{border-top:1px solid var(--ln)!important;padding:7px 10px!important}
+.cx-funil button.on{border-color:var(--c)!important}
+.cx-funil button b{font-size:1.05rem!important}
+@media (hover:hover){.cx-t td.ac .cx-btn.dan{color:#9ca3af;border-color:transparent;background:transparent}
+.cx-t tbody tr:hover td.ac .cx-btn.dan,.cx-t td.ac .cx-btn.dan:focus{color:#b91c1c;border-color:#f3c4c4}}
+.od-plano{background:#fff!important;border-color:var(--ln,#e5e7eb)!important;box-shadow:inset 3px 0 0 #fca5a5}
+.nx-tr.top{background:transparent!important}
+.nx-pg2 div:first-child span:empty{display:none}
+.nx-pg2 div:first-child{justify-content:flex-end}
 </style>
 </body>
 </html>
