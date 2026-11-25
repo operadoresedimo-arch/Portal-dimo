@@ -5280,6 +5280,7 @@ function eqOp(ix){const r=(EQ.rows||[])[ix];if(!r)return;eqOpCss();eqOpFecha();
   h+='<div class="eqm-k">'+k('Ligações com ela',d?fmtN(d.n):'-')+k('Atendidas',tp?fmtN(tp.at):'-')+k('TMA',tp&&tp.at?mmss(tp.tma):'-')+k('Logada',hm(o.login))+k('Acordos',d?fmtN(d.aco):'-')+'</div>';
   h+='<h4>Quem desligou</h4>';
   if(!d||!d.n)h+='<div class="eqm-vz">Ainda sem essa informação para '+esc(r.nm)+' nesse dia. Aparece depois da próxima coleta do robô da Fastway.</div>';
+  else if(d.sem+d.ou>=d.n)h+='<div class="eqm-vz">A Fastway ainda não informa quem desligou nas '+d.n+' ligações dela. Assim que esse dado vier, aparece aqui sozinho.</div>';
   else{const sem=d.sem+d.ou,it=[['Cliente desligou no atendimento',d.cli,'#484a4e'],['Cliente desligou no fluxo',d.flu,'#a3a6ab'],['Ela desligou',d.op,'#dc2626'],['Sem informação da Fastway',sem,'#e2e4e7']];
     h+='<div class="eqm-bar">'+it.filter(x=>x[1]>0).map(x=>'<i style="width:'+pc(x[1],d.n).toFixed(1)+'%;background:'+x[2]+'" title="'+x[0]+': '+x[1]+'"></i>').join('')+'</div>';
     h+='<div class="eqm-lg">'+it.map(x=>'<div><i style="background:'+x[2]+'"></i>'+x[0]+'<b>'+fmtN(x[1])+' · '+pf(pc(x[1],d.n),0)+'%</b></div>').join('')+'</div>';
@@ -5290,7 +5291,7 @@ function eqOp(ix){const r=(EQ.rows||[])[ix];if(!r)return;eqOpCss();eqOpFecha();
   h+='<div class="eqm-lg"><div><i style="background:#16a34a"></i>Falando<b>'+pf(pc(o.fala,L),0)+'%</b></div><div><i style="background:#d4a937"></i>Esperando ligação<b>'+pf(pc(o.ocioso,L),0)+'%</b></div><div><i style="background:#b91c1c"></i>Manual<b>'+pf(pc(mEf,L),0)+'%</b></div><div><i style="background:#8a8d92"></i>Pausa<b>'+pf(pc(o.pausa,L),0)+'%</b></div></div>';
   if(r.al&&r.al.length)h+='<h4>Situação</h4><div>'+r.al.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+esc(a[0])+'</span>').join('')+'</div>';
   if(pz&&pz.lista&&pz.lista.length)h+='<h4>Pausas</h4><div class="eqm-pz">'+pz.lista.slice(0,24).map(x=>'<div>'+esc(x)+'</div>').join('')+'</div>';
-  h+='<div class="eqm-f">Dados da Fastway. "Sem informação" é quando a Fastway não preenche quem desligou: não conta como desligamento dela.</div></div>';
+  h+='<div class="eqm-f">'+(d&&d.fonte==='eventos'?'Dados dos eventos da Fastway. "Ela desligou" é o atendimento em que a Fastway não marcou que o cliente desligou.':'Dados da Fastway. "Sem informação" é quando a Fastway não preenche quem desligou: não conta como desligamento dela.')+'</div></div>';
   const md=document.createElement('div');md.id='eqOpMd';md.innerHTML=h;md.addEventListener('click',eqOpFecha);document.body.appendChild(md);const b=md.querySelector('.eqm-x');if(b)b.focus()}
 function eqMonta(dia){
   const hoje=dia===new Date().toLocaleDateString('pt-BR');
