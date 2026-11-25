@@ -8,7 +8,8 @@ window.EdimoAuth=(function(){
   var API='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec',NOME='edimo_sessao_v2',pendente=null;
   function chave(f){return String(f.login||f.nome||'').trim().toLowerCase().replace(/^\d+\./,'')}
   function ler(){try{return JSON.parse(sessionStorage.getItem(NOME)||localStorage.getItem(NOME)||'null')}catch(e){return null}}
-  function limpar(){pendente=null;[localStorage,sessionStorage].forEach(function(st){[NOME,'user','mu','mq_tok','lm','nm','em','cacheDados','cacheDadosDia','cacheDados2'].forEach(function(k){st.removeItem(k)})})}
+  var leituras=new Map();
+  function limpar(){pendente=null;leituras.clear();[localStorage,sessionStorage].forEach(function(st){[NOME,'user','mu','mq_tok','lm','nm','em','cacheDados','cacheDadosDia','cacheDados2','edimo_inicio_rapido_v1','edimo_banco_estrutura_v1'].forEach(function(k){st.removeItem(k)})})}
   function salvar(r){
     if(r.trocar){pendente=r;return r}
     pendente=null;
@@ -19,7 +20,14 @@ window.EdimoAuth=(function(){
   }
   function post(b,preservarErro){
     var s=pendente||ler();if(!b.sessao&&s)b.sessao=s.token;
-    return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b),cache:'no-store'})
+    // Somente leituras idênticas compartilham a consulta. Nunca autenticação ou gravações.
+    var ttl=b.type==='auth_diretorio'?60000:b.type==='dados_ler'&&b.recurso==='ponto'?5000:b.type==='relatorio_ler'?30000:0;
+    var ck=ttl?JSON.stringify(b):'',hit=ck&&leituras.get(ck);
+    function copia(r){return JSON.parse(JSON.stringify(r))}
+    if(hit&&Date.now()<hit.ate)return hit.p.then(copia);
+    if(!ttl&&!/^auth_(sessao|status_senhas)$/.test(b.type||''))leituras.clear();
+    var item={ate:Date.now()+ttl,p:null};
+    var pedido=fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b),cache:'no-store'})
     .then(function(r){return r.json()}).then(function(r){
       if(!r||r.status!=='ok'){
         if(preservarErro&&r&&!r.relogin)return r;
@@ -29,6 +37,10 @@ window.EdimoAuth=(function(){
       }
       return r;
     });
+    if(!ck)return pedido;
+    item.p=pedido.then(function(r){item.ate=Date.now()+ttl;return r},function(e){if(leituras.get(ck)===item)leituras.delete(ck);throw e});
+    // Mantém a requisição em andamento compartilhada, mesmo se o servidor demorar.
+    item.ate=Infinity;leituras.set(ck,item);return item.p.then(copia);
   }
   function entrar(u,p,keep){limpar();return post({type:'auth_entrar',usuario:u,senha:p,manter:!!keep}).then(salvar)}
   function restaurar(){
@@ -61,17 +73,17 @@ window.EdimoAuth=(function(){
     if(['feedver','feed','feedfoto','fotos'].indexOf(recurso)<0)return fetch(url,opcoes);
     return post({type:'dados_ler',recurso:recurso,id:u.searchParams.get('id')||''}).then(function(r){return resposta(r.dados)});
   }
-  return {login:entrar,restore:restaurar,change:mudar,directoryResponse:diretorio,passwordStatus:senhasStatus,clear:limpar,pointResponse:ponto,fetchData:buscarDados};
+  return {login:entrar,restore:restaurar,change:mudar,directoryResponse:diretorio,passwordStatus:senhasStatus,clear:limpar,pointResponse:ponto,fetchData:buscarDados,refreshReads:function(){leituras.clear()}};
 })();
 </script>
 
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, viewport-fit=cover" name="viewport"/>
 <title>Portal | Édimo Soluções em Cobranças</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" media="print" onload="this.media='all'"/>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 :root{--bg:#060e1e;--bg2:#0a1429;--card:#0d1a30;--card2:#101f38;--border:#152544;--border2:#1a3055;--gold:#d4a937;--gold-glow:rgba(212,169,55,.15);--text:#eaf0fa;--text2:#7e93b0;--text3:#3d5575;--green:#22d872;--green2:#1bcc66;--purple:#a855f7;--red:#f87171;--blue:#2563eb;--blue2:#3b82f6;--blue3:#60a5fa;--blue-glow:rgba(37,99,235,.15);--silver:#b8c4d0;--bronze:#cd7f32;--cyan:#06b6d4}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-feature-settings:"tnum"}
@@ -3324,7 +3336,7 @@ function doLogin(){return window.edimoLoginSeguro?window.edimoLoginSeguro():unde
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 function setupUI(){document.getElementById('navUser').innerHTML='👤 '+cU.nome;if(isA())document.querySelectorAll('.admin-only').forEach(el=>el.style.display='')}
 function doLogout(){EdimoAuth.clear();sessionStorage.removeItem('user');localStorage.removeItem('user');cU=null;cRD=null;window.location.hash='';window.location.reload()}
-window.addEventListener('load',function(){
+window.addEventListener('DOMContentLoaded',function(){
   EdimoAuth.restore().then(function(r){if(!r)return;cU=r.user;(r.keep?localStorage:sessionStorage).setItem('user',JSON.stringify(cU));document.getElementById('loginScreen').style.display='none';setupUI();startApp()})
   .catch(function(){document.getElementById('loginLoading').style.display='none';var el=document.getElementById('loginError');el.textContent='Entre novamente para validar sua sessao. Sem conexao, tente de novo.';el.style.display='block'});
 });
@@ -3362,7 +3374,7 @@ async function loadEntradas(){
 }
 
 setInterval(async function(){try{await loadPonto();updateFaltaAlert();if(cRD&&document.getElementById('pageRanking')&&document.getElementById('pageRanking').offsetParent){const y=window.scrollY,mc=document.querySelector('.main,.content,main');const my=mc?mc.scrollTop:0;renderR(cRD);window.scrollTo(0,y);if(mc)mc.scrollTop=my}}catch(e){}},300000); // ponto atualiza a cada 5 min
-async function startApp(){showNav();showPage('ranking');const h=window.location.hash;if(h&&h.startsWith('#d=')){try{const j=LZString.decompressFromEncodedURIComponent(h.substring(3));if(j){cRD=JSON.parse(j);renderR(cRD);loadEntradas().then(function(){renderR(cRD)});loadCompDrive();return}}catch(e){}}await loadDrive();loadCompDrive();}
+async function startApp(){showNav();showPage('ranking');const h=window.location.hash;if(h&&h.startsWith('#d=')){try{const j=LZString.decompressFromEncodedURIComponent(h.substring(3));if(j){cRD=JSON.parse(j);renderR(cRD);loadEntradas().then(function(){renderR(cRD)});return}}catch(e){}}inicioLer();await loadDrive(false);}
 
 // sem acordo ainda no dia: mantem o cabecalho (com o botao do discador e o Hoje/Escolher dia) e avisa
 function rankSemAcordos(){const pg=document.getElementById('pageRanking');if(!pg)return;
@@ -3371,7 +3383,46 @@ function rankSemAcordos(){const pg=document.getElementById('pageRanking');if(!pg
     '<p>Édimo Debarba Junior <b>·</b> Última leitura às <strong>'+hr+'</strong></p></div>'+(window.MODO?window.MODO.widget('acordos'):'')+'</div>'+
     '<div class="nx-vazio"><b>Nenhum acordo ainda hoje</b><span>Última leitura do Cobmais às '+hr+'. A tela atualiza sozinha quando sair o primeiro acordo.</span></div><div id="eqWrap">'+(window.EQUIPE?window.EQUIPE.html(''):'')+'</div></div>';
   if(window.histBarra)window.histBarra()}
-async function loadDrive(){const rl0=document.getElementById('rankLoading');if(rl0)rl0.style.display='block';try{const inicio=await Promise.all([loadPonto(),rkCSV(),loadEntradas()]);const csv=inicio[1];const data=parseCSV(csv);if(data&&data.ops.length>0){cRD=data;renderR(cRD)}else{rankSemAcordos()}}catch(e){const rl=document.getElementById('rankLoading');if(rl){rl.style.display='block';rl.innerHTML='Erro ao carregar.'}}}
+// Cópia curta só nesta aba, só após validar a sessão, sem CPF ou telefone.
+var inicioTempo=0,inicioEstado='',driveEmCurso=null;
+function inicioChave(){return cU?String(cU.login||cU.nome)+'|'+String(cU.perfil||'')+'|'+String(cU.papel||''):''}
+function inicioAviso(estado){
+  inicioEstado=estado;
+  var pg=document.getElementById('pageRanking'),e=document.getElementById('inicioStatus');
+  if(!pg)return;
+  if(!e){e=document.createElement('div');e.id='inicioStatus';e.setAttribute('role','status');e.style.cssText='padding:7px 2px;color:#64748b;font:500 12px/1.5 inherit';pg.insertBefore(e,pg.firstChild)}
+  var h=inicioTempo?new Date(inicioTempo).toLocaleTimeString('pt-BR'):'';
+  e.textContent=estado==='atualizando'?(h?'Última leitura às '+h+' · Atualizando dados...':'Atualizando dados...'):estado==='erro'?'Não foi possível atualizar'+(h?'. Mostrando a última leitura às '+h:'')+'. Tente novamente.':h?'Dados lidos às '+h:'';
+}
+function inicioLer(){
+  try{
+    var c=JSON.parse(sessionStorage.getItem('edimo_inicio_rapido_v1')||'null');
+    if(!c||!cU||c.k!==inicioChave()||c.dia!==new Date().toLocaleDateString('pt-BR')||Date.now()-c.t>600000||c.t>Date.now()||!c.r||!Array.isArray(c.r.ops))return;
+    cRD=c.r;pontoData=c.p;allEntradas=c.e||{};allLogins=c.l||{};allAdmissao=c.a||{};inicioTempo=c.t;renderR(cRD);inicioAviso('atualizando');
+  }catch(e){}
+}
+function inicioGravar(){
+  if(!cU||!cRD)return;
+  try{sessionStorage.setItem('edimo_inicio_rapido_v1',JSON.stringify({k:inicioChave(),dia:new Date().toLocaleDateString('pt-BR'),t:inicioTempo,r:cRD,p:pontoData,e:allEntradas,l:allLogins,a:allAdmissao}))}catch(e){}
+}
+async function loadDrive(forcar){
+  if(driveEmCurso)return driveEmCurso;
+  if(forcar!==false)EdimoAuth.refreshReads();
+  driveEmCurso=(async function(){
+    const rl0=document.getElementById('rankLoading');if(rl0&&!cRD)rl0.style.display='block';inicioAviso('atualizando');
+    try{
+      const inicio=await Promise.all([loadPonto(),rkCSV(),loadEntradas()]),data=parseCSV(inicio[1]);
+      inicioTempo=Date.now();inicioEstado='';
+      if(data&&data.ops.length>0){cRD=data;renderR(cRD);inicioGravar();if(compIniciado)autoComp()}
+      else{cRD=null;sessionStorage.removeItem('edimo_inicio_rapido_v1');rankSemAcordos()}
+      inicioAviso('');
+    }catch(e){
+      if(cRD)inicioAviso('erro');
+      else{const rl=document.getElementById('rankLoading');if(rl){rl.style.display='block';rl.innerHTML='Erro ao carregar.'}inicioAviso('erro')}
+    }
+  })();
+  try{return await driveEmCurso}finally{driveEmCurso=null}
+}
 
 function showNav(){document.getElementById('nav').style.display='block'}
 function showPage(p){
@@ -3380,6 +3431,7 @@ function showPage(p){
   var tabT=document.getElementById('tabT');if(tabT)tabT.classList.toggle('active',p==='treinamentos');
   document.getElementById('pageRanking').classList.toggle('active',p==='ranking');
   document.getElementById('pageComp').classList.toggle('active',p==='comparativo');
+  if(p==='comparativo'&&!compIniciado)loadCompDrive();
   var tabA=document.getElementById('tabA');if(tabA)tabA.classList.toggle('active',p==='avaliacao');
   var pageA=document.getElementById('pageAvaliacao');if(pageA){pageA.classList.toggle('active',p==='avaliacao');if(p==='avaliacao'&&window.avd)avd.carregar();}
   var sbA=document.getElementById('sbA');if(sbA)sbA.classList.toggle('active',p==='avaliacao');
@@ -3419,7 +3471,7 @@ function renderR(data){
   let h='<div class="nx">';
   // cabecalho (date-header: o historico coloca os botoes Hoje / Escolher dia aqui dentro)
   h+='<div class="nx-head date-header"><div class="nx-head-l"><div class="nx-tt"><h2>Acompanhamento do Dia</h2><span class="nx-live'+(hist?' hist':'')+'"><i></i>'+(hist?'Histórico':'Ao vivo')+' · '+esc(date||new Date().toLocaleDateString('pt-BR'))+'</span></div>'+
-     '<p>Édimo Debarba Junior <b>·</b> Última sincronização às <strong>'+agora+'</strong></p></div>'+
+     '<p>Édimo Debarba Junior <b>·</b> Última leitura às <strong>'+(inicioTempo?new Date(inicioTempo).toLocaleTimeString('pt-BR'):agora)+'</strong></p></div>'+
      (window.MODO?window.MODO.widget('acordos'):'')+'<div class="nx-busca"><input id="nxBusca" type="search" placeholder="Buscar operador..." value="'+esc(window.NXB||'')+'" oninput="nxBusca(this.value)"></div></div>';
   // indicadores
   h+='<div class="nx-kpis">';
@@ -3456,7 +3508,7 @@ function renderR(data){
   h+='<div class="nx-vazio" id="nxVazio" style="display:none">Nenhum operador nesse filtro.</div></div>';
   h+='<div id="eqWrap">'+(window.EQUIPE?window.EQUIPE.html(hist?date:''):'')+'</div>';
   h+='<div class="dash-footer"><div class="brand-ft">ÉDIMO</div>Soluções em Cobranças</div></div>';
-  document.getElementById('pageRanking').innerHTML=h;toolbar.style.display='flex';updateFaltaAlert();nxAplica();
+  document.getElementById('pageRanking').innerHTML=h;toolbar.style.display='flex';updateFaltaAlert();nxAplica();if(inicioEstado)inicioAviso(inicioEstado);
 }
 window.NXF='todos';window.NXB='';
 function nxAplica(){const q=normN(window.NXB||''),f=window.NXF||'todos';let v=0;
@@ -3586,20 +3638,31 @@ async function compRemota(url){
   const wb=XLSX.read(a,{type:'array'}),csv=XLSX.utils.sheet_to_csv(wsBR(wb.Sheets[wb.SheetNames[0]]));
   return parseCompCSV(csv);
 }
+var compIniciado=false,compEmCurso=null;
 async function loadCompDrive(){
-  try{
-    // cada arquivo carrega sozinho: se um faltar no Drive, os outros aparecem do mesmo jeito
-    const ds=(await Promise.allSettled([compRemota(CP_M1),compRemota(CP_M2),compRemota(CP_NOW),compRemota(CP_M3)])).map((r,i)=>{if(r.status!=='fulfilled')console.log('Comp Drive: arquivo '+(i+1)+' nao carregou:',r.reason&&r.reason.message);return r.status==='fulfilled'?r.value:null});
-    ds.forEach((d,idx)=>{if(d&&d.ops.length>0){cD[idx]=d;const el=document.getElementById('slot'+idx);if(el){el.classList.add('loaded');el.querySelector('.slot-icon').textContent='✅';const de=document.getElementById('sd'+idx);de.textContent=d.period;de.style.display='block';}}});
-    autoComp();
-  }catch(e){console.log('Comp Drive error:',e);}
+  if(compEmCurso)return compEmCurso;
+  compIniciado=true;
+  compEmCurso=(async function(){
+    var fim=0,falhas=0,pg=document.getElementById('pageComp'),av=document.getElementById('compStatus');
+    if(pg&&!av){av=document.createElement('div');av.id='compStatus';av.setAttribute('role','status');av.style.cssText='padding:8px 0;color:#64748b;font-size:12px';pg.insertBefore(av,pg.firstChild)}
+    function status(){if(av)av.textContent=fim<4?'Carregando meses: '+fim+'/4. Os resultados ainda estão parciais.':falhas?'Não foi possível atualizar '+falhas+' arquivo(s). Os demais estão disponíveis.':''}
+    status();
+    await Promise.allSettled([CP_M1,CP_M2,CP_NOW,CP_M3].map(async function(url,idx){
+      try{
+        var d=await compRemota(url);
+        if(d&&d.ops.length>0){cD[idx]=d;const el=document.getElementById('slot'+idx);if(el){el.classList.add('loaded');el.querySelector('.slot-icon').textContent='✅';const de=document.getElementById('sd'+idx);de.textContent=d.period;de.style.display='block'}autoComp()}
+      }catch(e){falhas++;console.log('Comp Drive: arquivo '+(idx+1)+' não carregou:',e.message)}
+      finally{fim++;status()}
+    }));
+  })();
+  try{return await compEmCurso}finally{compEmCurso=null}
 }
 var compRefreshBusy=false;
 async function atualizarComissoesSilencioso(){
   if(compRefreshBusy||document.hidden)return;
   compRefreshBusy=true;var y=window.scrollY;
-  try{try{const d=parseCSV(await rkCSV());if(d&&!d.ops.length&&document.querySelector('#pageRanking .nx-vazio')&&!(window.rankHistAtivo&&window.rankHistAtivo()))rankSemAcordos();if(d&&d.ops.length>0){cRD=d;const pr=document.getElementById('pageRanking');if(pr&&pr.offsetParent){const mc=document.querySelector('.main,.content,main');const my=mc?mc.scrollTop:0;renderR(cRD);window.scrollTo(0,y);if(mc)mc.scrollTop=my}}}catch(e){}
-  await loadCompDrive();window.scrollTo(0,y)}finally{compRefreshBusy=false}
+  try{try{const d=parseCSV(await rkCSV());if(d&&!d.ops.length&&document.querySelector('#pageRanking .nx-vazio')&&!(window.rankHistAtivo&&window.rankHistAtivo()))rankSemAcordos();if(d&&d.ops.length>0){cRD=d;inicioTempo=Date.now();inicioEstado='';inicioGravar();const pr=document.getElementById('pageRanking');if(pr&&pr.offsetParent){const mc=document.querySelector('.main,.content,main');const my=mc?mc.scrollTop:0;renderR(cRD);window.scrollTo(0,y);if(mc)mc.scrollTop=my}}}catch(e){}
+  if(compIniciado)await loadCompDrive();window.scrollTo(0,y)}finally{compRefreshBusy=false}
 }
 setInterval(atualizarComissoesSilencioso,300000); // atualiza Drive a cada 5 min sem voltar ao inicio
 
@@ -7672,19 +7735,25 @@ function vBdImp(){var I=BD.imp;
   h+='</tbody></table></div>'+(I.linhas.length>50?'<div class="bd-nota">Mostrando 50 de '+inteiro(I.linhas.length)+'. A conferência em Excel traz todas, com todas as colunas.</div>':'');
   return h+'</div>';
 }
+// Só estrutura/contagens por 2 minutos nesta aba. Prévia e Excel sempre consultam o servidor.
+function bdMetaChave(){return key()+'|'+String(cU&&cU.perfil||'')+'|'+String(cU&&cU.papel||'')}
+function bdMetaLimpar(){BD.exp.semCache=true;try{sessionStorage.removeItem('edimo_banco_estrutura_v1')}catch(e){}}
+function bdMetaGravar(j){BD.exp.metaTS=Date.now();BD.exp.semCache=false;try{sessionStorage.setItem('edimo_banco_estrutura_v1',JSON.stringify({k:bdMetaChave(),t:BD.exp.metaTS,d:j}))}catch(e){}}
 function vBdExp(){var E=BD.exp;
-  if(!E.info){if(!E.carreg){E.carreg=true;api({acao:'banco_info'}).then(function(j){E.carreg=false;E.info=j;
+  if(!E.info&&!E.semCache&&tokGet()){try{var mt=JSON.parse(sessionStorage.getItem('edimo_banco_estrutura_v1')||'null');if(mt&&mt.k===bdMetaChave()&&Date.now()-mt.t<120000&&mt.t<=Date.now()&&mt.d&&Array.isArray(mt.d.colunas)&&Array.isArray(mt.d.credores)){E.info=mt.d;E.metaTS=mt.t}}catch(e){}}
+  if(!E.info){if(!E.carreg){E.carreg=true;api({acao:'banco_info'}).then(function(j){E.carreg=false;E.info=j;bdMetaGravar(j);
       if(!E.cols){E.cols={credor:1};(j.colunas||[]).forEach(function(k){E.cols[k]=1})}else (j.colunas||[]).forEach(function(k){if(E.cols[k]===undefined)E.cols[k]=1});if(VIEW==='banco')render()})
     .catch(function(e){E.carreg=false;E.info={erro:e.message};if(VIEW==='banco')render()})}
     return '<div class="cx-card"><div class="cx-vazio">Carregando o banco de dados...</div></div>'}
   var I=E.info;
+  if(!E.cols){E.cols={credor:1};(I.colunas||[]).forEach(function(k){E.cols[k]=1})}
   if(I.erro){var m=I.erro;E.info=null;return '<div class="cx-card"><div class="cx-vazio"><b>Não consegui abrir o banco</b>'+esc(m)+'<br><br><button class="cx-btn" onclick="CRM.bdInfo()">Tentar de novo</button></div></div>'}
   if(!I.total)return '<div class="cx-card"><div class="cx-vazio"><b>O banco ainda está vazio</b>Importe uma planilha primeiro, em 📥 Importar planilha.</div></div>';
   var nSel=Object.keys(E.cred).filter(function(k){return E.cred[k]}).length;bdCss2();
   var credSel=I.credores.filter(function(c){return E.cred[c.id||'_']}),nReg=(credSel.length?credSel:I.credores).reduce(function(s,c){return s+(+c.n||0)},0);
   var credTxt=!credSel.length?'Todos os credores':credSel.length===1?credSel[0].nome:credSel.length+' credores: '+credSel.slice(0,2).map(function(c){return c.nome}).join(', ')+(credSel.length>2?' +'+(credSel.length-2):'');
   var abC=BD.dd==='cred',qc=E.qcred||'';
-  var h='<div class="cx-card"><div class="bd-sub">1. O que buscar <small style="font-weight:600;color:#64748b">· '+inteiro(I.total)+' registros no banco</small></div><div class="bd-g bd-g3">';
+  var h='<div class="cx-card"><div class="bd-sub">1. O que buscar <small style="font-weight:600;color:#64748b">· '+inteiro(I.total)+' registros no banco'+(E.metaTS?' · estrutura lida às '+new Date(E.metaTS).toLocaleTimeString('pt-BR'):'')+'</small></div><div class="bd-g bd-g3">';
   h+='<div class="bd-dd">Credores<button type="button" class="bd-ddb'+(abC?' on':'')+'" title="'+esc(credSel.map(function(c){return c.nome}).join(', '))+'" onclick="CRM.bdDd(\'cred\',event)">'+esc(credTxt)+' <span style="color:#94a3b8">('+inteiro(nReg)+')</span></button>';
   if(abC)h+='<div class="bd-ddp bd-cred" onclick="event.stopPropagation()"><input type="search" id="bdQCred" class="bd-ddq" placeholder="Procurar credor" value="'+esc(qc)+'" oninput="CRM.bdVal(\'qcred\',this.value);CRM.bdFiltra(this)"><label class="bd-all"><input type="checkbox"'+(nSel?'':' checked')+' onchange="CRM.bdTodos()"> <b>Todos os credores</b></label>'+
     I.credores.map(function(c){var k=c.id||'_',n=nz(c.nome||'');return '<label data-n="'+esc(n)+'"'+(qc&&n.indexOf(nz(qc))<0?' style="display:none"':'')+'><input type="checkbox"'+(E.cred[k]?' checked':'')+' onchange="CRM.bdCk(\'cred\',\''+js(k)+'\',this.checked)"> <span style="flex:1">'+esc(c.nome)+'</span><small style="color:#94a3b8">'+inteiro(c.n)+'</small></label>'}).join('')+'</div>';
@@ -7786,7 +7855,7 @@ Object.assign(window.CRM,{
     else toast(L.length+' linhas novas baixadas')},
   bdImportar:function(){var I=BD.imp;if(!I||!I.prev||!I.ch||I.enviando)return;var c=I.credor?acha(I.credor):null;
     if(!confirm('Importar para o banco?\n\n• '+I.prev.novo+' linhas novas entram (com todas as colunas)\n• '+I.prev.existe+' que já existem só completam campos vazios\n• '+I.prev.dup+' repetidas dentro do arquivo não duplicam\n\nCredor: '+(c?c.nome:'(sem credor)')))return;
-    var N=I.linhas.length,i=0,T={novos:0,repetidos:0,completados:0};I.importando=1;I.parar=0;
+    var N=I.linhas.length,i=0,T={novos:0,repetidos:0,completados:0};bdMetaLimpar();I.importando=1;I.parar=0;
     (function lote(){
       if(I.parar&&i<N){I.enviando='';I.importando=0;I.parar=0;I.prev=null;I.st=null;BD.exp.info=null;BD.exp.res=null;render();
         alert('Importação parada na linha '+i+' de '+N+'.\n\n'+T.novos+' linhas novas já tinham entrado no banco e ficaram salvas.');return}
@@ -7796,7 +7865,7 @@ Object.assign(window.CRM,{
       api({acao:'banco_importar',cols:I.chaves.map(function(j){return I.cab[j]}),credor_id:I.credor||'',credor:c?c.nome:'',arquivo:I.arquivo,cab:I.cab,linhas:I.linhas.slice(i,i+400),chaves:I.ch.slice(i,i+400),docs:I.docs.slice(i,i+400)})
       .then(function(j){T.novos+=j.novos;T.repetidos+=j.repetidos;T.completados+=j.completados;i+=400;lote()})
       .catch(function(e){I.enviando='';I.importando=0;render();alert('A importação parou na linha '+(i+1)+' de '+N+'.\n\n'+e.message+'\n\nO que já entrou está salvo. Clique em Conferir repetidos e importe de novo: o que já entrou não duplica.')})})()},
-  bdInfo:function(){BD.exp.info=null;BD.exp.res=null;render()},
+  bdInfo:function(){bdMetaLimpar();BD.exp.info=null;BD.exp.res=null;render()},
   bdTodos:function(){BD.exp.cred={};BD.exp.res=null;render()},
   bdCk:function(g,k,v){BD.exp[g][k]=v?1:0;if(g==='cols'){BD.exp.manual=BD.exp.manual||{};BD.exp.manual[k]=1}else BD.exp.res=null;render()},
   bdFCol:function(v){BD.exp.fcol=v;render()},
