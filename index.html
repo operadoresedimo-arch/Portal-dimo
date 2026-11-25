@@ -5291,7 +5291,7 @@ function eqOp(ix){const r=(EQ.rows||[])[ix];if(!r)return;eqOpCss();eqOpFecha();
   h+='<div class="eqm-lg"><div><i style="background:#16a34a"></i>Falando<b>'+pf(pc(o.fala,L),0)+'%</b></div><div><i style="background:#d4a937"></i>Esperando ligação<b>'+pf(pc(o.ocioso,L),0)+'%</b></div><div><i style="background:#b91c1c"></i>Manual<b>'+pf(pc(mEf,L),0)+'%</b></div><div><i style="background:#8a8d92"></i>Pausa<b>'+pf(pc(o.pausa,L),0)+'%</b></div></div>';
   if(r.al&&r.al.length)h+='<h4>Situação</h4><div>'+r.al.map(a=>'<span class="od-st" style="--c:'+a[1]+'">'+odi('alert',12)+esc(a[0])+'</span>').join('')+'</div>';
   if(pz&&pz.lista&&pz.lista.length)h+='<h4>Pausas</h4><div class="eqm-pz">'+pz.lista.slice(0,24).map(x=>'<div>'+esc(x)+'</div>').join('')+'</div>';
-  h+='<div class="eqm-f">'+(d&&d.fonte==='eventos'?'Dados dos eventos da Fastway. "Ela desligou" é o atendimento em que a Fastway não marcou que o cliente desligou.':'Dados da Fastway. "Sem informação" é quando a Fastway não preenche quem desligou: não conta como desligamento dela.')+'</div></div>';
+  h+='<div class="eqm-f">'+(d&&d.fonte==='eventos'?'Dados dos eventos da Fastway. "Ela desligou" é o atendimento encerrado por ela (confirmado pela Fastway).'+(d.man?' '+d.man+' ligações manuais dela ficaram fora dessa conta.':''):'Dados da Fastway. "Sem informação" é quando a Fastway não preenche quem desligou: não conta como desligamento dela.')+'</div></div>';
   const md=document.createElement('div');md.id='eqOpMd';md.innerHTML=h;md.addEventListener('click',eqOpFecha);document.body.appendChild(md);const b=md.querySelector('.eqm-x');if(b)b.focus()}
 function eqMonta(dia){
   const hoje=dia===new Date().toLocaleDateString('pt-BR');
