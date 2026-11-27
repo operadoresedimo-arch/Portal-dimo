@@ -7920,7 +7920,7 @@ window.showPage=function(p){
 const API_CFG='https://script.google.com/macros/s/AKfycbyUX25htVlM8Fs0voi7QK3QzAlF15jYgtzehFG-oUlbP4w0S4efX_Pc7UlrAa0p1_IU/exec';
 const PERFIS=[['operador','Operador','#484a4e'],['prospeccao','Prospecção','#0891b2'],['lider','Líder','#b8901f'],['admin','Admin','#8B1A1A']];
 const NOMEP={};PERFIS.forEach(p=>NOMEP[p[0]]=p[1]);
-const TELAS=[['ranking','Acompanhamento do Dia','sbR'],['trabalho','Área de Trabalho','sbW'],['comparativo','Comparativo','sbC'],['treinamentos','Treinamentos','sbT'],['qualidade','Qualidade das Ligações (só as próprias)','sbQ'],['prosp','Prospecção','sbP'],['avaliacao','Avaliação de Discagem','sbA'],['tv','Dashboard TV','sbTV']];
+const TELAS=[['ranking','Acompanhamento do Dia','sbR'],['trabalho','Área de Trabalho','sbW'],['comparativo','Comparativo','sbC'],['treinamentos','Treinamentos','sbT'],['qualidade','Qualidade das Ligações (só as próprias)','sbQ'],['prosp','Prospecção','sbP'],['cob','CRM Operador (piloto)','sbCO'],['avaliacao','Avaliação de Discagem','sbA'],['tv','Dashboard TV','sbTV']];
 const PAINEIS=[['equipe','Equipe no discador (tempo, pausas e ao vivo)','dentro do Acompanhamento do Dia']];
 const BASE=['ranking','trabalho','comparativo','treinamentos','qualidade','prosp'];
 const PADRAO={operador:BASE.slice(),prospeccao:BASE.slice(),lider:BASE.slice()};
@@ -8146,5 +8146,7 @@ window.CFGP={
 </style>
 <link rel="stylesheet" href="central-atendimento.css?v=2711"/>
 <script defer src="central-atendimento.js?v=2711"></script>
+<link rel="stylesheet" href="crm-operador.css?v=2711"/>
+<script defer src="crm-operador.js?v=2711"></script>
 </body>
 </html>
