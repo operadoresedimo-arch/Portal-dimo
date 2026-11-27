@@ -44,7 +44,9 @@ function euNome(){var n=(typeof cU!=='undefined'&&cU&&cU.nome)?String(cU.nome):e
 function lider(){var p=(typeof cU!=='undefined'&&cU)?String(cU.papel||cU.perfil||''):'';return p==='admin'||p==='lider'}
 function tokGet(){try{var t=JSON.parse(localStorage.getItem('mq_tok')||'null');return t&&t.k===eu()?t.t:''}catch(e){return ''}}
 function tokSet(t){try{localStorage.setItem('mq_tok',JSON.stringify({k:eu(),t:t}))}catch(e){}}
-function url(){return (typeof SCRIPT_URL!=='undefined'&&SCRIPT_URL)||''}
+// mesmo servidor da Prospeccao (o SCRIPT_URL do portal fica fechado dentro do login, por isso o endereco fixo)
+var URL_PADRAO='https://script.google.com/macros/s/AKfycbyq1tRKBjM71qSguAbeBlD6u2e02tcm0K5y5ycAKpuGiF1H3bCxzl3_7XA_ttIOMU0zAw/exec';
+function url(){return (typeof SCRIPT_URL!=='undefined'&&SCRIPT_URL)||URL_PADRAO}
 function post(b){return fetch(url(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)}).then(function(r){return r.json()})}
 function api(b){b.type='crm';b.login=eu();b.token=tokGet();return post(b).then(function(j){
   if(j.status!=='ok'){if(j.relogin){try{localStorage.removeItem('mq_tok')}catch(e){}var e=new Error('senha');e.relogin=1;throw e}throw new Error(j.msg||'erro')}
