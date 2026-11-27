@@ -5974,7 +5974,8 @@ function copiar(t){(navigator.clipboard?navigator.clipboard.writeText(t):Promise
 function meusAcordos(){try{if(!cRD||!cRD.ops||!cU)return null;const o=cRD.ops.find(x=>mesmaPessoa(x.n,cU.nome)||mesmaPessoa(cU.nome,x.n));return o?o.a:0}catch(e){return null}}
 function campo(k,lb,tipo,extra){return '<div class="'+(extra||'')+'"><label>'+lb+'</label><input id="tb_'+k+'" type="'+(tipo||'text')+'" value="'+esc(F[k])+'" oninput="TB.set(\''+k+'\',this.value)"></div>'}
 function render(){
-  const el=$('pageTrabalho');if(!el)return;if(!F)carrega();
+  if(window.EDCentral)window.EDCentral.mount();
+  const el=$('atApoio')||$('pageTrabalho');if(!el)return;if(!F)carrega();
   const v=vars(),c=calc(),ac=meusAcordos();
   let h='<div class="tb-top"><div><h2>Área de Trabalho</h2><p>Use do lado do Cobmais durante a ligação. Fica tudo só no seu computador.</p></div><div class="tb-sp"></div>'+
     (ac===null?'':'<div class="tb-meta">Meus acordos hoje: <b>'+ac+'</b> / meta 4</div>')+
@@ -7744,7 +7745,7 @@ function vBdExp(){var E=BD.exp;
   if(!E.info){if(!E.carreg){E.carreg=true;api({acao:'banco_info'}).then(function(j){E.carreg=false;E.info=j;bdMetaGravar(j);
       if(!E.cols){E.cols={credor:1};(j.colunas||[]).forEach(function(k){E.cols[k]=1})}else (j.colunas||[]).forEach(function(k){if(E.cols[k]===undefined)E.cols[k]=1});if(VIEW==='banco')render()})
     .catch(function(e){E.carreg=false;E.info={erro:e.message};if(VIEW==='banco')render()})}
-    return '<div class="cx-card"><div role="status" aria-label="Carregando o banco de dados" style="display:flex;align-items:center;justify-content:center;min-height:200px;padding:16px"><img src="carregando-banco.gif?v=2511" width="160" height="160" alt="Carregando o banco de dados..." style="display:block;max-width:100%;object-fit:contain"></div></div>'}
+    return '<div class="cx-card"><div class="cx-vazio">Carregando o banco de dados...</div></div>'}
   var I=E.info;
   if(!E.cols){E.cols={credor:1};(I.colunas||[]).forEach(function(k){E.cols[k]=1})}
   if(I.erro){var m=I.erro;E.info=null;return '<div class="cx-card"><div class="cx-vazio"><b>Não consegui abrir o banco</b>'+esc(m)+'<br><br><button class="cx-btn" onclick="CRM.bdInfo()">Tentar de novo</button></div></div>'}
@@ -8143,5 +8144,7 @@ window.CFGP={
 .nx-pg2 div:first-child span:empty{display:none}
 .nx-pg2 div:first-child{justify-content:flex-end}
 </style>
+<link rel="stylesheet" href="central-atendimento.css?v=2711"/>
+<script defer src="central-atendimento.js?v=2711"></script>
 </body>
 </html>

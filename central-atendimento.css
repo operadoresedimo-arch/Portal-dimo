@@ -1,0 +1,81 @@
+/* Central Édimo: escopo exclusivo da Área de Trabalho. */
+.edc{--ec-ink:#484a4e;--ec-gold:#a17b19;--ec-line:#e4e4e2;--ec-soft:#f7f7f5;color:var(--ec-ink);font:400 14px/1.5 Inter,system-ui,sans-serif;max-width:1560px;margin:auto}
+.edc *{box-sizing:border-box}
+.edc button,.edc input,.edc select,.edc textarea{font:inherit}
+.edc button{cursor:pointer}
+.edc button:disabled{cursor:not-allowed;opacity:.5}
+.edc button:focus-visible,.edc input:focus-visible,.edc select:focus-visible,.edc textarea:focus-visible{outline:3px solid #d4a937;outline-offset:2px}
+.edc .ec-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:4px 0 18px}
+.edc .ec-head h2{font-size:26px;letter-spacing:-.7px;color:#333639;margin:0}
+.edc .ec-head p,.edc .ec-muted{color:#707478}
+.edc p{margin:0}
+.edc .ec-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border:1px solid var(--ec-line);border-radius:6px;background:#fff;font-size:14px;white-space:nowrap}
+.edc .ec-light{width:10px;height:10px;border-radius:50%;display:inline-block;background:#8b8f94;flex-shrink:0}
+.edc .ec-light.green{background:#208346}.edc .ec-light.yellow{background:#db8718}.edc .ec-light.red{background:#c23d38}
+.edc .ec-health{display:flex;align-items:center;justify-content:space-between;gap:12px;background:white;border:1px solid var(--ec-line);border-radius:10px;padding:12px 16px;margin-bottom:14px}
+.edc .ec-health>div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.edc .ec-health small{font-size:14px;color:#707478}
+.edc .ec-nav{display:flex;gap:6px;border-bottom:1px solid var(--ec-line);margin-bottom:16px;overflow:auto}
+.edc .ec-nav button{border:0;border-bottom:3px solid transparent;color:#666a6e;background:transparent;padding:12px 16px;white-space:nowrap}
+.edc .ec-nav button[aria-selected=true]{border-bottom-color:#d4a937;color:#333639;font-weight:700}
+.edc .ec-demo-banner{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff8e5;border:1px solid #eeddaa;border-radius:8px;padding:10px 14px;margin:0 0 14px}
+.edc .ec-btn{border:1px solid #d6d7d5;background:#fff;color:#484a4e;border-radius:7px;padding:8px 13px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.edc .ec-btn.primary{background:#484a4e;border-color:#484a4e;color:white}
+.edc .ec-btn.link{border:0;background:transparent;padding:4px 0;color:#856513}
+.edc .ec-btn.small{padding:5px 9px}
+.edc .ec-panel{border:1px solid var(--ec-line);background:#fff;border-radius:10px;padding:20px;min-width:0}
+.edc .ec-panel h3{font-size:17px;color:#333639;margin:0 0 8px}
+.edc .ec-panel h4{font-size:14px;margin:0 0 6px}
+.edc .ec-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.edc .ec-between{justify-content:space-between}
+.edc .ec-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(270px,1fr);gap:16px}
+.edc .ec-field{display:flex;flex-direction:column;gap:5px;min-width:0;margin:0 0 12px}
+.edc .ec-field>span,.edc .ec-field>label{font-size:14px;font-weight:600}
+.edc .ec-field input,.edc .ec-field select,.edc .ec-field textarea,.edc .ec-search{width:100%;border:1px solid #d6d7d5;border-radius:7px;padding:9px 11px;background:#fff;color:#484a4e;min-height:40px}
+.edc .ec-field textarea{resize:vertical;min-height:90px}
+.edc .ec-fields{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.edc .ec-upload{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:170px;border:1px dashed #c3b17e;background:#fcfbf7;border-radius:8px;padding:20px;text-align:center;margin:16px 0;cursor:pointer}
+.edc .ec-upload b{font-size:17px}.edc .ec-upload input{max-width:100%;font-size:14px}
+.edc .ec-note{font-size:14px;color:#707478;margin-top:12px}
+.edc .ec-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;min-height:320px;padding:24px;color:#707478}
+.edc .ec-empty b{font-size:20px;font-weight:600;color:#484a4e}
+.edc .ec-mark{width:52px;height:52px;background:#f5f1e4;border:1px solid #e4d8b6;display:flex;align-items:center;justify-content:center;border-radius:14px;font-size:23px;color:#a17b19;margin-bottom:4px}
+.edc .ec-table-wrap{overflow:auto;max-width:100%;border:1px solid var(--ec-line);border-radius:8px;margin:14px 0}
+.edc table.ec-table{border-collapse:collapse;width:100%;text-align:left;background:white;margin:0}
+.edc .ec-table th,.edc .ec-table td{padding:10px 12px;border-bottom:1px solid #edeeec;font-size:14px;white-space:nowrap;text-align:left;color:#484a4e}
+.edc .ec-table th{background:#f7f7f5;font-weight:600}
+.edc .ec-table tbody tr:last-child td{border-bottom:0}
+.edc .ec-table .active td{background:#fcf8e9}
+.edc .ec-chat{display:grid;grid-template-columns:260px minmax(0,1fr) 240px;min-height:510px;border:1px solid var(--ec-line);border-radius:10px;background:white;overflow:hidden}
+.edc .ec-inbox{border-right:1px solid var(--ec-line);padding:14px;min-width:0}
+.edc .ec-inbox>div:first-child{margin-bottom:14px}
+.edc .ec-thread{width:100%;display:block;text-align:left;border:1px solid transparent;background:transparent;border-radius:8px;padding:12px;margin:6px 0;color:#484a4e}
+.edc .ec-thread.on{background:#f6f2e6;border-color:#e9dfc2}
+.edc .ec-thread b,.edc .ec-thread span{display:block}
+.edc .ec-thread span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#777b7e;margin-top:3px}
+.edc .ec-conversation{display:flex;flex-direction:column;min-width:0;background:#fafaf8}
+.edc .ec-conv-head{background:white;border-bottom:1px solid var(--ec-line);padding:16px 20px;display:flex;justify-content:space-between;gap:12px}
+.edc .ec-messages{flex:1;padding:22px;display:flex;flex-direction:column;gap:14px;max-height:460px;overflow:auto;min-height:270px}
+.edc .ec-bubble{align-self:flex-start;max-width:85%;background:white;border:1px solid #e3e4e1;border-radius:0 10px 10px 10px;padding:11px 14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.edc .ec-bubble.out{align-self:flex-end;background:#f3edda;border-color:#e6dbb7;border-radius:10px 0 10px 10px}
+.edc .ec-bubble small{display:block;color:#797975;font-size:14px;margin-top:6px}
+.edc .ec-compose{padding:14px;background:white;border-top:1px solid var(--ec-line)}
+.edc .ec-compose textarea{width:100%;min-height:66px;max-height:180px;border:1px solid #d6d7d5;border-radius:7px;padding:10px;resize:vertical;font:inherit;color:#484a4e}
+.edc .ec-contact{padding:20px;border-left:1px solid var(--ec-line)}
+.edc .ec-contact dl{margin:16px 0}
+.edc .ec-contact dt{color:#707478;font-size:14px;margin-top:14px}
+.edc .ec-contact dd{font-size:14px;margin:3px 0 0;overflow-wrap:anywhere}
+.edc .ec-local{margin:18px 0 4px;color:#74787b;font-size:14px}
+.edc .ec-error{background:#fff2f0;color:#9f302a;border:1px solid #edc7c2;padding:10px 13px;border-radius:7px;margin-bottom:14px}
+.edc .ec-notice{background:#f5f5f2;border:1px solid #e2e3dd;color:#555b56;padding:10px 13px;border-radius:7px;margin-bottom:14px}
+.edc .ec-result{border:1px solid #ddd;border-radius:8px;padding:14px;margin-top:16px}
+.edc .ec-result.blocked{background:#fff5ee;border-color:#ebcfae}.edc .ec-result.ready{background:#f1f8f2;border-color:#bbd6be}
+.edc .ec-legend{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0}
+.edc .ec-legend span{display:flex;align-items:center;gap:7px}
+.edc .ec-settings{margin:14px 0 0;padding-left:20px;color:#606568}
+.edc .ec-settings li{margin-bottom:9px}
+.edc #atApoio .tb-top h2{font-size:20px}
+.edc #atApoio .tb-top p{font-size:14px}
+.edc [hidden]{display:none!important}
+@media(max-width:1250px){.edc .ec-chat{grid-template-columns:230px minmax(0,1fr)}.edc .ec-contact{grid-column:1/-1;border-top:1px solid var(--ec-line);border-left:0}.edc .ec-contact dl{display:flex;gap:24px;flex-wrap:wrap}.edc .ec-contact dt{margin-top:0}}
+@media(max-width:850px){.edc .ec-grid{grid-template-columns:1fr}.edc .ec-chat{grid-template-columns:1fr}.edc .ec-inbox{border-right:0;border-bottom:1px solid var(--ec-line)}.edc .ec-health,.edc .ec-head{align-items:flex-start;flex-direction:column}.edc .ec-fields{grid-template-columns:1fr}.edc .ec-nav button{padding:10px 12px}.edc .ec-chat{min-height:0}.edc .ec-messages{min-height:230px}}
