@@ -8,7 +8,7 @@
  const $=id=>document.getElementById(id);
  const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
- const S={tab:new URLSearchParams(location.search).get('trabalho')==='1'?'apoio':'chat',demo:false,thread:0,drafts:{},book:null,sheet:'',file:'',head:0,rows:[],name:-1,phone:-1,size:20,lots:[],lot:0,lotPage:0,contacts:[],stats:null,campaigns:[],notice:'',error:'',busy:false,sim:{quality:'YELLOW',age:'0',count:'0',gap:'180'}};
+ const S={tab:'chat',demo:false,thread:0,drafts:{},book:null,sheet:'',file:'',head:0,rows:[],name:-1,phone:-1,size:20,lots:[],lot:0,lotPage:0,contacts:[],stats:null,campaigns:[],notice:'',error:'',busy:false,sim:{quality:'YELLOW',age:'0',count:'0',gap:'180'}};
  const examples=[
   {name:'Contato exemplo A',last:'Olá! Pode me ajudar?',messages:[{out:false,t:'Olá! Pode me ajudar?'},{out:true,t:'Olá! Como posso ajudar você hoje?'}]},
   {name:'Contato exemplo B',last:'Obrigada pelo retorno.',messages:[{out:false,t:'Obrigada pelo retorno.'}]}
@@ -37,10 +37,10 @@
   }
   activeOwner=who;
   if($('edCentral')){if(changed)render();return}
-  const old=document.createElement('div');old.id='atApoio';
+  const old=document.createElement('div');old.id='atApoio';old.hidden=true;
   while(pg.firstChild)old.appendChild(pg.firstChild);
   const shell=document.createElement('div');shell.id='edCentral';shell.className='edc';
-  shell.innerHTML='<header class="ec-head"><div><h2>Área de Trabalho</h2><p>Conversas, planilhas e campanhas em um só lugar.</p></div><span class="ec-badge"><i class="ec-light"></i>Base sem conexão</span></header><div id="ecHealth"></div><nav class="ec-nav" role="tablist" aria-label="Área de Trabalho">'+[['chat','Conversas'],['planilhas','Planilhas'],['campanhas','Campanhas'],['numeros','Números e qualidade'],['apoio','Apoio à ligação']].map(t=>'<button type="button" id="ecTab_'+t[0]+'" role="tab" aria-controls="'+(t[0]==='apoio'?'atApoio':'ecContent')+'" aria-selected="false" data-ec="tab:'+t[0]+'">'+t[1]+'</button>').join('')+'</nav><div id="ecAlerts" aria-live="polite"></div><section id="ecContent" role="tabpanel"></section><p class="ec-local">Base local, sem envios reais. Importações, lotes e rascunhos ficam só nesta aba e se perdem ao atualizar. Histórico compartilhado e integração com a Meta ainda não estão conectados.</p>';
+  shell.innerHTML='<header class="ec-head"><div><h2>Área de Trabalho</h2><p>Conversas, planilhas e campanhas em um só lugar.</p></div><span class="ec-badge"><i class="ec-light"></i>Base sem conexão</span></header><div id="ecHealth"></div><nav class="ec-nav" role="tablist" aria-label="Área de Trabalho">'+[['chat','Conversas'],['planilhas','Planilhas'],['campanhas','Campanhas'],['numeros','Números e qualidade']].map(t=>'<button type="button" id="ecTab_'+t[0]+'" role="tab" aria-controls="ecContent" aria-selected="false" data-ec="tab:'+t[0]+'">'+t[1]+'</button>').join('')+'</nav><div id="ecAlerts" aria-live="polite"></div><section id="ecContent" role="tabpanel"></section><p class="ec-local">Base local, sem envios reais. Importações, lotes e rascunhos ficam só nesta aba e se perdem ao atualizar. Histórico compartilhado e integração com a Meta ainda não estão conectados.</p>';
   shell.insertBefore(old,shell.querySelector('.ec-local'));pg.appendChild(shell);
   shell.addEventListener('click',click);
   shell.addEventListener('change',change);
@@ -56,11 +56,10 @@
   $('ecHealth').innerHTML=health();
   $('ecAlerts').innerHTML=S.error?'<div class="ec-error" role="alert">'+esc(S.error)+'</div>':S.notice?'<div class="ec-notice">'+esc(S.notice)+'</div>':'';
   document.querySelectorAll('#edCentral .ec-nav button').forEach(b=>{const on=b.dataset.ec==='tab:'+S.tab;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
-  $('atApoio').hidden=S.tab!=='apoio';
-  $('ecContent').hidden=S.tab==='apoio';$('ecContent').setAttribute('aria-labelledby','ecTab_'+S.tab);
-  if(S.tab!=='apoio')$('ecContent').innerHTML=({chat:chat,planilhas:spreadsheets,campanhas:campaigns,numeros:numbers}[S.tab]||chat)();
+  $('ecContent').setAttribute('aria-labelledby','ecTab_'+S.tab);
+  $('ecContent').innerHTML=({chat:chat,planilhas:spreadsheets,campanhas:campaigns,numeros:numbers}[S.tab]||chat)();
  }
- function tab(t){S.tab=t;S.error='';S.notice='';render()}
+ function tab(t){if(!['chat','planilhas','campanhas','numeros'].includes(t))return;S.tab=t;S.error='';S.notice='';render()}
  function chat(){
   if(!S.demo)return '<div class="ec-chat"><aside class="ec-inbox"><div><b>Conversas</b></div><input class="ec-search" placeholder="Buscar conversa" disabled aria-label="Buscar conversa"><p class="ec-note">As conversas aparecerão aqui depois de conectar o servidor.</p></aside><div class="ec-conversation"><div class="ec-empty"><div class="ec-mark" aria-hidden="true">◌</div><b>Seu atendimento, aqui.</b><p>Escolha uma conversa para ver o histórico e responder.<br>Nenhuma mensagem está sendo recebida ou enviada nesta base.</p>'+btn('Ver demonstração do chat','demo','primary')+'</div><div class="ec-compose"><textarea disabled placeholder="Conecte o servidor para responder." aria-label="Mensagem"></textarea><div class="ec-row ec-between"><span class="ec-muted">Envio indisponível</span>'+btn('Enviar','offline','primary',true)+'</div></div></div><aside class="ec-contact"><b>Dados do contato</b><p class="ec-note">Nome, telefone, responsável, lote e situação do atendimento.</p></aside></div>';
   const c=examples[S.thread];

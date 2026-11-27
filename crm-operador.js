@@ -165,7 +165,6 @@ function casca(conteudo){
   var m='<aside class="cx-sb"><div class="cx-logo"><b>CRM Operador</b><small>Cobrança · piloto</small></div>'+
     it('dia','🏠','Meu dia')+it('busca','🔎','Buscar cliente')+(C.cli?it('ficha','📇',curtoNome(C.cli.nome)):'')+
     it('agenda','📅','Retornos e promessas',ag)+it('hist','🗂️','Atendimentos')+
-    '<div class="cx-sep">Ferramentas</div><button type="button" class="cx-nav" data-co="apoio">🧰 Apoio à ligação</button>'+
     '<div class="cx-foot">'+(C.modo==='planilha'?'<b>●</b> Atendimentos na planilha':C.modo==='local'?'<b style="color:#d97706">●</b> Salvando neste computador':'Conectando...')+
     '<br>'+(C.info&&C.info.total?Number(C.info.total).toLocaleString('pt-BR')+' registros no banco':'')+'<br><a href="#" data-co="recarregar" style="color:#0f3557;font-weight:700">↻ Atualizar</a></div></aside>';
   var lado=$('coSide');if(!lado){lado=document.createElement('div');lado.id='coSide';document.body.appendChild(lado)}
@@ -299,7 +298,6 @@ var ANT='ranking';
 function acao(a,v,el){
   if(a==='ir'){C.view=v;render();return}
   if(a==='voltar'){window.showPage(ANT&&ANT!=='cob'?ANT:'ranking');return}
-  if(a==='apoio'){var w=window.open(location.pathname+'?trabalho=1','edimoApoio','width=1180,height=860');if(!w)window.showPage('trabalho');return}
   if(a==='recarregar'){C.info=null;C.at=null;iniciar();return}
   if(a==='info'){C.infoErr='';carregaInfo();render();return}
   if(a==='buscar'){var i=$('coQ');buscar(i?i.value:C.q);return}
