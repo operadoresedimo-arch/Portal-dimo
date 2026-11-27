@@ -14,7 +14,8 @@
   {name:'Contato exemplo B',last:'Obrigada pelo retorno.',messages:[{out:false,t:'Obrigada pelo retorno.'}]}
  ];
  function owner(){return typeof cU!=='undefined'&&cU?String(cU.login||cU.nome||''):''}
- let activeOwner='';
+ let activeOwner='', shell=null;
+ const initialExamples=JSON.stringify(examples);
  function guard(ctx,now){
   now=now||Date.now();
   if(!ctx.connected)return {ok:false,reason:'Sem conexão com a Meta',code:'OFFLINE'};
@@ -28,20 +29,19 @@
  function btn(text,action,cls,disabled){return '<button type="button" class="ec-btn '+(cls||'')+'" data-ec="'+action+'"'+(disabled?' disabled':'')+'>'+text+'</button>'}
  function notice(msg,error){S.error=error?msg:'';S.notice=error?'':msg;render()}
  function health(){return '<div class="ec-health"><div><span class="ec-light" aria-hidden="true"></span><b>Qualidade não consultada</b><small>Sem conexão com a Meta</small></div><div><small>Até 20/h · intervalo mínimo de 2 min</small>'+btn('Ver regras','tab:numeros','link')+'</div></div>'}
- function mount(){
-  const pg=$('pageTrabalho');if(!pg)return;
+ function mount(pg){
+  if(!pg)return;
   const who=owner();
   const changed=activeOwner&&activeOwner!==who;
   if(changed){
+   S.tab='chat';S.thread=0;examples.splice(0,examples.length,...JSON.parse(initialExamples));
    S.book=null;S.rows=[];S.contacts=[];S.lots=[];S.campaigns=[];S.drafts={};S.stats=null;S.file='';S.demo=false;S.notice='';S.error='';
   }
   activeOwner=who;
-  if($('edCentral')){if(changed)render();return}
-  const old=document.createElement('div');old.id='atApoio';old.hidden=true;
-  while(pg.firstChild)old.appendChild(pg.firstChild);
-  const shell=document.createElement('div');shell.id='edCentral';shell.className='edc';
-  shell.innerHTML='<header class="ec-head"><div><h2>Área de Trabalho</h2><p>Conversas, planilhas e campanhas em um só lugar.</p></div><span class="ec-badge"><i class="ec-light"></i>Base sem conexão</span></header><div id="ecHealth"></div><nav class="ec-nav" role="tablist" aria-label="Área de Trabalho">'+[['chat','Conversas'],['planilhas','Planilhas'],['campanhas','Campanhas'],['numeros','Números e qualidade']].map(t=>'<button type="button" id="ecTab_'+t[0]+'" role="tab" aria-controls="ecContent" aria-selected="false" data-ec="tab:'+t[0]+'">'+t[1]+'</button>').join('')+'</nav><div id="ecAlerts" aria-live="polite"></div><section id="ecContent" role="tabpanel"></section><p class="ec-local">Base local, sem envios reais. Importações, lotes e rascunhos ficam só nesta aba e se perdem ao atualizar. Histórico compartilhado e integração com a Meta ainda não estão conectados.</p>';
-  shell.insertBefore(old,shell.querySelector('.ec-local'));pg.appendChild(shell);
+  if(shell){if(shell.parentNode!==pg)pg.appendChild(shell);if(changed)render();return}
+  shell=document.createElement('div');shell.id='edCentral';shell.className='edc';
+  shell.innerHTML='<header class="ec-head"><div><h2>WhatsApp</h2><p>Conversas, planilhas e campanhas em um só lugar.</p></div><span class="ec-badge"><i class="ec-light"></i>Base sem conexão</span></header><div id="ecHealth"></div><nav class="ec-nav" role="tablist" aria-label="WhatsApp">'+[['chat','Conversas'],['planilhas','Planilhas'],['campanhas','Campanhas'],['numeros','Números e qualidade']].map(t=>'<button type="button" id="ecTab_'+t[0]+'" role="tab" aria-controls="ecContent" aria-selected="false" data-ec="tab:'+t[0]+'">'+t[1]+'</button>').join('')+'</nav><div id="ecAlerts" aria-live="polite"></div><section id="ecContent" role="tabpanel"></section><p class="ec-local">Base local, sem envios reais. Importações, lotes e rascunhos ficam só nesta aba e se perdem ao atualizar. Histórico compartilhado e integração com a Meta ainda não estão conectados.</p>';
+  pg.appendChild(shell);
   shell.addEventListener('click',click);
   shell.addEventListener('change',change);
   shell.addEventListener('input',input);

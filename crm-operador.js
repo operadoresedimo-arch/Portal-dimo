@@ -164,12 +164,12 @@ function casca(conteudo){
   var it=function(v,ic,t,n){return '<button type="button" class="cx-nav'+(C.view===v?' on':'')+'" data-co="ir" data-v="'+v+'">'+ic+' '+esc(t)+(n?'<em>'+n+'</em>':'')+'</button>'};
   var m='<aside class="cx-sb"><div class="cx-logo"><b>CRM Operador</b><small>Cobrança · piloto</small></div>'+
     it('dia','🏠','Meu dia')+it('busca','🔎','Buscar cliente')+(C.cli?it('ficha','📇',curtoNome(C.cli.nome)):'')+
-    it('agenda','📅','Retornos e promessas',ag)+it('hist','🗂️','Atendimentos')+
+    it('agenda','📅','Retornos e promessas',ag)+it('hist','🗂️','Atendimentos')+(podeWhats()?it('whatsapp','💬','WhatsApp'):'')+
     '<div class="cx-foot">'+(C.modo==='planilha'?'<b>●</b> Atendimentos na planilha':C.modo==='local'?'<b style="color:#d97706">●</b> Salvando neste computador':'Conectando...')+
     '<br>'+(C.info&&C.info.total?Number(C.info.total).toLocaleString('pt-BR')+' registros no banco':'')+'<br><a href="#" data-co="recarregar" style="color:#0f3557;font-weight:700">↻ Atualizar</a></div></aside>';
   var lado=$('coSide');if(!lado){lado=document.createElement('div');lado.id='coSide';document.body.appendChild(lado)}
   lado.innerHTML=m.replace('<aside class="cx-sb">','<aside class="cx-sb"><button type="button" class="cx-volta" data-co="voltar">&larr; Voltar ao portal</button>');
-  return '<div class="cx co">'+m.replace('<aside class="cx-sb">','<aside class="cx-sb cx-sb-in">')+'<section class="cx-main" id="coMain">'+aviso()+conteudo+'</section></div>'}
+  return '<div class="cx co">'+m.replace('<aside class="cx-sb">','<aside class="cx-sb cx-sb-in">')+'<section class="cx-main" id="coMain">'+(C.view==='whatsapp'?'':aviso())+conteudo+'</section></div>'}
 function caixaBusca(grande){return '<div class="co-busca'+(grande?' gr':'')+'"><input class="cx-in" id="coQ" placeholder="Nome, CPF ou CNPJ do cliente" value="'+esc(C.q)+'" autocomplete="off">'+b(C.busc?'Buscando...':'🔎 Buscar','buscar',null,'pri',C.busc?' disabled':'')+'</div>'}
 
 function vDia(){var L=lista(),h=hojeIso(),hj=L.filter(function(x){return String(x.data).slice(0,10)===h});
@@ -265,8 +265,10 @@ function entrar(){var i=$('coSenha');if(!i||!i.value)return;var bt=i.nextElement
 
 function render(){if(!EL||!ativo())return;if(C.senha)return;
   var foco=document.activeElement&&document.activeElement.id,pos=0;try{pos=document.activeElement.selectionStart}catch(e){}
-  var h=C.view==='busca'?vBusca():C.view==='ficha'?vFicha():C.view==='agenda'?vAgenda():C.view==='hist'?vHist():vDia();
+  if(C.view==='whatsapp'&&!podeWhats())C.view='dia';
+  var h=C.view==='whatsapp'?'<div id="coWhatsApp"></div>':C.view==='busca'?vBusca():C.view==='ficha'?vFicha():C.view==='agenda'?vAgenda():C.view==='hist'?vHist():vDia();
   EL.innerHTML=casca(h);
+  if(C.view==='whatsapp'){var wa=$('coWhatsApp');if(window.EDCentral)window.EDCentral.mount(wa);else wa.textContent='Não consegui carregar o WhatsApp. Atualize o portal.'}
   if(foco&&/^co[QH]$/.test(foco)){var q=$(foco);if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(e){}}}}
 function iniciar(){if(!tokGet()){pedeSenha('');return}C.senha=false;carregaInfo();carregaAt();render()}
 function ativo(){var p=$('pageCob');return !!(p&&p.classList.contains('active'))}
@@ -296,7 +298,7 @@ function csv(){var L=lista(),K=CAMPOS,q=function(v){v=String(v==null?'':v);if(/^
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='atendimentos-'+hojeIso()+'.csv';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
 var ANT='ranking';
 function acao(a,v,el){
-  if(a==='ir'){C.view=v;render();return}
+  if(a==='ir'){if(v==='whatsapp'&&!podeWhats())return;C.view=v;render();return}
   if(a==='voltar'){window.showPage(ANT&&ANT!=='cob'?ANT:'ranking');return}
   if(a==='recarregar'){C.info=null;C.at=null;iniciar();return}
   if(a==='info'){C.infoErr='';carregaInfo();render();return}
@@ -330,8 +332,9 @@ function onKey(e){var t=e.target;if(e.key!=='Enter'||!t)return;if(t.id==='coQ'){
 
 // ---- liga no portal ----
 function pode(){if(typeof cU==='undefined'||!cU)return false;if(typeof window.pode==='function')return window.pode('cob');return String(cU.perfil||'')==='admin'}
+function podeWhats(){return pode()&&(typeof window.pode!=='function'||window.pode('trabalho'))}
 function montar(){
-  if(!$('sbCO')){var ref=$('sbW')||$('sbR');if(!ref||!ref.parentNode)return false;var bt=document.createElement('button');bt.className='sb-item';bt.id='sbCO';bt.style.display='none';
+  if(!$('sbCO')){var ref=$('sbR');if(!ref||!ref.parentNode)return false;var bt=document.createElement('button');bt.className='sb-item';bt.id='sbCO';bt.style.display='none';
     bt.setAttribute('onclick',"showPage('cob')");bt.innerHTML='\uD83D\uDCBC CRM Operador';ref.parentNode.insertBefore(bt,ref.nextSibling)}
   if(!$('pageCob')){var m=document.querySelector('.main');if(!m)return false;var p=document.createElement('div');p.className='page';p.id='pageCob';m.appendChild(p);
     p.addEventListener('click',onClick);p.addEventListener('input',onInput);p.addEventListener('change',onInput);p.addEventListener('keydown',onKey)}
@@ -340,13 +343,15 @@ function montar(){
 function ligar(){
   montar();
   var sp=window.showPage;if(typeof sp!=='function'||sp._co)return;
-  var novo=function(p){if(p!=='cob')ANT=p;sp.apply(this,arguments);montar();
+  var novo=function(p){if(p==='trabalho'){if(podeWhats()){C.view='whatsapp';p='cob'}else p='ranking'}
+    if(p!=='cob')ANT=p;sp.call(this,p);montar();
     var on=p==='cob'&&pode(),pg=$('pageCob'),sb=$('sbCO');
     if(p==='cob'&&!pode()){if(pg)pg.classList.remove('active');document.body.classList.remove('cob-on');return}
     document.body.classList.toggle('cob-on',on);if(pg)pg.classList.toggle('active',on);if(sb)sb.classList.toggle('active',on);
     if(on)iniciar()};
   novo._co=1;window.showPage=novo;
   setInterval(function(){montar();var sb=$('sbCO');if(sb)sb.style.display=pode()?'':'none';
+    if(C.view==='whatsapp'&&ativo()&&!podeWhats())render();
     if(C.at!=null&&C._eu!==eu()){C.at=null;C.cli=null;C.res=null;C.form=null;C.view='dia'}C._eu=eu()},700)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ligar);else ligar();
 window.CRMOP={_calc:calc,_mapa:mapa,_agrupa:agrupa,_C:C};
