@@ -163,14 +163,14 @@ function casca(conteudo){
   var L=C.at?lista():[],h=hojeIso(),ag=L.filter(function(x){return x.retorno&&x.feito!=='sim'&&x.retorno<=h}).length;
   var it=function(v,ic,t,n){return '<button type="button" class="cx-nav'+(C.view===v?' on':'')+'" data-co="ir" data-v="'+v+'">'+ic+' '+esc(t)+(n?'<em>'+n+'</em>':'')+'</button>'};
   var m='<aside class="cx-sb"><div class="cx-logo"><b>CRM Operador</b><small>Cobrança · piloto</small></div>'+
-    it('dia','🏠','Meu dia')+it('busca','🔎','Buscar cliente')+(C.cli?it('ficha','📇',curtoNome(C.cli.nome)):'')+
-    it('agenda','📅','Retornos e promessas',ag)+it('hist','🗂️','Atendimentos')+(podeWhats()?it('whatsapp','💬','WhatsApp'):'')+
+    it('dia','🕒','Meu dia')+it('busca','🔍','Buscar cliente')+(C.cli?it('ficha','👤',curtoNome(C.cli.nome)):'')+
+    it('agenda','📅','Retornos e promessas',ag)+it('hist','📋','Atendimentos')+(podeWhats()?it('whatsapp','💬','WhatsApp'):'')+
     '<div class="cx-foot">'+(C.modo==='planilha'?'<b>●</b> Atendimentos na planilha':C.modo==='local'?'<b style="color:#d97706">●</b> Salvando neste computador':'Conectando...')+
     '<br>'+(C.info&&C.info.total?Number(C.info.total).toLocaleString('pt-BR')+' registros no banco':'')+'<br><a href="#" data-co="recarregar" style="color:#0f3557;font-weight:700">↻ Atualizar</a></div></aside>';
   var lado=$('coSide');if(!lado){lado=document.createElement('div');lado.id='coSide';document.body.appendChild(lado)}
   lado.innerHTML=m.replace('<aside class="cx-sb">','<aside class="cx-sb"><button type="button" class="cx-volta" data-co="voltar">&larr; Voltar ao portal</button>');
   return '<div class="cx co">'+m.replace('<aside class="cx-sb">','<aside class="cx-sb cx-sb-in">')+'<section class="cx-main" id="coMain">'+(C.view==='whatsapp'?'':aviso())+conteudo+'</section></div>'}
-function caixaBusca(grande){return '<div class="co-busca'+(grande?' gr':'')+'"><input class="cx-in" id="coQ" placeholder="Nome, CPF ou CNPJ do cliente" value="'+esc(C.q)+'" autocomplete="off">'+b(C.busc?'Buscando...':'🔎 Buscar','buscar',null,'pri',C.busc?' disabled':'')+'</div>'}
+function caixaBusca(grande){return '<div class="co-busca'+(grande?' gr':'')+'"><input class="cx-in" id="coQ" placeholder="Nome, CPF ou CNPJ do cliente" value="'+esc(C.q)+'" autocomplete="off">'+b(C.busc?'Buscando...':'🔍 Buscar','buscar',null,'pri',C.busc?' disabled':'')+'</div>'}
 
 function vDia(){var L=lista(),h=hojeIso(),hj=L.filter(function(x){return String(x.data).slice(0,10)===h});
   var ab=L.filter(function(x){return x.retorno&&x.feito!=='sim'}),atr=ab.filter(function(x){return x.retorno<h}),deh=ab.filter(function(x){return x.retorno===h});
@@ -206,7 +206,7 @@ function vFicha(){var F=C.cli;if(!F){C.view='busca';return vBusca()}
   var tels={},mails={},ends={};R.forEach(function(r){M.tel.forEach(function(i){var t=soDig(r[i]);if(t.length>=10)tels[t.replace(/^55(?=\d{10,11}$)/,'')]=1});M.email.forEach(function(i){var e=u(i,r);if(/@/.test(e))mails[e.toLowerCase()]=1});
     var e=M.end.map(function(i){return u(i,r)}).filter(String).join(', ');if(e)ends[e]=1});
   var imp=R.map(function(r){return u(M.imp,r)}).filter(String).sort().pop()||'';
-  var x='<div class="cx-hd"><div><h2>'+esc(tit(F.nome)||'(sem nome)')+'</h2><p>'+esc(docFmt(F.doc))+' · '+esc(F.credores.join(', ')||'sem credor')+'</p></div><div class="cx-tb" style="margin:0">'+b('📝 Registrar atendimento','novo',null,'pri')+b('← Busca','ir','busca')+'</div></div>';
+  var x='<div class="cx-hd"><div><h2>'+esc(tit(F.nome)||'(sem nome)')+'</h2><p>'+esc(docFmt(F.doc))+' · '+esc(F.credores.join(', ')||'sem credor')+'</p></div><div class="cx-tb" style="margin:0">'+b('📋 Registrar atendimento','novo',null,'pri')+b('← Busca','ir','busca')+'</div></div>';
   x+='<div class="co-aviso az">Situação da última planilha importada'+(imp?' ('+esc(br(imp))+')':'')+'. <b>Antes de cobrar, confira no Cobmais se já pagou ou fez acordo.</b></div>';
   if(C.form)x+=vForm();
   x+='<div class="co-g2"><div class="cx-box"><h3>Contato</h3>'+
@@ -335,7 +335,7 @@ function pode(){if(typeof cU==='undefined'||!cU)return false;if(typeof window.po
 function podeWhats(){return pode()&&(typeof window.pode!=='function'||window.pode('trabalho'))}
 function montar(){
   if(!$('sbCO')){var ref=$('sbR');if(!ref||!ref.parentNode)return false;var bt=document.createElement('button');bt.className='sb-item';bt.id='sbCO';bt.style.display='none';
-    bt.setAttribute('onclick',"showPage('cob')");bt.innerHTML='\uD83D\uDCBC CRM Operador';ref.parentNode.insertBefore(bt,ref.nextSibling)}
+    bt.setAttribute('onclick',"showPage('cob')");bt.innerHTML='\uD83E\uDDF0 CRM Operador';ref.parentNode.insertBefore(bt,ref.nextSibling)}
   if(!$('pageCob')){var m=document.querySelector('.main');if(!m)return false;var p=document.createElement('div');p.className='page';p.id='pageCob';m.appendChild(p);
     p.addEventListener('click',onClick);p.addEventListener('input',onInput);p.addEventListener('change',onInput);p.addEventListener('keydown',onKey)}
   if(!$('coSide')){var s=document.createElement('div');s.id='coSide';document.body.appendChild(s);s.addEventListener('click',onClick)}
